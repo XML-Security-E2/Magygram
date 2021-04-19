@@ -1,19 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 import { HashRouter as Router, Link, Switch } from "react-router-dom";
-import LoginPage from './pages/LoginPage';
-import RegistrationPage from './pages/RegistrationPage';
-
+import LoginPage from "./pages/LoginPage";
+import RegistrationPage from "./pages/RegistrationPage";
 
 function App() {
-  return (
-    <Router>
+	return (
+		<Router>
 			<Switch>
 				<Link exact to="/login" path="/login" component={LoginPage} />
-        <Link exact to="/registration" path="/registration" component={RegistrationPage} />
+				<Link exact to="/registration" path="/registration" component={RegistrationPage} />
 			</Switch>
 		</Router>
-  );
+	);
 }
 
 export default App;
