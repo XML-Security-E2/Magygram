@@ -12,7 +12,7 @@ function login(username, password) {}
 function logout() {}
 
 function register(user) {
-	Axios.post(`${config.API_URL}/api/registration`, user)
+	Axios.post(`${config.API_URL}/users`, user)
 		.then((res) => {
 			console.log(res);
 		})
