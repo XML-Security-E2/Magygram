@@ -27,7 +27,7 @@ func main() {
 
 	Db, _ = gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	// Auto Migrate
-	Db.AutoMigrate(&model.User{})
+	Db.AutoMigrate(&model.User{}, &model.AccountActivation{})
 
 	e := echo.New()
 
