@@ -7,7 +7,18 @@ export const userService = {
 	register,
 };
 
-function login(username, password) {}
+function login(loginRequest) {
+	Axios.post(`${config.API_URL}/users/login`, loginRequest)
+		.then((res) => {
+			console.log(res);
+			localStorage.setItem("accessToken", res.data.accessToken);
+			localStorage.setItem("role", res.data.role);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+	return "";
+}
 
 function logout() {}
 

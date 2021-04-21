@@ -9,6 +9,7 @@ type Config struct {
 	Server struct {
 		Port string
 		Host string
+		Secret string
 	}
 	Database struct {
 		Host     string
