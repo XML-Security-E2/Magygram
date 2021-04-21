@@ -31,4 +31,10 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 	return u, err
 }
 
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	u := &model.User{Email: email}
+	err := r.Conn.Where("email = ?", email).First(&u).Error
+	return u, err
+}
+
 

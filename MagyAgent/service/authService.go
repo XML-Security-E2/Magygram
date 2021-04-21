@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"errors"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"magyAgent/domain/model"
 	"magyAgent/domain/repository"
 	"magyAgent/domain/service-contracts"
@@ -39,4 +42,31 @@ func (u *authService) ActivateUser(ctx context.Context, activationId string) (bo
 		return false, err
 	}
 	return true, err
+}
+
+func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
+	user, err := u.UserRepository.GetByEmail(ctx, loginRequest.Email)
+	if err != nil {
+		return nil, errors.New("invalid email address")
+	}
+	if !user.Active {
+		return nil, errors.New("user account is not activated")
+	}
+	if !equalPasswords(user.Password, loginRequest.Password) {
+		return nil, errors.New("invalid password")
+	}
+	return user, err
+}
+
+func equalPasswords(hashedPwd string, passwordRequest string) bool {
+
+	byteHash := []byte(hashedPwd)
+	plainPwd := []byte(passwordRequest)
+	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
 }

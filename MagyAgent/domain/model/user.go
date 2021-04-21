@@ -2,6 +2,8 @@ package model
 
 import (
 	"github.com/beevik/guid"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type User struct {
@@ -11,6 +13,7 @@ type User struct {
 	Email string `gorm:"unique"`
 	Password string
 	Surname string
+	Role string
 }
 
 type UserRequest struct {
@@ -21,6 +24,26 @@ type UserRequest struct {
 	RepeatedPassword string `json:"repeatedPassword"`
 }
 
+type LoginRequest struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
 func NewUser(userRequest *UserRequest) *User {
-	return &User{Id: guid.New().String(), Active: false, Name: userRequest.Name, Surname: userRequest.Surname, Email: userRequest.Email, Password: userRequest.Password}
+	return &User{Id: guid.New().String(),
+				 Active: false,
+				 Name: userRequest.Name,
+				 Surname: userRequest.Surname,
+				 Email: userRequest.Email,
+				 Password: hashAndSaltPassword(userRequest.Password),
+			     Role: "admin"}
+}
+
+func hashAndSaltPassword(password string) string {
+	pwd := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash)
 }

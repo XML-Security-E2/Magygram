@@ -1,6 +1,7 @@
 server :
   port : "443"
   host : "localhost"
+  secret : "MagyGram"
 
 database :
   host : "localhost"
@@ -14,3 +15,4 @@ mail :
   password : "magygramxml"
   host : "smtp.gmail.com"
   port : "587"
+
