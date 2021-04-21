@@ -6,5 +6,6 @@ import (
 )
 
 type AuthService interface {
-	RegisterUser(ctx context.Context, user *model.User) (*model.User, error)
+	RegisterUser(ctx context.Context, user *model.UserRequest) (*model.User, error)
+	ActivateUser(ctx context.Context, activationId string) (bool, error)
 }

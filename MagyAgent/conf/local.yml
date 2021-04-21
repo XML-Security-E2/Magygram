@@ -1,0 +1,16 @@
+server :
+  port : "443"
+  host : "localhost"
+
+database :
+  host : "localhost"
+  port : "5432"
+  user : "postgres"
+  password : "root"
+  database : "test"
+
+mail :
+  sender : "info.magygram@gmail.com"
+  password : "magygramxml"
+  host : "smtp.gmail.com"
+  port : "587"

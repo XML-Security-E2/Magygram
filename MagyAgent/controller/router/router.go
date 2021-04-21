@@ -7,4 +7,6 @@ import (
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/users", h.RegisterUser)
+	e.GET("/users/activate/:activationId", h.ActivateUser)
+
 }
