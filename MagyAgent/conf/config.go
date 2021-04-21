@@ -17,6 +17,12 @@ type Config struct {
 		Password string
 		Database string
 	}
+	Mail struct {
+		Sender   string
+		Password string
+		Host 	 string
+		Port 	 string
+	}
 }
 
 var Current *Config

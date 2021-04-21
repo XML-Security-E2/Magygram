@@ -53,5 +53,5 @@ func (h *authHandler) ActivateUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "User can not be activated.")
 	}
 
-	return c.JSON(http.StatusNoContent, activationId)
+	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
 }
