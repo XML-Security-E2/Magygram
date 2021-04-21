@@ -1,0 +1,10 @@
+server :
+  port : "443"
+  host : "localhost"
+
+database :
+  host : "localhost"
+  port : "5432"
+  user : "postgres"
+  password : "root"
+  database : "test"
