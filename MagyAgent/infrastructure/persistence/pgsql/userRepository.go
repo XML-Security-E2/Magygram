@@ -21,7 +21,14 @@ func (r *userRepository) Create(ctx context.Context, u *model.User) (*model.User
 }
 
 func (r *userRepository) Update(ctx context.Context, u *model.User) (*model.User, error) {
-	err := r.Conn.Model(u).Updates(u).Error
+	err := r.Conn.Model(u).Updates(map[string]interface{}{
+		"Email" : u.Email,
+		"Active" : u.Active,
+		"Name" : u.Name,
+		"Password" : u.Password,
+		"Surname" : u.Surname,
+		"Roles" : u.Roles,
+	}).Error
 	return u, err
 }
 

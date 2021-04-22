@@ -20,18 +20,13 @@ type AuthHandler interface {
 	LoginUser(c echo.Context) error
 	AdminCheck(c echo.Context) error
 	OtherCheck(c echo.Context) error
-	AuthorizationMiddleware(roles ...string) echo.MiddlewareFunc
+	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
 }
 
 var (
-	// ErrHttpGenericMessage that is returned in general case, details should be logged in such case
 	ErrHttpGenericMessage = echo.NewHTTPError(http.StatusInternalServerError, "something went wrong, please try again later")
-
-	// ErrWrongCredentials indicates that login attempt failed because of incorrect login or password
 	ErrWrongCredentials = echo.NewHTTPError(http.StatusUnauthorized, "username or password is invalid")
-
 	ErrUnauthorized = echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
-
 )
 
 type authHandler struct {
@@ -55,7 +50,7 @@ func (h *authHandler) RegisterUser(c echo.Context) error {
 
 	user, err := h.AuthService.RegisterUser(ctx, userRequest)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "User can not Create.")
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, user.Id)
@@ -86,6 +81,7 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	user, err := h.AuthService.AuthenticateUser(ctx, loginRequest)
+
 	if err != nil || user == nil {
 		return ErrWrongCredentials
 	}
