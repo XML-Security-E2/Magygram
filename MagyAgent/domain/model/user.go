@@ -13,7 +13,7 @@ type User struct {
 	Email string `gorm:"unique"`
 	Password string
 	Surname string
-	Role string
+	Roles []Role `gorm:"many2many:user_roles;"`
 }
 
 type UserRequest struct {
@@ -35,11 +35,11 @@ func NewUser(userRequest *UserRequest) *User {
 				 Name: userRequest.Name,
 				 Surname: userRequest.Surname,
 				 Email: userRequest.Email,
-				 Password: hashAndSaltPassword(userRequest.Password),
-			     Role: "admin"}
+				 Password: HashAndSaltPassword(userRequest.Password),
+			     Roles: []Role{{ Id: "7a753a24-5a20-4021-a3e0-0afdf3744675", Name: "user"}}}
 }
 
-func hashAndSaltPassword(password string) string {
+func HashAndSaltPassword(password string) string {
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {

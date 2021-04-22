@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
@@ -94,20 +95,23 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 		return ErrHttpGenericMessage
 	}
 
+	rolesString, _ := json.Marshal(user.Roles)
 	return c.JSON(http.StatusOK, map[string]string{
 		"accessToken": token,
-		"role" : user.Role,
+		"roles" : string(rolesString),
 	})
 }
 
 func generateToken(user *model.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
+	rolesString, _ := json.Marshal(user.Roles)
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["email"] = user.Email
 	claims["name"] = user.Name
 	claims["surname"] = user.Surname
-	claims["role"] = user.Role
+	claims["roles"] = string(rolesString)
+	claims["id"] = user.Id
 	claims["exp"] = time.Now().Add(time.Hour).Unix()
 
 	return token.SignedString([]byte(conf.Current.Server.Secret))
@@ -121,7 +125,7 @@ func (h *authHandler) OtherCheck(c echo.Context) error {
 	return c.JSON(http.StatusOK, "OKET")
 }
 
-func (h *authHandler) AuthorizationMiddleware(roles ...string) echo.MiddlewareFunc {
+func (h *authHandler) AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc {
 	return func (next echo.HandlerFunc) echo.HandlerFunc {
 		return func (c echo.Context) error {
 			authStringHeader := c.Request().Header.Get("Authorization")
@@ -143,16 +147,34 @@ func (h *authHandler) AuthorizationMiddleware(roles ...string) echo.MiddlewareFu
 			}
 
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-				tokenRole, _ := claims["role"].(string)
-				for _, role := range roles {
-					if tokenRole == role {
-						next(c)
-					}
+				rolesString, _ := claims["roles"].(string)
+				var tokenRoles []model.Role
+
+				if err := json.Unmarshal([]byte(rolesString), &tokenRoles); err != nil {
+					return ErrUnauthorized
 				}
+
+				if checkPermission(tokenRoles, allowedPermissions) {
+					next(c)
+				}
+
 				return ErrUnauthorized
 			} else{
 				return ErrUnauthorized
 			}
 		}
 	}
+}
+
+func checkPermission(userRoles []model.Role, allowedPermissions []string) bool{
+	for _, role := range userRoles {
+		for _, permission := range role.Permissions {
+			for _, allowedPermission := range allowedPermissions {
+				if permission.Name == allowedPermission {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }

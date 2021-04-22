@@ -45,7 +45,7 @@ func (u *authService) ActivateUser(ctx context.Context, activationId string) (bo
 }
 
 func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
-	user, err := u.UserRepository.GetByEmail(ctx, loginRequest.Email)
+	user, err := u.UserRepository.GetByEmailEagerly(ctx, loginRequest.Email)
 	if err != nil {
 		return nil, errors.New("invalid email address")
 	}
@@ -57,6 +57,22 @@ func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.
 	}
 	return user, err
 }
+
+func (u *authService) HasUserPermission(desiredPermission string, userId string) (bool, error) {
+	roles, err := u.UserRepository.GetAllRolesByUserId(userId)
+	if err != nil {
+		return false, errors.New("invalid email address")
+	}
+	 for _, role := range roles {
+	 	for _, permission := range role.Permissions {
+	 		if permission.Name == desiredPermission {
+	 			return true, err
+			}
+		}
+	 }
+	 return false, err
+}
+
 
 func equalPasswords(hashedPwd string, passwordRequest string) bool {
 

@@ -33,8 +33,26 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	u := &model.User{Email: email}
-	err := r.Conn.Where("email = ?", email).First(&u).Error
+	err := r.Conn.First(&u, "email = ?", email).Error
 	return u, err
 }
+
+func (r *userRepository) GetByEmailEagerly(ctx context.Context, email string) (*model.User, error) {
+	u := &model.User{Email: email}
+	err := r.Conn.Preload("Roles").Preload("Roles.Permissions").First(&u, "email = ?", email).Error
+	return u, err
+}
+
+func (r *userRepository) GetAllRolesByUserId(userId string) ([]model.Role, error) {
+	u := &model.User{Id: userId}
+	err := r.Conn.Preload("Roles").Preload("Roles.Permissions").First(&u).Error
+	return u.Roles, err
+}
+
+
+
+
+
+
 
 

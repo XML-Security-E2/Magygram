@@ -10,4 +10,6 @@ type UserRepository interface {
 	Update(ctx context.Context, user *model.User) (*model.User, error)
 	GetByID(ctx context.Context, id string) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
+	GetByEmailEagerly(ctx context.Context, email string) (*model.User, error)
+	GetAllRolesByUserId(userId string) ([]model.Role, error)
 }
