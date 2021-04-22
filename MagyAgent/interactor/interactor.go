@@ -11,6 +11,7 @@ import (
 
 type Interactor interface {
 	NewUserRepository() repository.UserRepository
+	NewLoginEventRepository() repository.LoginEventRepository
 	NewAccountActivationRepository() repository.AccountActivationRepository
 	NewAuthService() service_contracts.AuthService
 	NewAccountActivationService() service_contracts.AccountActivationService
@@ -37,6 +38,10 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	return appHandler
 }
 
+func (i *interactor) NewLoginEventRepository() repository.LoginEventRepository {
+return pgsql.NewLoginEventRepository(i.Conn)
+}
+
 func (i *interactor) NewUserRepository() repository.UserRepository {
 	return pgsql.NewUserRepository(i.Conn)
 }
@@ -46,7 +51,7 @@ func (i *interactor) NewAccountActivationRepository() repository.AccountActivati
 }
 
 func (i *interactor) NewAuthService() service_contracts.AuthService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService())
+	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewLoginEventRepository())
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {

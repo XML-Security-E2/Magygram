@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"magyAgent/domain/model"
@@ -13,20 +14,27 @@ import (
 type authService struct {
 	repository.UserRepository
 	service_contracts.AccountActivationService
+	repository.LoginEventRepository
 }
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService) service_contracts.AuthService {
-	return &authService{r, a}
+var (
+	MAX_UNSUCCESSFUL_LOGINS = 3
+)
+
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, l repository.LoginEventRepository) service_contracts.AuthService {
+	return &authService{r, a, l}
 }
 
 func (u *authService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*model.User, error) {
-	user := model.NewUser(userRequest)
+	user, err := model.NewUser(userRequest)
+	if err != nil { return nil, err}
 	accActivation, _ :=u.AccountActivationService.Create(ctx, user.Id)
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivation.Id)
 	return u.UserRepository.Create(ctx, user)
 }
 
 func (u *authService) ActivateUser(ctx context.Context, activationId string) (bool, error) {
+
 	accActivation, err := u.AccountActivationService.GetValidActivationById(ctx, activationId)
 	if accActivation == nil || err != nil {
 		return false, err
@@ -44,8 +52,23 @@ func (u *authService) ActivateUser(ctx context.Context, activationId string) (bo
 	return true, err
 }
 
+func (u *authService) DeactivateUser(ctx context.Context, userEmail string) (bool, error){
+
+	user, err := u.UserRepository.GetByEmail(ctx, userEmail)
+	if err != nil {
+		return false, err
+	}
+	user.Active = false
+	_, err = u.UserRepository.Update(ctx, user)
+	if err != nil {
+		return false, err
+	}
+	return true, err
+}
+
+
 func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
-	user, err := u.UserRepository.GetByEmail(ctx, loginRequest.Email)
+	user, err := u.UserRepository.GetByEmailEagerly(ctx, loginRequest.Email)
 	if err != nil {
 		return nil, errors.New("invalid email address")
 	}
@@ -53,10 +76,47 @@ func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.
 		return nil, errors.New("user account is not activated")
 	}
 	if !equalPasswords(user.Password, loginRequest.Password) {
+		u.HandleLoginEventAndAccountActivation(ctx, user.Email, false)
 		return nil, errors.New("invalid password")
 	}
+	u.HandleLoginEventAndAccountActivation(ctx, user.Email, true)
 	return user, err
 }
+
+func (u *authService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool) {
+	if successful {
+		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, model.SuccessfulLogin, 0))
+		return
+	}
+	loginEvent, err := u.LoginEventRepository.GetLastByUserEmail(ctx, userEmail)
+
+	if err != nil || loginEvent == nil {
+		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, model.UnsuccessfulLogin, 1))
+		return
+	}
+
+	newLoginEvent, _ := u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, model.UnsuccessfulLogin, loginEvent.RepetitionNumber + 1))
+	if newLoginEvent.RepetitionNumber > MAX_UNSUCCESSFUL_LOGINS {
+		fmt.Println("JEL UDJE")
+		u.DeactivateUser(ctx, userEmail)
+	}
+}
+
+func (u *authService) HasUserPermission(desiredPermission string, userId string) (bool, error) {
+	roles, err := u.UserRepository.GetAllRolesByUserId(userId)
+	if err != nil {
+		return false, errors.New("invalid email address")
+	}
+	 for _, role := range roles {
+	 	for _, permission := range role.Permissions {
+	 		if permission.Name == desiredPermission {
+	 			return true, err
+			}
+		}
+	 }
+	 return false, err
+}
+
 
 func equalPasswords(hashedPwd string, passwordRequest string) bool {
 
