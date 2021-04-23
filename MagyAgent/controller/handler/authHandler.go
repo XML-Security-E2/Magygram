@@ -18,6 +18,7 @@ type AuthHandler interface {
 	RegisterUser(c echo.Context) error
 	ActivateUser(c echo.Context) error
 	LoginUser(c echo.Context) error
+	ResetPassword(c echo.Context) error
 	AdminCheck(c echo.Context) error
 	OtherCheck(c echo.Context) error
 	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
@@ -98,6 +99,22 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	})
 }
 
+func (h *authHandler) ResetPassword(c echo.Context) error {
+
+	resetPasswordRequest := &model.ResetPasswordRequest{}
+	if err := c.Bind(resetPasswordRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+
+	_, err := h.AuthService.ResetPassword(ctx, resetPasswordRequest.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, "Email has been send")
+}
 func generateToken(user *model.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	rolesString, _ := json.Marshal(user.Roles)

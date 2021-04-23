@@ -15,14 +15,16 @@ type authService struct {
 	repository.UserRepository
 	service_contracts.AccountActivationService
 	repository.LoginEventRepository
+	service_contracts.AccountResetPasswordService
 }
+
 
 var (
 	MAX_UNSUCCESSFUL_LOGINS = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, l repository.LoginEventRepository) service_contracts.AuthService {
-	return &authService{r, a, l}
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, l repository.LoginEventRepository, rp service_contracts.AccountResetPasswordService) service_contracts.AuthService {
+	return &authService{r, a, l, rp }
 }
 
 func (u *authService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*model.User, error) {
@@ -129,4 +131,18 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 	}
 
 	return true
+}
+
+func (u *authService) ResetPassword(ctx context.Context, userEmail string) (bool, error) {
+	user, err := u.GetByEmail(ctx,userEmail)
+	//pokrivena invalid email
+	if err != nil {
+		return false, errors.New("invalid email address")
+	}
+
+	accResetPassword, _ :=u.AccountResetPasswordService.Create(ctx, user.Id)
+
+	go SendResetPasswordMail(user.Email, user.Name, accResetPassword.Id)
+
+	return true, nil
 }

@@ -33,6 +33,10 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+type ResetPasswordRequest struct {
+	Email string `json:"email"`
+}
+
 func NewUser(userRequest *UserRequest) (*User,error) {
 	hashAndSalt, err := HashAndSaltPasswordIfStrong(userRequest.Password)
 	if err != nil {

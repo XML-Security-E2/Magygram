@@ -50,12 +50,20 @@ func (i *interactor) NewAccountActivationRepository() repository.AccountActivati
 	return pgsql.NewAccountActivationRepository(i.Conn)
 }
 
+func (i *interactor) NewAccountResetPasswordRepository() repository.AccountResetPasswordRepository {
+	return pgsql.NewAccountResetPasswordRepository(i.Conn)
+}
+
 func (i *interactor) NewAuthService() service_contracts.AuthService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewLoginEventRepository())
+	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewLoginEventRepository(),i.NewAccountResetPasswordService())
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {
 	return service.NewAccountActivationService(i.NewAccountActivationRepository())
+}
+
+func (i *interactor) NewAccountResetPasswordService() service_contracts.AccountResetPasswordService {
+	return service.NewAccountResetPasswordService(i.NewAccountResetPasswordRepository())
 }
 
 func (i *interactor) NewAuthHandler() handler.AuthHandler {

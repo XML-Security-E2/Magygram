@@ -41,6 +41,22 @@ func SendActivationMail(receiver string, name string, activationId string) {
 	}
 }
 
+func SendResetPasswordMail(receiver string, name string, activationId string) {
+	auth = smtp.PlainAuth("MagyGram", conf.Current.Mail.Sender, conf.Current.Mail.Password, conf.Current.Mail.Host)
+	templateData := struct {
+		Name string
+		URL  string
+	}{
+		Name: name,
+		URL: "https://" + conf.Current.Server.Host + ":" + conf.Current.Server.Port + "/users/reset-password/" + activationId,
+	}
+	r := NewRequest([]string{receiver}, "Hello "+ name + "!", "Hello "+ name + "!")
+	if err := r.parseTemplate("mainResetPassword.html", templateData); err == nil {
+		ok, _ := r.sendEmail()
+		fmt.Println(ok)
+	}
+}
+
 func (r *Request) sendEmail() (bool, error) {
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	subject := "Subject: " + r.subject + "!\n"
