@@ -23,6 +23,7 @@ type AuthHandler interface {
 	OtherCheck(c echo.Context) error
 	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
 	ResetPasswordActivation(c echo.Context) error
+	ChangeNewPassword(c echo.Context) error
 }
 
 var (
@@ -207,4 +208,21 @@ func (h *authHandler) ResetPasswordActivation(c echo.Context) error {
 	}
 
 	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/reset-password/" + resetPasswordId)//c.JSON(http.StatusNoContent, activationId)
+}
+
+func (h *authHandler) ChangeNewPassword(c echo.Context) error {
+	changeNewPasswordRequest := &model.ChangeNewPasswordRequest{}
+	if err := c.Bind(changeNewPasswordRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+
+	_, err := h.AuthService.ChangeNewPassword(ctx, changeNewPasswordRequest)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, "Password has been changed")
 }
