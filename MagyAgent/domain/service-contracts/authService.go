@@ -13,4 +13,5 @@ type AuthService interface {
 	HasUserPermission(desiredPermission string, userId string) (bool, error)
 	HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool)
 	ResetPassword(ctx context.Context, userEmail string) (bool, error)
+	ResetPasswordActivation(ctx context.Context, resetPasswordId string) (bool, error)
 }

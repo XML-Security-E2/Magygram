@@ -146,3 +146,12 @@ func (u *authService) ResetPassword(ctx context.Context, userEmail string) (bool
 
 	return true, nil
 }
+
+func (u *authService) ResetPasswordActivation(ctx context.Context, activationId string) (bool, error) {
+	accReset, err := u.AccountResetPasswordService.GetValidActivationById(ctx, activationId)
+	if accReset == nil || err != nil {
+		return false, err
+	}
+
+	return true, err
+}

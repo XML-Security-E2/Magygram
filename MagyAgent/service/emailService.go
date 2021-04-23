@@ -51,7 +51,7 @@ func SendResetPasswordMail(receiver string, name string, activationId string) {
 		URL: "https://" + conf.Current.Server.Host + ":" + conf.Current.Server.Port + "/users/reset-password/" + activationId,
 	}
 	r := NewRequest([]string{receiver}, "Hello "+ name + "!", "Hello "+ name + "!")
-	if err := r.parseTemplate("mainResetPassword.html", templateData); err == nil {
+	if err := r.parseTemplate("mailResetPassword.html", templateData); err == nil {
 		ok, _ := r.sendEmail()
 		fmt.Println(ok)
 	}

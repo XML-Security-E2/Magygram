@@ -22,6 +22,7 @@ type AuthHandler interface {
 	AdminCheck(c echo.Context) error
 	OtherCheck(c echo.Context) error
 	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
+	ResetPasswordActivation(c echo.Context) error
 }
 
 var (
@@ -190,4 +191,20 @@ func checkPermission(userRoles []model.Role, allowedPermissions []string) bool{
 		}
 	}
 	return false
+}
+
+func (h *authHandler) ResetPasswordActivation(c echo.Context) error {
+	resetPasswordId := c.Param("resetPasswordId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	activated, err := h.AuthService.ResetPasswordActivation(ctx, resetPasswordId)
+	if err != nil || activated == false{
+		return echo.NewHTTPError(http.StatusInternalServerError, "User can not reset password.")
+	}
+
+	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/reset-password/" + resetPasswordId)//c.JSON(http.StatusNoContent, activationId)
 }
