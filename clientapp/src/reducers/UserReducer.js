@@ -7,13 +7,16 @@ export const userReducer = (state, action) => {
 			userService.register(action.user);
 			return state;
 		case userConstants.LOGIN_REQUEST:
-			userService.login(action.loginRequest);
+		    userService.login(action.loginRequest);
 			return state;
 		case userConstants.RESET_PASSWORD_LINK_REQUEST:
 			userService.resetPasswordLinkRequest(action.resetPasswordLinkRequest);
 			return state;
 		case userConstants.RESET_PASSWORD_REQUEST:
 			userService.resetPasswordRequest(action.resetPasswordRequest);
+			return state;
+		case userConstants.RESEND_ACTIVATION_LINK_REQUEST:
+			userService.resendActivationLink(action.resendActivationLink);
 			return state;
 		default:
 			return state;

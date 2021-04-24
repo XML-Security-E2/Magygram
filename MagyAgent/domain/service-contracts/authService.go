@@ -14,4 +14,6 @@ type AuthService interface {
 	HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool)
 	ResetPassword(ctx context.Context, userEmail string) (bool, error)
 	ResetPasswordActivation(ctx context.Context, resetPasswordId string) (bool, error)
+	ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error)
+	ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error)
 }

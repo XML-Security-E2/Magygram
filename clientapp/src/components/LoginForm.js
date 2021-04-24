@@ -8,6 +8,7 @@ const LoginForm = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
@@ -35,7 +36,7 @@ const LoginForm = () => {
 				<input className="btn btn-primary btn-block" type="submit" value="Log In" />
 			</div>
 			<a className="forgot" href="#/forgot-password">
-				Forgot your email or password?
+				Forgot your password?
 			</a>
 		</form>
 	);

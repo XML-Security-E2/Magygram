@@ -23,12 +23,15 @@ type AuthHandler interface {
 	OtherCheck(c echo.Context) error
 	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
 	ResetPasswordActivation(c echo.Context) error
+	ChangeNewPassword(c echo.Context) error
+	ResendActivationLink(c echo.Context) error
 }
 
 var (
 	ErrHttpGenericMessage = echo.NewHTTPError(http.StatusInternalServerError, "something went wrong, please try again later")
 	ErrWrongCredentials = echo.NewHTTPError(http.StatusUnauthorized, "username or password is invalid")
 	ErrUnauthorized = echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	ErrBlockedUser = echo.NewHTTPError(http.StatusForbidden, "User is not activated")
 )
 
 type authHandler struct {
@@ -84,8 +87,12 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	ctx := c.Request().Context()
 	user, err := h.AuthService.AuthenticateUser(ctx, loginRequest)
 
-	if err != nil || user == nil {
+	if err != nil && user==nil {
 		return ErrWrongCredentials
+	}
+
+	if err != nil && user != nil {
+		return ErrBlockedUser
 	}
 
 	token, err := generateToken(user)
@@ -100,8 +107,24 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	})
 }
 
-func (h *authHandler) ResetPassword(c echo.Context) error {
+func (h *authHandler) ResendActivationLink(c echo.Context) error {
 
+	activateLinkRequest := &model.ActivateLinkRequest{}
+	if err := c.Bind(activateLinkRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	_, err := h.AuthService.ResendActivationLink(ctx, activateLinkRequest)
+
+	if err != nil {
+		return ErrWrongCredentials
+	}
+
+	return c.JSON(http.StatusCreated, "Activation link has been send")
+}
+
+func (h *authHandler) ResetPassword(c echo.Context) error {
 	resetPasswordRequest := &model.ResetPasswordRequest{}
 	if err := c.Bind(resetPasswordRequest); err != nil {
 		return err
@@ -110,8 +133,9 @@ func (h *authHandler) ResetPassword(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	_, err := h.AuthService.ResetPassword(ctx, resetPasswordRequest.Email)
+
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, "Email has been send")
@@ -207,4 +231,21 @@ func (h *authHandler) ResetPasswordActivation(c echo.Context) error {
 	}
 
 	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/reset-password/" + resetPasswordId)//c.JSON(http.StatusNoContent, activationId)
+}
+
+func (h *authHandler) ChangeNewPassword(c echo.Context) error {
+	changeNewPasswordRequest := &model.ChangeNewPasswordRequest{}
+	if err := c.Bind(changeNewPasswordRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+
+	_, err := h.AuthService.ChangeNewPassword(ctx, changeNewPasswordRequest)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, "Password has been changed")
 }

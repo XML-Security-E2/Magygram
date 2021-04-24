@@ -37,6 +37,16 @@ type ResetPasswordRequest struct {
 	Email string `json:"email"`
 }
 
+type ActivateLinkRequest struct {
+	Email string `json:"email"`
+}
+
+type ChangeNewPasswordRequest struct {
+	ResetPasswordId string `json:"resetPasswordId"`
+	Password string `json:"password"`
+	PasswordRepeat string `json:"passwordRepeat"`
+}
+
 func NewUser(userRequest *UserRequest) (*User,error) {
 	hashAndSalt, err := HashAndSaltPasswordIfStrong(userRequest.Password)
 	if err != nil {
