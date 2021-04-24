@@ -37,6 +37,10 @@ type ResetPasswordRequest struct {
 	Email string `json:"email"`
 }
 
+type ActivateLinkRequest struct {
+	Email string `json:"email"`
+}
+
 type ChangeNewPasswordRequest struct {
 	ResetPasswordId string `json:"resetPasswordId"`
 	Password string `json:"password"`

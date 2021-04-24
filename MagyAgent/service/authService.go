@@ -69,6 +69,17 @@ func (u *authService) DeactivateUser(ctx context.Context, userEmail string) (boo
 	return true, err
 }
 
+func (u *authService) ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error) {
+	user, err := u.UserRepository.GetByEmail(ctx, activateLinkRequest.Email)
+	if err != nil {
+		return false, err
+	}
+
+	accActivation, _ := u.AccountActivationService.Create(ctx, user.Id)
+	go SendActivationMail(user.Email, user.Name, accActivation.Id)
+
+	return true, nil
+}
 
 func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
 	user, err := u.UserRepository.GetByEmailEagerly(ctx, loginRequest.Email)
@@ -76,7 +87,7 @@ func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.
 		return nil, errors.New("invalid email address")
 	}
 	if !user.Active {
-		return nil, errors.New("user account is not activated")
+		return user, errors.New("user account is not activated")
 	}
 	if !equalPasswords(user.Password, loginRequest.Password) {
 		u.HandleLoginEventAndAccountActivation(ctx, user.Email, false)

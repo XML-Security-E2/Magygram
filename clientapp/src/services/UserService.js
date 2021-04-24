@@ -1,5 +1,6 @@
 import Axios from "axios";
 import { config } from "../config/config";
+import { userConstants } from "../constants/UserConstants";
 
 export const userService = {
 	login,
@@ -7,19 +8,33 @@ export const userService = {
 	register,
 	resetPasswordLinkRequest,
 	resetPasswordRequest,
+	resendActivationLink,
 };
 
 function login(loginRequest) {
+
 	Axios.post(`${config.API_URL}/users/login`, loginRequest)
 		.then((res) => {
-			console.log(res);
-			localStorage.setItem("accessToken", res.data.accessToken);
-			localStorage.setItem("role", res.data.role);
+			alert('test')
+			if(res.status === 201){
+                localStorage.setItem("accessToken", res.data.accessToken);
+				localStorage.setItem("role", res.data.role);
+			}
 		})
 		.catch((err) => {
-			console.log(err);
 		});
-	return "";
+	return userConstants.USERS_LOGIN_FAILURE
+}
+
+function resendActivationLink(resendActivationLink) {
+
+	Axios.post(`${config.API_URL}/users/resend-activation-link`, resendActivationLink)
+		.then((res) => {
+			alert('test')
+		})
+		.catch((err) => {
+		});
+	return userConstants.USERS_LOGIN_FAILURE
 }
 
 function resetPasswordLinkRequest(resetPasswordLinkRequest) {
