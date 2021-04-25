@@ -32,12 +32,18 @@ const LoginForm = () => {
 			<div className="form-group">
 				<input className="form-control" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
 			</div>
-			<div className="form-group">
-				<input className="btn btn-primary btn-block" type="submit" value="Log In" />
-			</div>
 			<a className="forgot" href="#/forgot-password">
 				Forgot your password?
 			</a>
+			<div className="form-group">
+				<input className="btn btn-primary btn-block" type="submit" value="Log In" />
+			</div>
+			<div className="forgot">
+				Don't have an account?
+				<a className="forgot" href="#/registration">
+					Sign up
+				</a>
+			</div>
 		</form>
 	);
 };

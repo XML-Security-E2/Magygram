@@ -15,10 +15,10 @@ function login(loginRequest) {
 
 	Axios.post(`${config.API_URL}/users/login`, loginRequest)
 		.then((res) => {
-			alert('test')
-			if(res.status === 201){
+			if(res.status === 200){
                 localStorage.setItem("accessToken", res.data.accessToken);
 				localStorage.setItem("role", res.data.role);
+				window.location = "#/";
 			}
 		})
 		.catch((err) => {
