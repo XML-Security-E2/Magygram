@@ -9,7 +9,6 @@ import (
 	"magyAgent/domain/model"
 	"magyAgent/domain/repository"
 	"magyAgent/domain/service-contracts"
-	"regexp"
 )
 
 type authService struct {
@@ -175,7 +174,7 @@ func (u *authService) ChangeNewPassword(ctx context.Context, changePasswordReque
 		return false, err
 	}
 
-	hashAndSalt, err := HashAndSaltPasswordIfStrong(changePasswordRequest.Password)
+	hashAndSalt, err := model.HashAndSaltPasswordIfStrong(changePasswordRequest.Password)
 
 	if err != nil {
 		return false, err
@@ -193,17 +192,15 @@ func (u *authService) ChangeNewPassword(ctx context.Context, changePasswordReque
 	return true, err
 }
 
-func HashAndSaltPasswordIfStrong(password string) (string, error) {
 
-	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*)$", password)
-	fmt.Println(isWeak)
-	if isWeak {
-		return password, errors.New("password must contain minimum eight characters, at least one capital letter and one number")
-	}
-	pwd := []byte(password)
-	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+
+func (u *authService) GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error) {
+	user, err := u.UserRepository.GetByID(ctx, userId)
+
 	if err != nil {
-		log.Println(err)
+		return nil, errors.New("invalid user id")
 	}
-	return string(hash), err
+
+	return user, err
 }
+

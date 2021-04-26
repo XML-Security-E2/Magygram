@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
-import { userConstants } from "../constants/UserConstants";
+import { Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
+import { userService } from "../services/UserService";
 
 const ForgotPasswordForm = () => {
-	const { dispatch } = useContext(UserContext);
+	const {userState, dispatch } = useContext(UserContext);
 
 	const [email, setEmail] = useState("");
 
@@ -14,7 +15,7 @@ const ForgotPasswordForm = () => {
 			email,
 		};
 
-		dispatch({ type: userConstants.RESET_PASSWORD_LINK_REQUEST, resetPasswordLinkRequest });
+		userService.resetPasswordLinkRequest(resetPasswordLinkRequest,dispatch);
 	};
 
 	return (
@@ -23,11 +24,21 @@ const ForgotPasswordForm = () => {
 			<div className="illustration">
 				<i className="icon ion-ios-navigate"></i>
 			</div>
-			<div className="form-group">
-				<input className="form-control" type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
+			<div hidden={userState.forgotPasswordLinkError.showSuccessMessage} className="form-group">
+				<input className="form-control" type="email" required name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
 			</div>
-			<div className="form-group">
+			<div className="form-group text-center" style={{ color: 'red' , fontSize:'0.8em'}} hidden={!userState.forgotPasswordLinkError.showError}>
+				{userState.forgotPasswordLinkError.errorMessage}
+			</div>
+			<div hidden={userState.forgotPasswordLinkError.showSuccessMessage} className="form-group">
 				<input className="btn btn-primary btn-block" type="submit" value="Send reset email" />
+			</div>
+
+			<div hidden={!userState.forgotPasswordLinkError.showSuccessMessage} className="form-group text-center" style={{ fontSize:'1.3em'}}>
+				We sent an email to <b>{userState.forgotPasswordLinkError.emailAddress}</b> with a link to get back into your account.
+			</div>
+			<div hidden={!userState.forgotPasswordLinkError.showSuccessMessage} className="form-group">
+				<Link className="btn btn-primary btn-block" to="/login">Back to login</Link>
 			</div>
 		</form>
 	);
