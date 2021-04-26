@@ -26,3 +26,13 @@ func (r *accountResetPasswordRepository) GetById(ctx context.Context, id string)
 	return a, err
 }
 
+func (r *accountResetPasswordRepository) Update(ctx context.Context, a *model.AccountResetPassword) (*model.AccountResetPassword, error) {
+	err := r.Conn.Model(a).Updates(map[string]interface{}{
+		"UserId" : a.UserId,
+		"GenerationDate" : a.GenerationDate,
+		"ExpirationDate" : a.ExpirationDate,
+		"Used" : a.Used,
+	}).Error
+	return a, err
+}
+

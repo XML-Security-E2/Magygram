@@ -8,6 +8,7 @@ import (
 var (
 	SuccessfulLogin = "successful"
 	UnsuccessfulLogin = "unsuccessful"
+	ActivatedAccount = "reactivated"
 )
 
 type LoginEvent struct {

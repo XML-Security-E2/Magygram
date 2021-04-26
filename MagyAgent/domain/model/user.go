@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"github.com/beevik/guid"
 	_ "github.com/go-playground/validator"
 	"golang.org/x/crypto/bcrypt"
@@ -14,10 +13,10 @@ import (
 type User struct {
 	Id string `gorm:"primaryKey"`
 	Active bool `gorm:"required"`
-	Name  string
+	Name  string `validate:"required,min=2"`
 	Email string `gorm:"unique" validate:"required,email"`
 	Password string
-	Surname string
+	Surname string `validate:"required,min=2"`
 	Roles []Role `gorm:"many2many:user_roles;"`
 }
 
@@ -49,7 +48,7 @@ type ChangeNewPasswordRequest struct {
 }
 
 func NewUser(userRequest *UserRequest) (*User,error) {
-	hashAndSalt, err := HashAndSaltPasswordIfStrong(userRequest.Password)
+	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching(userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +61,15 @@ func NewUser(userRequest *UserRequest) (*User,error) {
 			     Roles: []Role{{ Id: "7a753a24-5a20-4021-a3e0-0afdf3744675", Name: "user"}}}, err
 }
 
-func HashAndSaltPasswordIfStrong(password string) (string, error) {
-
+func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {
+	isMatching := password == repeatedPassword
+	if !isMatching {
+		return "", errors.New("passwords are not matching")
+	}
 	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
-	fmt.Println(isWeak)
+
 	if isWeak {
-		return password, errors.New("password must contain minimum eight characters, at least one capital letter, one number and one special character.")
+		return "", errors.New("password must contain minimum eight characters, at least one capital letter, one number and one special character")
 	}
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)

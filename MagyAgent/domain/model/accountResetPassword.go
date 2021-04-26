@@ -10,9 +10,10 @@ type AccountResetPassword struct {
 	UserId string
 	GenerationDate time.Time
 	ExpirationDate time.Time
+	Used bool
 }
 
 func NewAccountResetPassword(userId string) *AccountResetPassword {
 	generationDate := time.Now()
-	return &AccountResetPassword{Id: guid.New().String(), UserId: userId, GenerationDate: generationDate, ExpirationDate: generationDate.Add(30 * time.Minute)}
+	return &AccountResetPassword{Id: guid.New().String(), UserId: userId, GenerationDate: generationDate, ExpirationDate: generationDate.Add(30 * time.Minute), Used: false}
 }

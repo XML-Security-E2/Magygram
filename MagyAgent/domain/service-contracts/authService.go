@@ -11,7 +11,7 @@ type AuthService interface {
 	DeactivateUser(ctx context.Context, userEmail string) (bool, error)
 	AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error)
 	HasUserPermission(desiredPermission string, userId string) (bool, error)
-	HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool)
+	HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string)
 	ResetPassword(ctx context.Context, userEmail string) (bool, error)
 	ResetPasswordActivation(ctx context.Context, resetPasswordId string) (bool, error)
 	ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error)

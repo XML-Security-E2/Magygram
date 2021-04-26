@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
+	"github.com/go-playground/validator"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"magyAgent/domain/model"
@@ -29,8 +29,10 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 
 func (u *authService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*model.User, error) {
 	user, err := model.NewUser(userRequest)
-
 	if err != nil { return nil, err}
+	if error := validator.New().Struct(user); error!= nil {
+		return nil, error
+	}
 	accActivation, _ :=u.AccountActivationService.Create(ctx, user.Id)
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivation.Id)
 	return u.UserRepository.Create(ctx, user)
@@ -52,6 +54,14 @@ func (u *authService) ActivateUser(ctx context.Context, activationId string) (bo
 	if err != nil {
 		return false, err
 	}
+
+	_, err = u.UseAccountActivation(ctx, activationId)
+	if err != nil {
+		return false, err
+	}
+
+	u.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.ActivatedAccount)
+
 	return true, err
 }
 
@@ -90,28 +100,27 @@ func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.
 		return user, errors.New("user account is not activated")
 	}
 	if !equalPasswords(user.Password, loginRequest.Password) {
-		u.HandleLoginEventAndAccountActivation(ctx, user.Email, false)
+		u.HandleLoginEventAndAccountActivation(ctx, user.Email, false, model.UnsuccessfulLogin)
 		return nil, errors.New("invalid password")
 	}
-	u.HandleLoginEventAndAccountActivation(ctx, user.Email, true)
+	u.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.SuccessfulLogin)
 	return user, err
 }
 
-func (u *authService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool) {
+func (u *authService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
 	if successful {
-		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, model.SuccessfulLogin, 0))
+		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
 		return
 	}
 	loginEvent, err := u.LoginEventRepository.GetLastByUserEmail(ctx, userEmail)
 
 	if err != nil || loginEvent == nil {
-		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, model.UnsuccessfulLogin, 1))
+		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 1))
 		return
 	}
 
-	newLoginEvent, _ := u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, model.UnsuccessfulLogin, loginEvent.RepetitionNumber + 1))
+	newLoginEvent, _ := u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, loginEvent.RepetitionNumber + 1))
 	if newLoginEvent.RepetitionNumber > MAX_UNSUCCESSFUL_LOGINS {
-		fmt.Println("JEL UDJE")
 		u.DeactivateUser(ctx, userEmail)
 	}
 }
@@ -169,14 +178,13 @@ func (u *authService) ResetPasswordActivation(ctx context.Context, activationId 
 }
 
 func (u *authService) ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error) {
-	accReset, err := u.AccountResetPasswordService.GetValidActivationById(ctx, changePasswordRequest.ResetPasswordId)
-	if accReset == nil || err != nil {
+	hashAndSalt, err := model.HashAndSaltPasswordIfStrongAndMatching(changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
+	if err != nil {
 		return false, err
 	}
 
-	hashAndSalt, err := model.HashAndSaltPasswordIfStrong(changePasswordRequest.Password)
-
-	if err != nil {
+	accReset, err := u.AccountResetPasswordService.GetValidActivationById(ctx, changePasswordRequest.ResetPasswordId)
+	if accReset == nil || err != nil {
 		return false, err
 	}
 
@@ -185,10 +193,17 @@ func (u *authService) ChangeNewPassword(ctx context.Context, changePasswordReque
 		return false, err
 	}
 	user.Password = hashAndSalt
+	user.Active = true
 	_, err = u.UserRepository.Update(ctx, user)
 	if err != nil {
 		return false, err
 	}
+
+	_, err = u.UseAccountReset(ctx, changePasswordRequest.ResetPasswordId)
+	if err != nil {
+		return false, err
+	}
+
 	return true, err
 }
 
