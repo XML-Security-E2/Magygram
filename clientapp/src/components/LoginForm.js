@@ -25,11 +25,12 @@ const LoginForm = () => {
 			<div className="illustration">
 				<i className="icon ion-ios-navigate"></i>
 			</div>
-			<div className="form-group">
-				<input className="form-control" type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
+			<div  className="form-group">
+				<input  className="form-control" required type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
 			</div>
+			
 			<div className="form-group">
-				<input className="form-control" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+				<input  className="form-control" required type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
 			</div>
 			<div className="form-group">
 				<input className="btn btn-primary btn-block" type="submit" value="Log In" />
