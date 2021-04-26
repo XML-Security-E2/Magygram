@@ -16,5 +16,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/admin-check", h.AdminCheck, h.AuthorizationMiddleware("execute_admin_check"))
 	e.GET("/other-check", h.OtherCheck, h.AuthorizationMiddleware("execute_admin_agent_check"))
 	e.POST("/users/resend-activation-link", h.ResendActivationLink)
-	e.GET("/users/check-existance/:userId", h.GetUserEmailIfUserExist)
+	e.GET("/users/check-existence/:userId", h.GetUserEmailIfUserExist)
 }

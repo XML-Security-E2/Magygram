@@ -1,27 +1,25 @@
 import { useContext, useState } from "react";
-import { userConstants } from "../constants/UserConstants";
+import { Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-
+import { userService } from "../services/UserService";
 
 const ResetPasswordForm = (props) => {
-	const { dispatch } = useContext(UserContext);
+	const { userState, dispatch } = useContext(UserContext);
 
 	const [password, setPassword] = useState("");
 	const [passwordRepeat, setPasswordRepeat] = useState("");
-    let resetPasswordId= props.id
+	let resetPasswordId = props.id;
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
 		let resetPasswordRequest = {
-            resetPasswordId,
+			resetPasswordId,
 			password,
 			passwordRepeat,
 		};
 
-		alert('test')
-
-		dispatch({ type: userConstants.RESET_PASSWORD_REQUEST, resetPasswordRequest });
+		userService.resetPasswordRequest(resetPasswordRequest, dispatch);
 	};
 
 	return (
@@ -30,14 +28,26 @@ const ResetPasswordForm = (props) => {
 			<div className="illustration">
 				<i className="icon ion-ios-navigate"></i>
 			</div>
-			<div className="form-group">
+			<div hidden={userState.resetPassword.showSuccessMessage} className="form-group">
 				<input className="form-control" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
 			</div>
-			<div className="form-group">
+			<div hidden={userState.resetPassword.showSuccessMessage} className="form-group">
 				<input className="form-control" type="password" name="password" placeholder="Repeat your password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)}></input>
 			</div>
-			<div className="form-group">
+			<div className="form-group text-center" style={{ color: "red", fontSize: "0.8em" }} hidden={!userState.resetPassword.showError}>
+				{userState.resetPassword.errorMessage}
+			</div>
+			<div hidden={userState.resetPassword.showSuccessMessage} className="form-group">
 				<input className="btn btn-primary btn-block" type="submit" value="Reset password" />
+			</div>
+
+			<div hidden={!userState.resetPassword.showSuccessMessage} className="form-group text-center" style={{ fontSize: "1.3em" }}>
+				You successfully changed your password.
+			</div>
+			<div hidden={!userState.resetPassword.showSuccessMessage} className="form-group">
+				<Link className="btn btn-primary btn-block" to="/login">
+					Back to login
+				</Link>
 			</div>
 		</form>
 	);

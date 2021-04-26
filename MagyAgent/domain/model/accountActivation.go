@@ -10,9 +10,10 @@ type AccountActivation struct {
 	UserId string
 	GenerationDate time.Time
 	ExpirationDate time.Time
+	Used bool
 }
 
 func NewAccountActivation(userId string) *AccountActivation {
 	generationDate := time.Now()
-	return &AccountActivation{Id: guid.New().String(), UserId: userId, GenerationDate: generationDate, ExpirationDate: generationDate.Add(30 * time.Minute)}
+	return &AccountActivation{Id: guid.New().String(), UserId: userId, GenerationDate: generationDate, ExpirationDate: generationDate.Add(30 * time.Minute), Used: false}
 }

@@ -300,6 +300,7 @@ func checkPermission(userRoles []model.Role, allowedPermissions []string) bool{
 }
 
 func (h *authHandler) ResetPasswordActivation(c echo.Context) error {
+
 	resetPasswordId := c.Param("resetPasswordId")
 
 	ctx := c.Request().Context()
@@ -323,13 +324,13 @@ func (h *authHandler) ChangeNewPassword(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	_, err := h.AuthService.ChangeNewPassword(ctx, changeNewPasswordRequest)
+	successful, err := h.AuthService.ChangeNewPassword(ctx, changeNewPasswordRequest)
 
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	if err != nil || !successful {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, "Password has been changed")
+	return c.JSON(http.StatusOK, "Password has been changed")
 }
 
 func (h *authHandler) GetUserEmailIfUserExist(c echo.Context) error {
