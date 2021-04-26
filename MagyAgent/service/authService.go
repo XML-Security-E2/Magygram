@@ -30,6 +30,7 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 
 func (u *authService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*model.User, error) {
 	user, err := model.NewUser(userRequest)
+
 	if err != nil { return nil, err}
 	accActivation, _ :=u.AccountActivationService.Create(ctx, user.Id)
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivation.Id)

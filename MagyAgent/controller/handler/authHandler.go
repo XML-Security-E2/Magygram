@@ -6,10 +6,14 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	"html/template"
+	_ "html/template"
+	"io"
 	"magyAgent/conf"
 	"magyAgent/domain/model"
 	service_contracts "magyAgent/domain/service-contracts"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -33,7 +37,6 @@ var (
 	ErrUnauthorized = echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
 	ErrBlockedUser = echo.NewHTTPError(http.StatusForbidden, "User is not activated")
 )
-
 type authHandler struct {
 	AuthService service_contracts.AuthService
 }
@@ -77,9 +80,32 @@ func (h *authHandler) ActivateUser(c echo.Context) error {
 	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
 }
 
+func HTMLEscape(w io.Writer, b []byte) {
+
+}
+
+type Todo struct {
+	Name        string
+	Password string
+}
 func (h *authHandler) LoginUser(c echo.Context) error {
 
-	loginRequest := &model.LoginRequest{}
+	/*loginRequest := &model.LoginRequest{}
+	fmt.Println("sakjefskjfs" + loginRequest.Email)
+	td := Todo{"Test templates", "Let's test a template to see the magic."}
+
+
+	t, err := template.New("todos").Parse("You have a task named \"{{ .loginRequest.Email}}\" with description: \"{{ .loginRequest.Password}}\"")
+	if err != nil {
+		panic(err)
+	}
+	err = t.Execute(os.Stdout, td)
+	if err != nil {
+		panic(err)
+	}
+
+	
+	
 	if err := c.Bind(loginRequest); err != nil {
 		return err
 	}
@@ -94,6 +120,37 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	if err != nil && user != nil {
 		return ErrBlockedUser
 	}
+
+	token, err := generateToken(user)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	rolesString, _ := json.Marshal(user.Roles)
+	return c.JSON(http.StatusOK, map[string]string{
+		"accessToken": token,
+		"roles" : string(rolesString),
+	})*/
+
+	loginRequest := &model.LoginRequest{}
+	if err := c.Bind(loginRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	user, err := h.AuthService.AuthenticateUser(ctx, loginRequest)
+
+	td := Todo{user.Email, user.Password}
+	t, err := template.New("todos").Parse("You have a task named \"{{ .Name}}\" with description: \"{{ .Password}}\"")
+	if err != nil {
+		panic(err)
+	}
+	err = t.Execute(os.Stdout, td)
+	if err != nil {
+		panic(err)
+	}
+
+
 
 	token, err := generateToken(user)
 	if err != nil {
