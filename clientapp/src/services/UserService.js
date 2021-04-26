@@ -11,19 +11,24 @@ export const userService = {
 	resendActivationLink,
 };
 
-function login(loginRequest) {
+function login(loginRequest,dispatch) {
 
-	Axios.post(`${config.API_URL}/users/login`, loginRequest)
+	dispatch(request());
+
+    Axios.post(`${config.API_URL}/users/login`, loginRequest, {validateStatus : () => true})
 		.then((res) => {
 			if(res.status === 200){
-                localStorage.setItem("accessToken", res.data.accessToken);
-				localStorage.setItem("role", res.data.role);
+				dispatch(success());
 				window.location = "#/";
+			}else if(res.status ===401){
+				dispatch(failure(res.data))
 			}
-		})
-		.catch((err) => {
-		});
-	return userConstants.USERS_LOGIN_FAILURE
+			dispatch({ type: userConstants.REGISTER_FAILURE });
+		}).catch (err => console.error(err))
+
+	function request() { return { type: userConstants.LOGIN_REQUEST } }
+    function success() { return { type: userConstants.LOGIN_SUCCESS } }
+    function failure(error) { return { type: userConstants.LOGIN_FAILURE, error } }
 }
 
 function resendActivationLink(resendActivationLink) {
