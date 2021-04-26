@@ -27,11 +27,12 @@ const LoginForm = (props) => {
 			<div className="illustration">
 				<i className="icon ion-ios-navigate"></i>
 			</div>
-			<div className="form-group">
-				<input className="form-control" type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
+			<div  className="form-group">
+				<input  className="form-control" required type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
 			</div>
+			
 			<div className="form-group">
-				<input className="form-control" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+				<input  className="form-control" required type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
 			</div>
 			<div className="form-group text-center" style={{ color: 'red' , fontSize:'0.8em'}} hidden={!userState.loginError.showError}>
 				{userState.loginError.errorMessage}

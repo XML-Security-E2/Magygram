@@ -6,6 +6,7 @@ import (
 	"github.com/beevik/guid"
 	_ "github.com/go-playground/validator"
 	"golang.org/x/crypto/bcrypt"
+	_ "html/template"
 	"log"
 	"regexp"
 )
@@ -63,10 +64,10 @@ func NewUser(userRequest *UserRequest) (*User,error) {
 
 func HashAndSaltPasswordIfStrong(password string) (string, error) {
 
-	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*)$", password)
+	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
 	fmt.Println(isWeak)
 	if isWeak {
-		return password, errors.New("password must contain minimum eight characters, at least one capital letter and one number")
+		return password, errors.New("password must contain minimum eight characters, at least one capital letter, one number and one special character.")
 	}
 	pwd := []byte(password)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
