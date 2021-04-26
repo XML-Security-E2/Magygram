@@ -7,6 +7,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import UserActivateRequestPage from "./pages/UserActivateRequestPage";
 import UserContextProvider from "./contexts/UserContext";
 import HomePage from "./pages/HomePage";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
 	return (
@@ -16,6 +17,8 @@ function App() {
 				<Link exact to="/login" path="/login" component={LoginPage} />
 				<Link exact to="/forgot-password" path="/forgot-password" component={ForgotPasswordPage} />
 				<Link exact to="/registration" path="/registration" component={RegistrationPage} />
+				<Link exact to="/404" path="/404" component={PageNotFound} />
+
 				<Route path="/reset-password/:id" component={ResetPasswordPage} />
 				<UserContextProvider>
 					<Route path="/blocked-user/:id" component={UserActivateRequestPage} />
