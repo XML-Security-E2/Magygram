@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
-	"html/template"
 	_ "html/template"
 	"io"
 	"magyAgent/conf"
 	"magyAgent/domain/model"
 	service_contracts "magyAgent/domain/service-contracts"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -22,13 +20,14 @@ type AuthHandler interface {
 	RegisterUser(c echo.Context) error
 	ActivateUser(c echo.Context) error
 	LoginUser(c echo.Context) error
-	ResetPassword(c echo.Context) error
+	ResetPasswordRequest(c echo.Context) error
 	AdminCheck(c echo.Context) error
 	OtherCheck(c echo.Context) error
 	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
 	ResetPasswordActivation(c echo.Context) error
 	ChangeNewPassword(c echo.Context) error
 	ResendActivationLink(c echo.Context) error
+	GetUserEmailIfUserExist(c echo.Context) error
 }
 
 var (
@@ -104,8 +103,6 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 		panic(err)
 	}
 
-	
-	
 	if err := c.Bind(loginRequest); err != nil {
 		return err
 	}
@@ -130,7 +127,7 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"accessToken": token,
 		"roles" : string(rolesString),
-	})*/
+	})
 
 	loginRequest := &model.LoginRequest{}
 	if err := c.Bind(loginRequest); err != nil {
@@ -161,6 +158,34 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"accessToken": token,
 		"roles" : string(rolesString),
+	})*/
+	loginRequest := &model.LoginRequest{}
+	if err := c.Bind(loginRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	user, err := h.AuthService.AuthenticateUser(ctx, loginRequest)
+
+	if err != nil && user==nil {
+		return ErrWrongCredentials
+	}
+
+	if err != nil && user != nil {
+		return c.JSON(http.StatusForbidden, map[string]string{
+			"userId" : user.Id,
+		})
+	}
+
+	token, err := generateToken(user)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	rolesString, _ := json.Marshal(user.Roles)
+	return c.JSON(http.StatusOK, map[string]string{
+		"accessToken": token,
+		"roles" : string(rolesString),
 	})
 }
 
@@ -178,10 +203,10 @@ func (h *authHandler) ResendActivationLink(c echo.Context) error {
 		return ErrWrongCredentials
 	}
 
-	return c.JSON(http.StatusCreated, "Activation link has been send")
+	return c.JSON(http.StatusOK, "Activation link has been send")
 }
 
-func (h *authHandler) ResetPassword(c echo.Context) error {
+func (h *authHandler) ResetPasswordRequest(c echo.Context) error {
 	resetPasswordRequest := &model.ResetPasswordRequest{}
 	if err := c.Bind(resetPasswordRequest); err != nil {
 		return err
@@ -195,7 +220,7 @@ func (h *authHandler) ResetPassword(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, "Email has been send")
+	return c.JSON(http.StatusOK, "Email has been send")
 }
 func generateToken(user *model.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -305,4 +330,23 @@ func (h *authHandler) ChangeNewPassword(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, "Password has been changed")
+}
+
+func (h *authHandler) GetUserEmailIfUserExist(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	user, err := h.AuthService.GetUserEmailIfUserExist(ctx, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"emailAddress": user.Email,
+	})
 }

@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
-import { userConstants } from "../constants/UserConstants";
 import { UserContext } from "../contexts/UserContext";
+import { userService } from "../services/UserService";
 
-const LoginForm = () => {
-	const { dispatch } = useContext(UserContext);
-
+const LoginForm = (props) => {
+	const { userState, dispatch } = useContext(UserContext);
+	
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -17,8 +17,9 @@ const LoginForm = () => {
 			password,
 		};
 
-		dispatch({ type: userConstants.LOGIN_REQUEST, loginRequest });
+		userService.login(loginRequest,dispatch)
 	};
+
 
 	return (
 		<form method="post" onSubmit={handleSubmit}>
@@ -32,6 +33,9 @@ const LoginForm = () => {
 			
 			<div className="form-group">
 				<input  className="form-control" required type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+			</div>
+			<div className="form-group text-center" style={{ color: 'red' , fontSize:'0.8em'}} hidden={!userState.loginError.showError}>
+				{userState.loginError.errorMessage}
 			</div>
 			<a className="forgot" href="#/forgot-password">
 				Forgot your password?

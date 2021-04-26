@@ -1,41 +1,28 @@
 import React, { useState, useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
-import { userConstants } from "../constants/UserConstants";
+import { userService } from "../services/UserService";
 
 const RegistrationForm = () => {
-	const { dispatch } = useContext(UserContext);
+	const {userState, dispatch } = useContext(UserContext);
 
 	const [name, setName] = useState("");
 	const [surname, setSurname] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [repeatedPassword, setRepeatedPassword] = useState("");
-	const [passwordError, setRepeatedPasswordError] = useState("none");
-	const [passError, setPasswordError] = useState("none");
-
-	const regexPassword = /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?":{}|<>~'_+=]*)$/;
 
 	const handleSubmit = (e) => {
-		setPasswordError("none")
-		setRepeatedPasswordError("none")
 		e.preventDefault();
-		if (regexPassword.test(password) === true) {
-			setPasswordError("initial")
-		}
-		else {
-			if (password !== repeatedPassword) {
-				setRepeatedPasswordError("initial")
-			} else {
-				let user = {
-					name,
-					surname,
-					email,
-					password,
-					repeatedPassword,
-				};
-			}
-		}
 
+		let user = {
+			name,
+			surname,
+			email,
+			password,
+			repeatedPassword,
+		};
+
+		userService.register(user,dispatch);
 	};
 
 
@@ -71,12 +58,9 @@ const RegistrationForm = () => {
 					onChange={(e) => setRepeatedPassword(e.target.value)}
 				/>
 			</div>
-			<div className="text-danger" style={{ display: passwordError }}>
-				Passwords must be the same.
-									</div>
-			<div className="text-danger" style={{ display: passError }}>
-				Password must contain minimum eight characters, at least one capital letter, one number and one special character.
-									</div>
+			<div className="form-group text-center" style={{ color: 'red' , fontSize:'0.8em'}} hidden={!userState.registrationError.showError}>
+				{userState.registrationError.errorMessage}
+			</div>
 			<div className="form-group">
 				<div className="form-check">
 					<label className="form-check-label">

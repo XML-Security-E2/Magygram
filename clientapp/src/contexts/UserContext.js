@@ -4,9 +4,27 @@ import { userReducer } from "../reducers/UserReducer";
 export const UserContext = createContext();
 
 const UserContextProvider = (props) => {
-	const [users, dispatch] = useReducer(userReducer, []);
-
-	return <UserContext.Provider value={{ users, dispatch }}>{props.children}</UserContext.Provider>;
+	const [userState, dispatch] = useReducer(userReducer, { 
+		loginError : { 
+			showError: false, 
+			errorMessage: ''
+		},
+		registrationError : {
+			showError: false,
+			errorMessage: ''
+		},
+		forgotPasswordLinkError : {
+			showError: false,
+			errorMessage: '',
+			showSuccessMessage: false,
+			emailAddress:''
+		},
+		blockedUser: {
+			emailAddress: ''
+		}
+	});
+	
+	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;
 };
 
 export default UserContextProvider;
