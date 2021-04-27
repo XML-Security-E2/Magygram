@@ -1,6 +1,6 @@
 import React from "react";
 
-const PageNotFound = () => {
+const UnauthorizedPage = () => {
 	return (
 		<React.Fragment>
 			<section className="login-clean">
@@ -9,15 +9,15 @@ const PageNotFound = () => {
 				</div>
 
 				<div className="text-center" style={{ fontSize: "6em", color: "#F4476B" }}>
-					<b>404</b>
+					<b>401</b>
 				</div>
 				<div className="text-center mt-5" style={{ fontSize: "3em" }}>
 					Oops... <br />
-					Page Not Found
+					Unauthorized
 				</div>
 			</section>
 		</React.Fragment>
 	);
 };
 
-export default PageNotFound;
+export default UnauthorizedPage;

@@ -7,11 +7,11 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	_ "html/template"
-	"io"
 	"magyAgent/conf"
 	"magyAgent/domain/model"
 	service_contracts "magyAgent/domain/service-contracts"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -79,86 +79,8 @@ func (h *authHandler) ActivateUser(c echo.Context) error {
 	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
 }
 
-func HTMLEscape(w io.Writer, b []byte) {
-
-}
-
-type Todo struct {
-	Name        string
-	Password string
-}
 func (h *authHandler) LoginUser(c echo.Context) error {
 
-	/*loginRequest := &model.LoginRequest{}
-	fmt.Println("sakjefskjfs" + loginRequest.Email)
-	td := Todo{"Test templates", "Let's test a template to see the magic."}
-
-
-	t, err := template.New("todos").Parse("You have a task named \"{{ .loginRequest.Email}}\" with description: \"{{ .loginRequest.Password}}\"")
-	if err != nil {
-		panic(err)
-	}
-	err = t.Execute(os.Stdout, td)
-	if err != nil {
-		panic(err)
-	}
-
-	if err := c.Bind(loginRequest); err != nil {
-		return err
-	}
-
-	ctx := c.Request().Context()
-	user, err := h.AuthService.AuthenticateUser(ctx, loginRequest)
-
-	if err != nil && user==nil {
-		return ErrWrongCredentials
-	}
-
-	if err != nil && user != nil {
-		return ErrBlockedUser
-	}
-
-	token, err := generateToken(user)
-	if err != nil {
-		return ErrHttpGenericMessage
-	}
-
-	rolesString, _ := json.Marshal(user.Roles)
-	return c.JSON(http.StatusOK, map[string]string{
-		"accessToken": token,
-		"roles" : string(rolesString),
-	})
-
-	loginRequest := &model.LoginRequest{}
-	if err := c.Bind(loginRequest); err != nil {
-		return err
-	}
-
-	ctx := c.Request().Context()
-	user, err := h.AuthService.AuthenticateUser(ctx, loginRequest)
-
-	td := Todo{user.Email, user.Password}
-	t, err := template.New("todos").Parse("You have a task named \"{{ .Name}}\" with description: \"{{ .Password}}\"")
-	if err != nil {
-		panic(err)
-	}
-	err = t.Execute(os.Stdout, td)
-	if err != nil {
-		panic(err)
-	}
-
-
-
-	token, err := generateToken(user)
-	if err != nil {
-		return ErrHttpGenericMessage
-	}
-
-	rolesString, _ := json.Marshal(user.Roles)
-	return c.JSON(http.StatusOK, map[string]string{
-		"accessToken": token,
-		"roles" : string(rolesString),
-	})*/
 	loginRequest := &model.LoginRequest{}
 	if err := c.Bind(loginRequest); err != nil {
 		return err
@@ -176,8 +98,8 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 			"userId" : user.Id,
 		})
 	}
-
-	token, err := generateToken(user)
+	expireTime := time.Now().Add(time.Hour).Unix() * 1000
+	token, err := generateToken(user, expireTime)
 	if err != nil {
 		return ErrHttpGenericMessage
 	}
@@ -186,6 +108,7 @@ func (h *authHandler) LoginUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"accessToken": token,
 		"roles" : string(rolesString),
+		"expireTime" : strconv.FormatInt(expireTime, 10) ,
 	})
 }
 
@@ -222,7 +145,7 @@ func (h *authHandler) ResetPasswordRequest(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, "Email has been send")
 }
-func generateToken(user *model.User) (string, error) {
+func generateToken(user *model.User, expireTime int64) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	rolesString, _ := json.Marshal(user.Roles)
 
@@ -232,7 +155,7 @@ func generateToken(user *model.User) (string, error) {
 	claims["surname"] = user.Surname
 	claims["roles"] = string(rolesString)
 	claims["id"] = user.Id
-	claims["exp"] = time.Now().Add(time.Hour).Unix()
+	claims["exp"] = expireTime
 
 	return token.SignedString([]byte(conf.Current.Server.Secret))
 }

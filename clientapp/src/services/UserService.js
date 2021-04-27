@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { config } from "../config/config";
 import { userConstants } from "../constants/UserConstants";
+import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 
 export const userService = {
 	login,
@@ -18,6 +19,7 @@ function login(loginRequest, dispatch) {
 	Axios.post(`${config.API_URL}/users/login`, loginRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
+				setAuthInLocalStorage(res.data);
 				dispatch(success());
 				window.location = "#/";
 			} else if (res.status === 401) {
@@ -126,11 +128,10 @@ function resetPasswordRequest(resetPasswordRequest, dispatch) {
 	}
 }
 
-//TODO
-//
-//
-//
-function logout() {}
+function logout() {
+	deleteLocalStorage();
+	window.location = "#/login";
+}
 
 function register(user, dispatch) {
 	if (validateUser(user, dispatch)) {
@@ -198,7 +199,7 @@ function checkIfUserIdExist(userId, dispatch) {
 			if (res.status === 200) {
 				dispatch(success(res.data.emailAddress));
 			} else if (res.status === 404) {
-				//TODO: redirect to page not found
+				window.location = "#/404";
 			}
 		})
 		.catch((err) => {});
