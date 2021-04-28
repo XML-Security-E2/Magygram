@@ -47,8 +47,8 @@ func initialInsert() {
 	permission2 := &model.Permission{ Id : "a4f07b70-00dd-4c8c-8e7f-07f9c08d9796", Name: "execute_admin_check", Roles: []model.Role{*role1}}
 	permission3 := &model.Permission{ Id : "28ecaf42-bd26-4fa6-94e3-22cedefd2237", Name: "execute_admin_agent_check", Roles: []model.Role{*role3, *role1}}
 
-	adminPassword, _ := model.HashAndSaltPasswordIfStrongAndMatching("Adminadmin1", "Adminadmin1")
-	agentPassword, _ := model.HashAndSaltPasswordIfStrongAndMatching("Agentagent1", "Adminadmin1")
+	adminPassword, _ := model.HashAndSaltPasswordIfStrongAndMatching("Adminadmin1*", "Adminadmin1*")
+	agentPassword, _ := model.HashAndSaltPasswordIfStrongAndMatching("Agentagent1*", "Agentagent1*")
 	admin := &model.User{Id: "c8381fb9-6e7a-4f4c-88c0-cafdfa11a4d7", Name: "Admin", Surname: "Adminic", Email: "admin@admin.com", Active: true, Password: adminPassword, Roles: []model.Role{*role1}}
 	agent := &model.User{Id: "1c033f28-af44-4394-be2c-71d0c93890e1", Name: "Agent", Surname: "Agentic", Email: "agent@agent.com", Active: true, Password: agentPassword, Roles: []model.Role{*role3}}
 
