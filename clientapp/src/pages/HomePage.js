@@ -1,5 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 import { userService } from "../services/UserService";
+import Axios from "axios";
+import { config } from "../config/config";
 
 const HomePage = () => {
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
@@ -7,16 +9,23 @@ const HomePage = () => {
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 	const imgStyle = { width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 
+	const [name, setName] = useState('')
+
 	const handleLogout = () => {
 		userService.logout();
 	}
 
 	const handleProfile = () =>{
-		alert('TODO')
+		Axios.get(`${config.API_URL}/users/637300ee-4abd-484a-8422-bc87f7cf82ff`, { validateStatus: () => true })
+		.then((res) => {
+			console.log(res.data)
+			setName(res.data.Name)
+		})
+		.catch((err) => {});
 	}
 
 	const handleSettings = () =>{
-		alert('TODO')
+		alert('TOD1O')
 	}
 
 	return (
@@ -44,6 +53,9 @@ const HomePage = () => {
 						<hr className="solid"/>
 						<li><button className=" btn shadow-none" onClick={handleLogout}>  Logout</button></li>
 					</ul>
+				</div>
+				<div>
+					{name}
 				</div>
 			</div>
 		</nav>

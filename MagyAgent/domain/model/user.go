@@ -5,6 +5,7 @@ import (
 	"github.com/beevik/guid"
 	_ "github.com/go-playground/validator"
 	"golang.org/x/crypto/bcrypt"
+	"html"
 	_ "html/template"
 	"log"
 	"regexp"
@@ -54,9 +55,9 @@ func NewUser(userRequest *UserRequest) (*User,error) {
 	}
 	return &User{Id: guid.New().String(),
 				 Active: false,
-				 Name: userRequest.Name,
-				 Surname: userRequest.Surname,
-				 Email: userRequest.Email,
+				 Name: html.EscapeString(userRequest.Name),
+				 Surname: html.EscapeString(userRequest.Surname),
+				 Email: html.EscapeString(userRequest.Email),
 				 Password: hashAndSalt,
 			     Roles: []Role{{ Id: "7a753a24-5a20-4021-a3e0-0afdf3744675", Name: "user"}}}, err
 }

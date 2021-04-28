@@ -221,3 +221,12 @@ func (u *authService) GetUserEmailIfUserExist(ctx context.Context, userId string
 	return user, err
 }
 
+func (u *authService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+	user, err := u.UserRepository.GetByID(ctx, userId)
+
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return user, err
+}

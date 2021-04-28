@@ -17,5 +17,6 @@ type AuthService interface {
 	ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error)
 	ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error)
 	GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error)
+	GetUserById(ctx context.Context, userId string) (*model.User, error)
 
 }
