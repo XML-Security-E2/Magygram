@@ -28,6 +28,7 @@ type AuthHandler interface {
 	ChangeNewPassword(c echo.Context) error
 	ResendActivationLink(c echo.Context) error
 	GetUserEmailIfUserExist(c echo.Context) error
+	GetUserById(c echo.Context) error
 }
 
 var (
@@ -274,3 +275,21 @@ func (h *authHandler) GetUserEmailIfUserExist(c echo.Context) error {
 		"emailAddress": user.Email,
 	})
 }
+func (h *authHandler) GetUserById(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	user, err := h.AuthService.GetUserById(ctx, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, user)
+}
+
