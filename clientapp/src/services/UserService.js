@@ -139,7 +139,7 @@ function register(user, dispatch) {
 		Axios.post(`${config.API_URL}/users`, user, { validateStatus: () => true })
 			.then((res) => {
 				if (res.status === 201) {
-					dispatch(success());
+					dispatch(success(user.email));
 				} else {
 					dispatch(failure(res.data.message));
 				}
@@ -152,8 +152,8 @@ function register(user, dispatch) {
 	function request() {
 		return { type: userConstants.REGISTER_REQUEST };
 	}
-	function success() {
-		return { type: userConstants.REGISTER_SUCCESS };
+	function success(emailAddress) {
+		return { type: userConstants.REGISTER_SUCCESS, emailAddress };
 	}
 	function failure(error) {
 		return { type: userConstants.REGISTER_FAILURE, errorMessage: error };

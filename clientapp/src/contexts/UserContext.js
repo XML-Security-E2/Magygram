@@ -12,6 +12,8 @@ const UserContextProvider = (props) => {
 		registrationError: {
 			showError: false,
 			errorMessage: "",
+			showSuccessMessage: false,
+			emailAddress: "",
 		},
 		forgotPasswordLinkError: {
 			showError: false,
