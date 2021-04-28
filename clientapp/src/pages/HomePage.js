@@ -9,7 +9,15 @@ const HomePage = () => {
 
 	const handleLogout = () => {
 		userService.logout();
-	};
+	}
+
+	const handleProfile = () =>{
+		alert('TODO')
+	}
+
+	const handleSettings = () =>{
+		alert('TODO')
+	}
 
 	return (
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
@@ -24,15 +32,18 @@ const HomePage = () => {
 				<div>
 					<input type="text" style={inputStyle} placeholder="Search" value="Search" />
 				</div>
-				<div className="d-xl-flex align-items-xl-center">
+				<div className="d-xl-flex align-items-xl-center dropdown">
 					<i className="fa fa-home" style={iconStyle} />
 					<i className="la la-wechat" style={iconStyle} />
 					<i className="la la-compass" style={iconStyle} />
 					<i className="fa fa-heart-o" style={iconStyle} />
-					<button className="btn btn-primary" onClick={handleLogout}>
-						Log out
-					</button>
-					<img className="rounded-circle" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage" />
+					<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage"/>
+					<ul style={{width:'200px', marginLeft:'15px'}} class="dropdown-menu">
+						<li><button className="la la-user btn shadow-none" onClick={handleProfile}>  Profile</button></li>
+						<li><button className="la la-cog btn shadow-none" onClick={handleSettings}>  Settings</button></li>
+						<hr className="solid"/>
+						<li><button className=" btn shadow-none" onClick={handleLogout}>  Logout</button></li>
+					</ul>
 				</div>
 			</div>
 		</nav>
