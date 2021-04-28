@@ -34,8 +34,10 @@ func (u *authService) RegisterUser(ctx context.Context, userRequest *model.UserR
 		return nil, error
 	}
 	accActivation, _ :=u.AccountActivationService.Create(ctx, user.Id)
+	user, err = u.UserRepository.Create(ctx, user)
+	if err != nil { return nil, err}
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivation.Id)
-	return u.UserRepository.Create(ctx, user)
+	return user, err
 }
 
 func (u *authService) ActivateUser(ctx context.Context, activationId string) (bool, error) {

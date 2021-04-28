@@ -7,10 +7,10 @@ import (
 
 type AccountResetPassword struct {
 	Id string `gorm:"primaryKey"`
-	UserId string
-	GenerationDate time.Time
-	ExpirationDate time.Time
-	Used bool
+	UserId string `gorm:"not null"`
+	GenerationDate time.Time `gorm:"not null"`
+	ExpirationDate time.Time `gorm:"not null"`
+	Used bool `gorm:"not null"`
 }
 
 func NewAccountResetPassword(userId string) *AccountResetPassword {

@@ -12,11 +12,11 @@ import (
 
 type User struct {
 	Id string `gorm:"primaryKey"`
-	Active bool `gorm:"required"`
-	Name  string `validate:"required,min=2"`
+	Active bool `gorm:"not null"`
+	Name  string `gorm:"not null" validate:"required,min=2"`
 	Email string `gorm:"unique" validate:"required,email"`
-	Password string
-	Surname string `validate:"required,min=2"`
+	Password string `gorm:"not null"`
+	Surname string `gorm:"not null" validate:"required,min=2"`
 	Roles []Role `gorm:"many2many:user_roles;"`
 }
 
