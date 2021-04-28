@@ -7,6 +7,8 @@ export const userReducer = (state, action) => {
 				registrationError: {
 					showError: false,
 					errorMessage: "",
+					showSuccessMessage: false,
+					emailAddress: "",
 				},
 			};
 		case userConstants.REGISTER_SUCCESS:
@@ -14,6 +16,8 @@ export const userReducer = (state, action) => {
 				registrationError: {
 					showError: false,
 					errorMessage: "",
+					showSuccessMessage: true,
+					emailAddress: action.emailAddress,
 				},
 			};
 		case userConstants.REGISTER_FAILURE:
@@ -21,6 +25,8 @@ export const userReducer = (state, action) => {
 				registrationError: {
 					showError: true,
 					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					emailAddress: "",
 				},
 			};
 		case userConstants.REGISTER_VALIDATION_FAILURE:
@@ -28,6 +34,8 @@ export const userReducer = (state, action) => {
 				registrationError: {
 					showError: true,
 					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					emailAddress: "",
 				},
 			};
 		case userConstants.LOGIN_REQUEST:
