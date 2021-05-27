@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MagyAgent.iml" filepath="$PROJECT_DIR$/.idea/MagyAgent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/magy-agent.iml" filepath="$PROJECT_DIR$/.idea/magy-agent.iml" />
     </modules>
   </component>
 </project>
