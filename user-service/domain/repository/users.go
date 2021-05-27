@@ -6,10 +6,10 @@ import (
 	"user-service/domain/model"
 )
 
-type UserModel struct {
-	C *mongo.Collection
-}
-
-func (m *UserModel) Insert(user model.User) (*mongo.InsertOneResult, error) {
-	return m.C.InsertOne(context.TODO(), user)
+type UserRepository interface {
+	Create(ctx context.Context, user *model.User) (*mongo.InsertOneResult, error)
+	Update(ctx context.Context, user *model.User) (*mongo.UpdateResult, error)
+	GetByID(ctx context.Context, id string) (*model.User, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
+	//GetAllRolesByUserId(userId string) ([]model.Role, error)
 }
