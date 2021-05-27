@@ -1,6 +1,6 @@
 package model
 
 type User struct {
-	Id string
-	Active bool
+	Id string `bson:"_id,omitempty"`
+	Name string `bson:"name,omitempty"`
 }
