@@ -16,7 +16,7 @@ type User struct {
 	Email string `bson:"email" validate:"required,email"`
 	Password string `bson:"password"`
 	Surname string `bson:"surname" validate:"required,min=2"`
-	//Roles []Role `gorm:"many2many:user_roles;"`
+	Roles []Role `bson:"roles"`
 }
 
 type UserRequest struct {
@@ -56,7 +56,8 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Name:     html.EscapeString(userRequest.Name),
 		Surname:  html.EscapeString(userRequest.Surname),
 		Email:    html.EscapeString(userRequest.Email),
-		Password: hashAndSalt}, err
+		Password: hashAndSalt,
+		Roles: []Role{{ Name: "user", Permissions: []Permission{}}}}, err
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {

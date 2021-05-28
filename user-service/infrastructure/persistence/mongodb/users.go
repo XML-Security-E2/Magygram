@@ -22,7 +22,11 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) (*mongo.I
 }
 
 func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.UpdateResult, error) {
-	return r.Col.UpdateByID(ctx, bson.M{"_id":  user.Id}, user)
+	return r.Col.UpdateOne(ctx, bson.M{"_id":  user.Id},bson.D{{"$set", bson.D{{"email" , user.Email},
+																{"active" , user.Active},
+																{"name" , user.Name},
+																{"password" , user.Password},
+																{"surname" , user.Surname}}}})
 }
 
 func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, error) {
@@ -51,6 +55,15 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.U
 
 	return &user, nil
 }
+
+func (r *userRepository) GetAllRolesByUserId(ctx context.Context, userId string) ([]model.Role, error) {
+	user, err := r.GetByID(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return user.Roles, nil
+}
+
 
 //func (r *userRepository) GetByEmailEagerly(ctx context.Context, email string) (*model.User, error) {
 //	u := &model.User{Email: email}

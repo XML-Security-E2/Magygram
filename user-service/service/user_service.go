@@ -1,43 +1,51 @@
 package service
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/go-playground/validator"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"user-service/domain/model"
 	"user-service/domain/repository"
-	service_contracts "user-service/domain/service-contracts"
+	"user-service/domain/service-contracts"
 )
 
-type UserService struct {
+type userService struct {
 	repository.UserRepository
 	service_contracts.AccountActivationService
 	repository.LoginEventRepository
-	service_contracts.AccountResetPasswordService
+	service_contracts.ResetPasswordService
 }
-
 
 var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, l repository.LoginEventRepository, rp service_contracts.AccountResetPasswordService) service_contracts.AuthService {
-	return &authService{r, a, l, rp }
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, l repository.LoginEventRepository, rp service_contracts.ResetPasswordService) service_contracts.UserService {
+	return &userService{r, a, l, rp }
 }
 
-func (u *authService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*model.User, error) {
+func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user, err := model.NewUser(userRequest)
-	if err != nil { return nil, err}
-	if error := validator.New().Struct(user); error!= nil {
-		return nil, error
+	if err != nil { return "", err}
+	if err := validator.New().Struct(user); err!= nil {
+		return "", err
 	}
-	accActivation, _ :=u.AccountActivationService.Create(ctx, user.Id)
-	user, err = u.UserRepository.Create(ctx, user)
-	if err != nil { return nil, err}
-	go SendActivationMail(userRequest.Email, userRequest.Name, accActivation.Id)
-	return user, err
+	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
+	fmt.Println(accActivationId)
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil { return "", err}
+	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
+	if userId, ok := result.InsertedID.(primitive.ObjectID); ok {
+		return userId.String(), nil
+	}
+	return "", err
 }
 
-func (u *authService) ActivateUser(ctx context.Context, activationId string) (bool, error) {
+func (u *userService) ActivateUser(ctx context.Context, activationId string) (bool, error) {
 
 	accActivation, err := u.AccountActivationService.GetValidActivationById(ctx, activationId)
 	if accActivation == nil || err != nil {
@@ -64,7 +72,7 @@ func (u *authService) ActivateUser(ctx context.Context, activationId string) (bo
 	return true, err
 }
 
-func (u *authService) DeactivateUser(ctx context.Context, userEmail string) (bool, error){
+func (u *userService) DeactivateUser(ctx context.Context, userEmail string) (bool, error){
 
 	user, err := u.UserRepository.GetByEmail(ctx, userEmail)
 	if err != nil {
@@ -78,20 +86,20 @@ func (u *authService) DeactivateUser(ctx context.Context, userEmail string) (boo
 	return true, err
 }
 
-func (u *authService) ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error) {
+func (u *userService) ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error) {
 	user, err := u.UserRepository.GetByEmail(ctx, activateLinkRequest.Email)
 	if err != nil {
 		return false, err
 	}
 
-	accActivation, _ := u.AccountActivationService.Create(ctx, user.Id)
-	go SendActivationMail(user.Email, user.Name, accActivation.Id)
+	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
+	go SendActivationMail(user.Email, user.Name, accActivationId)
 
 	return true, nil
 }
 
-func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
-	user, err := u.UserRepository.GetByEmailEagerly(ctx, loginRequest.Email)
+func (u *userService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
+	user, err := u.UserRepository.GetByEmail(ctx, loginRequest.Email)
 	if err != nil {
 		return nil, errors.New("invalid email address")
 	}
@@ -106,7 +114,7 @@ func (u *authService) AuthenticateUser(ctx context.Context, loginRequest *model.
 	return user, err
 }
 
-func (u *authService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
+func (u *userService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
 	if successful {
 		u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
 		return
@@ -118,14 +126,14 @@ func (u *authService) HandleLoginEventAndAccountActivation(ctx context.Context, 
 		return
 	}
 
-	newLoginEvent, _ := u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, loginEvent.RepetitionNumber + 1))
-	if newLoginEvent.RepetitionNumber > MaxUnsuccessfulLogins {
+	_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, loginEvent.RepetitionNumber+1))
+	if loginEvent.RepetitionNumber + 1 > MaxUnsuccessfulLogins {
 		u.DeactivateUser(ctx, userEmail)
 	}
 }
 
-func (u *authService) HasUserPermission(desiredPermission string, userId string) (bool, error) {
-	roles, err := u.UserRepository.GetAllRolesByUserId(userId)
+func (u *userService) HasUserPermission(ctx context.Context, desiredPermission string, userId string) (bool, error) {
+	roles, err := u.UserRepository.GetAllRolesByUserId(ctx, userId)
 	if err != nil {
 		return false, errors.New("invalid email address")
 	}
@@ -153,22 +161,21 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 	return true
 }
 
-func (u *authService) ResetPassword(ctx context.Context, userEmail string) (bool, error) {
+func (u *userService) ResetPassword(ctx context.Context, userEmail string) (bool, error) {
 	user, err := u.GetByEmail(ctx,userEmail)
 	//pokrivena invalid email
 	if err != nil {
 		return false, errors.New("invalid email address")
 	}
 
-	accResetPassword, _ :=u.AccountResetPasswordService.Create(ctx, user.Id)
-
-	go SendResetPasswordMail(user.Email, user.Name, accResetPassword.Id)
+	accResetPasswordId, _ := u.ResetPasswordService.Create(ctx, user.Id)
+	go SendResetPasswordMail(user.Email, user.Name, accResetPasswordId)
 
 	return true, nil
 }
 
-func (u *authService) ResetPasswordActivation(ctx context.Context, activationId string) (bool, error) {
-	accReset, err := u.AccountResetPasswordService.GetValidActivationById(ctx, activationId)
+func (u *userService) ResetPasswordActivation(ctx context.Context, activationId string) (bool, error) {
+	accReset, err := u.ResetPasswordService.GetValidActivationById(ctx, activationId)
 	if accReset == nil || err != nil {
 		return false, err
 	}
@@ -176,13 +183,13 @@ func (u *authService) ResetPasswordActivation(ctx context.Context, activationId 
 	return true, err
 }
 
-func (u *authService) ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error) {
+func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error) {
 	hashAndSalt, err := model.HashAndSaltPasswordIfStrongAndMatching(changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
 		return false, err
 	}
 
-	accReset, err := u.AccountResetPasswordService.GetValidActivationById(ctx, changePasswordRequest.ResetPasswordId)
+	accReset, err := u.ResetPasswordService.GetValidActivationById(ctx, changePasswordRequest.ResetPasswordId)
 	if accReset == nil || err != nil {
 		return false, err
 	}
@@ -208,7 +215,7 @@ func (u *authService) ChangeNewPassword(ctx context.Context, changePasswordReque
 
 
 
-func (u *authService) GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error) {
+func (u *userService) GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error) {
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {
@@ -218,7 +225,7 @@ func (u *authService) GetUserEmailIfUserExist(ctx context.Context, userId string
 	return user, err
 }
 
-func (u *authService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+func (u *userService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {

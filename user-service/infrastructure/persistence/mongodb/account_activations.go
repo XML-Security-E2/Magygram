@@ -35,5 +35,5 @@ func (r *accountActivationRepository) GetById(ctx context.Context, id string) (*
 }
 
 func (r *accountActivationRepository) Update(ctx context.Context, a *model.AccountActivation)  (*mongo.UpdateResult, error) {
-	return r.Col.UpdateByID(ctx, a.Id, a)
+	return r.Col.UpdateOne(ctx, bson.M{"_id":  a.Id}, bson.D{{"$set", bson.D{{"used" , a.Used}}}})
 }

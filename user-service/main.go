@@ -4,18 +4,17 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/labstack/echo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"time"
 	"user-service/conf"
-	"user-service/domain/model"
-	"user-service/domain/repository"
+	"user-service/controller/middleware"
+	"user-service/controller/router"
+	"user-service/interactor"
 )
 
-type application struct {
-	users    *repository.UserModel
-}
 
 var runServer = flag.Bool("server", false, "production is -server option require")
 
@@ -25,9 +24,8 @@ func main() {
 	mongoDbInfo := fmt.Sprintf("%s:%s",
 		conf.Current.Database.Host, conf.Current.Database.Port)
 
-
 	mongoURI := flag.String("mongoURI", mongoDbInfo, "Database hostname url")
-	mongoDatabse := flag.String("mongoDatabse", conf.Current.Database.Database, "Database name")
+	mongoDatabase := flag.String("mongoDatabse", conf.Current.Database.Database, "Database name")
 	enableCredentials := flag.Bool("enableCredentials", false, "Enable the use of credentials for mongo connection")
 	flag.Parse()
 
@@ -57,15 +55,17 @@ func main() {
 		}
 	}()
 
-	app := &application{
-		users: &repository.UserModel{
-			C: client.Database(*mongoDatabse).Collection("users"),
-		},
-	}
+	usersCol := client.Database(*mongoDatabase).Collection("users")
+	accActivationsCol := client.Database(*mongoDatabase).Collection("account-activations")
+	loginEventsCol := client.Database(*mongoDatabase).Collection("login-events")
+	resetPasswordsCol := client.Database(*mongoDatabase).Collection("reset-passwords")
 
-	var user = model.User{Id: "test", Name: "Dusan"}
+	e := echo.New()
+	i := interactor.NewInteractor(usersCol, accActivationsCol, loginEventsCol, resetPasswordsCol)
+	h := i.NewAppHandler()
 
-	app.users.Insert(user)
+	router.NewRouter(e, h)
+	middleware.NewMiddleware(e)
 
-  	fmt.Println(user.Id)
+	e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 }
