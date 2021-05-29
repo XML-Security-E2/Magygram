@@ -1,5 +1,4 @@
 import Axios from "axios";
-import { config } from "../config/config";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 
