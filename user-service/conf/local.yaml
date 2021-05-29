@@ -20,3 +20,6 @@ authservice:
   protocol: "https://"
   domain: "localhost"
   port: "461"
+
+gateway:
+  port: "8085"

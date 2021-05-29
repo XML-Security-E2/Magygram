@@ -2,7 +2,7 @@ package handler
 
 import (
 	"auth-service/domain/model"
-	service_contracts "auth-service/domain/service-contracts"
+	"auth-service/domain/service-contracts"
 	"context"
 	"github.com/labstack/echo"
 	"net/http"
@@ -19,7 +19,6 @@ var (
 	ErrHttpGenericMessage = echo.NewHTTPError(http.StatusInternalServerError, "something went wrong, please try again later")
 	ErrWrongCredentials = echo.NewHTTPError(http.StatusUnauthorized, "username or password is invalid")
 	ErrUnauthorized = echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
-	ErrBlockedUser = echo.NewHTTPError(http.StatusForbidden, "User is not activated")
 )
 
 type userHandler struct {
@@ -66,7 +65,7 @@ func (u userHandler) ActivateUser(c echo.Context) error {
 }
 
 func (u userHandler) ResetPassword(c echo.Context) error {
-	changeNewPasswordRequest := &model.ChangeNewPasswordRequest{}
+	changeNewPasswordRequest := &model.PasswordChangeRequest{}
 	if err := c.Bind(changeNewPasswordRequest); err != nil {
 		return err
 	}

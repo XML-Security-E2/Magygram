@@ -32,7 +32,7 @@ type ActivatedRequest struct {
 	Email string `json:"email"`
 }
 
-type ChangeNewPasswordRequest struct {
+type PasswordChangeRequest struct {
 	UserId string `json:"userId"`
 	Password string `json:"password"`
 	PasswordRepeat string `json:"passwordRepeat"`

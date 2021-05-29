@@ -3,7 +3,7 @@ package handler
 import (
 	"auth-service/conf"
 	"auth-service/domain/model"
-	service_contracts "auth-service/domain/service-contracts"
+	"auth-service/domain/service-contracts"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -112,7 +112,7 @@ func (a authHandler) AuthorizationMiddleware(allowedPermissions ...string) echo.
 				}
 
 				if checkPermission(tokenRoles, allowedPermissions) {
-					next(c)
+					_ = next(c)
 				}
 
 				return ErrUnauthorized

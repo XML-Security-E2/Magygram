@@ -18,7 +18,7 @@ type userService struct {
 }
 
 func NewUserService(r repository.UserRepository,a repository.LoginEventRepository) service_contracts.UserService {
-	return &userService{r,a }
+	return &userService{r,a}
 }
 
 func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
@@ -83,7 +83,7 @@ func (u userService) DeactivateUser(ctx context.Context, userEmail string) (bool
 	return true, err
 }
 
-func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error) {
+func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *model.PasswordChangeRequest) (bool, error) {
 	hashAndSalt, err := model.HashAndSaltPasswordIfStrongAndMatching(changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
 		return false, err

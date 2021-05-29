@@ -30,6 +30,10 @@ type Config struct {
 		Domain string
 		Port 	 string
 	}
+
+	Gateway struct {
+		Port 	 string
+	}
 }
 
 var Current *Config
