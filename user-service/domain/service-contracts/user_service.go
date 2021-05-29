@@ -8,7 +8,6 @@ import (
 type UserService interface {
 	RegisterUser(ctx context.Context, user *model.UserRequest) (string, error)
 	ActivateUser(ctx context.Context, activationId string) (bool, error)
-	DeactivateUser(ctx context.Context, userEmail string) (bool, error)
 	ResetPassword(ctx context.Context, userEmail string) (bool, error)
 	ResetPasswordActivation(ctx context.Context, resetPasswordId string) (bool, error)
 	ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error)

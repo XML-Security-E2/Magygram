@@ -59,13 +59,18 @@ func main() {
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	accActivationsCol := client.Database(*mongoDatabase).Collection("account-activations")
 	resetPasswordsCol := client.Database(*mongoDatabase).Collection("reset-passwords")
-	usersCol.Indexes().CreateOne( context.Background(),
-		mongo.IndexModel{
+	usersCol.Indexes().CreateMany(context.Background(),
+		[]mongo.IndexModel{{
 			Keys: bson.M{
 				"email": 1,
 			},
 			Options: options.Index().SetUnique(true),
-		})
+		}, {
+			Keys: bson.M{
+				"username": 1,
+			},
+			Options: options.Index().SetUnique(true),
+		}})
 
 
 	e := echo.New()

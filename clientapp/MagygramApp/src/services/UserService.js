@@ -1,5 +1,4 @@
 import Axios from "axios";
-import { config } from "../config/config";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 
@@ -16,7 +15,7 @@ export const userService = {
 function login(loginRequest, dispatch) {
 	dispatch(request());
 
-	Axios.post(`${config.API_URL}/users/login`, loginRequest, { validateStatus: () => true })
+	Axios.post(`/api/auth/login`, loginRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
 				setAuthInLocalStorage(res.data);
@@ -46,7 +45,7 @@ function login(loginRequest, dispatch) {
 function resendActivationLink(resendActivationLink, dispatch) {
 	dispatch(request());
 
-	Axios.post(`${config.API_URL}/users/resend-activation-link`, resendActivationLink, { validateStatus: () => true })
+	Axios.post(`/api/users/resend-activation-link`, resendActivationLink, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success());
@@ -70,7 +69,7 @@ function resendActivationLink(resendActivationLink, dispatch) {
 function resetPasswordLinkRequest(resetPasswordLinkRequest, dispatch) {
 	dispatch(request());
 
-	Axios.post(`${config.API_URL}/users/reset-password-link-request`, resetPasswordLinkRequest, { validateStatus: () => true })
+	Axios.post(`/api/users/reset-password-link-request`, resetPasswordLinkRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(resetPasswordLinkRequest.email));
@@ -101,7 +100,7 @@ function resetPasswordRequest(resetPasswordRequest, dispatch) {
 	if (passwordValid === true) {
 		dispatch(request());
 
-		Axios.post(`${config.API_URL}/users/reset-password`, resetPasswordRequest, { validateStatus: () => true })
+		Axios.post(`/api/users/reset-password`, resetPasswordRequest, { validateStatus: () => true })
 			.then((res) => {
 				if (res.status === 200) {
 					dispatch(success());
@@ -136,7 +135,7 @@ function logout() {
 function register(user, dispatch) {
 	if (validateUser(user, dispatch)) {
 		dispatch(request());
-		Axios.post(`${config.API_URL}/users`, user, { validateStatus: () => true })
+		Axios.post(`/api/users`, user, { validateStatus: () => true })
 			.then((res) => {
 				if (res.status === 201) {
 					dispatch(success(user.email));
@@ -194,7 +193,7 @@ function validateUser(user, dispatch) {
 }
 
 function checkIfUserIdExist(userId, dispatch) {
-	Axios.get(`${config.API_URL}/users/check-existence/` + userId, { validateStatus: () => true })
+	Axios.get(`/api/users/check-existence/` + userId, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(res.data.emailAddress));
