@@ -6,10 +6,10 @@ import (
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
-	e.POST("/users", h.RegisterUser)
-	e.GET("/users/activate/:activationId", h.ActivateUser)
-	e.POST("/users/login", h.LoginUser)
-	e.POST("/users/reset-password", h.ResetPassword)
-	e.GET("/admin-check", h.AdminCheck, h.AuthorizationMiddleware("execute_admin_check"))
-	e.GET("/other-check", h.OtherCheck, h.AuthorizationMiddleware("execute_admin_agent_check"))
+	e.POST("/api/users", h.RegisterUser)
+	e.GET("/api/users/activate/:activationId", h.ActivateUser)
+	e.POST("/api/users/login", h.LoginUser)
+	e.POST("/api/users/reset-password", h.ResetPassword)
+	e.GET("/api/admin-check", h.AdminCheck, h.AuthorizationMiddleware("execute_admin_check"))
+	e.GET("/api/other-check", h.OtherCheck, h.AuthorizationMiddleware("execute_admin_agent_check"))
 }

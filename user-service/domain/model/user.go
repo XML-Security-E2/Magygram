@@ -16,7 +16,6 @@ type User struct {
 	Email string `bson:"email" validate:"required,email"`
 	Password string `bson:"password"`
 	Surname string `bson:"surname" validate:"required,min=2"`
-	Roles []Role `bson:"roles"`
 }
 
 type UserRequest struct {
@@ -25,11 +24,6 @@ type UserRequest struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
 	RepeatedPassword string `json:"repeatedPassword"`
-}
-
-type LoginRequest struct {
-	Email string `json:"email"`
-	Password string `json:"password"`
 }
 
 type ResetPasswordRequest struct {
@@ -56,8 +50,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Name:     html.EscapeString(userRequest.Name),
 		Surname:  html.EscapeString(userRequest.Surname),
 		Email:    html.EscapeString(userRequest.Email),
-		Password: hashAndSalt,
-		Roles: []Role{{ Name: "user", Permissions: []Permission{}}}}, err
+		Password: hashAndSalt}, err
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {

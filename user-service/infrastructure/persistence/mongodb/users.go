@@ -55,18 +55,3 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.U
 
 	return &user, nil
 }
-
-func (r *userRepository) GetAllRolesByUserId(ctx context.Context, userId string) ([]model.Role, error) {
-	user, err := r.GetByID(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-	return user.Roles, nil
-}
-
-
-//func (r *userRepository) GetByEmailEagerly(ctx context.Context, email string) (*model.User, error) {
-//	u := &model.User{Email: email}
-//	err := r.Conn.Preload("Roles").Preload("Roles.Permissions").First(&u, "email = ?", email).Error
-//	return u, err
-//}

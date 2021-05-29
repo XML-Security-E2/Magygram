@@ -57,11 +57,10 @@ func main() {
 
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	accActivationsCol := client.Database(*mongoDatabase).Collection("account-activations")
-	loginEventsCol := client.Database(*mongoDatabase).Collection("login-events")
 	resetPasswordsCol := client.Database(*mongoDatabase).Collection("reset-passwords")
 
 	e := echo.New()
-	i := interactor.NewInteractor(usersCol, accActivationsCol, loginEventsCol, resetPasswordsCol)
+	i := interactor.NewInteractor(usersCol, accActivationsCol, resetPasswordsCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

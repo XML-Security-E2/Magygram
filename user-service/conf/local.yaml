@@ -1,5 +1,5 @@
 server :
-  port : "443"
+  port : "460"
   host : "localhost"
   secret : "MagyGram"
 
@@ -16,3 +16,7 @@ mail :
   host : "smtp.gmail.com"
   port : "587"
 
+authservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "461"

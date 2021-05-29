@@ -7,14 +7,15 @@ import (
 	"user-service/domain/service-contracts"
 	"user-service/infrastructure/persistence/mongodb"
 	"user-service/service"
+	"user-service/service/intercomm"
 )
 
 type Interactor interface {
 	NewUserRepository() repository.UserRepository
-	NewLoginEventRepository() repository.LoginEventRepository
 	NewAccountActivationRepository() repository.AccountActivationRepository
 	NewUserService() service_contracts.UserService
 	NewAccountActivationService() service_contracts.AccountActivationService
+	NewAuthClient() intercomm.AuthClient
 	NewUserHandler() handler.UserHandler
 	NewAppHandler() handler.AppHandler
 }
@@ -22,13 +23,11 @@ type Interactor interface {
 type interactor struct {
 	UserCol *mongo.Collection
 	AccCol *mongo.Collection
-	LogECol *mongo.Collection
 	ResPwdCol *mongo.Collection
-
 }
 
-func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, LogECol *mongo.Collection, ResPwdCol *mongo.Collection) Interactor {
-	return &interactor{UserCol, AccCol, LogECol, ResPwdCol}
+func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection) Interactor {
+	return &interactor{UserCol, AccCol,  ResPwdCol}
 }
 
 type appHandler struct {
@@ -36,14 +35,15 @@ type appHandler struct {
 	// embed all handler interfaces
 }
 
+func (i *interactor) NewAuthClient() intercomm.AuthClient {
+	return intercomm.NewAuthClient()
+}
+
+
 func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.UserHandler = i.NewUserHandler()
 	return appHandler
-}
-
-func (i *interactor) NewLoginEventRepository() repository.LoginEventRepository {
-	return mongodb.NewLoginEventRepository(i.LogECol)
 }
 
 func (i *interactor) NewUserRepository() repository.UserRepository {
@@ -59,7 +59,7 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewLoginEventRepository(),i.NewResetPasswordService())
+	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService())
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {
