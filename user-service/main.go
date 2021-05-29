@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/labstack/echo"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
@@ -58,6 +59,14 @@ func main() {
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	accActivationsCol := client.Database(*mongoDatabase).Collection("account-activations")
 	resetPasswordsCol := client.Database(*mongoDatabase).Collection("reset-passwords")
+	usersCol.Indexes().CreateOne( context.Background(),
+		mongo.IndexModel{
+			Keys: bson.M{
+				"email": 1,
+			},
+			Options: options.Index().SetUnique(true),
+		})
+
 
 	e := echo.New()
 	i := interactor.NewInteractor(usersCol, accActivationsCol, resetPasswordsCol)
