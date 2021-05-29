@@ -4,11 +4,12 @@ import { UserContext } from "../contexts/UserContext";
 import { userService } from "../services/UserService";
 
 const RegistrationForm = () => {
-	const {userState, dispatch } = useContext(UserContext);
+	const { userState, dispatch } = useContext(UserContext);
 
 	const [name, setName] = useState("");
 	const [surname, setSurname] = useState("");
 	const [email, setEmail] = useState("");
+	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [repeatedPassword, setRepeatedPassword] = useState("");
 
@@ -19,13 +20,13 @@ const RegistrationForm = () => {
 			name,
 			surname,
 			email,
+			username,
 			password,
 			repeatedPassword,
 		};
 
-		userService.register(user,dispatch);
+		userService.register(user, dispatch);
 	};
-
 
 	return (
 		<form method="post" onSubmit={handleSubmit}>
@@ -46,6 +47,10 @@ const RegistrationForm = () => {
 				</div>
 
 				<div className="form-group">
+					<input className="form-control" required type="username" name="username" placeholder="@Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+				</div>
+
+				<div className="form-group">
 					<input className="form-control" required type="password" name="passwordInput" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
 				</div>
 
@@ -60,7 +65,7 @@ const RegistrationForm = () => {
 						onChange={(e) => setRepeatedPassword(e.target.value)}
 					/>
 				</div>
-				<div className="form-group text-center" style={{ color: 'red' , fontSize:'0.8em'}} hidden={!userState.registrationError.showError}>
+				<div className="form-group text-center" style={{ color: "red", fontSize: "0.8em" }} hidden={!userState.registrationError.showError}>
 					{userState.registrationError.errorMessage}
 				</div>
 				<div className="form-group">
@@ -79,14 +84,15 @@ const RegistrationForm = () => {
 			</div>
 
 			<section hidden={!userState.registrationError.showSuccessMessage} className="login-clean">
-				<div className="form-group text-center" style={{ fontSize:'1.3em'}}>
+				<div className="form-group text-center" style={{ fontSize: "1.3em" }}>
 					We sent an email to <b>{userState.registrationError.emailAddress}</b> with a activation link to activate your account.
 				</div>
 				<div className="form-group">
-					<Link className="btn btn-primary btn-block" to="/login">Back to login</Link>
+					<Link className="btn btn-primary btn-block" to="/login">
+						Back to login
+					</Link>
 				</div>
 			</section>
-
 		</form>
 	);
 };

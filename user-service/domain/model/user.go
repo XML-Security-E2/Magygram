@@ -7,6 +7,7 @@ import (
 
 type User struct {
 	Id string `bson:"_id,omitempty"`
+	Username  string `bson:"username" validate:"required,min=1"`
 	Name  string `bson:"name" validate:"required,min=2"`
 	Email string `bson:"email" validate:"required,email"`
 	Surname string `bson:"surname" validate:"required,min=2"`
@@ -15,6 +16,7 @@ type User struct {
 type UserRequest struct {
 	Name  string `json:"name"`
 	Surname string `json:"surname"`
+	Username  string `json:"username"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 	RepeatedPassword string `json:"repeatedPassword"`
@@ -38,5 +40,6 @@ func NewUser(userRequest *UserRequest) *User {
 	return &User{Id: guid.New().String(),
 		Name:     html.EscapeString(userRequest.Name),
 		Surname:  html.EscapeString(userRequest.Surname),
+		Username: html.EscapeString(userRequest.Username),
 		Email:    html.EscapeString(userRequest.Email)}
 }

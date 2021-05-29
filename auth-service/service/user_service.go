@@ -52,21 +52,21 @@ func (u userService) ActivateUser(ctx context.Context, userId string) (bool, err
 	return true, err
 }
 
-func (a userService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
+func (u userService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
 	if successful {
-		_, _ = a.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
+		_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
 		return
 	}
-	loginEvent, err := a.LoginEventRepository.GetLastByUserEmail(ctx, userEmail)
+	loginEvent, err := u.LoginEventRepository.GetLastByUserEmail(ctx, userEmail)
 
 	if err != nil || loginEvent == nil {
-		_, _ = a.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 1))
+		_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 1))
 		return
 	}
 
-	_, _ = a.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, loginEvent.RepetitionNumber+1))
+	_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, loginEvent.RepetitionNumber+1))
 	if loginEvent.RepetitionNumber + 1 > MaxUnsuccessfulLogins {
-		_, _ = a.DeactivateUser(ctx, userEmail)
+		_, _ = u.DeactivateUser(ctx, userEmail)
 	}
 }
 
