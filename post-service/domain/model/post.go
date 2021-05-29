@@ -5,6 +5,24 @@ import (
 	"github.com/beevik/guid"
 )
 
+/* Za postmana
+{
+    "Description" : "Description",
+    "Location" : "Kraljevo",
+    "PostType" : "REGULAR",
+    "Media": [
+        { "Url":"images/image1", "MediaType": "IMAGE" },
+        { "Url":"images/image2", "MediaType": "IMAGE" },
+        { "Url":"videos/video1", "MediaType": "VIDEO" }
+    ],
+    "UserInfo" : {
+        "Id" : "2a5a1dc2-f5ad-4eb8-ae69-f4ea160422ff",
+        "Username" : "testniusername",
+        "ImageURL" : "images/image253"
+    }
+}
+ */
+
 type Post struct {
 	Id string `bson:"_id,omitempty"`
 	Description string `bson:"description"`
