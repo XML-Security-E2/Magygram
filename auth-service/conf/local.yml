@@ -1,0 +1,18 @@
+server :
+  port : "443"
+  host : "localhost"
+  secret : "MagyGram"
+
+database :
+  host : "mongodb://localhost"
+  port : "27017"
+  user : "root"
+  password : "root"
+  database : "no-waiter-auth-service"
+
+mail :
+  sender : "info.magygram@gmail.com"
+  password : "magygramxml"
+  host : "smtp.gmail.com"
+  port : "587"
+
