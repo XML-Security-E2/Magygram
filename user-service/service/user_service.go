@@ -27,11 +27,15 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 }
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
-	user, err := model.NewUser(userRequest)
-	if err != nil { return "", err}
+	user := model.NewUser(userRequest)
+
 	if err := validator.New().Struct(user); err!= nil {
 		return "", err
 	}
+
+	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
+	if err != nil { return "", err}
+
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
 
 	result, err := u.UserRepository.Create(ctx, user)
@@ -39,10 +43,6 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 	fmt.Println(result.InsertedID.(string))
 	if userId, ok := result.InsertedID.(string); ok {
-
-		err = u.AuthClient.RegisterUser(user)
-		if err != nil { return "", err}
-
 		return userId, nil
 	}
 	return "", err
@@ -55,12 +55,7 @@ func (u *userService) ActivateUser(ctx context.Context, activationId string) (bo
 		return false, err
 	}
 
-	user, err := u.UserRepository.GetByID(ctx, accActivation.UserId)
-	if err != nil {
-		return false, err
-	}
-	user.Active = true
-	_, err = u.UserRepository.Update(ctx, user)
+	err = u.AuthClient.ActivateUser(accActivation.UserId)
 	if err != nil {
 		return false, err
 	}
@@ -70,20 +65,6 @@ func (u *userService) ActivateUser(ctx context.Context, activationId string) (bo
 		return false, err
 	}
 
-	return true, err
-}
-
-func (u *userService) DeactivateUser(ctx context.Context, userEmail string) (bool, error){
-
-	user, err := u.UserRepository.GetByEmail(ctx, userEmail)
-	if err != nil {
-		return false, err
-	}
-	user.Active = false
-	_, err = u.UserRepository.Update(ctx, user)
-	if err != nil {
-		return false, err
-	}
 	return true, err
 }
 
@@ -122,10 +103,6 @@ func (u *userService) ResetPasswordActivation(ctx context.Context, activationId 
 }
 
 func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error) {
-	hashAndSalt, err := model.HashAndSaltPasswordIfStrongAndMatching(changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
-	if err != nil {
-		return false, err
-	}
 
 	accReset, err := u.ResetPasswordService.GetValidActivationById(ctx, changePasswordRequest.ResetPasswordId)
 	if accReset == nil || err != nil {
@@ -136,9 +113,8 @@ func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordReque
 	if err != nil {
 		return false, err
 	}
-	user.Password = hashAndSalt
-	user.Active = true
-	_, err = u.UserRepository.Update(ctx, user)
+
+	err = 	u.AuthClient.ChangePassword(user.Id, changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
 		return false, err
 	}
@@ -151,15 +127,12 @@ func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordReque
 	return true, err
 }
 
-
-
 func (u *userService) GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error) {
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
-
 	return user, err
 }
 

@@ -48,6 +48,8 @@ func (i *interactor) NewUserRepository() repository.UserRepository {
 	return mongodb.NewUserRepository(i.UserCol)
 }
 
+
+
 func (i *interactor) NewUserService() service_contracts.UserService {
 	return service.NewUserService(i.NewUserRepository(), i.NewLoginEventRepository())
 }

@@ -68,7 +68,6 @@ func (h *userHandler) ActivateUser(c echo.Context) error {
 	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
 }
 
-
 func (h *userHandler) ResendActivationLink(c echo.Context) error {
 
 	activateLinkRequest := &model.ActivateLinkRequest{}

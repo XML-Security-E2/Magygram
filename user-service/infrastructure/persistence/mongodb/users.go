@@ -23,9 +23,8 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) (*mongo.I
 
 func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.UpdateResult, error) {
 	return r.Col.UpdateOne(ctx, bson.M{"_id":  user.Id},bson.D{{"$set", bson.D{{"email" , user.Email},
-																{"active" , user.Active},
+																{"username" , user.Username},
 																{"name" , user.Name},
-																{"password" , user.Password},
 																{"surname" , user.Surname}}}})
 }
 
