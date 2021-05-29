@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"github.com/beevik/guid"
 	"golang.org/x/crypto/bcrypt"
 	"html"
 	"log"
@@ -12,30 +11,29 @@ import (
 type User struct {
 	Id string `bson:"_id,omitempty"`
 	Active bool `bson:"active"`
-	Name  string `bson:"name" validate:"required,min=2"`
 	Email string `bson:"email" validate:"required,email"`
 	Password string `bson:"password"`
-	Surname string `bson:"surname" validate:"required,min=2"`
+	Roles []Role `bson:"roles"`
 }
 
 type UserRequest struct {
-	Name  string `json:"name"`
-	Surname string `json:"surname"`
+	Id string `json:"id"`
 	Email string `json:"email"`
 	Password string `json:"password"`
 	RepeatedPassword string `json:"repeatedPassword"`
 }
 
-type ResetPasswordRequest struct {
+type LoginRequest struct {
 	Email string `json:"email"`
+	Password string `json:"password"`
 }
 
-type ActivateLinkRequest struct {
+type ActivatedRequest struct {
 	Email string `json:"email"`
 }
 
 type ChangeNewPasswordRequest struct {
-	ResetPasswordId string `json:"resetPasswordId"`
+	UserId string `json:"userId"`
 	Password string `json:"password"`
 	PasswordRepeat string `json:"passwordRepeat"`
 }
@@ -45,12 +43,11 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &User{Id: guid.New().String(),
+	return &User{Id: userRequest.Id,
 		Active:   false,
-		Name:     html.EscapeString(userRequest.Name),
-		Surname:  html.EscapeString(userRequest.Surname),
 		Email:    html.EscapeString(userRequest.Email),
-		Password: hashAndSalt}, err
+		Password: hashAndSalt,
+		Roles: []Role{{ Name: "user", Permissions: []Permission{}}}}, err
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {

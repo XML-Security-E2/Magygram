@@ -1,5 +1,5 @@
 server :
-  port : "460"
+  port : "461"
   host : "localhost"
   secret : "MagyGram"
 
@@ -8,7 +8,7 @@ database :
   port : "27017"
   user : "root"
   password : "root"
-  database : "no-waiter-user-service"
+  database : "no-waiter-auth-service"
 
 mail :
   sender : "info.magygram@gmail.com"
@@ -16,7 +16,3 @@ mail :
   host : "smtp.gmail.com"
   port : "587"
 
-authservice:
-  protocol: "https://"
-  domain: "localhost"
-  port: "461"

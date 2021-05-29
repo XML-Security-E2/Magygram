@@ -1,21 +1,18 @@
 package main
 
 import (
+	"auth-service/conf"
+	"auth-service/controller/router"
+	"auth-service/interactor"
 	"context"
 	"flag"
 	"fmt"
 	"github.com/labstack/echo"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"time"
-	"user-service/conf"
-	"user-service/controller/middleware"
-	"user-service/controller/router"
-	"user-service/interactor"
 )
-
 
 var runServer = flag.Bool("server", false, "production is -server option require")
 
@@ -57,23 +54,13 @@ func main() {
 	}()
 
 	usersCol := client.Database(*mongoDatabase).Collection("users")
-	accActivationsCol := client.Database(*mongoDatabase).Collection("account-activations")
-	resetPasswordsCol := client.Database(*mongoDatabase).Collection("reset-passwords")
-	usersCol.Indexes().CreateOne( context.Background(),
-		mongo.IndexModel{
-			Keys: bson.M{
-				"email": 1,
-			},
-			Options: options.Index().SetUnique(true),
-		})
-
+	loginEventsCol := client.Database(*mongoDatabase).Collection("login-events")
 
 	e := echo.New()
-	i := interactor.NewInteractor(usersCol, accActivationsCol, resetPasswordsCol)
+	i := interactor.NewInteractor(usersCol, loginEventsCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
-	middleware.NewMiddleware(e)
 
 	e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 }

@@ -1,21 +1,17 @@
-module user-service
+module auth-service
 
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go v1.38.49 // indirect
 	github.com/beevik/guid v0.0.0-20170504223318-d0ea8faecee0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/klauspost/compress v1.12.3 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/spf13/viper v1.7.1
-	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.5.2
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
