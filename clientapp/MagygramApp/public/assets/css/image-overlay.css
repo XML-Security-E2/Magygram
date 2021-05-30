@@ -1,0 +1,31 @@
+.container-img {
+	position: relative;
+	width: 100%;
+}
+
+.overlay-img {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 0;
+	transition: 0.3s ease;
+	background-color: transparent;
+}
+
+.container-img:hover .overlay-img {
+	opacity: 0.9;
+}
+
+.icon-img {
+	font-size: 20px;
+	position: absolute;
+	top: 10%;
+	left: 80%;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	text-align: center;
+}
