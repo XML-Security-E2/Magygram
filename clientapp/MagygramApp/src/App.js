@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import PageNotFound from "./pages/PageNotFound";
 import { ProtectedRoute } from "./router/ProtectedRouter";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import CreatePostPage from "./pages/CreatePostPage";
 
 function App() {
 	return (
@@ -20,6 +21,8 @@ function App() {
 				<ProtectedRoute roles={[]} redirectTo="/" path="/registration" component={RegistrationPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/reset-password/:id" component={ResetPasswordPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/blocked-user/:id" component={UserActivateRequestPage} />
+				<Route path="/add-posts" component={CreatePostPage} />
+
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 
 				<Route path="/404" component={PageNotFound} />

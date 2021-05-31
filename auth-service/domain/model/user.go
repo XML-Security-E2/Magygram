@@ -47,7 +47,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Active:   false,
 		Email:    html.EscapeString(userRequest.Email),
 		Password: hashAndSalt,
-		Roles: []Role{{ Name: "user", Permissions: []Permission{}}}}, err
+		Roles: []Role{{ Name: "user", Permissions: []Permission{{"create_post"}}}}}, err
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {

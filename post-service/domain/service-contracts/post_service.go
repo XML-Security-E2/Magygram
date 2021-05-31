@@ -6,5 +6,5 @@ import (
 )
 
 type PostService interface {
-	CreatePost(ctx context.Context, post *model.PostRequest) (string, error)
+	CreatePost(ctx context.Context, bearer string,  post *model.PostRequest) (string, error)
 }

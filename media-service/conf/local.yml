@@ -1,0 +1,4 @@
+server :
+  port : "463"
+  host : "localhost"
+  secret : "MagyGram"

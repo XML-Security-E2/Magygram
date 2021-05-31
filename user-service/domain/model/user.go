@@ -13,6 +13,12 @@ type User struct {
 	Surname string `bson:"surname" validate:"required,min=2"`
 }
 
+type UserInfo struct {
+	Id string `json:"id"`
+	Username  string `json:"username"`
+	ImageURL  string `json:"imageUrl"`
+}
+
 type UserRequest struct {
 	Name  string `json:"name"`
 	Surname string `json:"surname"`

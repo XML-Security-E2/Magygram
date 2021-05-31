@@ -2,7 +2,10 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/beevik/guid"
+	"mime/multipart"
+	"strings"
 )
 
 /* Za postmana
@@ -28,6 +31,8 @@ type Post struct {
 	Description string `bson:"description"`
 	Location string `bson:"location"`
 	PostType PostType `bson:"post_type"`
+	Tags []string `bson:"tags"`
+	HashTags []string `bson:"hashTags"`
 	Media []Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
 	LikedBy []UserInfo `bson:"liked_by"`
@@ -43,34 +48,45 @@ const(
 )
 
 type PostRequest struct {
-	Description string
-	Location string
-	PostType PostType
-	Media []Media
-	UserInfo UserInfo
+	Description string `json:"description"`
+	Location string `json:"location"`
+	Media []*multipart.FileHeader `json:"media"`
+	Tags []string `json:"tags"`
 }
 
-func NewPost(postRequest *PostRequest) (*Post, error) {
-	err := validatePostTypeEnums(postRequest.PostType)
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType, media []Media) (*Post, error) {
+	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
 	}
 
-	err = validateMediaTypeEnums(postRequest.Media)
+	err = validateMediaTypeEnums(media)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(len(postRequest.Tags))
 
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
-		PostType: postRequest.PostType,
-		Media: postRequest.Media,
-		UserInfo: postRequest.UserInfo,
+		HashTags: getHashTagsFromDescription(postRequest.Description),
+		UserInfo: postOwner,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 	}, nil
+}
+
+func getHashTagsFromDescription(description string) []string {
+	var hashTags []string
+	words := strings.Fields(description)
+	for _, w := range words {
+		if strings.HasPrefix(w, "#") {
+			hashTags = append(hashTags, strings.TrimPrefix(w, "#"))
+		}
+	}
+	return hashTags
 }
 
 func validatePostTypeEnums(pt PostType) error {
