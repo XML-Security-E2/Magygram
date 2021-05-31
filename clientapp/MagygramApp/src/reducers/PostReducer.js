@@ -32,6 +32,15 @@ export const postReducer = (state, action) => {
 					successMessage: "",
 				},
 			};
+		case postConstants.REGISTER_REQUEST:
+			return {
+				registrationError: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					emailAddress: "",
+				},
+			};
 		default:
 			return state;
 	}
