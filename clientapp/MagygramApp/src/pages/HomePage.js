@@ -1,11 +1,13 @@
-import React, {useState} from "react";
+import React, {useState, useContext, useEffect} from "react";
 import { userService } from "../services/UserService";
+import { postService } from "../services/PostService";
 import Axios from "axios";
 import { config } from "../config/config";
 import Timeline from "../components/Timeline";
-import PostContextProvider from "../contexts/PostContext";
+import  PostContextProvider, { PostContext } from "../contexts/PostContext";
 
 const HomePage = () => {
+	const { postState, dispatch } = useContext(PostContext);
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
@@ -28,6 +30,14 @@ const HomePage = () => {
 	const handleSettings = () =>{
 		alert('TOD1O')
 	}
+
+
+	useEffect(() => {
+		const getPostsHandler = async () => {
+			await postService.findPostsForTimeline(dispatch);
+		};
+		getPostsHandler();
+	}, [dispatch]);
 
 	return (
 		<React.Fragment>
@@ -69,9 +79,7 @@ const HomePage = () => {
 					<div class="col-9">
 						<div class="row">
 							<div class="col-8">
-								<PostContextProvider>
 									<Timeline/>
-								</PostContextProvider>
 							</div>
 							
 						</div>

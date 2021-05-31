@@ -39,4 +39,11 @@ func (p postService) CreatePost(ctx context.Context, postRequest *model.PostRequ
 	return "", err
 }
 
+func (p postService) GetPostsForTimeline(ctx context.Context) ([]*model.Post, error) {
+	result, err := p.PostRepository.GetAll(ctx)
+
+	if err != nil { return nil, err}
+
+	return result, nil
+}
 

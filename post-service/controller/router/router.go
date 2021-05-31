@@ -7,4 +7,5 @@ import (
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/posts", h.CreatePost)
+	e.GET("/api/posts", h.GetPostsForTimeline)
 }

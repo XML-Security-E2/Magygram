@@ -2,14 +2,17 @@ import { postConstants } from "../constants/PostConstants";
 
 export const postReducer = (state, action) => {
 	switch (action.type) {
-		case postConstants.REGISTER_REQUEST:
+		case postConstants.TIMELINE_POSTS_REQUEST:
 			return {
-				registrationError: {
-					showError: false,
-					errorMessage: "",
-					showSuccessMessage: false,
-					emailAddress: "",
-				},
+				
+			};
+		case postConstants.TIMELINE_POSTS_SUCCESS:
+			return {
+				
+			};
+		case postConstants.TIMELINE_POSTS_FAILURE:
+			return {
+				
 			};
 		default:
 			return state;

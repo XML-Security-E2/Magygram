@@ -7,4 +7,5 @@ import (
 
 type PostService interface {
 	CreatePost(ctx context.Context, post *model.PostRequest) (string, error)
+	GetPostsForTimeline(ctx context.Context) ([]*model.Post , error)
 }

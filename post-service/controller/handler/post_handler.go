@@ -11,7 +11,7 @@ import (
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
-
+	GetPostsForTimeline(c echo.Context) error
 }
 
 type postHandler struct {
@@ -39,6 +39,20 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, postId)
+}
+
+func (p postHandler) GetPostsForTimeline(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	posts, err := p.PostService.GetPostsForTimeline(ctx)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, posts)
 }
 
 
