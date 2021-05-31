@@ -103,3 +103,9 @@
 .sugest-username {
 	font-size: 14px;
 }
+
+.story_modal .modal-content {
+	border-radius: 20px;
+	background-color: rgb(31, 31, 31);
+	color: #000;
+}
