@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/go-playground/validator"
+	_ "net/http"
 	"post-service/domain/model"
 	"post-service/domain/repository"
 	"post-service/domain/service-contracts"
@@ -46,4 +47,3 @@ func (p postService) GetPostsForTimeline(ctx context.Context) ([]*model.Post, er
 
 	return result, nil
 }
-

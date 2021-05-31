@@ -1,10 +1,19 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import { PostContext } from "../contexts/PostContext";
 import Post from "./Post";
 import "react-image-gallery/styles/css/image-gallery.css";
+import { postService } from "../services/PostService";
 
 const Timeline = () => {
-	const { postState } = useContext(PostContext);
+	const { postState, dispatch } = useContext(PostContext);
+
+	useEffect(() => {
+		alert('test')
+		const getPostsHandler = async () => {
+			await postService.findPostsForTimeline(dispatch);
+		};
+		getPostsHandler();
+	}, [dispatch]);
 
 	return (
         <React.Fragment>

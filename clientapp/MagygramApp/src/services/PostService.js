@@ -1,5 +1,6 @@
 import Axios from "axios";
 import { postConstants } from "../constants/PostConstants";
+import { authHeader } from "../helpers/auth-header";
 
 export const postService = {
 	findPostsForTimeline,
@@ -7,17 +8,19 @@ export const postService = {
 
 async function findPostsForTimeline(dispatch) {
 	dispatch(request());
-
-	await Axios.get(`/api/posts`, { validateStatus: () => true })
+	await Axios.get(`/api/posts`, { validateStatus: () => true, headers: {
+		'Authorization': localStorage.getItem("accessToken")
+	}	 })
 		.then((res) => {
 			if (res.status === 200) {
+				
 				dispatch(success(res.data));
 			} else {
 				failure()
 			}
 		})
 		.catch((err) => {
-			failure()
+			console.log(err);
 		});
 
 	function request() {

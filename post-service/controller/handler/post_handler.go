@@ -2,10 +2,14 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"net/http"
+	"post-service/conf"
 	"post-service/domain/model"
 	"post-service/domain/service-contracts"
+	"strings"
 )
 
 
@@ -46,7 +50,8 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	//var userId= GetUserIdFromJWTToken(c)
+	//fmt.Println(userId)
 	posts, err := p.PostService.GetPostsForTimeline(ctx)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -55,4 +60,28 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	return c.JSON(http.StatusOK, posts)
 }
 
+func GetUserIdFromJWTToken(c echo.Context) string{
+	authStringHeader := c.Request().Header.Get("Authorization")
+	if authStringHeader == "" {
+		return ""
+	}
+
+	authHeader := strings.Split(authStringHeader, "Bearer ")
+	jwtToken := authHeader[1]
+
+	token, err := jwt.Parse(jwtToken, func (token *jwt.Token) (interface{}, error){
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(conf.Current.Server.Secret), nil
+	})
+
+	if err != nil {
+		return ""
+	}
+
+	claims, _ := token.Claims.(jwt.MapClaims)
+	id, _ := claims["id"].(string)
+	return id
+}
 
