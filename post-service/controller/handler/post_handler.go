@@ -71,7 +71,8 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	}
 	//var userId= GetUserIdFromJWTToken(c)
 	//fmt.Println(userId)
-	posts, err := p.PostService.GetPostsForTimeline(ctx)
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetPostsForTimeline(ctx,bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

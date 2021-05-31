@@ -8,7 +8,6 @@ const Timeline = () => {
 	const { postState, dispatch } = useContext(PostContext);
 
 	useEffect(() => {
-		alert('test')
 		const getPostsHandler = async () => {
 			await postService.findPostsForTimeline(dispatch);
 		};

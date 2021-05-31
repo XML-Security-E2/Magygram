@@ -10,12 +10,9 @@ export const postService = {
 
 async function findPostsForTimeline(dispatch) {
 	dispatch(request());
-	await Axios.get(`/api/posts`, { validateStatus: () => true, headers: {
-		'Authorization': localStorage.getItem("accessToken")
-	}	 })
+	await Axios.get(`/api/posts`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
-				
 				dispatch(success(res.data));
 			} else {
 				failure()

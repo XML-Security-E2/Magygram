@@ -50,10 +50,58 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	return "", err
 }
 
-func (p postService) GetPostsForTimeline(ctx context.Context) ([]*model.Post, error) {
+func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]*model.PostResponse, error) {
 	result, err := p.PostRepository.GetAll(ctx)
 
-	if err != nil { return nil, err}
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
+	}
 
-	return result, nil
+	retVal := mapPostsToResponsePostDTO(result, userInfo.Id)
+
+
+	return retVal, nil
 }
+
+func mapPostsToResponsePostDTO(result []*model.Post, userId string) []*model.PostResponse {
+	var retVal []*model.PostResponse
+	
+	for _, post := range result {
+		res, err := model.NewPostResponse(post,hasUserLikedPost(post,userId),hasUserDislikedPost(post,userId))
+
+		if err != nil { return nil}
+
+		retVal = append(retVal, res)
+	}
+
+	return retVal
+}
+
+func hasUserLikedPost(post *model.Post, usedId string) bool {
+	var retVal = false
+
+	for _, likedUserInfo := range post.LikedBy {
+		if likedUserInfo.Id == usedId{
+			retVal=true
+			break
+		}
+	}
+
+	return retVal
+}
+
+func hasUserDislikedPost(post *model.Post, usedId string) bool {
+	var retVal = false
+
+	for _, dislikedUserInfo := range post.DislikedBy {
+		if dislikedUserInfo.Id == usedId{
+			retVal=true
+			break
+		}
+	}
+
+	return retVal
+}
+
+

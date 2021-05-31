@@ -134,3 +134,34 @@ type Comment struct {
 	CreatedBy UserInfo
 	Content string
 }
+
+type PostResponse struct {
+	Id string
+	Description string
+	Location string
+	PostType PostType
+	Tags []string
+	HashTags []string
+	Media []Media
+	UserInfo UserInfo
+	LikedBy []UserInfo
+	DislikedBy []UserInfo
+	Comments []Comment
+	Liked bool
+	Disliked bool
+}
+
+func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, error) {
+	return &PostResponse{Id: post.Id,
+		Description:   post.Description,
+		Location:    post.Location,
+		HashTags: post.HashTags,
+		Media: post.Media,
+		UserInfo: post.UserInfo,
+		LikedBy: post.LikedBy,
+		DislikedBy: post.DislikedBy,
+		Comments: post.Comments,
+		Liked: liked,
+		Disliked: disliked,
+	}, nil
+}
