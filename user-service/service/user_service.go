@@ -145,3 +145,22 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 
 	return user, err
 }
+
+func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
+
+	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return &model.UserInfo{
+		Id:       userId,
+		Username: user.Username,
+		ImageURL: "",
+	}, nil
+}

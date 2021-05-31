@@ -17,8 +17,9 @@ import (
 type AuthHandler interface {
 	LoginUser(c echo.Context) error
 	AdminCheck(c echo.Context) error
-	OtherCheck(c echo.Context) error
-	AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc
+	AuthorizationSuccess(c echo.Context) error
+	AuthorizationMiddleware() echo.MiddlewareFunc
+	GetLoggedUserId(c echo.Context) error
 }
 
 type authHandler struct {
@@ -78,13 +79,19 @@ func (a authHandler) AdminCheck(c echo.Context) error {
 	return c.JSON(http.StatusOK, "OKET")
 }
 
-func (a authHandler) OtherCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, "OKET")
+func (a authHandler) AuthorizationSuccess(c echo.Context) error {
+	fmt.Println("OKEEEJ")
+	return c.JSON(http.StatusOK, "")
 }
 
-func (a authHandler) AuthorizationMiddleware(allowedPermissions ...string) echo.MiddlewareFunc {
+
+func (a authHandler) AuthorizationMiddleware() echo.MiddlewareFunc {
 	return func (next echo.HandlerFunc) echo.HandlerFunc {
 		return func (c echo.Context) error {
+			var allowedPermissions []string
+			permissionsHeader := c.Request().Header.Get("X-permissions")
+			json.Unmarshal([]byte(permissionsHeader), &allowedPermissions)
+
 			authStringHeader := c.Request().Header.Get("Authorization")
 			if authStringHeader == "" {
 				return ErrUnauthorized
@@ -134,4 +141,32 @@ func checkPermission(userRoles []model.Role, allowedPermissions []string) bool{
 		}
 	}
 	return false
+}
+
+func (a authHandler) GetLoggedUserId(c echo.Context) error {
+	authStringHeader := c.Request().Header.Get("Authorization")
+
+	if authStringHeader == "" {
+		return ErrUnauthorized
+	}
+	authHeader := strings.Split(authStringHeader, "Bearer ")
+	jwtToken := authHeader[1]
+
+	token, err := jwt.Parse(jwtToken, func (token *jwt.Token) (interface{}, error){
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(conf.Current.Server.Secret), nil
+	})
+
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userId, _ := claims["id"].(string)
+		return c.JSON(http.StatusOK, userId)
+	} else{
+		return ErrUnauthorized
+	}
 }

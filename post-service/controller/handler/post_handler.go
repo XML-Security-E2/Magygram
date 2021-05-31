@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	"mime/multipart"
 	"net/http"
 	"post-service/conf"
 	"post-service/domain/model"
@@ -27,17 +29,34 @@ func NewPostHandler(p service_contracts.PostService) PostHandler {
 }
 
 func (p postHandler) CreatePost(c echo.Context) error {
-	postRequest := &model.PostRequest{}
-	if err := c.Bind(postRequest); err != nil {
-		return err
+
+	location := c.FormValue("location")
+	description := c.FormValue("description")
+	tagsString := c.FormValue("tags")
+
+	mpf, _ := c.MultipartForm()
+	var tags []string
+	json.Unmarshal([]byte(tagsString), &tags)
+
+	var headers []*multipart.FileHeader
+	for _, v := range mpf.File {
+		headers = append(headers, v[0])
+	}
+
+	postRequest := &model.PostRequest{
+		Description: description,
+		Location:    location,
+		Media:       headers,
+		Tags:        tags,
 	}
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	bearer := c.Request().Header.Get("Authorization")
 
-	postId, err := p.PostService.CreatePost(ctx, postRequest)
+	postId, err := p.PostService.CreatePost(ctx, bearer, postRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
