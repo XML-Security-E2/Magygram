@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/beevik/guid"
 	"mime/multipart"
+	"strings"
 )
 
 /* Za postmana
@@ -30,7 +31,8 @@ type Post struct {
 	Description string `bson:"description"`
 	Location string `bson:"location"`
 	PostType PostType `bson:"post_type"`
-	Tags []string `bson:"tags"` //izmeniti za usere
+	Tags []string `bson:"tags"`
+	HashTags []string `bson:"hashTags"`
 	Media []Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
 	LikedBy []UserInfo `bson:"liked_by"`
@@ -68,14 +70,23 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType, me
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
-		PostType: postType,
-		Media: media,
-		Tags: postRequest.Tags,
+		HashTags: getHashTagsFromDescription(postRequest.Description),
 		UserInfo: postOwner,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 	}, nil
+}
+
+func getHashTagsFromDescription(description string) []string {
+	var hashTags []string
+	words := strings.Fields(description)
+	for _, w := range words {
+		if strings.HasPrefix(w, "#") {
+			hashTags = append(hashTags, strings.TrimPrefix(w, "#"))
+		}
+	}
+	return hashTags
 }
 
 func validatePostTypeEnums(pt PostType) error {
