@@ -15,6 +15,7 @@ func main() {
 	conf.NewConfig(*runServer)
 
 	e := echo.New()
+
 	i := interactor.NewInteractor()
 	h := i.NewAppHandler()
 

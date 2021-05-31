@@ -89,6 +89,9 @@ const CreatePostForm = () => {
 								<textarea className="form-control" id="description" rows="3" placeholder="Description..." onChange={(e) => setDescription(e.target.value)}></textarea>
 							</div>
 							<div className="form-group">
+								<img src="https://localhost:463/api/media/e5fc6a3a-67fc-4bc8-9740-18eeb1b17942.jpg" />
+							</div>
+							<div className="form-group">
 								<button type="submit" className="btn btn-primary float-right">
 									Create
 								</button>

@@ -22,15 +22,15 @@ func NewPostService(r repository.PostRepository, ic intercomm.MediaClient) servi
 }
 
 func (p postService) CreatePost(ctx context.Context, postRequest *model.PostRequest) (string, error) {
+	media, err := p.MediaClient.SaveMedia(postRequest.Media)
+	if err != nil { return "", err}
+
 	post, err := model.NewPost(postRequest, model.UserInfo{
 		Id:       "123131232112",
 		Username: "nikola",
 		ImageURL: "nikola.jpg",
-	}, "REGULAR", []model.Media{})
+	}, "REGULAR", media)
 
-	if err != nil { return "", err}
-
-	err = p.MediaClient.SaveMedia(postRequest.Media)
 	if err != nil { return "", err}
 
 	if err := validator.New().Struct(post); err!= nil {
@@ -47,5 +47,3 @@ func (p postService) CreatePost(ctx context.Context, postRequest *model.PostRequ
 
 	return "", err
 }
-
-

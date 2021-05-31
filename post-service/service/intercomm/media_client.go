@@ -2,21 +2,24 @@ package intercomm
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"post-service/conf"
+	"post-service/domain/model"
 )
 
 type MediaClient interface {
-	SaveMedia(mediaList []*multipart.FileHeader) error
+	SaveMedia(mediaList []*multipart.FileHeader) ([]model.Media, error)
 	
 }
 
 type mediaClient struct {}
 
-func (m mediaClient) SaveMedia(mediaList []*multipart.FileHeader) error {
+func (m mediaClient) SaveMedia(mediaList []*multipart.FileHeader) ([]model.Media, error) {
 	body := &bytes.Buffer{}
 	client := &http.Client{}
 	writer := multipart.NewWriter(body)
@@ -34,15 +37,19 @@ func (m mediaClient) SaveMedia(mediaList []*multipart.FileHeader) error {
 
 	req, err := http.NewRequest("POST", baseUrl, bytes.NewReader(body.Bytes()))
 	if err != nil {
-		return err
+		return []model.Media{}, err
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	resp, err := client.Do(req)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		return err
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	var retMedia []model.Media
+	json.Unmarshal(bodyBytes, &retMedia)
+
+	if err != nil || resp.StatusCode != http.StatusCreated {
+		return []model.Media{}, err
 	}
 
-	return nil
+	return retMedia, nil
 }
 
 func writeFileToRequestBody(media *multipart.FileHeader, fw io.Writer, writer *multipart.Writer, idx int) (io.Writer, error) {
@@ -51,7 +58,7 @@ func writeFileToRequestBody(media *multipart.FileHeader, fw io.Writer, writer *m
 		return nil, err
 	}
 	defer src.Close()
-	fw, err = writer.CreateFormFile("images[" + string(idx)+"]", "test.png")
+	fw, err = writer.CreateFormFile("images[" + string(idx)+"]", media.Filename)
 	if err != nil {
 		return nil, err
 	}

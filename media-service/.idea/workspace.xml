@@ -3,12 +3,20 @@
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/CreatePostForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/CreatePostForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/PostService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/PostService.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/model/post.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/interactor/interactor.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/interactor/interactor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/handler/media_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/handler/media_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/files/7da48e5a-4be4-4bf4-be3f-f40f6e0580e7.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/files/945553e6-ac04-43db-81fa-205ef85c9838.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/files/ceda6068-8afe-4e1d-b165-616b32b61dda.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/files/e29bd894-07b1-4dc1-a737-4b04377cbf63.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/files/eed43ef4-19f3-4dcc-b464-7224fc6b6c9f.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/files/f6096f44-03e7-4e96-bc2d-7cc0807516f9.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/media_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/media_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/media_client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/post_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
