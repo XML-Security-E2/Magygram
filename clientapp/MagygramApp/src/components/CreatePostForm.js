@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import MediaInputField from "./MediaInputField";
 import { v4 as uuidv4 } from "uuid";
 import TagsListInput from "./TagsListInput";
+import { PostContext } from "../contexts/PostContext";
 
 const CreatePostForm = () => {
+	const { postState, dispatch } = useContext(PostContext);
+
 	const [location, setLocation] = useState("");
+	const [description, setDescription] = useState("");
+	const [showedMedia, setShowedMedia] = useState([]);
 	const [tags, setTags] = useState([]);
 	const [tagInput, setTagInput] = useState("");
 
@@ -23,13 +28,37 @@ const CreatePostForm = () => {
 		setTags(prom);
 	};
 
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		let postMedia = [];
+		let tagNames = [];
+
+		showedMedia.forEach((media) => {
+			postMedia.push({ media: media.content, type: media.type });
+		});
+
+		tags.forEach((tag) => {
+			tagsName.push(tag.EntityDTO.Name);
+		});
+
+		let post = {
+			location,
+			description,
+			postMedia,
+			tags: tagNames,
+		};
+
+		console.log(post);
+		//postService.createPost(post, dispatch);
+	};
+
 	return (
 		<React.Fragment>
 			<div className="container ">
-				<h3 className="text-center mt-2">Create new post</h3>
+				<h3 className="text-center mt-4">Create new post</h3>
 				<div className="row">
-					<div className="col-12 mt-2">
-						<form className="forms-sample" method="put">
+					<div className="col-12 mt-4">
+						<form className="forms-sample" method="post" onSubmit={handleSubmit}>
 							<div className="form-group row">
 								<div className="col-6 float-left">
 									<div className="input-group ml-0">
@@ -44,7 +73,7 @@ const CreatePostForm = () => {
 							</div>
 							<hr />
 							<div className="form-group">
-								<MediaInputField />
+								<MediaInputField showedMedia={showedMedia} setShowedMedia={setShowedMedia} />
 							</div>
 							<hr />
 
@@ -56,7 +85,7 @@ const CreatePostForm = () => {
 
 							<div className="form-group">
 								<label for="description">Description</label>
-								<textarea className="form-control" id="description" rows="3" placeholder="Description..."></textarea>
+								<textarea className="form-control" id="description" rows="3" placeholder="Description..." onChange={(e) => setDescription(e.target.value)}></textarea>
 							</div>
 							<div className="form-group">
 								<button type="submit" className="btn btn-primary float-right">

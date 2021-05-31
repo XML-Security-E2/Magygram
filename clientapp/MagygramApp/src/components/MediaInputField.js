@@ -1,17 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
-const MediaInputField = () => {
-	const [image, setImage] = useState("");
-
-	const [showedMedia, setShowedMedia] = useState([]);
-
+const MediaInputField = ({ showedMedia, setShowedMedia }) => {
 	const imgRef = React.createRef();
 	const videoRef = React.createRef();
 
 	const onImageChange = (e) => {
-		setImage(e.target.files[0]);
-		console.log(image);
 		if (e.target.files && e.target.files[0]) {
 			let img = e.target.files[0];
 			let mediaCpy = [...showedMedia];
@@ -20,10 +14,9 @@ const MediaInputField = () => {
 
 			console.log(extension);
 			if (extension === "mp4") {
-				mediaCpy.push({ src: filename, type: "video", id: uuidv4() });
+				mediaCpy.push({ src: filename, type: "video", id: uuidv4(), content: e.target.files[0] });
 				console.log(mediaCpy);
-				//videoRef.load();
-			} else mediaCpy.push({ src: filename, type: "image", id: uuidv4() });
+			} else mediaCpy.push({ src: filename, type: "image", id: uuidv4(), content: e.target.files[0] });
 
 			setShowedMedia(mediaCpy);
 		}

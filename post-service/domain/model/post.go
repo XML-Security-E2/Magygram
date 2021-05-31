@@ -43,15 +43,14 @@ const(
 )
 
 type PostRequest struct {
-	Description string
-	Location string
-	PostType PostType
-	Media []Media
-	UserInfo UserInfo
+	Description string `json:"description"`
+	Location string `json:"location"`
+	Media []Media `json:"media"`
+	Tags []string `json:"tags"`
 }
 
-func NewPost(postRequest *PostRequest) (*Post, error) {
-	err := validatePostTypeEnums(postRequest.PostType)
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType) (*Post, error) {
+	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +63,9 @@ func NewPost(postRequest *PostRequest) (*Post, error) {
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
-		PostType: postRequest.PostType,
+		PostType: postType,
 		Media: postRequest.Media,
-		UserInfo: postRequest.UserInfo,
+		UserInfo: postOwner,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},

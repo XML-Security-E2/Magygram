@@ -1,6 +1,7 @@
 import React from "react";
 import CreatePostForm from "../components/CreatePostForm";
 import Header from "../components/Header";
+import PostContextProvider from "../contexts/PostContext";
 
 const CreatePostPage = () => {
 	return (
@@ -10,7 +11,9 @@ const CreatePostPage = () => {
 					<Header />
 					<div className="main-panel">
 						<div className="container">
-							<CreatePostForm />
+							<PostContextProvider>
+								<CreatePostForm />
+							</PostContextProvider>
 						</div>
 					</div>
 				</div>
