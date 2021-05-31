@@ -4,6 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 import TagsListInput from "./TagsListInput";
 import { PostContext } from "../contexts/PostContext";
 import { postService } from "../services/PostService";
+import { postConstants } from "../constants/PostConstants";
+import SuccessAlert from "./SuccessAlert";
+import FailureAlert from "./FailureAlert";
 
 const CreatePostForm = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -56,6 +59,18 @@ const CreatePostForm = () => {
 	return (
 		<React.Fragment>
 			<div className="container ">
+				<SuccessAlert
+					hidden={!postState.createPost.showSuccessMessage}
+					header="Success"
+					message={postState.createPost.successMessage}
+					handleCloseAlert={() => dispatch({ type: postConstants.CREATE_POST_REQUEST })}
+				/>
+				<FailureAlert
+					hidden={!postState.createPost.showError}
+					header="Error"
+					message={postState.createPost.errorMessage}
+					handleCloseAlert={() => dispatch({ type: postConstants.CREATE_POST_REQUEST })}
+				/>
 				<h3 className="text-center mt-4">Create new post</h3>
 				<div className="row">
 					<div className="col-12 mt-4">
