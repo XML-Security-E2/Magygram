@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/labstack/echo"
+	"mime/multipart"
 	"net/http"
 	"post-service/domain/model"
 	"post-service/domain/service-contracts"
@@ -23,7 +25,26 @@ func NewPostHandler(p service_contracts.PostService) PostHandler {
 }
 
 func (p postHandler) CreatePost(c echo.Context) error {
-	postRequest := &model.PostRequest{}
+
+	location := c.FormValue("location")
+	description := c.FormValue("description")
+	tags := c.FormValue("tags")
+
+	fmt.Println(location)
+	mpf, _ := c.MultipartForm()
+	var headers []*multipart.FileHeader
+	for _, v := range mpf.File {
+		headers = append(headers, v[0])
+	}
+
+	fmt.Println(len(headers))
+	postRequest := &model.PostRequest{
+		Description: description,
+		Location:    location,
+		Media:       headers,
+		Tags:        []string{tags},
+	}
+
 	if err := c.Bind(postRequest); err != nil {
 		return err
 	}

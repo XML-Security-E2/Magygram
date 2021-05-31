@@ -6,22 +6,31 @@ import (
 	"post-service/domain/model"
 	"post-service/domain/repository"
 	"post-service/domain/service-contracts"
+	"post-service/service/intercomm"
 )
 
 
 
 type postService struct {
 	repository.PostRepository
+	intercomm.MediaClient
 }
 
 
-func NewPostService(r repository.PostRepository) service_contracts.PostService {
-	return &postService{r }
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient) service_contracts.PostService {
+	return &postService{r , ic}
 }
 
 func (p postService) CreatePost(ctx context.Context, postRequest *model.PostRequest) (string, error) {
-	post, err := model.NewPost(postRequest)
+	post, err := model.NewPost(postRequest, model.UserInfo{
+		Id:       "123131232112",
+		Username: "nikola",
+		ImageURL: "nikola.jpg",
+	}, "REGULAR", []model.Media{})
 
+	if err != nil { return "", err}
+
+	err = p.MediaClient.SaveMedia(postRequest.Media)
 	if err != nil { return "", err}
 
 	if err := validator.New().Struct(post); err!= nil {

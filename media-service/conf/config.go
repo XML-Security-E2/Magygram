@@ -1,6 +1,5 @@
 package conf
 
-
 import (
 	"fmt"
 	"github.com/spf13/viper"
@@ -11,25 +10,6 @@ type Config struct {
 		Port string
 		Host string
 		Secret string
-	}
-	Database struct {
-		Host     string
-		Port     string
-		User     string
-		Password string
-		Database string
-	}
-	Mail struct {
-		Sender   string
-		Password string
-		Host 	 string
-		Port 	 string
-	}
-
-	Mediaservice struct {
-		Protocol   string
-		Domain 	 string
-		Port 	 string
 	}
 }
 

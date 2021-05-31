@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"mime/multipart"
 )
 
 /* Za postmana
@@ -45,17 +46,17 @@ const(
 type PostRequest struct {
 	Description string `json:"description"`
 	Location string `json:"location"`
-	Media []Media `json:"media"`
+	Media []*multipart.FileHeader `json:"media"`
 	Tags []string `json:"tags"`
 }
 
-func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType) (*Post, error) {
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType, media []Media) (*Post, error) {
 	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
 	}
 
-	err = validateMediaTypeEnums(postRequest.Media)
+	err = validateMediaTypeEnums(media)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType) (*
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
 		PostType: postType,
-		Media: postRequest.Media,
+		Media: media,
 		UserInfo: postOwner,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},

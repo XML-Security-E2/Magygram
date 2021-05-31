@@ -3,6 +3,7 @@ import MediaInputField from "./MediaInputField";
 import { v4 as uuidv4 } from "uuid";
 import TagsListInput from "./TagsListInput";
 import { PostContext } from "../contexts/PostContext";
+import { postService } from "../services/PostService";
 
 const CreatePostForm = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -34,22 +35,22 @@ const CreatePostForm = () => {
 		let tagNames = [];
 
 		showedMedia.forEach((media) => {
-			postMedia.push({ media: media.content, type: media.type });
+			postMedia.push(media.content);
 		});
 
 		tags.forEach((tag) => {
-			tagsName.push(tag.EntityDTO.Name);
+			tagNames.push(tag.EntityDTO.Name);
 		});
 
 		let post = {
 			location,
 			description,
-			postMedia,
-			tags: tagNames,
+			postMedia: postMedia,
+			tags: tagNames[0],
 		};
 
 		console.log(post);
-		//postService.createPost(post, dispatch);
+		postService.createPost(post, dispatch);
 	};
 
 	return (
