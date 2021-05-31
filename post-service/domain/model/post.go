@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/beevik/guid"
 	"mime/multipart"
 )
@@ -29,6 +30,7 @@ type Post struct {
 	Description string `bson:"description"`
 	Location string `bson:"location"`
 	PostType PostType `bson:"post_type"`
+	Tags []string `bson:"tags"` //izmeniti za usere
 	Media []Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
 	LikedBy []UserInfo `bson:"liked_by"`
@@ -61,11 +63,14 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType, me
 		return nil, err
 	}
 
+	fmt.Println(len(postRequest.Tags))
+
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
 		PostType: postType,
 		Media: media,
+		Tags: postRequest.Tags,
 		UserInfo: postOwner,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},

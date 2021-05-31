@@ -31,6 +31,12 @@ type Config struct {
 		Domain 	 string
 		Port 	 string
 	}
+
+	Userservice struct {
+		Protocol   string
+		Domain 	 string
+		Port 	 string
+	}
 }
 
 var Current *Config

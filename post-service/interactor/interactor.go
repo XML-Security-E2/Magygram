@@ -15,14 +15,13 @@ type Interactor interface {
 	NewPostService() service_contracts.PostService
 	NewPostHandler() handler.PostHandler
 	NewMediaClient() intercomm.MediaClient
+	NewUserClient() intercomm.UserClient
 	NewAppHandler() handler.AppHandler
 }
 
 type interactor struct {
 	PostCol *mongo.Collection
 }
-
-
 
 func NewInteractor(PostCol *mongo.Collection) Interactor {
 	return &interactor{PostCol}
@@ -42,12 +41,16 @@ func (i *interactor) NewMediaClient() intercomm.MediaClient {
 	return intercomm.NewMediaClient()
 }
 
+func (i *interactor) NewUserClient() intercomm.UserClient {
+	return intercomm.NewUserClient()
+}
+
 func (i *interactor) NewPostRepository() repository.PostRepository {
 	return mongodb.NewPostRepository(i.PostCol)
 }
 
 func (i *interactor) NewPostService() service_contracts.PostService {
-	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient())
+	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient(), i.NewUserClient())
 }
 
 func (i *interactor) NewPostHandler() handler.PostHandler {

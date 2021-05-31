@@ -14,22 +14,23 @@ import (
 type postService struct {
 	repository.PostRepository
 	intercomm.MediaClient
+	intercomm.UserClient
 }
 
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient) service_contracts.PostService {
-	return &postService{r , ic}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
+	return &postService{r , ic, uc}
 }
 
-func (p postService) CreatePost(ctx context.Context, postRequest *model.PostRequest) (string, error) {
+func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil { return "", err}
+
 	media, err := p.MediaClient.SaveMedia(postRequest.Media)
 	if err != nil { return "", err}
 
-	post, err := model.NewPost(postRequest, model.UserInfo{
-		Id:       "123131232112",
-		Username: "nikola",
-		ImageURL: "nikola.jpg",
-	}, "REGULAR", media)
+	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media)
 
 	if err != nil { return "", err}
 

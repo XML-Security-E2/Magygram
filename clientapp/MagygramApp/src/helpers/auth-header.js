@@ -1,6 +1,10 @@
 export function authHeader() {
+	console.log("ALALALAL");
 	validateAccessToken();
-	let token = JSON.parse(localStorage.getItem("accessToken"));
+	console.log("ALALALAL1");
+
+	let token = localStorage.getItem("accessToken");
+	console.log(token);
 
 	if (token) {
 		return { Authorization: "Bearer " + token };
@@ -58,11 +62,6 @@ export function hasPermissions(desiredPermissions) {
 }
 
 function validateAccessToken() {
-	let time = new Date().getTime();
-	console.log(localStorage.getItem("expireTime"));
-	console.log(time);
-	console.log(localStorage.getItem("expireTime") <= time);
-
 	if (localStorage.getItem("expireTime") <= new Date().getTime()) {
 		deleteLocalStorage();
 	}

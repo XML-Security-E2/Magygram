@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"github.com/labstack/echo"
 	"mime/multipart"
 	"net/http"
@@ -28,33 +28,31 @@ func (p postHandler) CreatePost(c echo.Context) error {
 
 	location := c.FormValue("location")
 	description := c.FormValue("description")
-	tags := c.FormValue("tags")
+	tagsString := c.FormValue("tags")
 
-	fmt.Println(location)
 	mpf, _ := c.MultipartForm()
+	var tags []string
+	json.Unmarshal([]byte(tagsString), &tags)
+
 	var headers []*multipart.FileHeader
 	for _, v := range mpf.File {
 		headers = append(headers, v[0])
 	}
 
-	fmt.Println(len(headers))
 	postRequest := &model.PostRequest{
 		Description: description,
 		Location:    location,
 		Media:       headers,
-		Tags:        []string{tags},
-	}
-
-	if err := c.Bind(postRequest); err != nil {
-		return err
+		Tags:        tags,
 	}
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	bearer := c.Request().Header.Get("Authorization")
 
-	postId, err := p.PostService.CreatePost(ctx, postRequest)
+	postId, err := p.PostService.CreatePost(ctx, bearer, postRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

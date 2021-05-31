@@ -9,6 +9,7 @@ export const postService = {
 function createPost(postDTO, dispatch) {
 	const formData = fetchFormData(postDTO);
 	dispatch(request());
+	console.log(formData);
 
 	Axios.post(`/api/posts`, formData, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
@@ -47,6 +48,6 @@ function fetchFormData(postDTO) {
 	}
 	formData.append("description", postDTO.description);
 	formData.append("location", postDTO.location);
-	formData.append("tags", postDTO.tags);
+	formData.append("tags", JSON.stringify(postDTO.tags));
 	return formData;
 }

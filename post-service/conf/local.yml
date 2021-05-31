@@ -20,3 +20,9 @@ mediaservice:
   protocol: "https://"
   domain: "localhost"
   port: "463"
+
+userservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "460"
+
