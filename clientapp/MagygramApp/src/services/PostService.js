@@ -6,24 +6,27 @@ export const postService = {
 };
 
 async function findPostsForTimeline(dispatch) {
+	dispatch(request());
 
-	await Axios.get(`/user-api/api/users/employee/waiter`, { validateStatus: () => true })
+	await Axios.get(`/api/posts`, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
+				dispatch(success(res.data));
 			} else {
+				failure()
 			}
 		})
 		.catch((err) => {
-			console.log(err);
+			failure()
 		});
 
 	function request() {
-		//return { type: userConstants.SET_WAITERS_REQUEST };
+		return { type: postConstants.TIMELINE_POSTS_REQUEST };
 	}
 	function success(data) {
-		//return { type: userConstants.SET_WAITERS_SUCCESS, waiters: data };
+		return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
 	}
-	function failure(message) {
-		//return { type: userConstants.SET_WAITERS_ERROR, errorMessage: message };
+	function failure() {
+		return { type: postConstants.TIMELINE_POSTS_FAILURE };
 	}
 }

@@ -4,10 +4,10 @@ import { postService } from "../services/PostService";
 import Axios from "axios";
 import { config } from "../config/config";
 import Timeline from "../components/Timeline";
-import  PostContextProvider, { PostContext } from "../contexts/PostContext";
+import { PostContext } from "../contexts/PostContext";
 
 const HomePage = () => {
-	const { postState, dispatch } = useContext(PostContext);
+	const { dispatch } = useContext(PostContext);
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
