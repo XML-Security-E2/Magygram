@@ -1,7 +1,7 @@
 import { postConstants } from "../constants/PostConstants";
 
-let strcpy = {}
-let postCopy = {}
+let strcpy = {};
+let postCopy = {};
 
 export const postReducer = (state, action) => {
 	switch (action.type) {
@@ -38,36 +38,36 @@ export const postReducer = (state, action) => {
 		case postConstants.TIMELINE_POSTS_REQUEST:
 			return {
 				...state,
-				timeline: {		
-					posts : []
-				}
+				timeline: {
+					posts: [],
+				},
 			};
 		case postConstants.TIMELINE_POSTS_SUCCESS:
 			return {
 				...state,
-				timeline: {		
-					posts : action.posts
-				}
+				timeline: {
+					posts: action.posts,
+				},
 			};
 		case postConstants.TIMELINE_POSTS_FAILURE:
 			return {
 				...state,
-				timeline: {		
-					posts : []
-				}
+				timeline: {
+					posts: [],
+				},
 			};
 		case postConstants.LIKE_POST_REQUEST:
 			return {
 				...state,
 			};
 		case postConstants.LIKE_POST_SUCCESS:
-			strcpy =  {
+			strcpy = {
 				...state,
 			};
-			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
-			postCopy.Liked= true;
-			if (postCopy.LikedBy.find(likedByUserInfo => likedByUserInfo.Id === state.loggedUserInfo.Id) === undefined){
-				postCopy.LikedBy.push(state.loggedUserInfo)
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			postCopy.Liked = true;
+			if (postCopy.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === state.loggedUserInfo.Id) === undefined) {
+				postCopy.LikedBy.push(state.loggedUserInfo);
 			}
 			return strcpy;
 		case postConstants.LIKE_POST_FAILURE:
@@ -79,13 +79,13 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 		case postConstants.UNLIKE_POST_SUCCESS:
-			strcpy =  {
+			strcpy = {
 				...state,
 			};
-			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
-			postCopy.Liked= false;
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			postCopy.Liked = false;
 			var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== state.loggedUserInfo.Id);
-			postCopy.LikedBy = newLikedByList
+			postCopy.LikedBy = newLikedByList;
 			return strcpy;
 		case postConstants.UNLIKE_POST_FAILURE:
 			return {
@@ -96,13 +96,13 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 		case postConstants.DISLIKE_POST_SUCCESS:
-			strcpy =  {
+			strcpy = {
 				...state,
 			};
-			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
-			postCopy.Disliked= true;
-			if (postCopy.DislikedBy.find(dislikedByUserInfo => dislikedByUserInfo.Id === state.loggedUserInfo.Id) === undefined){
-				postCopy.DislikedBy.push(state.loggedUserInfo)
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			postCopy.Disliked = true;
+			if (postCopy.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === state.loggedUserInfo.Id) === undefined) {
+				postCopy.DislikedBy.push(state.loggedUserInfo);
 			}
 			return strcpy;
 		case postConstants.DISLIKE_POST_FAILURE:
@@ -114,17 +114,51 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 		case postConstants.UNDISLIKE_POST_SUCCESS:
-			strcpy =  {
+			strcpy = {
 				...state,
 			};
-			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
-			postCopy.Disliked= false;
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			postCopy.Disliked = false;
 			var newDisikedByList = postCopy.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== state.loggedUserInfo.Id);
-			postCopy.DislikedBy = newDisikedByList
+			postCopy.DislikedBy = newDisikedByList;
 			return strcpy;
 		case postConstants.UNDISLIKE_POST_FAILURE:
 			return {
 				...state,
+			};
+
+		case postConstants.SET_USER_COLLECTIONS_REQUEST:
+			return {
+				...state,
+				userCollections: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+					collections: [],
+				},
+			};
+		case postConstants.SET_USER_COLLECTIONS_SUCCESS:
+			return {
+				...state,
+				userCollections: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+					collections: action.collections,
+				},
+			};
+		case postConstants.SET_USER_COLLECTIONS_FAILURE:
+			return {
+				...state,
+				userCollections: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+					collections: [],
+				},
 			};
 		default:
 			return state;

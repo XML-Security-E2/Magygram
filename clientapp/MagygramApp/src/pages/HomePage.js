@@ -7,6 +7,7 @@ import PostContextProvider from "../contexts/PostContext";
 import StoryContextProvider from "../contexts/StoryContext";
 import CreateStoryModal from "../components/modals/CreateStoryModal";
 import StoryButton from "../components/StoryButton";
+import AddPostToFavouritesModal from "../components/modals/AddPostToFavouritesModal";
 
 const HomePage = () => {
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
@@ -80,26 +81,27 @@ const HomePage = () => {
 				</nav>
 			</div>
 			<StoryContextProvider>
-				<CreateStoryModal />
-				<div>
-					<div class="mt-4">
-						<div class="container d-flex justify-content-center">
-							<div class="col-9">
-								<div class="row">
-									<div class="col-8">
-										<StoryButton />
-										<PostContextProvider>
+				<PostContextProvider>
+					<CreateStoryModal />
+					<AddPostToFavouritesModal />
+					<div>
+						<div class="mt-4">
+							<div class="container d-flex justify-content-center">
+								<div class="col-9">
+									<div class="row">
+										<div class="col-8">
+											<StoryButton />
 											<Timeline />
-										</PostContextProvider>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</PostContextProvider>
 			</StoryContextProvider>
 		</React.Fragment>
 	);
 };
 
-export default HomePage
+export default HomePage;

@@ -75,11 +75,15 @@ const(
 	VIDEO
 )
 
+var (
+	DefaultCollection = "all posts"
+)
+
 func NewUser(userRequest *UserRequest) *User {
 	return &User{Id: guid.New().String(),
 		Name:     html.EscapeString(userRequest.Name),
 		Surname:  html.EscapeString(userRequest.Surname),
 		Username: html.EscapeString(userRequest.Username),
 		Email:    html.EscapeString(userRequest.Email),
-		FavouritePosts: map[string][]IdWithMedia{}}
+		FavouritePosts: map[string][]IdWithMedia{ DefaultCollection: {}}}
 }

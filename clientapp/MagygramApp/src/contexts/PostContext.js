@@ -12,13 +12,20 @@ const PostContextProvider = (props) => {
 			successMessage: "",
 		},
 		timeline: {
-			posts: []
+			posts: [],
+		},
+		userCollections: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+			collections: [],
 		},
 		loggedUserInfo: {
 			Id: "063d2368-9035-4184-8b0f-bdb255e6a492",
 			ImageURL: "",
 			Username: "nikolakolovic",
-		}
+		},
 	});
 
 	return <PostContext.Provider value={{ postState, dispatch }}>{props.children}</PostContext.Provider>;

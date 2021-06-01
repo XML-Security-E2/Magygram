@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"user-service/domain/model"
@@ -10,6 +11,7 @@ import (
 type CollectionsHandler interface {
 	CreateCollection(c echo.Context) error
 	AddPostToCollection(c echo.Context) error
+	GetUsersCollections(c echo.Context) error
 }
 
 type collectionsHandler struct {
@@ -50,4 +52,18 @@ func (ch collectionsHandler) AddPostToCollection(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, "")
+}
+
+func (ch collectionsHandler) GetUsersCollections(c echo.Context) error {
+
+	ctx := c.Request().Context()
+	bearer := c.Request().Header.Get("Authorization")
+	fmt.Println(bearer)
+	collection, err := ch.CollectionsService.GetUsersCollections(ctx,bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, collection)
 }
