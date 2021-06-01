@@ -165,3 +165,7 @@ func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, erro
 		Disliked: disliked,
 	}, nil
 }
+
+type PostId struct {
+	Id string
+}

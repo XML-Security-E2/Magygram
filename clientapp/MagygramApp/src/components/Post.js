@@ -19,11 +19,11 @@ const Post = ({post}) => {
     }
 
     const DislikePost = (postId) => {
-        alert(postId)
+        postService.dislikePost(postId, dispatch)
     }
 
     const UndislikePost = (postId) => {
-        alert(postId)
+        postService.undislikePost(postId, dispatch)
     }
 
 	return (

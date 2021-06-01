@@ -2,6 +2,8 @@ package mongodb
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
@@ -41,4 +43,31 @@ func (r *postRepository) GetAll(ctx context.Context) ([]*model.Post, error) {
 		}
 	}
 	return results, nil
+}
+
+func (r *postRepository) GetOne(ctx context.Context, postId string) (*model.Post, error) {
+	var post = model.Post{}
+	fmt.Println(postId)
+	err := r.Col.FindOne(ctx, bson.M{"_id": postId}).Decode(&post)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("ErrNoDocuments")
+		}
+		return nil, err
+	}
+	return &post, nil
+}
+
+func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.UpdateResult, error) {
+	return r.Col.UpdateOne(ctx, bson.M{"_id":  post.Id},bson.D{{"$set", bson.D{
+		{"description" , post.Description},
+		{"location" , post.Location},
+		{"post_type" , post.PostType},
+		{"tags" , post.Tags},
+		{"hashTags" , post.HashTags},
+		{"media" , post.Media},
+		{"user_info" , post.UserInfo},
+		{"liked_by" , post.LikedBy},
+		{"disliked_by" , post.DislikedBy},
+		{"comments" , post.Comments}}}})
 }

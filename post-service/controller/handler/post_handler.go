@@ -4,20 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"mime/multipart"
 	"net/http"
-	"post-service/conf"
 	"post-service/domain/model"
 	"post-service/domain/service-contracts"
-	"strings"
 )
 
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
 	GetPostsForTimeline(c echo.Context) error
+	LikePost(c echo.Context) error
 }
 
 type postHandler struct {
@@ -80,28 +78,26 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	return c.JSON(http.StatusOK, posts)
 }
 
-func GetUserIdFromJWTToken(c echo.Context) string{
-	authStringHeader := c.Request().Header.Get("Authorization")
-	if authStringHeader == "" {
-		return ""
+func (p postHandler) LikePost(c echo.Context) error {
+	postId := &model.PostId{}
+	if err := c.Bind(postId); err != nil {
+		return err
 	}
 
-	authHeader := strings.Split(authStringHeader, "Bearer ")
-	jwtToken := authHeader[1]
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 
-	token, err := jwt.Parse(jwtToken, func (token *jwt.Token) (interface{}, error){
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(conf.Current.Server.Secret), nil
-	})
+	fmt.Println("POSTID: " + postId.Id)
 
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.LikePost(ctx, bearer, postId.Id)
 	if err != nil {
-		return ""
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	claims, _ := token.Claims.(jwt.MapClaims)
-	id, _ := claims["id"].(string)
-	return id
+	return c.JSON(http.StatusOK, "")
 }
+
 

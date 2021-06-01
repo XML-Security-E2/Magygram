@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-playground/validator"
 	_ "net/http"
 	"post-service/domain/model"
@@ -17,7 +18,6 @@ type postService struct {
 	intercomm.MediaClient
 	intercomm.UserClient
 }
-
 
 func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
 	return &postService{r , ic, uc}
@@ -64,6 +64,35 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 	return retVal, nil
 }
 
+func (p postService) LikePost(ctx context.Context, bearer string, postId string) error {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return err
+	}
+	fmt.Println("1TEST1")
+
+	result, err := p.PostRepository.GetOne(ctx,postId)
+	if err != nil {
+		return err
+	}
+	var res model.UserInfo
+	fmt.Println("TEST22")
+
+
+	res.Id= userInfo.Id
+	res.ImageURL= userInfo.ImageURL
+	res.Username= userInfo.Username
+
+	result.LikedBy = append(result.LikedBy, res)
+
+	_, err = p.PostRepository.Update(ctx,result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func mapPostsToResponsePostDTO(result []*model.Post, userId string) []*model.PostResponse {
 	var retVal []*model.PostResponse
 	
@@ -103,5 +132,6 @@ func hasUserDislikedPost(post *model.Post, usedId string) bool {
 
 	return retVal
 }
+
 
 

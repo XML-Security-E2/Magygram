@@ -8,6 +8,8 @@ export const postService = {
 	createPost,
 	likePost,
 	unlikePost,
+	dislikePost,
+	undislikePost,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -85,8 +87,24 @@ function fetchFormData(postDTO) {
 
 function likePost(postId, dispatch) {
 	dispatch(request());
-	dispatch(success(postId));
-	dispatch(failure("Test"));
+
+	let likeDTO = {
+		postId: postId
+	};
+
+	Axios.put(`/api/posts/like`, likeDTO ,{ validateStatus: () => true, headers: authHeader() })
+	.then((res) => {		
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(postId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
 
 	function request() {
 		return { type: postConstants.LIKE_POST_REQUEST };
@@ -112,5 +130,37 @@ function unlikePost(postId, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.UNLIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function dislikePost(postId, dispatch) {
+	dispatch(request());
+	dispatch(success(postId));
+	dispatch(failure("Test"));
+
+	function request() {
+		return { type: postConstants.DISLIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.DISLIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.DISLIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function undislikePost(postId, dispatch) {
+	dispatch(request());
+	dispatch(success(postId));
+	dispatch(failure("Test"));
+
+	function request() {
+		return { type: postConstants.UNDISLIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.UNDISLIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.UNDISLIKE_POST_FAILURE, errorMessage: message };
 	}
 }

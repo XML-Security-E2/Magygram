@@ -9,4 +9,6 @@ import (
 type PostRepository interface {
 	Create(ctx context.Context, post *model.Post) (*mongo.InsertOneResult, error)
 	GetAll(ctx context.Context) ([]*model.Post, error)
+	GetOne(ctx context.Context, postId string) (*model.Post, error)
+	Update(ctx context.Context, post *model.Post) (*mongo.UpdateResult, error)
 }

@@ -83,6 +83,34 @@ export const postReducer = (state, action) => {
 			return {
 				...state,
 			};
+		case postConstants.DISLIKE_POST_REQUEST:
+			return {
+				...state,
+			};
+		case postConstants.DISLIKE_POST_SUCCESS:
+			strcpy =  {
+				...state,
+			};
+			strcpy.timeline.posts.find(post => post.Id === action.postId).Disliked = true;
+			return strcpy;
+		case postConstants.DISLIKE_POST_FAILURE:
+			return {
+				...state,
+			};
+		case postConstants.UNDISLIKE_POST_REQUEST:
+			return {
+				...state,
+			};
+		case postConstants.UNDISLIKE_POST_SUCCESS:
+			strcpy =  {
+				...state,
+			};
+			strcpy.timeline.posts.find(post => post.Id === action.postId).Disliked = false;
+			return strcpy;
+		case postConstants.UNDISLIKE_POST_FAILURE:
+			return {
+				...state,
+			};
 		default:
 			return state;
 	}
