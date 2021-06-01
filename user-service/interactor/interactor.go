@@ -13,10 +13,13 @@ import (
 type Interactor interface {
 	NewUserRepository() repository.UserRepository
 	NewAccountActivationRepository() repository.AccountActivationRepository
+	NewCollectionsService() service_contracts.CollectionsService
 	NewUserService() service_contracts.UserService
 	NewAccountActivationService() service_contracts.AccountActivationService
 	NewAuthClient() intercomm.AuthClient
+	NewPostClient() intercomm.PostClient
 	NewUserHandler() handler.UserHandler
+	NewCollectionsHandler() handler.CollectionsHandler
 	NewAppHandler() handler.AppHandler
 }
 
@@ -26,12 +29,15 @@ type interactor struct {
 	ResPwdCol *mongo.Collection
 }
 
+
+
 func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection) Interactor {
 	return &interactor{UserCol, AccCol,  ResPwdCol}
 }
 
 type appHandler struct {
 	handler.UserHandler
+	handler.CollectionsHandler
 	// embed all handler interfaces
 }
 
@@ -39,11 +45,23 @@ func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
 }
 
+func (i *interactor) NewPostClient() intercomm.PostClient {
+	return intercomm.NewPostClient()
+}
 
 func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.UserHandler = i.NewUserHandler()
+	appHandler.CollectionsHandler = i.NewCollectionsHandler()
 	return appHandler
+}
+
+func (i *interactor) NewCollectionsHandler() handler.CollectionsHandler {
+	return handler.NewCollectionsHandler(i.NewCollectionsService())
+}
+
+func (i *interactor) NewCollectionsService() service_contracts.CollectionsService {
+	return service.NewCollectionsService(i.NewUserRepository(), i.NewAuthClient(), i.NewPostClient())
 }
 
 func (i *interactor) NewUserRepository() repository.UserRepository {

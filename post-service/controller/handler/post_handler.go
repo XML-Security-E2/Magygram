@@ -13,6 +13,7 @@ import (
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
+	GetPostsFirstImage(c echo.Context) error
 
 }
 
@@ -58,6 +59,21 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, postId)
+}
+
+func (p postHandler) GetPostsFirstImage(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	postImage, err := p.PostService.GetPostsFirstImage(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, postImage)
 }
 
 
