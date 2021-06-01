@@ -6,6 +6,7 @@ import Timeline from "../components/Timeline";
 import PostContextProvider from "../contexts/PostContext";
 import StoryContextProvider from "../contexts/StoryContext";
 import CreateStoryModal from "../components/modals/CreateStoryModal";
+import StoryButton from "../components/StoryButton";
 
 const HomePage = () => {
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
@@ -80,22 +81,23 @@ const HomePage = () => {
 			</div>
 			<StoryContextProvider>
 				<CreateStoryModal />
-			</StoryContextProvider>
-			<div>
-				<div class="mt-4">
-					<div class="container d-flex justify-content-center">
-						<div class="col-9">
-							<div class="row">
-								<div class="col-8">
-									<PostContextProvider>
-										<Timeline />
-									</PostContextProvider>
+				<div>
+					<div class="mt-4">
+						<div class="container d-flex justify-content-center">
+							<div class="col-9">
+								<div class="row">
+									<div class="col-8">
+										<StoryButton />
+										<PostContextProvider>
+											<Timeline />
+										</PostContextProvider>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</StoryContextProvider>
 		</React.Fragment>
 	);
 };

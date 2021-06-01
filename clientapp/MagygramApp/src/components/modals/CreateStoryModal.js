@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Modal } from "react-bootstrap";
+import { storyConstants } from "../../constants/StoryConstants";
 import { StoryContext } from "../../contexts/StoryContext";
 import { storyService } from "../../services/StoryService";
 
@@ -33,8 +34,12 @@ const CreateStoryModal = () => {
 		storyService.createStory(story, dispatch);
 	};
 
+	const handleModalClose = () => {
+		dispatch({ type: storyConstants.CREATE_STORY_REQUEST });
+	};
+
 	return (
-		<Modal show={true} className="story_modal" aria-labelledby="contained-modal-title-vcenter">
+		<Modal show={storyState.createStory.showModal} className="story_modal" aria-labelledby="contained-modal-title-vcenter" onHide={handleModalClose}>
 			<Modal.Body>
 				<input type="file" ref={imgRef} style={{ display: "none" }} name="image" accept="image/png, image/jpeg, video/mp4" onChange={onImageChange} />
 				<div style={{ opacity: showedMedia !== "" ? 1 : 0 }} className="d-flex flex-row-reverse">

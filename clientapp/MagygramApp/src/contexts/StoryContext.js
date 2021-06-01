@@ -1,11 +1,12 @@
 import React, { createContext, useReducer } from "react";
-import { postReducer } from "../reducers/PostReducer";
+import { storyReducer } from "../reducers/StoryReducer";
 
 export const StoryContext = createContext();
 
 const StoryContextProvider = (props) => {
-	const [storyState, dispatch] = useReducer(postReducer, {
+	const [storyState, dispatch] = useReducer(storyReducer, {
 		createStory: {
+			showModal: false,
 			showError: false,
 			errorMessage: "",
 			showSuccessMessage: false,

@@ -1,3 +1,4 @@
+import { modalConstants } from "../constants/ModalConstants";
 import { storyConstants } from "../constants/StoryConstants";
 
 export const storyReducer = (state, action) => {
@@ -6,6 +7,7 @@ export const storyReducer = (state, action) => {
 			return {
 				...state,
 				createStory: {
+					showModal: false,
 					showError: false,
 					errorMessage: "",
 					showSuccessMessage: false,
@@ -16,6 +18,7 @@ export const storyReducer = (state, action) => {
 			return {
 				...state,
 				createStory: {
+					showModal: false,
 					showError: false,
 					errorMessage: "",
 					showSuccessMessage: true,
@@ -26,8 +29,21 @@ export const storyReducer = (state, action) => {
 			return {
 				...state,
 				createStory: {
+					showModal: false,
 					showError: true,
 					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+		case modalConstants.OPEN_CREATE_STORY_MODAL:
+			console.log(state);
+			return {
+				...state,
+				createStory: {
+					showModal: true,
+					showError: false,
+					errorMessage: "",
 					showSuccessMessage: false,
 					successMessage: "",
 				},
