@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/CreatePostForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/CreatePostForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/PostReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/PostReducer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway/api_gateway.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +16,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
+  <component name="GOROOT" url="file://$USER_HOME$/go/go1.16.3" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
@@ -44,16 +42,17 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/main.go" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -76,6 +75,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

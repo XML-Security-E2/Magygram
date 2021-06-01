@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/labstack/echo"
 	"mime/multipart"
 	"net/http"
@@ -79,20 +78,15 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 }
 
 func (p postHandler) LikePost(c echo.Context) error {
-	postId := &model.PostId{}
-	if err := c.Bind(postId); err != nil {
-		return err
-	}
+	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	fmt.Println("POSTID: " + postId.Id)
-
 	bearer := c.Request().Header.Get("Authorization")
-	err := p.PostService.LikePost(ctx, bearer, postId.Id)
+	err := p.PostService.LikePost(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

@@ -76,8 +76,6 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 		return err
 	}
 	var res model.UserInfo
-	fmt.Println("TEST22")
-
 
 	res.Id= userInfo.Id
 	res.ImageURL= userInfo.ImageURL

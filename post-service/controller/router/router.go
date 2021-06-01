@@ -8,5 +8,5 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/posts", h.CreatePost)
 	e.GET("/api/posts", h.GetPostsForTimeline)
-	e.PUT("/api/posts/like", h.LikePost)
+	e.PUT("/api/posts/:postId/like", h.LikePost)
 }

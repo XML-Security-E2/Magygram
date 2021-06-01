@@ -88,11 +88,7 @@ function fetchFormData(postDTO) {
 function likePost(postId, dispatch) {
 	dispatch(request());
 
-	let likeDTO = {
-		postId: postId
-	};
-
-	Axios.put(`/api/posts/like`, likeDTO ,{ validateStatus: () => true, headers: authHeader() })
+	Axios.put(`/api/posts/${postId}/like`, {} ,{ validateStatus: () => true, headers: authHeader() })
 	.then((res) => {		
 			console.log(res);
 			if (res.status === 200) {
