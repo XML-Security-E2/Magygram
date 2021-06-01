@@ -2,8 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/CreateStoryModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/CreateStoryModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway/api_gateway.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/model/post.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/conf/local.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

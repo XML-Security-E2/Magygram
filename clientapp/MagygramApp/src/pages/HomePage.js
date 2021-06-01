@@ -4,6 +4,7 @@ import Axios from "axios";
 import { config } from "../config/config";
 import Timeline from "../components/Timeline";
 import PostContextProvider from "../contexts/PostContext";
+import StoryContextProvider from "../contexts/StoryContext";
 import CreateStoryModal from "../components/modals/CreateStoryModal";
 
 const HomePage = () => {
@@ -77,7 +78,9 @@ const HomePage = () => {
 					</div>
 				</nav>
 			</div>
-			<CreateStoryModal />
+			<StoryContextProvider>
+				<CreateStoryModal />
+			</StoryContextProvider>
 			<div>
 				<div class="mt-4">
 					<div class="container d-flex justify-content-center">

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"story-service/domain/service-contracts"
@@ -21,8 +22,8 @@ func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 }
 
 func (p storyHandler) CreateStory(c echo.Context) error {
-
-	headers, err := c.FormFile("image")
+	fmt.Println("UDJE")
+	headers, err := c.FormFile("images")
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
