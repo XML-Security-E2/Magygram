@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"github.com/beevik/guid"
 	"mime/multipart"
 	"strings"
@@ -30,7 +29,7 @@ type Post struct {
 	Id string `bson:"_id,omitempty"`
 	Description string `bson:"description"`
 	Location string `bson:"location"`
-	PostType PostType `bson:"post_type"`
+	ContentType ContentType `bson:"post_type"`
 	Tags []string `bson:"tags"`
 	HashTags []string `bson:"hashTags"`
 	Media []Media `bson:"media"`
@@ -40,7 +39,7 @@ type Post struct {
 	Comments []Comment `bson:"comments"`
 }
 
-type PostType string
+type ContentType string
 
 const(
 	REGULAR = iota
@@ -54,7 +53,7 @@ type PostRequest struct {
 	Tags []string `json:"tags"`
 }
 
-func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType, media []Media) (*Post, error) {
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media) (*Post, error) {
 	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
@@ -65,13 +64,14 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType PostType, me
 		return nil, err
 	}
 
-	fmt.Println(len(postRequest.Tags))
-
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
 		HashTags: getHashTagsFromDescription(postRequest.Description),
 		UserInfo: postOwner,
+		Media: media,
+		Tags: postRequest.Tags,
+		ContentType : postType,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
@@ -89,7 +89,7 @@ func getHashTagsFromDescription(description string) []string {
 	return hashTags
 }
 
-func validatePostTypeEnums(pt PostType) error {
+func validatePostTypeEnums(pt ContentType) error {
 	switch pt {
 	case "REGULAR", "CAMPAIGN":
 		return nil
