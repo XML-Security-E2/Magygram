@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-playground/validator"
 	_ "net/http"
 	"post-service/domain/model"
@@ -69,7 +68,6 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 	if err != nil {
 		return err
 	}
-	fmt.Println("1TEST1")
 
 	result, err := p.PostRepository.GetOne(ctx,postId)
 	if err != nil {
@@ -89,6 +87,51 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 	}
 
 	return nil
+}
+
+func (p postService) UnlikePost(ctx context.Context, bearer string, postId string) error {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return err
+	}
+
+	result, err := p.PostRepository.GetOne(ctx,postId)
+	if err != nil {
+		return err
+	}
+
+	result.LikedBy = findAndDeleteLikedBy(result, userInfo)
+
+	_, err = p.PostRepository.Update(ctx,result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func findAndDeleteLikedBy(result *model.Post, info *model.UserInfo) []model.UserInfo {
+	index := 0
+	for _, i := range result.LikedBy {
+		if i.Id != info.Id {
+			result.LikedBy[index] = i
+			index++
+		}
+	}
+	return result.LikedBy[:index]
+}
+
+
+
+func findAndDeleteLikedBy1(s [4]int, item int) []int {
+	index := 0
+	for _, i := range s {
+		if i != item {
+			s[index] = i
+			index++
+		}
+	}
+	return s[:index]
 }
 
 func mapPostsToResponsePostDTO(result []*model.Post, userId string) []*model.PostResponse {

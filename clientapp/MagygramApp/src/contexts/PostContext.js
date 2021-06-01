@@ -14,6 +14,11 @@ const PostContextProvider = (props) => {
 		timeline: {
 			posts: []
 		},
+		loggedUserInfo: {
+			Id: "063d2368-9035-4184-8b0f-bdb255e6a492",
+			ImageURL: "",
+			Username: "nikolakolovic",
+		}
 	});
 
 	return <PostContext.Provider value={{ postState, dispatch }}>{props.children}</PostContext.Provider>;

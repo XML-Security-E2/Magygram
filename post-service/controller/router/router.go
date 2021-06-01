@@ -9,4 +9,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/posts", h.CreatePost)
 	e.GET("/api/posts", h.GetPostsForTimeline)
 	e.PUT("/api/posts/:postId/like", h.LikePost)
+	e.PUT("/api/posts/:postId/unlike", h.UnlikePost)
+
 }

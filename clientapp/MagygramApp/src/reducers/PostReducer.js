@@ -1,6 +1,7 @@
 import { postConstants } from "../constants/PostConstants";
 
 let strcpy = {}
+let postCopy = {}
 
 export const postReducer = (state, action) => {
 	switch (action.type) {
@@ -63,7 +64,11 @@ export const postReducer = (state, action) => {
 			strcpy =  {
 				...state,
 			};
-			strcpy.timeline.posts.find(post => post.Id === action.postId).Liked = true;
+			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
+			postCopy.Liked= true;
+			if (postCopy.LikedBy.find(likedByUserInfo => likedByUserInfo.Id === state.loggedUserInfo.Id) === undefined){
+				postCopy.LikedBy.push(state.loggedUserInfo)
+			}
 			return strcpy;
 		case postConstants.LIKE_POST_FAILURE:
 			return {
@@ -77,7 +82,10 @@ export const postReducer = (state, action) => {
 			strcpy =  {
 				...state,
 			};
-			strcpy.timeline.posts.find(post => post.Id === action.postId).Liked = false;
+			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
+			postCopy.Liked= false;
+			var newLikedByList = postCopy.LikedBy.filter((deliverer) => deliverer.Id !== state.loggedUserInfo.Id);
+			postCopy.LikedBy = newLikedByList
 			return strcpy;
 		case postConstants.UNLIKE_POST_FAILURE:
 			return {

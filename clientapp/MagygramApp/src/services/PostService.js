@@ -115,9 +115,20 @@ function likePost(postId, dispatch) {
 
 function unlikePost(postId, dispatch) {
 	dispatch(request());
-	dispatch(success(postId));
-	dispatch(failure("Test"));
-
+	Axios.put(`/api/posts/${postId}/unlike`, {} ,{ validateStatus: () => true, headers: authHeader() })
+	.then((res) => {		
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(postId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+		
 	function request() {
 		return { type: postConstants.UNLIKE_POST_REQUEST };
 	}
