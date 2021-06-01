@@ -18,6 +18,7 @@ type PostHandler interface {
 	UnlikePost(c echo.Context) error
 	DislikePost(c echo.Context) error
 	UndislikePost(c echo.Context) error
+	GetPostsFirstImage(c echo.Context) error
 }
 
 type postHandler struct {
@@ -64,6 +65,7 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, postId)
 }
 
+
 func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	ctx := c.Request().Context()
 	if ctx == nil {
@@ -81,6 +83,7 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 }
 
 func (p postHandler) LikePost(c echo.Context) error {
+
 	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
@@ -146,5 +149,20 @@ func (p postHandler) UndislikePost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) GetPostsFirstImage(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	postImage, err := p.PostService.GetPostsFirstImage(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, postImage)
 }
 

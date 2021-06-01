@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/go-playground/validator"
 	_ "net/http"
 	"post-service/domain/model"
@@ -17,7 +18,6 @@ type postService struct {
 	intercomm.MediaClient
 	intercomm.UserClient
 }
-
 
 func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
 	return &postService{r , ic, uc}
@@ -221,4 +221,16 @@ func hasUserDislikedPost(post *model.Post, usedId string) bool {
 }
 
 
+func (p postService) GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error) {
+
+	post, err := p.PostRepository.GetByID(ctx, postId)
+
+	if err != nil {
+		return nil, errors.New("invalid post id")
+	}
+	if len(post.Media) > 0 {
+		return &post.Media[0], nil
+	}
+	return nil, nil
+}
 

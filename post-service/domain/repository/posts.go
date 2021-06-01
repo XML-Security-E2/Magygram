@@ -11,4 +11,5 @@ type PostRepository interface {
 	GetAll(ctx context.Context) ([]*model.Post, error)
 	GetOne(ctx context.Context, postId string) (*model.Post, error)
 	Update(ctx context.Context, post *model.Post) (*mongo.UpdateResult, error)
+	GetByID(ctx context.Context, id string) (*model.Post, error)
 }

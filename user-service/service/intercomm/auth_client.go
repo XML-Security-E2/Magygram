@@ -99,7 +99,7 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 
 func (a authClient) ActivateUser(userId string) error {
 
-	resp, err := http.Get(fmt.Sprintf("%s/activate/%s", baseUrl, userId))
+	resp, err := http.Get(fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId))
 	if err != nil || resp.StatusCode != 200 {
 		fmt.Println(resp.StatusCode)
 		return errors.New("failed updating user")
@@ -112,7 +112,7 @@ func (a authClient) ChangePassword(userId string, password string, passwordRepea
 	passwordRequest := &passwordChangeRequest{UserId: userId, Password: password, PasswordRepeat: passwordRepeat}
 	jsonPasswordRequest, _ := json.Marshal(passwordRequest)
 
-	resp, err := http.Post(fmt.Sprintf("%s/reset-password", baseUrl), "application/json", bytes.NewBuffer(jsonPasswordRequest))
+	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port), "application/json", bytes.NewBuffer(jsonPasswordRequest))
 	if err != nil || resp.StatusCode != 200 {
 		message, err := getErrorMessageFromRequestBody(resp.Body)
 		if err != nil {

@@ -12,4 +12,5 @@ type PostService interface {
 	UnlikePost(ctx context.Context, bearer string,  postId string) error
 	DislikePost(ctx context.Context, bearer string,  postId string) error
 	UndislikePost(ctx context.Context, bearer string,  postId string) error
+	GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error)
 }

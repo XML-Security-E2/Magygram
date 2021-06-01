@@ -45,6 +45,19 @@ func (r *postRepository) GetAll(ctx context.Context) ([]*model.Post, error) {
 	return results, nil
 }
 
+func (r *postRepository) GetByID(ctx context.Context, id string) (*model.Post, error) {
+
+	var post = model.Post{}
+	err := r.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&post)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("ErrNoDocuments")
+		}
+		return nil, err
+	}
+	return &post, nil
+}
+
 func (r *postRepository) GetOne(ctx context.Context, postId string) (*model.Post, error) {
 	var post = model.Post{}
 	fmt.Println(postId)
@@ -62,7 +75,7 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.U
 	return r.Col.UpdateOne(ctx, bson.M{"_id":  post.Id},bson.D{{"$set", bson.D{
 		{"description" , post.Description},
 		{"location" , post.Location},
-		{"post_type" , post.PostType},
+		{"post_type" , post.ContentType},
 		{"tags" , post.Tags},
 		{"hashTags" , post.HashTags},
 		{"media" , post.Media},

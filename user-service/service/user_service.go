@@ -28,7 +28,6 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user := model.NewUser(userRequest)
-
 	if err := validator.New().Struct(user); err!= nil {
 		return "", err
 	}
@@ -41,6 +40,7 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	fmt.Println("test3")
 
 	result, err := u.UserRepository.Create(ctx, user)
+
 	if err != nil { return "", err}
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 	fmt.Println(result.InsertedID.(string))
