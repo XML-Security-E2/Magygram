@@ -11,6 +11,7 @@
 		"bootstrap-icons": "^1.5.0",
 		"react": "^17.0.2",
 		"react-bootstrap": "^1.6.0",
+		"react-datepicker": "^4.1.0",
 		"react-dom": "^17.0.2",
 		"react-image-gallery": "^1.0.10",
 		"react-image-video-gallery": "^0.8.18",
