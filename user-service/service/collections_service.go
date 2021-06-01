@@ -36,7 +36,7 @@ func (c collectionsService) CreateCollection(ctx context.Context, bearer string,
 		return errors.New(fmt.Sprintf("collection with name %s already exist", collectionName))
 	}
 
-	user.FavouritePosts[collectionName] = []model.Media{{}}
+	user.FavouritePosts[collectionName] = []model.IdWithMedia{}
 	_, err = c.UserRepository.Update(ctx, user)
 	if err != nil {
 		return err
@@ -61,12 +61,23 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 		return errors.New(fmt.Sprintf("invalid %s collection", favouritePostRequest.CollectionName))
 	}
 
+	for colName, _ := range user.FavouritePosts {
+		for _, favMedia := range user.FavouritePosts[colName] {
+			if favMedia.Id == favouritePostRequest.PostId {
+				return errors.New(fmt.Sprintf("post with %s id already in favourites", favouritePostRequest.PostId))
+			}
+		}
+	}
+
 	postImage, err := c.PostClient.GetPostsFirstImage(favouritePostRequest.PostId)
 	if err != nil {
 		return err
 	}
 
-	user.FavouritePosts[favouritePostRequest.CollectionName] = append(user.FavouritePosts[favouritePostRequest.CollectionName], *postImage)
+	user.FavouritePosts[favouritePostRequest.CollectionName] = append(user.FavouritePosts[favouritePostRequest.CollectionName], model.IdWithMedia{
+		Id:    favouritePostRequest.PostId,
+		Media: *postImage,
+	})
 	_, err = c.UserRepository.Update(ctx, user)
 	if err != nil {
 		return err

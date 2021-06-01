@@ -12,7 +12,7 @@ type User struct {
 	Name  string `bson:"name" validate:"required,min=2"`
 	Email string `bson:"email" validate:"required,email"`
 	Surname string `bson:"surname" validate:"required,min=2"`
-	FavouritePosts map[string][]Media `bson:"favouritePosts"`
+	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
 }
 
 type UserInfo struct {
@@ -52,6 +52,11 @@ func validateMediaTypeEnums(md Media) error {
 	return nil
 }
 
+type IdWithMedia struct {
+	Id string `json:"id"`
+	Media Media `json:"media"`
+}
+
 type FavouritePostRequest struct {
 	PostId string `json:"postId"`
 	CollectionName string `json:"collectionName"`
@@ -76,5 +81,5 @@ func NewUser(userRequest *UserRequest) *User {
 		Surname:  html.EscapeString(userRequest.Surname),
 		Username: html.EscapeString(userRequest.Username),
 		Email:    html.EscapeString(userRequest.Email),
-		FavouritePosts: map[string][]Media{}}
+		FavouritePosts: map[string][]IdWithMedia{}}
 }
