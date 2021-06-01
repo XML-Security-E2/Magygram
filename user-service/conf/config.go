@@ -31,6 +31,12 @@ type Config struct {
 		Port 	 string
 	}
 
+	Postservice struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
+
 	Gateway struct {
 		Port 	 string
 	}

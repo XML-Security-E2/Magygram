@@ -7,4 +7,5 @@ import (
 
 type PostService interface {
 	CreatePost(ctx context.Context, bearer string,  post *model.PostRequest) (string, error)
+	GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error)
 }

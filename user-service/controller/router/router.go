@@ -16,4 +16,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/resend-activation-link", h.ResendActivationLink)
 	e.GET("/api/users/check-existence/:userId", h.GetUserEmailIfUserExist)
 	e.GET("/api/users/:userId", h.GetUserById)
+
+	e.POST("/api/users/collections", h.CreateCollection)
+	e.POST("/api/users/collections/posts", h.AddPostToCollection)
+
 }
