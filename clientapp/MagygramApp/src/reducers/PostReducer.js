@@ -1,5 +1,7 @@
 import { postConstants } from "../constants/PostConstants";
 
+let strcpy = {}
+
 export const postReducer = (state, action) => {
 	switch (action.type) {
 		case postConstants.CREATE_POST_REQUEST:
@@ -58,13 +60,26 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 		case postConstants.LIKE_POST_SUCCESS:
-			alert('t')
-			let strcpy =  {
+			strcpy =  {
 				...state,
 			};
 			strcpy.timeline.posts.find(post => post.Id === action.postId).Liked = true;
 			return strcpy;
 		case postConstants.LIKE_POST_FAILURE:
+			return {
+				...state,
+			};
+		case postConstants.UNLIKE_POST_REQUEST:
+			return {
+				...state,
+			};
+		case postConstants.UNLIKE_POST_SUCCESS:
+			strcpy =  {
+				...state,
+			};
+			strcpy.timeline.posts.find(post => post.Id === action.postId).Liked = false;
+			return strcpy;
+		case postConstants.UNLIKE_POST_FAILURE:
 			return {
 				...state,
 			};

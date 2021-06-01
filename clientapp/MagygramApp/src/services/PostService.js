@@ -7,6 +7,7 @@ export const postService = {
 	findPostsForTimeline,
 	createPost,
 	likePost,
+	unlikePost,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -84,9 +85,8 @@ function fetchFormData(postDTO) {
 
 function likePost(postId, dispatch) {
 	dispatch(request());
-
 	dispatch(success(postId));
-
+	dispatch(failure("Test"));
 
 	function request() {
 		return { type: postConstants.LIKE_POST_REQUEST };
@@ -96,5 +96,21 @@ function likePost(postId, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.LIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function unlikePost(postId, dispatch) {
+	dispatch(request());
+	dispatch(success(postId));
+	dispatch(failure("Test"));
+
+	function request() {
+		return { type: postConstants.UNLIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.UNLIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.UNLIKE_POST_FAILURE, errorMessage: message };
 	}
 }

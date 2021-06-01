@@ -1,6 +1,6 @@
 import React from "react";
 
-const PostInteraction = ({post, LikePost, DislikePost}) => {
+const PostInteraction = ({post, LikePost, DislikePost, UnlikePost, UndislikePost}) => {
     const iconStyle = { fontSize: "35px", margin: "0px" };
 
 
@@ -19,12 +19,12 @@ const PostInteraction = ({post, LikePost, DislikePost}) => {
                         </button>
                     </li>
                     <li hidden={!post.Liked || post.Dislike} className="list-inline-item">
-                        <button className="btn p-0">
+                        <button onClick={()=> UnlikePost(post.Id)} className="btn p-0">
                                 <i width="1.6em" height="1.6em" fill="currentColor" className="fa fa-thumbs-up" style={iconStyle} />
                         </button>
                     </li>
                     <li hidden={post.Liked || !post.Dislike} className="list-inline-item">
-                        <button className="btn p-0">
+                        <button onClick={()=> UndislikePost(post.Id)} className="btn p-0">
                                 <i width="1.6em" height="1.6em" fill="currentColor" className="fa fa-thumbs-down" style={iconStyle} />
                         </button>
                     </li>

@@ -8,13 +8,21 @@ import { postService } from "../services/PostService";
 import { PostContext } from "../contexts/PostContext";
 
 const Post = ({post}) => {
-	const { postState, dispatch } = useContext(PostContext);
+	const { dispatch } = useContext(PostContext);
 
     const LikePost = (postId) => {
         postService.likePost(postId, dispatch)
     }
 
+    const UnlikePost = (postId) => {
+        postService.unlikePost(postId, dispatch)
+    }
+
     const DislikePost = (postId) => {
+        alert(postId)
+    }
+
+    const UndislikePost = (postId) => {
         alert(postId)
     }
 
@@ -25,7 +33,7 @@ const Post = ({post}) => {
                     <PostHeader username={post.UserInfo.Username} image={post.UserInfo.ImageURL}/>
                     <div className="card-body p-0">
                         <PostImageSlider media={post.Media}/>
-                        <PostInteraction post={post} LikePost={LikePost} DislikePost={DislikePost}/>
+                        <PostInteraction post={post} LikePost={LikePost} DislikePost={DislikePost} UnlikePost={UnlikePost} UndislikePost={UndislikePost}/>
                         <div className="pl-3 pr-3 pb-2">
                         <PostInformation username={post.UserInfo.Username} likes={post.LikedBy.length} description={post.Description}/>
                         </div>
