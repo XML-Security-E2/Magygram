@@ -32,7 +32,6 @@ export const postReducer = (state, action) => {
 					successMessage: "",
 				},
 			};
-
 		case postConstants.TIMELINE_POSTS_REQUEST:
 			return {
 				...state,
@@ -53,6 +52,21 @@ export const postReducer = (state, action) => {
 				timeline: {		
 					posts : []
 				}
+			};
+		case postConstants.LIKE_POST_REQUEST:
+			return {
+				...state,
+			};
+		case postConstants.LIKE_POST_SUCCESS:
+			alert('t')
+			let strcpy =  {
+				...state,
+			};
+			strcpy.timeline.posts.find(post => post.Id === action.postId).Liked = true;
+			return strcpy;
+		case postConstants.LIKE_POST_FAILURE:
+			return {
+				...state,
 			};
 		default:
 			return state;

@@ -6,6 +6,7 @@ import { authHeader } from "../helpers/auth-header";
 export const postService = {
 	findPostsForTimeline,
 	createPost,
+	likePost,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -79,4 +80,21 @@ function fetchFormData(postDTO) {
 	formData.append("location", postDTO.location);
 	formData.append("tags", JSON.stringify(postDTO.tags));
 	return formData;
+}
+
+function likePost(postId, dispatch) {
+	dispatch(request());
+
+	dispatch(success(postId));
+
+
+	function request() {
+		return { type: postConstants.LIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.LIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.LIKE_POST_FAILURE, errorMessage: message };
+	}
 }
