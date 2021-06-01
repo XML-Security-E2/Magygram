@@ -35,7 +35,7 @@ const Post = ({post}) => {
                         <PostImageSlider media={post.Media}/>
                         <PostInteraction post={post} LikePost={LikePost} DislikePost={DislikePost} UnlikePost={UnlikePost} UndislikePost={UndislikePost}/>
                         <div className="pl-3 pr-3 pb-2">
-                        <PostInformation username={post.UserInfo.Username} likes={post.LikedBy.length} description={post.Description}/>
+                        <PostInformation username={post.UserInfo.Username} likes={post.LikedBy.length} dislikes={post.DislikedBy.length} description={post.Description}/>
                         </div>
                         <PostComments comments={post.Comments}/>
                     </div>

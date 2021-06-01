@@ -18,6 +18,7 @@ type postService struct {
 	intercomm.UserClient
 }
 
+
 func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
 	return &postService{r , ic, uc}
 }
@@ -110,6 +111,64 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 	return nil
 }
 
+func (p postService) DislikePost(ctx context.Context, bearer string, postId string) error {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return err
+	}
+
+	result, err := p.PostRepository.GetOne(ctx,postId)
+	if err != nil {
+		return err
+	}
+	var res model.UserInfo
+
+	res.Id= userInfo.Id
+	res.ImageURL= userInfo.ImageURL
+	res.Username= userInfo.Username
+
+	result.DislikedBy = append(result.DislikedBy, res)
+
+	_, err = p.PostRepository.Update(ctx,result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p postService) UndislikePost(ctx context.Context, bearer string, postId string) error {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return err
+	}
+
+	result, err := p.PostRepository.GetOne(ctx,postId)
+	if err != nil {
+		return err
+	}
+
+	result.DislikedBy = findAndDeleteDislikedBy(result, userInfo)
+
+	_, err = p.PostRepository.Update(ctx,result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func findAndDeleteDislikedBy(result *model.Post, info *model.UserInfo) []model.UserInfo {
+	index := 0
+	for _, i := range result.DislikedBy {
+		if i.Id != info.Id {
+			result.DislikedBy[index] = i
+			index++
+		}
+	}
+	return result.DislikedBy[:index]
+}
+
 func findAndDeleteLikedBy(result *model.Post, info *model.UserInfo) []model.UserInfo {
 	index := 0
 	for _, i := range result.LikedBy {
@@ -119,19 +178,6 @@ func findAndDeleteLikedBy(result *model.Post, info *model.UserInfo) []model.User
 		}
 	}
 	return result.LikedBy[:index]
-}
-
-
-
-func findAndDeleteLikedBy1(s [4]int, item int) []int {
-	index := 0
-	for _, i := range s {
-		if i != item {
-			s[index] = i
-			index++
-		}
-	}
-	return s[:index]
 }
 
 func mapPostsToResponsePostDTO(result []*model.Post, userId string) []*model.PostResponse {

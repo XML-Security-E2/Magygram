@@ -16,6 +16,8 @@ type PostHandler interface {
 	GetPostsForTimeline(c echo.Context) error
 	LikePost(c echo.Context) error
 	UnlikePost(c echo.Context) error
+	DislikePost(c echo.Context) error
+	UndislikePost(c echo.Context) error
 }
 
 type postHandler struct {
@@ -112,4 +114,37 @@ func (p postHandler) UnlikePost(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")
 }
 
+func (p postHandler) DislikePost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.DislikePost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) UndislikePost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.UndislikePost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
 

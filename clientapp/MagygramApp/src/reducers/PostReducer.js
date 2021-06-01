@@ -84,7 +84,7 @@ export const postReducer = (state, action) => {
 			};
 			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
 			postCopy.Liked= false;
-			var newLikedByList = postCopy.LikedBy.filter((deliverer) => deliverer.Id !== state.loggedUserInfo.Id);
+			var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== state.loggedUserInfo.Id);
 			postCopy.LikedBy = newLikedByList
 			return strcpy;
 		case postConstants.UNLIKE_POST_FAILURE:
@@ -99,7 +99,11 @@ export const postReducer = (state, action) => {
 			strcpy =  {
 				...state,
 			};
-			strcpy.timeline.posts.find(post => post.Id === action.postId).Disliked = true;
+			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
+			postCopy.Disliked= true;
+			if (postCopy.DislikedBy.find(dislikedByUserInfo => dislikedByUserInfo.Id === state.loggedUserInfo.Id) === undefined){
+				postCopy.DislikedBy.push(state.loggedUserInfo)
+			}
 			return strcpy;
 		case postConstants.DISLIKE_POST_FAILURE:
 			return {
@@ -113,7 +117,10 @@ export const postReducer = (state, action) => {
 			strcpy =  {
 				...state,
 			};
-			strcpy.timeline.posts.find(post => post.Id === action.postId).Disliked = false;
+			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
+			postCopy.Disliked= false;
+			var newDisikedByList = postCopy.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== state.loggedUserInfo.Id);
+			postCopy.DislikedBy = newDisikedByList
 			return strcpy;
 		case postConstants.UNDISLIKE_POST_FAILURE:
 			return {
