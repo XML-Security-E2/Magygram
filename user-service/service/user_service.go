@@ -31,11 +31,13 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	if err := validator.New().Struct(user); err!= nil {
 		return "", err
 	}
-
+	fmt.Println("test1")
 	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil { return "", err}
+	fmt.Println("test2")
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
+	fmt.Println("test3")
 
 	result, err := u.UserRepository.Create(ctx, user)
 

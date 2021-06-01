@@ -86,7 +86,7 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
 	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
-			"application/json", bytes.NewBuffer(jsonUserRequest))
+		"application/json", bytes.NewBuffer(jsonUserRequest))
 	if err != nil || resp.StatusCode != 201 {
 		message, err := getErrorMessageFromRequestBody(resp.Body)
 		if err != nil {

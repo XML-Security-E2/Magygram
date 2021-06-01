@@ -13,8 +13,12 @@ import (
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
+	GetPostsForTimeline(c echo.Context) error
+	LikePost(c echo.Context) error
+	UnlikePost(c echo.Context) error
+	DislikePost(c echo.Context) error
+	UndislikePost(c echo.Context) error
 	GetPostsFirstImage(c echo.Context) error
-
 }
 
 type postHandler struct {
@@ -61,6 +65,92 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, postId)
 }
 
+
+func (p postHandler) GetPostsForTimeline(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	//var userId= GetUserIdFromJWTToken(c)
+	//fmt.Println(userId)
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetPostsForTimeline(ctx,bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, posts)
+}
+
+func (p postHandler) LikePost(c echo.Context) error {
+
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.LikePost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) UnlikePost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.UnlikePost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) DislikePost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.DislikePost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) UndislikePost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.PostService.UndislikePost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
 func (p postHandler) GetPostsFirstImage(c echo.Context) error {
 	postId := c.Param("postId")
 
@@ -75,5 +165,4 @@ func (p postHandler) GetPostsFirstImage(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, postImage)
 }
-
 

@@ -2,8 +2,41 @@ import Axios from "axios";
 import { postConstants } from "../constants/PostConstants";
 import { authHeader } from "../helpers/auth-header";
 
+
 export const postService = {
+	findPostsForTimeline,
 	createPost,
+	likePost,
+	unlikePost,
+	dislikePost,
+	undislikePost,
+};
+
+async function findPostsForTimeline(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure()
+			}
+		})
+			.catch((err) => {
+				failure()
+			});
+
+		function request() {
+			return { type: postConstants.TIMELINE_POSTS_REQUEST};
+		}
+
+		function success(data) {
+			return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
+		}
+		function failure() {
+			return { type: postConstants.TIMELINE_POSTS_FAILURE };
+		}
+
 };
 
 function createPost(postDTO, dispatch) {
@@ -50,4 +83,115 @@ function fetchFormData(postDTO) {
 	formData.append("location", postDTO.location);
 	formData.append("tags", JSON.stringify(postDTO.tags));
 	return formData;
+}
+
+function likePost(postId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts/${postId}/like`, {} ,{ validateStatus: () => true, headers: authHeader() })
+	.then((res) => {		
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(postId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: postConstants.LIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.LIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.LIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function unlikePost(postId, dispatch) {
+	dispatch(request());
+	Axios.put(`/api/posts/${postId}/unlike`, {} ,{ validateStatus: () => true, headers: authHeader() })
+	.then((res) => {		
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(postId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: postConstants.UNLIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.UNLIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.UNLIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function dislikePost(postId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts/${postId}/dislike`, {} ,{ validateStatus: () => true, headers: authHeader() })
+	.then((res) => {		
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(postId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: postConstants.DISLIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.DISLIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.DISLIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function undislikePost(postId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts/${postId}/undislike`, {} ,{ validateStatus: () => true, headers: authHeader() })
+	.then((res) => {		
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(postId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: postConstants.UNDISLIKE_POST_REQUEST };
+	}
+	function success(postId) {
+		return { type: postConstants.UNDISLIKE_POST_SUCCESS, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.UNDISLIKE_POST_FAILURE, errorMessage: message };
+	}
 }
