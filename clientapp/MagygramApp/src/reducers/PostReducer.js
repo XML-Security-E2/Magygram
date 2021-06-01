@@ -1,4 +1,5 @@
 import { postConstants } from "../constants/PostConstants";
+import { modalConstants } from "../constants/ModalConstants";
 
 let strcpy = {}
 let postCopy = {}
@@ -125,6 +126,38 @@ export const postReducer = (state, action) => {
 		case postConstants.UNDISLIKE_POST_FAILURE:
 			return {
 				...state,
+			};
+		case modalConstants.SHOW_POST_LIKED_BY_DETAILS:
+			return {
+				...state,
+				postLikedBy:{
+					showModal: true,
+					likedBy: action.LikedBy
+				}
+			};
+		case modalConstants.HIDE_POST_LIKED_BY_DETAILS:
+			return {
+				...state,
+				postLikedBy:{
+					showModal: false,
+					likedBy: []
+				}
+			};
+		case modalConstants.SHOW_POST_DISLIKES_MODAL:
+			return {
+				...state,
+				postDislikes:{
+					showModal: true,
+					dislikes: action.Dislikes
+				}
+			};
+		case modalConstants.HIDE_POST_DISLIKES_MODAL:
+			return {
+				...state,
+				postDislikes:{
+					showModal: false,
+					dislikes: []
+				}
 			};
 		default:
 			return state;
