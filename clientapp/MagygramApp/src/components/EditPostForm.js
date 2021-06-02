@@ -51,7 +51,6 @@ const EditPostForm = () => {
 	};
 
 	useEffect(() => {
-		console.log(postState.editPost);
 		setLocation(postState.editPost.post.location);
 		setDescription(postState.editPost.post.description);
 
