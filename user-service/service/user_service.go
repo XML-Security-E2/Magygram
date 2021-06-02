@@ -148,6 +148,16 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 	return user, err
 }
 
+func (u *userService) SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error) {
+	users, err := u.UserRepository.SearchForUsersByUsername(ctx, username)
+
+	if err != nil {
+		return nil, errors.New("Couldn't find any users")
+	}
+
+	return users, err
+}
+
 func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
 
 	userId, err := u.AuthClient.GetLoggedUserId(bearer)
