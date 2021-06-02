@@ -9,6 +9,7 @@ import CreateStoryModal from "../components/modals/CreateStoryModal";
 import StoryButton from "../components/StoryButton";
 import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
+import Header from "../components/Header";
 
 const HomePage = () => {
 	const history = useHistory();
@@ -17,6 +18,7 @@ const HomePage = () => {
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 	const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 	const [name, setName] = useState("");
+	const imgStyle2 = {"transform":"scale(1.5)","width":"100%","position":"absolute","left":"0"};
 
 	const handleLogout = () => {
 		userService.logout();
@@ -45,51 +47,7 @@ const HomePage = () => {
 
 	return (
 		<React.Fragment>
-			<div>
-				<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
-					<div className="container">
-						<div>
-							<img src="assets/img/logotest.png" alt="NistagramLogo" />
-						</div>
-						<button className="navbar-toggler" data-toggle="collapse">
-							<span className="sr-only">Toggle navigation</span>
-							<span className="navbar-toggler-icon"></span>
-						</button>
-						<div>
-							<input type="text" style={inputStyle} placeholder="Search" value="Search" />
-						</div>
-						<div className="d-xl-flex align-items-xl-center dropdown">
-							<i className="fa fa-home" style={iconStyle} />
-							<i className="la la-wechat" style={iconStyle} />
-							<i className="la la-compass" style={iconStyle} />
-							<i className="fa fa-heart-o" style={iconStyle} />
-							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage" />
-							<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
-								<li>
-									<button className="la la-user btn shadow-none" onClick={handleProfile}>
-										{" "}
-										Profile
-									</button>
-								</li>
-								<li>
-									<button className="la la-cog btn shadow-none" onClick={handleSettings}>
-										{" "}
-										Settings
-									</button>
-								</li>
-								<hr className="solid" />
-								<li>
-									<button className=" btn shadow-none" onClick={handleLogout}>
-										{" "}
-										Logout
-									</button>
-								</li>
-							</ul>
-						</div>
-						<div>{name}</div>
-					</div>
-				</nav>
-			</div>
+			<Header/>
 			<StoryContextProvider>
 				<CreateStoryModal />
 				<div>
@@ -99,6 +57,7 @@ const HomePage = () => {
 								<div class="row">
 									<div class="col-8">
 										<StoryButton />
+
 										<PostContextProvider>
 											<Timeline />
 										</PostContextProvider>
