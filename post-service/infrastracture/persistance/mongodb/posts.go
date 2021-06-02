@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/beevik/guid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
@@ -13,14 +14,32 @@ import (
 
 type postRepository struct {
 	Col *mongo.Collection
+	locationCol *mongo.Collection
+	tagCol *mongo.Collection
 }
 
-func NewPostRepository(Col *mongo.Collection) repository.PostRepository {
-	return &postRepository{Col}
+func NewPostRepository(Col *mongo.Collection, locationCol *mongo.Collection, tagCol *mongo.Collection) repository.PostRepository {
+	return &postRepository{Col, locationCol, tagCol}
 }
 
 func (r *postRepository) Create(ctx context.Context, post *model.Post) (*mongo.InsertOneResult, error) {
+	r.InsertLocation(ctx, post.Location)
+	for _, tag := range post.Tags {
+		r.InsertTag(ctx, tag)
+	}
 	return r.Col.InsertOne(ctx, post)
+}
+
+func (r *postRepository) InsertLocation(ctx context.Context, name string) error {
+	location := model.Location{guid.New().String(), name}
+	_, err := r.locationCol.InsertOne(ctx, location)
+	return err
+}
+
+func (r *postRepository) InsertTag(ctx context.Context, name string) error {
+	tag := model.Tag{guid.New().String(), name}
+	_, err := r.tagCol.InsertOne(ctx, tag)
+	return err
 }
 
 func (r *postRepository) GetAll(ctx context.Context) ([]*model.Post, error) {
@@ -84,3 +103,4 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.U
 		{"disliked_by" , post.DislikedBy},
 		{"comments" , post.Comments}}}})
 }
+
