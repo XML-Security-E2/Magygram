@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/relationship-service/certificate-key.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/certificate.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/conf/config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/conf/local.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/controller/handler/app_handler.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/controller/handler/follow_handler.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/controller/middleware/middleware.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/controller/router/router.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/domain/model/follow.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/domain/repository/follow.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/domain/service-contracts/follow_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/go.mod" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/infrastructure/persistence/neo4jdb/follow.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/interactor/interactor.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/relationship-service/service/follow_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/controller/handler/app_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/controller/handler/app_handler.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$USER_HOME$/sdk/go1.16.3" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="false" />
+  </component>
+  <component name="ProjectId" id="1tDxFhQ3g7HzmyqFjDakfqQkQoW" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RunManager" selected="Go Build.go build user-service">
+    <configuration name="go build auth-service" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="Magygram" />
+      <working_directory value="$PROJECT_DIR$/auth-service" />
+      <kind value="PACKAGE" />
+      <package value="auth-service" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build user-service" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="Magygram" />
+      <working_directory value="$PROJECT_DIR$/user-service" />
+      <kind value="PACKAGE" />
+      <package value="user-service" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build user_service.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="Magygram" />
+      <working_directory value="$PROJECT_DIR$/user-service" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/user-service/service/user_service.go" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build user-service" />
+        <item itemvalue="Go Build.go build user_service.go" />
+        <item itemvalue="Go Build.go build auth-service" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/user-service/controller/handler/user_handler.go</url>
+          <line>2</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
