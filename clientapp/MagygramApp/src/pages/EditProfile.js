@@ -1,10 +1,8 @@
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
 import { config } from "../config/config";
 import { authHeader } from "../helpers/auth-header";
-import { UserContext } from "../contexts/UserContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useHistory } from "react-router-dom";
@@ -14,32 +12,31 @@ const EditProfile = () => {
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
-    const iconStyle1 = { fontSize: "30px", margin: "0px", marginLeft: "200px" };
+	//const iconStyle1 = { fontSize: "30px", margin: "0px", marginLeft: "200px" };
 	const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
-    const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
-	const nameStyle = { left: "20",  marginLeft: "13px"}
-    const editStyle = {color: "black", left: "20",  marginLeft: "13px",marginRight: "13px", borderWidth: "1px", borderStyle: "solid" }
-    const sectionStyle = { left: "20",  marginLeft: "100px"}
-   
-	const [surname, setSurname] = useState("");
-    const [name, setName] = useState("");
+	//const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
+	//const nameStyle = { left: "20", marginLeft: "13px" };
+	//const editStyle = { color: "black", left: "20", marginLeft: "13px", marginRight: "13px", borderWidth: "1px", borderStyle: "solid" };
+	const sectionStyle = { left: "20", marginLeft: "100px" };
+
+	//const [surname, setSurname] = useState("");
+	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [repeatedPassword, setRepeatedPassword] = useState("");
+	//const [password, setPassword] = useState("");
+	//const [repeatedPassword, setRepeatedPassword] = useState("");
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		let user = {
-			name,
-			surname,
-			email,
-			username,
-			password,
-			repeatedPassword,
-		};
-
+		// let user = {
+		// 	name,
+		// 	surname,
+		// 	email,
+		// 	username,
+		// 	password,
+		// 	repeatedPassword,
+		// };
 	};
 
 	const handleLogout = () => {
@@ -47,20 +44,20 @@ const EditProfile = () => {
 	};
 
 	const handleProfile = () => {
-
-        
-		let path = `/profile`; 
+		let path = `/profile`;
 		history.push(path);
-        
-		Axios.get(`${config.API_URL}/api/users/logged`,{
+
+		Axios.get(`${config.API_URL}/api/users/logged`, {
 			validateStatus: () => true,
-			headers: { Authorization: authHeader() }
+			headers: { Authorization: authHeader() },
 		})
 			.then((res) => {
 				console.log(res.data);
 				setName(res.data.Name);
 			})
-			.catch((err) => {console.log(err);});
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	const handleSettings = () => {
@@ -113,70 +110,65 @@ const EditProfile = () => {
 						<div>{name}</div>
 					</div>
 				</nav>
-                <br/>
-                <br/>
-            <div className="container">
-            <form method="post" onSubmit={handleSubmit}>
+				<br />
+				<br />
+				<div className="container">
+					<form method="post" onSubmit={handleSubmit}>
+						<div>
+							<h2 className="text-center">
+								<strong>Edit</strong> profile
+							</h2>
+							<br />
+							<div className="form-group">
+								<input className="form-control" required type="text" name="nameInput" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+							</div>
 
-			<div >
-				<h2 className="text-center">
-					<strong>Edit</strong> profile
-				</h2>
-                <br/>
-				<div className="form-group">
-					<input className="form-control" required type="text" name="nameInput" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-				</div>
-                
-				<div className="form-group">
-					<input className="form-control" required type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-				</div>
+							<div className="form-group">
+								<input className="form-control" required type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+							</div>
 
-				<div className="form-group">
-					<input className="form-control" required type="username" name="username" placeholder="@Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-				</div>
+							<div className="form-group">
+								<input className="form-control" required type="username" name="username" placeholder="@Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+							</div>
 
-				<div className="form-group">
-					<input className="form-control" required type="text" name="websiteInput" placeholder="Website" value={name} onChange={(e) => setName(e.target.value)} />
-				</div>
+							<div className="form-group">
+								<input className="form-control" required type="text" name="websiteInput" placeholder="Website" value={name} onChange={(e) => setName(e.target.value)} />
+							</div>
 
-                <div className="form-group">
-					<input className="form-control" required type="text" name="bioInput" placeholder="Bio" value={name} onChange={(e) => setName(e.target.value)} />
-				</div>
+							<div className="form-group">
+								<input className="form-control" required type="text" name="bioInput" placeholder="Bio" value={name} onChange={(e) => setName(e.target.value)} />
+							</div>
 
-                <div className="form-group">
-					<input className="form-control" required type="text" name="numberInput" placeholder="Number" value={name} onChange={(e) => setName(e.target.value)} />
-				</div>
+							<div className="form-group">
+								<input className="form-control" required type="text" name="numberInput" placeholder="Number" value={name} onChange={(e) => setName(e.target.value)} />
+							</div>
 
-            
-
-                <div class="flexbox-container">
-                    <div>Date of birth</div>
-                    <div style={sectionStyle}>
-					<DatePicker />
-                    </div>
+							<div class="flexbox-container">
+								<div>Date of birth</div>
+								<div style={sectionStyle}>
+									<DatePicker />
+								</div>
+							</div>
+							<br />
+							<div class="flexbox-container">
+								<div>Gender</div>
+								<div style={sectionStyle}>
+									<select id="dropdown">
+										<option value="1"> Male</option>
+										<option value="2"> Female</option>
+									</select>
+								</div>
+							</div>
+							<br />
+							<div className="form-group">
+								<input className="btn btn-primary btn-block" type="submit" value="Save" />
+							</div>
+						</div>
+					</form>
 				</div>
-                <br/>
-                <div class="flexbox-container">
-                    <div>Gender</div>
-                    <div style={sectionStyle}>
-					<select id = "dropdown">
-                        <option value="1"> Male</option>
-                        <option value="2"> Female</option>
-                    </select>
-                    </div>
-				</div>
-                <br/>
-				<div className="form-group">
-					<input className="btn btn-primary btn-block" type="submit" value="Save" />
-				</div>
-				
 			</div>
-		</form>
-            </div>
-            </div>
-			
 		</React.Fragment>
 	);
 };
 
-export default EditProfile
+export default EditProfile;
