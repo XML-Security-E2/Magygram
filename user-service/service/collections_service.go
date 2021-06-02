@@ -16,6 +16,7 @@ type collectionsService struct {
 	intercomm.PostClient
 }
 
+
 func NewCollectionsService(r repository.UserRepository, ic 	intercomm.AuthClient, pc intercomm.PostClient) service_contracts.CollectionsService {
 	return &collectionsService{r, ic, pc}
 }
@@ -96,7 +97,7 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 	return nil
 }
 
-func (c collectionsService) GetUsersCollections(ctx context.Context, bearer string) (map[string][]model.IdWithMedia, error) {
+func (c collectionsService) GetUsersCollections(ctx context.Context, bearer string, except string) (map[string][]model.IdWithMedia, error) {
 	userId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
 		return nil, err
@@ -107,19 +108,52 @@ func (c collectionsService) GetUsersCollections(ctx context.Context, bearer stri
 		return nil, errors.New("invalid user id")
 	}
 
-	var collectionsWith4Media map[string][]model.IdWithMedia
+	var collectionsWith4Media = make(map[string][]model.IdWithMedia)
 
 	for colName, _ := range user.FavouritePosts {
-		var i int
-		collectionsWith4Media[colName] = []model.IdWithMedia{}
-		if i < 4 {
-			for _, favMedia := range user.FavouritePosts[colName] {
-				collectionsWith4Media[colName] = append(collectionsWith4Media[colName], favMedia)
-				i = i + 1
-				fmt.Println(i)
+		if colName != except {
+			var i int
+			collectionsWith4Media[colName] = []model.IdWithMedia{}
+			if i < 4 {
+				for _, favMedia := range user.FavouritePosts[colName] {
+					collectionsWith4Media[colName] = append(collectionsWith4Media[colName], favMedia)
+					i = i + 1
+				}
 			}
+			i = 0
 		}
 	}
-
 	return collectionsWith4Media, nil
+}
+
+func (c collectionsService) CheckIfPostsInFavourites(ctx context.Context, bearer string, postIds *[]string) ([]*model.PostIdFavouritesFlag, error) {
+	userId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := c.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	var postsFavFlags []*model.PostIdFavouritesFlag
+	for _, postId := range *postIds {
+		fav := false
+		for _, favMedia := range user.FavouritePosts[model.DefaultCollection] {
+			if favMedia.Id == postId {
+				fav = true
+				fmt.Println(fav , "1")
+
+			}
+		}
+		fmt.Println(postId)
+
+		fmt.Println(fav)
+		postsFavFlags = append(postsFavFlags, &model.PostIdFavouritesFlag{
+			Id:         postId,
+			Favourites: fav,
+		})
+	}
+	return postsFavFlags, nil
 }

@@ -148,13 +148,17 @@ type PostResponse struct {
 	LikedBy []UserInfo
 	DislikedBy []UserInfo
 	Comments []Comment
+	Favourites bool
 	Liked bool
 	Disliked bool
 }
 
+type PostIdFavouritesFlag struct {
+	Id string `json:"id"`
+	Favourites bool `json:"favourites"`
+}
 
-
-func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, error) {
+func NewPostResponse(post *Post, liked bool, disliked bool, favourites bool) (*PostResponse, error) {
 	return &PostResponse{Id: post.Id,
 		Description:   post.Description,
 		Location:    post.Location,
@@ -166,6 +170,7 @@ func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, erro
 		Comments: post.Comments,
 		Liked: liked,
 		Disliked: disliked,
+		Favourites: favourites,
 	}, nil
 }
 

@@ -5,6 +5,7 @@ import { authHeader } from "../helpers/auth-header";
 export const postService = {
 	findPostsForTimeline,
 	findAllUsersCollections,
+	addPostToCollection,
 	createPost,
 	likePost,
 	unlikePost,
@@ -16,6 +17,7 @@ async function findPostsForTimeline(dispatch) {
 	dispatch(request());
 	await Axios.get(`/api/posts`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
+			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
 			} else {
@@ -40,13 +42,13 @@ async function findPostsForTimeline(dispatch) {
 
 async function findAllUsersCollections(dispatch) {
 	dispatch(request());
-	await Axios.get(`/api/users/collections`, { validateStatus: () => true, headers: authHeader() })
+	await Axios.get(`/api/users/collections/except-default`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
 			} else {
-				failure();
+				failure("Error while loading collections");
 			}
 		})
 		.catch((err) => {
@@ -92,6 +94,33 @@ function createPost(postDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function addPostToCollection(collectionDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/users/collections/posts`, collectionDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 201) {
+				dispatch(success("Post successfully added to favourites"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_FAILURE, errorMessage: message };
 	}
 }
 

@@ -8,5 +8,6 @@ import (
 type CollectionsService interface {
 	CreateCollection(ctx context.Context, bearer string, collectionName string) error
 	AddPostToCollection(ctx context.Context, bearer string, favouritePostRequest *model.FavouritePostRequest) error
-	GetUsersCollections(ctx context.Context, bearer string) (map[string][]model.IdWithMedia,error)
+	GetUsersCollections(ctx context.Context, bearer string, except string) (map[string][]model.IdWithMedia,error)
+	CheckIfPostsInFavourites(ctx context.Context, bearer string,postIds *[]string) ([]*model.PostIdFavouritesFlag,error)
 }

@@ -1,3 +1,4 @@
+import { modalConstants } from "../constants/ModalConstants";
 import { postConstants } from "../constants/PostConstants";
 
 let strcpy = {};
@@ -160,6 +161,52 @@ export const postReducer = (state, action) => {
 					collections: [],
 				},
 			};
+		case modalConstants.OPEN_ADD_TO_COLLECTION_MODAL:
+			return {
+				...state,
+				addToFavouritesModa: {
+					renderCollectionSwitch: !state.addToFavouritesModa.renderCollectionSwitch,
+					showModal: true,
+					selectedPostId: action.postId,
+				},
+			};
+		case modalConstants.CLOSE_ADD_TO_COLLECTION_MODAL:
+			strcpy = {
+				...state,
+			};
+			strcpy.addToFavouritesModa.showModal = false;
+			strcpy.addToFavouritesModa.selectedPostId = "";
+
+			return strcpy;
+
+		case postConstants.ADD_POST_TO_COLLECTION_REQUEST:
+			strcpy = {
+				...state,
+			};
+			strcpy.userCollections.showError = false;
+			strcpy.userCollections.errorMessage = "";
+			strcpy.userCollections.showSuccessMessage = false;
+			strcpy.userCollections.successMessage = "";
+			return strcpy;
+
+		case postConstants.ADD_POST_TO_COLLECTION_SUCCESS:
+			strcpy = {
+				...state,
+			};
+			strcpy.userCollections.showError = false;
+			strcpy.userCollections.errorMessage = "";
+			strcpy.userCollections.showSuccessMessage = true;
+			strcpy.userCollections.successMessage = action.successMessage;
+			return strcpy;
+		case postConstants.ADD_POST_TO_COLLECTION_FAILURE:
+			strcpy = {
+				...state,
+			};
+			strcpy.userCollections.showError = true;
+			strcpy.userCollections.errorMessage = action.errorMessage;
+			strcpy.userCollections.showSuccessMessage = false;
+			strcpy.userCollections.successMessage = "";
+			return strcpy;
 		default:
 			return state;
 	}
