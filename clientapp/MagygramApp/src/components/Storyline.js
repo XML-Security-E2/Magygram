@@ -14,6 +14,10 @@ const Storyline = () => {
 		getStoriesHandler();
 	}, [dispatch]);
 
+	const openStorySlider = () =>{
+		alert('todo')
+	}
+
 	return (
         <React.Fragment>
             <div className="card">
@@ -21,7 +25,7 @@ const Storyline = () => {
 					<ul className="list-unstyled mb-0">
 						<StoryButton/>
 						{storyState.storyline.stories.map((story) => {
-							return <Story story={story}/>; })}
+							return <Story story={story} openStorySlider={openStorySlider}/>; })}
 					</ul>
 				</div>
 			</div>

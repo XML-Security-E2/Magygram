@@ -59,7 +59,7 @@ export const storyReducer = (state, action) => {
 			return {
 				...state,
 				storyline: {		
-					stories : []
+					stories : action.stories
 				}
 			};
 		case storyConstants.STORYLINE_STORY_FAILURE:

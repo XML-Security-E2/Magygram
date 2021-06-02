@@ -20,20 +20,15 @@ type MediaClient interface {
 type mediaClient struct {}
 
 func (m mediaClient) SaveMedia(media *multipart.FileHeader) (model.Media, error) {
-	fmt.Println("udjemedi1")
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	var fw io.Writer
 	defer writer.Close()
 
-	fmt.Println("udjemedi2")
 	fw, _ = writeFileToRequestBody(media, fw, writer)
 	writer.Close()
-	fmt.Println("udjemedi31")
-	fmt.Println("udjemedi14")
 
 	retMedia, statusCode, err := handleSaveMediaRequest(body, writer)
-	fmt.Println("udjemedi15")
 
 	if err != nil || statusCode != http.StatusCreated {
 		return model.Media{}, err

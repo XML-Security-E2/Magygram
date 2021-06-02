@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-playground/validator"
 	"mime/multipart"
 	"story-service/domain/model"
@@ -22,47 +21,68 @@ func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc 
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
-	fmt.Println("udje2")
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil { return "", err}
-	fmt.Println("udje3")
 
 	media, err := p.MediaClient.SaveMedia(file)
 	if err != nil { return "", err}
-	fmt.Println("udje4")
 
 	post, err := model.NewStory(*userInfo, "REGULAR", media)
-	fmt.Println("udje5")
 
 	if err != nil { return "", err}
 
 	if err := validator.New().Struct(post); err!= nil {
 		return "", err
 	}
-	fmt.Println("udje6")
 
 	result, err := p.StoryRepository.Create(ctx, post)
-	fmt.Println("udje7")
 
 	if err != nil { return "", err}
 	if postId, ok := result.InsertedID.(string); ok {
 		if err != nil { return "", err}
 		return postId, nil
 	}
-	fmt.Println("udje8")
 
 	return "", err
 }
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryResponse, error) {
-	result, err := p.StoryRepository.GetAll(ctx)
+	//result, err := p.StoryRepository.GetAll(ctx)
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
-	if err != nil {
-		return nil, err
+	//userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	var retVal []*model.StoryResponse
+	story1 := model.StoryResponse{Id: "123",
+		Media: model.Media{
+			Url: "http://lorempixel.com/1000/600/nature/2/",
+			MediaType: "IMAGE",
+		},
+		UserInfo: model.UserInfo{
+			Id: "123",
+			Username: "nikolakolovic",
+			ImageURL: "http://lorempixel.com/1000/600/nature/2/",
+		},
+		ContentType: "REGULAR",
 	}
+	retVal=append(retVal, &story1)
+	story2 := model.StoryResponse{Id: "123",
+		Media: model.Media{
+			Url: "http://lorempixel.com/1000/600/nature/1/",
+			MediaType: "IMAGE",
+		},
+		UserInfo: model.UserInfo{
+			Id: "123",
+			Username: "nkl",
+			ImageURL: "assets/images/profiles/profile-1.jpg",
+		},
+		ContentType: "REGULAR",
+	}
+	retVal=append(retVal, &story2)
 
-	retVal := mapStoriesToResponseStoriesDTO(result, userInfo.Id)
+	//retVal := mapStoriesToResponseStoriesDTO(result, userInfo.Id)
 
 	return retVal, nil
 }
