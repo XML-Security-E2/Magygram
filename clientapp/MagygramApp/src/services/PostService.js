@@ -6,6 +6,7 @@ export const postService = {
 	findPostsForTimeline,
 	findAllUsersCollections,
 	addPostToCollection,
+	createCollection,
 	deletePostFromCollection,
 	createPost,
 	likePost,
@@ -122,6 +123,36 @@ function addPostToCollection(collectionDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.ADD_POST_TO_COLLECTION_FAILURE, errorMessage: message };
+	}
+}
+
+function createCollection(collectionName, dispatch) {
+	let formData = new FormData();
+	formData.append("name", collectionName);
+
+	dispatch(request());
+
+	Axios.post(`/api/users/collections`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 201) {
+				dispatch(success("Collection successfully created", collectionName));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.CREATE_COLLECTION_REQUEST };
+	}
+	function success(message, collectionName) {
+		return { type: postConstants.CREATE_COLLECTION_SUCCESS, successMessage: message, collectionName };
+	}
+	function failure(message) {
+		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
 	}
 }
 

@@ -4,6 +4,7 @@ import { modalConstants } from "../../constants/ModalConstants";
 import { postConstants } from "../../constants/PostConstants";
 import { PostContext } from "../../contexts/PostContext";
 import { postService } from "../../services/PostService";
+import AddCollectionButton from "../AddCollectionButton";
 import CollectionButton from "../CollectionButton";
 import FailureAlert from "../FailureAlert";
 import SuccessAlert from "../SuccessAlert";
@@ -17,11 +18,15 @@ const AddPostToFavouritesModal = () => {
 
 	const handleSaveToCollection = (collectionName) => {
 		let collectionDTO = {
-			postId: postState.addToFavouritesModa.selectedPostId,
+			postId: postState.addToFavouritesModal.selectedPostId,
 			collectionName,
 		};
 
 		postService.addPostToCollection(collectionDTO, dispatch);
+	};
+
+	const handleCreateCollection = (collectionName) => {
+		postService.createCollection(collectionName, dispatch);
 	};
 
 	useEffect(() => {
@@ -29,12 +34,12 @@ const AddPostToFavouritesModal = () => {
 			await postService.findAllUsersCollections(dispatch);
 		};
 		getCollections();
-	}, [postState.addToFavouritesModa.renderCollectionSwitch, dispatch]);
+	}, [postState.addToFavouritesModal.renderCollectionSwitch, dispatch]);
 
 	return (
-		<Modal show={postState.addToFavouritesModa.showModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
+		<Modal show={postState.addToFavouritesModal.showModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Header closeButton>
-				<Modal.Title id="contained-modal-title-vcenter">Favourites</Modal.Title>
+				<Modal.Title id="contained-modal-title-vcenter">Select collection</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<SuccessAlert
@@ -57,6 +62,9 @@ const AddPostToFavouritesModal = () => {
 							</div>
 						);
 					})}
+					<div className="col-3 " align="center">
+						<AddCollectionButton createCollection={handleCreateCollection} />
+					</div>
 				</div>
 			</Modal.Body>
 			<Modal.Footer>

@@ -164,8 +164,8 @@ export const postReducer = (state, action) => {
 		case modalConstants.OPEN_ADD_TO_COLLECTION_MODAL:
 			return {
 				...state,
-				addToFavouritesModa: {
-					renderCollectionSwitch: !state.addToFavouritesModa.renderCollectionSwitch,
+				addToFavouritesModal: {
+					renderCollectionSwitch: !state.addToFavouritesModal.renderCollectionSwitch,
 					showModal: true,
 					selectedPostId: action.postId,
 				},
@@ -174,8 +174,8 @@ export const postReducer = (state, action) => {
 			strcpy = {
 				...state,
 			};
-			strcpy.addToFavouritesModa.showModal = false;
-			strcpy.addToFavouritesModa.selectedPostId = "";
+			strcpy.addToFavouritesModal.showModal = false;
+			strcpy.addToFavouritesModal.selectedPostId = "";
 
 			return strcpy;
 
@@ -193,22 +193,18 @@ export const postReducer = (state, action) => {
 			strcpy = {
 				...state,
 			};
-
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.collectionDTO.postId);
 
 			if (action.defaultCollection) {
 				postCopy.Favourites = true;
 			} else {
-				let colCpy = [...strcpy.userCollections.collections[action.collectionDTO.collectionName]];
-				console.log(colCpy);
-				colCpy.push({
-					id: action.collectionDTO.postId,
-					media: { url: postCopy.Media[0].Url, mediaType: postCopy.Media[0].MediaType },
-				});
-				console.log(colCpy);
-				strcpy.userCollections.collections[action.collectionDTO.collectionName] = colCpy;
+				if (strcpy.userCollections.collections[action.collectionDTO.collectionName].find((col) => col.id === action.collectionDTO.postId) === undefined) {
+					strcpy.userCollections.collections[action.collectionDTO.collectionName].push({
+						id: action.collectionDTO.postId,
+						media: { url: postCopy.Media[0].Url, mediaType: postCopy.Media[0].MediaType },
+					});
+				}
 			}
-			console.log(strcpy);
 
 			strcpy.userCollections.showError = false;
 			strcpy.userCollections.errorMessage = "";
@@ -245,6 +241,38 @@ export const postReducer = (state, action) => {
 			return strcpy;
 		case postConstants.DELETE_POST_FROM_COLLECTION_FAILURE:
 			return state;
+
+		case postConstants.CREATE_COLLECTION_REQUEST:
+			strcpy = {
+				...state,
+			};
+			strcpy.userCollections.showError = false;
+			strcpy.userCollections.errorMessage = "";
+			strcpy.userCollections.showSuccessMessage = false;
+			strcpy.userCollections.successMessage = "";
+			return strcpy;
+
+		case postConstants.CREATE_COLLECTION_SUCCESS:
+			strcpy = {
+				...state,
+			};
+
+			strcpy.userCollections.collections[action.collectionName] = [];
+			strcpy.userCollections.showError = false;
+			strcpy.userCollections.errorMessage = "";
+			strcpy.userCollections.showSuccessMessage = true;
+			strcpy.userCollections.successMessage = action.successMessage;
+
+			return strcpy;
+		case postConstants.CREATE_COLLECTION_FAILURE:
+			strcpy = {
+				...state,
+			};
+			strcpy.userCollections.showError = true;
+			strcpy.userCollections.errorMessage = action.errorMessage;
+			strcpy.userCollections.showSuccessMessage = false;
+			strcpy.userCollections.successMessage = "";
+			return strcpy;
 		default:
 			return state;
 	}

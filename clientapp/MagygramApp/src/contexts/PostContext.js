@@ -14,7 +14,7 @@ const PostContextProvider = (props) => {
 		timeline: {
 			posts: [],
 		},
-		addToFavouritesModa: {
+		addToFavouritesModal: {
 			renderCollectionSwitch: false,
 			showModal: false,
 			selectedPostId: "",
