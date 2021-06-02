@@ -14,6 +14,7 @@ type FollowRepository interface {
 	CreateUser(user *model.User) error
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
+	AcceptFollowRequest(followRequest *model.FollowRequest) error
 }
 
 type followRepository struct {
@@ -63,6 +64,31 @@ func (f *followRepository) CreateFollowRequest(followRequest *model.FollowReques
 	}
 	return nil
 }
+
+func (f *followRepository) AcceptFollowRequest(followRequest *model.FollowRequest) error {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer unsafeClose(session)
+
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error){
+		query := "MATCH (object:User)<-[f:FOLLOWREQUEST]-(subject:User) WHERE object.id = $objectId AND subject.id = $subjectId DELETE f"
+		parameters := map[string]interface{}{
+			"subjectId": followRequest.SubjectId,
+			"objectId": followRequest.ObjectId,
+		}
+		_, err := tx.Run(query, parameters)
+
+		query = "MATCH (object:User), (subject:User) WHERE object.id = $objectId AND subject.id = $subjectId CREATE (subject)-[:FOLLOW]->(object)"
+		_, err = tx.Run(query, parameters)
+
+		return nil, err
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func (f *followRepository) CreateUser(user *model.User) (err error) {
 	session := f.Driver.NewSession(neo4j.SessionConfig{

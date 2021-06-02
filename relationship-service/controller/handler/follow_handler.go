@@ -12,6 +12,7 @@ type FollowHandler interface {
 	CreateUser(ctx echo.Context) error
 	ReturnFollowedUsers(ctx echo.Context) error
 	ReturnFollowRequests(ctx echo.Context) error
+	AcceptFollowRequest(ctx echo.Context) error
 }
 
 type followHandler struct {
@@ -36,6 +37,20 @@ func (f *followHandler) FollowRequest(c echo.Context) error {
 	return c.JSON(http.StatusCreated, followId)
 }
 
+func (f *followHandler) AcceptFollowRequest(ctx echo.Context) error {
+	followRequest := &model.FollowRequest{}
+	if err := ctx.Bind(followRequest); err != nil {
+		return err
+	}
+
+	err := f.FollowService.AcceptFollowRequest(followRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusCreated, true)
+}
+
 func (f *followHandler) CreateUser(c echo.Context) error {
 	user := &model.User{}
 	if err := c.Bind(user); err != nil {
@@ -44,7 +59,7 @@ func (f *followHandler) CreateUser(c echo.Context) error {
 	if err := f.FollowService.CreateUser(user); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusCreated, "")
+	return c.JSON(http.StatusCreated, true)
 }
 
 func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {

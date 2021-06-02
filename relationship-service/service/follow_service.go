@@ -9,6 +9,7 @@ import (
 
 type FollowService interface {
 	FollowRequest(followRequest *model.FollowRequest) (bool, error)
+	AcceptFollowRequest(followRequest *model.FollowRequest) error
 	CreateUser(user *model.User) error
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
@@ -51,6 +52,10 @@ func (f *followService) CreateUser(user *model.User) error {
 		return err
 	}
 	return nil
+}
+
+func (f *followService) AcceptFollowRequest(followRequest *model.FollowRequest) error {
+	return f.FollowRepository.AcceptFollowRequest(followRequest)
 }
 
 func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, error) {
