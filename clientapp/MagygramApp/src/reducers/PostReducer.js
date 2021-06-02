@@ -173,10 +173,27 @@ export const postReducer = (state, action) => {
 			if (postCopy.Comments.find(comment => comment.Id === action.comment.Id) === undefined){
 				postCopy.Comments.push(action.comment)
 			}
+			
 			return strcpy;
 		case postConstants.COMMENT_POST_FAILURE:
 			return {
 				...state,
+			};
+		case modalConstants.SHOW_VIEW_POST_MODAL:
+			return {
+				...state,
+				viewPostModal:{
+					showModal: true,
+					post: action.post
+				}
+			};
+		case modalConstants.HIDE_VIEW_POST_MODAL:
+			return {
+				...state,
+				viewPostModal: {
+					showModal:false,
+					post:action.post
+				}
 			};
 		default:
 			return state;

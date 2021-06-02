@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 
-const PostComments = ({comments , postComment}) => {
+const PostComments = ({comments , postComment ,viewAllComments}) => {
 	const [comment, setComment] = useState("");
 
 
 	return (
         <React.Fragment>
             <div className="pl-3 pr-3 pb-2">
-                <button hidden= {comments.length<3} className="btn p-0">
+                <button hidden={comments.length<3} onClick={() => viewAllComments()} className="btn p-0">
                     <span className="text-muted">View all {comments.length} comments</span>
                 </button>
 
