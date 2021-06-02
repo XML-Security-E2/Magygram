@@ -10,6 +10,8 @@ import StoryButton from "../components/StoryButton";
 import AddPostToFavouritesModal from "../components/modals/AddPostToFavouritesModal";
 import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
+import OptionsModal from "../components/modals/OptionsModal";
+import EditPostModal from "../components/modals/EditPostModal";
 
 const HomePage = () => {
 	const history = useHistory();
@@ -95,6 +97,8 @@ const HomePage = () => {
 				<PostContextProvider>
 					<CreateStoryModal />
 					<AddPostToFavouritesModal />
+					<OptionsModal />
+					<EditPostModal />
 					<div>
 						<div class="mt-4">
 							<div class="container d-flex justify-content-center">

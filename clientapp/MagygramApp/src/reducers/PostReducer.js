@@ -6,6 +6,34 @@ let postCopy = {};
 
 export const postReducer = (state, action) => {
 	switch (action.type) {
+		case postConstants.EDIT_POST_REQUEST:
+			strcpy = {
+				...state,
+			};
+			strcpy.editPost.showError = false;
+			strcpy.editPost.errorMessage = "";
+			strcpy.editPost.showSuccessMessage = false;
+			strcpy.editPost.successMessage = "";
+			return strcpy;
+
+		case postConstants.EDIT_POST_SUCCESS:
+			strcpy = {
+				...state,
+			};
+			strcpy.editPost.showError = false;
+			strcpy.editPost.errorMessage = "";
+			strcpy.editPost.showSuccessMessage = true;
+			strcpy.editPost.successMessage = action.successMessage;
+			return strcpy;
+		case postConstants.EDIT_POST_FAILURE:
+			strcpy = {
+				...state,
+			};
+			strcpy.editPost.showError = true;
+			strcpy.editPost.errorMessage = action.errorMessage;
+			strcpy.editPost.showSuccessMessage = false;
+			strcpy.editPost.successMessage = "";
+			return strcpy;
 		case postConstants.CREATE_POST_REQUEST:
 			return {
 				...state,
@@ -339,6 +367,79 @@ export const postReducer = (state, action) => {
 				viewPostModal: {
 					showModal: false,
 					post: action.post,
+				},
+			};
+
+		case modalConstants.SHOW_POST_OPTIONS_MODAL:
+			console.log(action.post);
+			return {
+				...state,
+				editPost: {
+					showModal: false,
+					post: {
+						id: action.post.Id,
+						location: action.post.Location,
+						tags: action.post.Tags,
+						description: action.post.Description,
+						media: action.post.Media,
+					},
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+				postOptions: {
+					showModal: true,
+				},
+			};
+		case modalConstants.HIDE_POST_OPTIONS_MODAL:
+			return {
+				...state,
+				editPost: {
+					showModal: false,
+					post: {
+						id: "",
+						location: "",
+						tags: [],
+						description: "",
+						media: [],
+					},
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+				postOptions: {
+					showModal: false,
+				},
+			};
+
+		case modalConstants.SHOW_POST_EDIT_MODAL:
+			strcpy = {
+				...state,
+			};
+			strcpy.editPost.showModal = true;
+			strcpy.postOptions.showModal = false;
+			return strcpy;
+		case modalConstants.HIDE_POST_EDIT_MODAL:
+			return {
+				...state,
+				editPost: {
+					showModal: false,
+					post: {
+						id: "",
+						location: "",
+						tags: [],
+						description: "",
+						media: [],
+					},
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+				postOptions: {
+					showModal: false,
 				},
 			};
 		default:

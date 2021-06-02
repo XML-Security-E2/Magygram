@@ -9,6 +9,7 @@ export const postService = {
 	createCollection,
 	deletePostFromCollection,
 	createPost,
+	editPost,
 	likePost,
 	unlikePost,
 	dislikePost,
@@ -97,6 +98,33 @@ function createPost(postDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function editPost(postDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts`, postDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success("Post successfully updated"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.EDIT_POST_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.EDIT_POST_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.EDIT_POST_FAILURE, errorMessage: message };
 	}
 }
 
