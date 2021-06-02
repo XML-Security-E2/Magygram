@@ -7,6 +7,7 @@ import PostContextProvider from "../contexts/PostContext";
 import StoryContextProvider from "../contexts/StoryContext";
 import CreateStoryModal from "../components/modals/CreateStoryModal";
 import StoryButton from "../components/StoryButton";
+import AddPostToFavouritesModal from "../components/modals/AddPostToFavouritesModal";
 import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
 
@@ -23,20 +24,20 @@ const HomePage = () => {
 	};
 
 	const handleProfile = () => {
-
-		let path = `/profile`; 
+		let path = `/profile`;
 		history.push(path);
 
-		Axios.get(`${config.API_URL}/users/logged`,{
+		Axios.get(`${config.API_URL}/users/logged`, {
 			validateStatus: () => true,
-			headers: { Authorization: authHeader()}
+			headers: { Authorization: authHeader() },
 		})
 			.then((res) => {
 				console.log(res.data);
 				setName(res.data.Name);
 			})
 			.catch((err) => {
-				console.log(err);});
+				console.log(err);
+			});
 	};
 
 	const handleSettings = () => {
@@ -91,26 +92,27 @@ const HomePage = () => {
 				</nav>
 			</div>
 			<StoryContextProvider>
-				<CreateStoryModal />
-				<div>
-					<div class="mt-4">
-						<div class="container d-flex justify-content-center">
-							<div class="col-9">
-								<div class="row">
-									<div class="col-8">
-										<StoryButton />
-										<PostContextProvider>
+				<PostContextProvider>
+					<CreateStoryModal />
+					<AddPostToFavouritesModal />
+					<div>
+						<div class="mt-4">
+							<div class="container d-flex justify-content-center">
+								<div class="col-9">
+									<div class="row">
+										<div class="col-8">
+											<StoryButton />
 											<Timeline />
-										</PostContextProvider>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</PostContextProvider>
 			</StoryContextProvider>
 		</React.Fragment>
 	);
 };
 
-export default HomePage
+export default HomePage;

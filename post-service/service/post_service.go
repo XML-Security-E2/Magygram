@@ -62,7 +62,7 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 		return nil, err
 	}
 
-	retVal := mapPostsToResponsePostDTO(result, userInfo.Id)
+	retVal := p.mapPostsToResponsePostDTO(bearer, result, userInfo.Id)
 
 
 	return retVal, nil
@@ -215,11 +215,14 @@ func findAndDeleteLikedBy(result *model.Post, info *model.UserInfo) []model.User
 	return result.LikedBy[:index]
 }
 
-func mapPostsToResponsePostDTO(result []*model.Post, userId string) []*model.PostResponse {
+func (p postService) mapPostsToResponsePostDTO(bearer string, result []*model.Post, userId string) []*model.PostResponse {
 	var retVal []*model.PostResponse
-	
+
+	postIdFavourites, err := p.UserClient.MapPostsToFavourites(bearer, getIdsFromPosts(result))
+	if err != nil { return nil}
+
 	for _, post := range result {
-		res, err := model.NewPostResponse(post,hasUserLikedPost(post,userId),hasUserDislikedPost(post,userId))
+		res, err := model.NewPostResponse(post,hasUserLikedPost(post,userId),hasUserDislikedPost(post,userId), isInFavourites(post, postIdFavourites))
 
 		if err != nil { return nil}
 
@@ -227,6 +230,23 @@ func mapPostsToResponsePostDTO(result []*model.Post, userId string) []*model.Pos
 	}
 
 	return retVal
+}
+
+func isInFavourites(post *model.Post, favourites []*model.PostIdFavouritesFlag) bool {
+	for _, postFav := range favourites {
+		if post.Id == postFav.Id {
+			return postFav.Favourites
+		}
+	}
+	return false
+}
+
+func getIdsFromPosts(posts []*model.Post) []string {
+	var ids []string
+	for _, post := range posts {
+		ids = append(ids, post.Id)
+	}
+	return ids
 }
 
 func hasUserLikedPost(post *model.Post, usedId string) bool {

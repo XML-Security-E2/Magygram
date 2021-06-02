@@ -10,32 +10,33 @@ const ProfilePage = () => {
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
-    const iconStyle1 = { fontSize: "30px", margin: "0px", marginLeft: "200px" };
+	const iconStyle1 = { fontSize: "30px", margin: "0px", marginLeft: "200px" };
 	const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
-    const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
-	const nameStyle = { left: "20",  marginLeft: "13px"}
-    const editStyle = {color: "black", left: "20",  marginLeft: "13px",marginRight: "13px", borderWidth: "1px", borderStyle: "solid" }
-    const sectionStyle = { left: "20",  marginLeft: "100px"}
-    const [name, setName] = useState("");
+	const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
+	const nameStyle = { left: "20", marginLeft: "13px" };
+	const editStyle = { color: "black", left: "20", marginLeft: "13px", marginRight: "13px", borderWidth: "1px", borderStyle: "solid" };
+	const sectionStyle = { left: "20", marginLeft: "100px" };
+	const [name, setName] = useState("");
 
 	const handleLogout = () => {
 		userService.logout();
 	};
 
 	const handleProfile = () => {
-
-		let path = `/profile`; 
+		let path = `/profile`;
 		history.push(path);
 
-		Axios.get(`${config.API_URL}/api/users/logged`,{
+		Axios.get(`${config.API_URL}/api/users/logged`, {
 			validateStatus: () => true,
-			headers: { Authorization: authHeader() }
+			headers: { Authorization: authHeader() },
 		})
 			.then((res) => {
 				console.log(res.data);
 				setName(res.data.Name);
 			})
-			.catch((err) => {console.log(err);});
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	const handleSettings = () => {
@@ -88,55 +89,47 @@ const ProfilePage = () => {
 						<div>{name}</div>
 					</div>
 				</nav>
-                    <br/>
-                <nav className="navbar navbar-light navbar-expand-md navigation-clean" >
-				
-                <div class="flexbox-container">
-                    <div>
-                        <img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src="assets/img/hitmanImage.jpeg" />
-                    </div>
-                    <section style={sectionStyle}>
-                    <div class="flexbox-container">
-                        <div>
-                            <h2 >username</h2>
-                        </div>
-                        <div>
-                            <a style = {editStyle} href="#/edit-profile" tabindex="0">Edit Profile</a>
-                        </div>
-                    </div>
-                    <div class="flexbox-container">
-                        <div>
-                            0 posts
-                        </div>
-                        <div style={nameStyle}>
-                            0 followers
-                        </div>
-                        <div style={nameStyle}>
-                            0 followings
-                        </div>
-                    </div>
-                    <br/>
-                    <div>
-                        <h4>name</h4>
-                    </div>
-                    <div>
-                        bio
-                    </div>
-                    </section>
-                </div>
+				<br />
+				<nav className="navbar navbar-light navbar-expand-md navigation-clean">
+					<div class="flexbox-container">
+						<div>
+							<img className="rounded-circle dropdown-toggle" alt="" style={imgProfileStyle} src="assets/img/hitmanImage.jpeg" />
+						</div>
+						<section style={sectionStyle}>
+							<div class="flexbox-container">
+								<div>
+									<h2>username</h2>
+								</div>
+								<div>
+									<a style={editStyle} href="#/edit-profile" tabindex="0">
+										Edit Profile
+									</a>
+								</div>
+							</div>
+							<div class="flexbox-container">
+								<div>0 posts</div>
+								<div style={nameStyle}>0 followers</div>
+								<div style={nameStyle}>0 followings</div>
+							</div>
+							<br />
+							<div>
+								<h4>name</h4>
+							</div>
+							<div>bio</div>
+						</section>
+					</div>
 				</nav>
-                 <hr/>
-                 <nav >
+				<hr />
+				<nav>
 					<div className="container">
-                        <i className="fa fa-th" style={iconStyle1} /> POSTS
-                        <i className="fa fa-bookmark" style={iconStyle1} /> SAVED
-                        <i className="fa fa-tag" style={iconStyle1} /> TAGGED
-                     </div>
-                </nav>
-            </div>
-			
+						<i className="fa fa-th" style={iconStyle1} /> POSTS
+						<i className="fa fa-bookmark" style={iconStyle1} /> SAVED
+						<i className="fa fa-tag" style={iconStyle1} /> TAGGED
+					</div>
+				</nav>
+			</div>
 		</React.Fragment>
 	);
 };
 
-export default ProfilePage
+export default ProfilePage;
