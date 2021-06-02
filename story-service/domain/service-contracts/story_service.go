@@ -8,5 +8,6 @@ import (
 
 type StoryService interface {
 	CreatePost(ctx context.Context, bearer string, storyContent *multipart.FileHeader) (string, error)
-	GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryResponse , error)
+	GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse , error)
+	GetStoriesForUser(ctx context.Context, userId string) (*model.StoryResponse , error)
 }

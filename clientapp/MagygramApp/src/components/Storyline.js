@@ -1,6 +1,8 @@
 import React, {useContext, useEffect} from "react";
+import { modalConstants } from "../constants/ModalConstants";
 import { StoryContext } from "../contexts/StoryContext";
 import { storyService } from "../services/StoryService";
+import StorySliderModal from "./modals/StorySliderModal";
 import Story from "./Story";
 import StoryButton from "./StoryButton";
 
@@ -14,8 +16,8 @@ const Storyline = () => {
 		getStoriesHandler();
 	}, [dispatch]);
 
-	const openStorySlider = () =>{
-		alert('todo')
+	const openStorySlider = (userId) =>{
+		storyService.GetStoryForUser(userId, dispatch)
 	}
 
 	return (
@@ -26,6 +28,8 @@ const Storyline = () => {
 						<StoryButton/>
 						{storyState.storyline.stories.map((story) => {
 							return <Story story={story} openStorySlider={openStorySlider}/>; })}
+						<StorySliderModal/>
+
 					</ul>
 				</div>
 			</div>

@@ -69,7 +69,39 @@ export const storyReducer = (state, action) => {
 					stories : []
 				}
 			};
+		case modalConstants.SHOW_STORY_SLIDER_MODAL:
+			return {
+				...state,
+				storySliderModal: {
+					showModal: true,
+					stories: createStories(action.stories),
+				}
+			};
+		case modalConstants.HIDE_STORY_SLIDER_MODAL:
+			return {
+				...state,
+				storySliderModal: {
+					showModal: false,
+					stories: action.stories,
+				}
+			};
 		default:
 			return state;
 	}
 };
+
+function createStories(stories){
+	var retVal =[]
+
+	stories.Media.forEach(media =>{
+		retVal.push({
+			url:media.Url,
+			header: {
+				heading: stories.UserInfo.Username,
+				profileImage: stories.UserInfo.ImageURL,
+			}
+		})
+	})
+
+	return retVal;
+}

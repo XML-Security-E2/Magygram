@@ -15,6 +15,10 @@ const StoryContextProvider = (props) => {
 		storyline: {
 			stories: []
 		},
+		storySliderModal: {
+			showModal: false,
+			stories: [],
+		}
 	});
 
 	return <StoryContext.Provider value={{ storyState, dispatch }}>{props.children}</StoryContext.Provider>;

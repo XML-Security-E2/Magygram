@@ -1,10 +1,12 @@
 import Axios from "axios";
+import { modalConstants } from "../constants/ModalConstants";
 import { storyConstants } from "../constants/StoryConstants";
 import { authHeader } from "../helpers/auth-header";
 
 export const storyService = {
 	createStory,
 	findStoriesForStoryline,
+	GetStoryForUser,
 };
 
 function createStory(storyDTO, dispatch) {
@@ -74,3 +76,26 @@ function fetchFormData(storyDTO) {
 	}
 	return formData;
 }
+
+function GetStoryForUser(userId, dispatch) {
+	Axios.get(`/api/story/` + userId, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				//failure()
+			}
+		})
+		.catch((err) => {
+			//failure()
+		});
+
+
+		function success(data) {
+			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+		}
+		//function failure() {
+		//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
+		//}
+
+};
