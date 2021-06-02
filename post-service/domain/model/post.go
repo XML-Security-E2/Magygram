@@ -3,6 +3,9 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"mime/multipart"
+	"strings"
+	"time"
 )
 
 /* Za postmana
@@ -27,7 +30,9 @@ type Post struct {
 	Id string `bson:"_id,omitempty"`
 	Description string `bson:"description"`
 	Location string `bson:"location"`
-	PostType PostType `bson:"post_type"`
+	ContentType ContentType `bson:"post_type"`
+	Tags []string `bson:"tags"`
+	HashTags []string `bson:"hashTags"`
 	Media []Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
 	LikedBy []UserInfo `bson:"liked_by"`
@@ -35,28 +40,28 @@ type Post struct {
 	Comments []Comment `bson:"comments"`
 }
 
-type PostType string
+type ContentType string
 
 const(
 	REGULAR = iota
 	CAMPAIGN
 )
 
+
 type PostRequest struct {
-	Description string
-	Location string
-	PostType PostType
-	Media []Media
-	UserInfo UserInfo
+	Description string `json:"description"`
+	Location string `json:"location"`
+	Media []*multipart.FileHeader `json:"media"`
+	Tags []string `json:"tags"`
 }
 
-func NewPost(postRequest *PostRequest) (*Post, error) {
-	err := validatePostTypeEnums(postRequest.PostType)
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media) (*Post, error) {
+	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
 	}
 
-	err = validateMediaTypeEnums(postRequest.Media)
+	err = validateMediaTypeEnums(media)
 	if err != nil {
 		return nil, err
 	}
@@ -64,16 +69,29 @@ func NewPost(postRequest *PostRequest) (*Post, error) {
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
-		PostType: postRequest.PostType,
-		Media: postRequest.Media,
-		UserInfo: postRequest.UserInfo,
+		HashTags: getHashTagsFromDescription(postRequest.Description),
+		UserInfo: postOwner,
+		Media: media,
+		Tags: postRequest.Tags,
+		ContentType : postType,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 	}, nil
 }
 
-func validatePostTypeEnums(pt PostType) error {
+func getHashTagsFromDescription(description string) []string {
+	var hashTags []string
+	words := strings.Fields(description)
+	for _, w := range words {
+		if strings.HasPrefix(w, "#") {
+			hashTags = append(hashTags, strings.TrimPrefix(w, "#"))
+		}
+	}
+	return hashTags
+}
+
+func validatePostTypeEnums(pt ContentType) error {
 	switch pt {
 	case "REGULAR", "CAMPAIGN":
 		return nil
@@ -116,5 +134,48 @@ type UserInfo struct {
 type Comment struct {
 	Id string
 	CreatedBy UserInfo
+	Content string
+	TimeCreated time.Time
+}
+
+type PostResponse struct {
+	Id string
+	Description string
+	Location string
+	ContentType ContentType
+	Tags []string
+	HashTags []string
+	Media []Media
+	UserInfo UserInfo
+	LikedBy []UserInfo
+	DislikedBy []UserInfo
+	Comments []Comment
+	Liked bool
+	Disliked bool
+}
+
+
+
+func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, error) {
+	return &PostResponse{Id: post.Id,
+		Description:   post.Description,
+		Location:    post.Location,
+		HashTags: post.HashTags,
+		Media: post.Media,
+		UserInfo: post.UserInfo,
+		LikedBy: post.LikedBy,
+		DislikedBy: post.DislikedBy,
+		Comments: post.Comments,
+		Liked: liked,
+		Disliked: disliked,
+	}, nil
+}
+
+type PostId struct {
+	Id string
+}
+
+type CommentRequest struct {
+	PostId string
 	Content string
 }

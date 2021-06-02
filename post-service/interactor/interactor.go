@@ -7,12 +7,15 @@ import (
 	"post-service/domain/service-contracts"
 	"post-service/infrastracture/persistance/mongodb"
 	"post-service/service"
+	"post-service/service/intercomm"
 )
 
 type Interactor interface {
 	NewPostRepository() repository.PostRepository
 	NewPostService() service_contracts.PostService
 	NewPostHandler() handler.PostHandler
+	NewMediaClient() intercomm.MediaClient
+	NewUserClient() intercomm.UserClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -34,12 +37,20 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	return appHandler
 }
 
+func (i *interactor) NewMediaClient() intercomm.MediaClient {
+	return intercomm.NewMediaClient()
+}
+
+func (i *interactor) NewUserClient() intercomm.UserClient {
+	return intercomm.NewUserClient()
+}
+
 func (i *interactor) NewPostRepository() repository.PostRepository {
 	return mongodb.NewPostRepository(i.PostCol)
 }
 
 func (i *interactor) NewPostService() service_contracts.PostService {
-	return service.NewPostService(i.NewPostRepository())
+	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient(), i.NewUserClient())
 }
 
 func (i *interactor) NewPostHandler() handler.PostHandler {

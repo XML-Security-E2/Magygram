@@ -14,4 +14,5 @@ type UserService interface {
 	ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error)
 	GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
+	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error)
 }

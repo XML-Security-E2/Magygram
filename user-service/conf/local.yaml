@@ -21,5 +21,10 @@ authservice:
   domain: "localhost"
   port: "461"
 
+postservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "462"
+
 gateway:
   port: "8085"

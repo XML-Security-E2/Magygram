@@ -28,17 +28,19 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user := model.NewUser(userRequest)
-
 	if err := validator.New().Struct(user); err!= nil {
 		return "", err
 	}
-
+	fmt.Println("test1")
 	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil { return "", err}
+	fmt.Println("test2")
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
+	fmt.Println("test3")
 
 	result, err := u.UserRepository.Create(ctx, user)
+
 	if err != nil { return "", err}
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 	fmt.Println(result.InsertedID.(string))
@@ -144,4 +146,23 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 	}
 
 	return user, err
+}
+
+func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
+
+	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return &model.UserInfo{
+		Id:       userId,
+		Username: user.Username,
+		ImageURL: "",
+	}, nil
 }

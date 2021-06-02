@@ -19,6 +19,7 @@ type UserHandler interface {
 	ResendActivationLink(c echo.Context) error
 	GetUserEmailIfUserExist(c echo.Context) error
 	GetUserById(c echo.Context) error
+	GetLoggedUserInfo(c echo.Context) error
 }
 
 var (
@@ -154,6 +155,7 @@ func (h *userHandler) GetUserEmailIfUserExist(c echo.Context) error {
 		"emailAddress": user.Email,
 	})
 }
+
 func (h *userHandler) GetUserById(c echo.Context) error {
 	userId := c.Param("userId")
 
@@ -170,4 +172,19 @@ func (h *userHandler) GetUserById(c echo.Context) error {
 
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
+	ctx := c.Request().Context()
+	bearer := c.Request().Header.Get("Authorization")
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	userInfo, err := h.UserService.GetLoggedUserInfo(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)
 }
