@@ -7,4 +7,6 @@ import (
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/story", h.CreateStory)
+	e.GET("/api/story", h.GetStoriesForStoryline)
+
 }

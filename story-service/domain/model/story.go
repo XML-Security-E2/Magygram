@@ -70,3 +70,20 @@ type UserInfo struct {
 	Username string
 	ImageURL string
 }
+
+type StoryResponse struct {
+	Id string
+	ContentType ContentType
+	Media Media
+	UserInfo UserInfo
+}
+
+
+
+func NewStoryResponse(story *Story) (*StoryResponse, error) {
+	return &StoryResponse{Id: story.Id,
+		Media: story.Media,
+		UserInfo: story.UserInfo,
+		ContentType: story.ContentType,
+	}, nil
+}
