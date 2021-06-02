@@ -6,10 +6,12 @@ import CreateStoryModal from "../components/modals/CreateStoryModal";
 import AddPostToFavouritesModal from "../components/modals/AddPostToFavouritesModal";
 import Header from "../components/Header";
 import Storyline from "../components/Storyline"
+import UserContextProvider from "../contexts/UserContext";
 
 const HomePage = () => {
 	return (
 		<React.Fragment>
+			<UserContextProvider>
 			<Header/>
 			<StoryContextProvider>
 				<PostContextProvider>
@@ -31,6 +33,7 @@ const HomePage = () => {
 					</div>
 				</PostContextProvider>
 			</StoryContextProvider>
+			</UserContextProvider>
 		</React.Fragment>
 	);
 };

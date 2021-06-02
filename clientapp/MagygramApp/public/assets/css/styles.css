@@ -36,12 +36,21 @@
 	border-color: red !important;
 }
 
-.story-profile-photo-visited {
+.story-profile-photo-add-story {
 	width: 56px;
 	height: 56px;
 	position: relative;
 	border-width: 3px !important;
 	border-color: gray !important;
+}
+
+
+.story-profile-photo-my-story {
+	width: 56px;
+	height: 56px;
+	position: relative;
+	border-width: 3px !important;
+	border-color: rgb(72, 49, 153) !important;
 }
 
 .post-profile-photo {

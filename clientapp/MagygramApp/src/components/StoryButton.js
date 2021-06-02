@@ -14,7 +14,7 @@ const StoryButton = () => {
 		<li class="list-inline-item">
 			<button onClick={handleOpenStory} className="btn p-0 m-0">
 				<div className="d-flex flex-column align-items-center">
-					<div className="btn-secondary rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger story-profile-photo">
+					<div className="btn-secondary rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger story-profile-photo-add-story">
 						<i  className="mdi mdi-plus w-50 h-50"></i>
 					</div>
 					<small>Add story</small>

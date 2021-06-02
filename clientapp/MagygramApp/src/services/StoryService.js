@@ -6,7 +6,7 @@ import { authHeader } from "../helpers/auth-header";
 export const storyService = {
 	createStory,
 	findStoriesForStoryline,
-	GetStoryForUser,
+	GetStoriesForUser,
 };
 
 function createStory(storyDTO, dispatch) {
@@ -77,7 +77,7 @@ function fetchFormData(storyDTO) {
 	return formData;
 }
 
-function GetStoryForUser(userId, dispatch) {
+function GetStoriesForUser(userId, dispatch) {
 	Axios.get(`/api/story/` + userId, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
