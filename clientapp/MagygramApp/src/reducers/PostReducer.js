@@ -20,6 +20,12 @@ export const postReducer = (state, action) => {
 			strcpy = {
 				...state,
 			};
+
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.post.id);
+			postCopy.Location = action.post.location;
+			postCopy.Description = action.post.description;
+			postCopy.Tags = action.post.tags;
+
 			strcpy.editPost.showError = false;
 			strcpy.editPost.errorMessage = "";
 			strcpy.editPost.showSuccessMessage = true;

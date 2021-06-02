@@ -108,7 +108,7 @@ function editPost(postDTO, dispatch) {
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success("Post successfully updated"));
+				dispatch(success("Post successfully updated", postDTO));
 			} else {
 				dispatch(failure(res.data.message));
 			}
@@ -120,8 +120,8 @@ function editPost(postDTO, dispatch) {
 	function request() {
 		return { type: postConstants.EDIT_POST_REQUEST };
 	}
-	function success(message) {
-		return { type: postConstants.EDIT_POST_SUCCESS, successMessage: message };
+	function success(message, post) {
+		return { type: postConstants.EDIT_POST_SUCCESS, successMessage: message, post };
 	}
 	function failure(message) {
 		return { type: postConstants.EDIT_POST_FAILURE, errorMessage: message };
