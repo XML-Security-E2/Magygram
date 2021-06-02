@@ -99,7 +99,8 @@ function createStories(stories){
 			header: {
 				heading: stories.UserInfo.Username,
 				profileImage: stories.UserInfo.ImageURL,
-			}
+			},
+			type: media.MediaType==='VIDEO'?'video':'image',
 		})
 	})
 

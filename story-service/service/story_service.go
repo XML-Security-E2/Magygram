@@ -65,7 +65,7 @@ func mapStoriesToResponseStoriesInfoDTO(result []*model.Story, id string) []*mod
 	var retVal []*model.StoryInfoResponse
 
 	for _, story := range result {
-		if story.UserInfo.Id!=id {
+		if story.UserInfo.Id!=id && !hasUserCreatedSomeStory(retVal, story.UserInfo.Id) {
 			res, err := model.NewStoryInfoResponse(story)
 
 			if err != nil { return nil}
@@ -75,6 +75,15 @@ func mapStoriesToResponseStoriesInfoDTO(result []*model.Story, id string) []*mod
 	}
 
 	return retVal
+}
+
+func hasUserCreatedSomeStory(result []*model.StoryInfoResponse, id string) bool {
+	for _, storyInfo := range result {
+		if storyInfo.UserInfo.Id==id {
+			return true
+		}
+	}
+	return false
 }
 
 func (p storyService) GetStoriesForUser(ctx context.Context, userId string) (*model.StoryResponse, error) {

@@ -23,6 +23,7 @@ func (s storyRepository) Create(ctx context.Context, story *model.Story) (*mongo
 
 func (s storyRepository) GetAll(ctx context.Context) ([]*model.Story, error) {
 	cursor, err := s.Col.Find(context.TODO(), bson.D{})
+
 	var results []*model.Story
 
 	if err != nil {
@@ -41,6 +42,7 @@ func (s storyRepository) GetAll(ctx context.Context) ([]*model.Story, error) {
 	}
 	return results, nil
 }
+
 
 func (s storyRepository) GetStoriesForUser(ctx context.Context, userId string) ([]*model.Story, error) {
 	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId})

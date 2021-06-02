@@ -12,10 +12,17 @@ const StorySliderModal = () => {
 		dispatch({ type: modalConstants.HIDE_STORY_SLIDER_MODAL, stories: storyState.storySliderModal.stories });
 	}
 
+	const onAllStoriesEnd = () => {
+		alert('todo on stories end')
+	}
+
 	return (
 		<Modal  size="md" show={storyState.storySliderModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body className="modal-body-remove-margins modal-content-remove-margins">
-				<Stories width="100%" stories={storyState.storySliderModal.stories}/>
+				<Stories 
+					width="100%" 
+					stories={storyState.storySliderModal.stories}
+					onAllStoriesEnd={onAllStoriesEnd}/>
 			</Modal.Body>
 		</Modal>
 	);
