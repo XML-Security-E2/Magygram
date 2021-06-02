@@ -47,6 +47,12 @@ const(
 	CAMPAIGN
 )
 
+type PostEditRequest struct {
+	Id string `json:"id"`
+	Description string `json:"description"`
+	Location string `json:"location"`
+	Tags []string `json:"tags"`
+}
 
 type PostRequest struct {
 	Description string `json:"description"`
@@ -69,7 +75,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
-		HashTags: getHashTagsFromDescription(postRequest.Description),
+		HashTags: GetHashTagsFromDescription(postRequest.Description),
 		UserInfo: postOwner,
 		Media: media,
 		Tags: postRequest.Tags,
@@ -80,7 +86,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 	}, nil
 }
 
-func getHashTagsFromDescription(description string) []string {
+func GetHashTagsFromDescription(description string) []string {
 	var hashTags []string
 	words := strings.Fields(description)
 	for _, w := range words {
@@ -171,6 +177,7 @@ func NewPostResponse(post *Post, liked bool, disliked bool, favourites bool) (*P
 		DislikedBy: post.DislikedBy,
 		Comments: post.Comments,
 		Liked: liked,
+		Tags: post.Tags,
 		Disliked: disliked,
 		Favourites: favourites,
 	}, nil

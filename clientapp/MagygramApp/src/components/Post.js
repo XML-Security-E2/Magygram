@@ -69,11 +69,15 @@ const Post = ({ post }) => {
 		dispatch({ type: modalConstants.SHOW_VIEW_POST_MODAL, post });
 	};
 
+	const handleOpenOptionsModal = () => {
+		dispatch({ type: modalConstants.SHOW_POST_OPTIONS_MODAL, post });
+	};
+
 	return (
 		<React.Fragment>
 			<div className="d-flex flex-column mt-4 mb-4">
 				<div className="card">
-					<PostHeader username={post.UserInfo.Username} image={post.UserInfo.ImageURL} />
+					<PostHeader username={post.UserInfo.Username} image={post.UserInfo.ImageURL} openOptionsModal={handleOpenOptionsModal} />
 					<div className="card-body p-0">
 						<PostImageSlider media={post.Media} />
 						<PostInteraction

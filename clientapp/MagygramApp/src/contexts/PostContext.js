@@ -11,6 +11,23 @@ const PostContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		editPost: {
+			showModal: false,
+			post: {
+				id: "",
+				location: "",
+				tags: [],
+				description: "",
+				media: [],
+			},
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
+		postOptions: {
+			showModal: false,
+		},
 		timeline: {
 			posts: [],
 		},

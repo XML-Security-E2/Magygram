@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, { useContext, useEffect } from "react";
 import { PostContext } from "../contexts/PostContext";
 import Post from "./Post";
 import "react-image-gallery/styles/css/image-gallery.css";
@@ -15,10 +15,12 @@ const Timeline = () => {
 	}, [dispatch]);
 
 	return (
-        <React.Fragment>
-            {postState.timeline.posts.map((post) => {
-						return <Post post={post}/>; })}
-        </React.Fragment>
+		<React.Fragment>
+			{postState.timeline.posts.map((post) => {
+				console.log(post);
+				return <Post post={post} />;
+			})}
+		</React.Fragment>
 	);
 };
 
