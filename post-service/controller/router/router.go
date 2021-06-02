@@ -13,4 +13,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/posts/:postId/dislike", h.DislikePost)
 	e.PUT("/api/posts/:postId/undislike", h.UndislikePost)
 	e.GET("/api/posts/:postId/image", h.GetPostsFirstImage)
+	e.PUT("/api/posts/comments", h.AddComment)
 }

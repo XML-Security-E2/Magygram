@@ -5,6 +5,7 @@ import (
 	"github.com/beevik/guid"
 	"mime/multipart"
 	"strings"
+	"time"
 )
 
 /* Za postmana
@@ -134,6 +135,7 @@ type Comment struct {
 	Id string
 	CreatedBy UserInfo
 	Content string
+	TimeCreated time.Time
 }
 
 type PostResponse struct {
@@ -171,4 +173,9 @@ func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, erro
 
 type PostId struct {
 	Id string
+}
+
+type CommentRequest struct {
+	PostId string
+	Content string
 }

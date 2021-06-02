@@ -9,6 +9,7 @@ import { PostContext } from "../contexts/PostContext";
 import PostLikesModal from "./modals/PostLikesModal";
 import { modalConstants } from "../constants/ModalConstants";
 import PostDislikesModal from "./modals/PostDislikesModal";
+import ViewPostModal from "./modals/ViewPostModal";
 
 const Post = ({post}) => {
 	const { dispatch } = useContext(PostContext);
@@ -38,6 +39,21 @@ const Post = ({post}) => {
 
     }
 
+    const postComment = (comment) => {
+        if(comment.length>=1){
+            let postDTO = {
+                PostId : post.Id,
+                Content: comment
+            };
+
+            postService.commentPost(postDTO, dispatch)
+        }
+    }
+
+    const viewAllComments = () =>{
+        dispatch({ type: modalConstants.SHOW_VIEW_POST_MODAL, post })
+    }
+
 	return (
         <React.Fragment>
             <div className="d-flex flex-column mt-4 mb-4">
@@ -49,11 +65,11 @@ const Post = ({post}) => {
                         <div className="pl-3 pr-3 pb-2">
                         <PostInformation username={post.UserInfo.Username} likes={post.LikedBy.length} dislikes={post.DislikedBy.length} description={post.Description} showLikedByModal={showLikedByModal} showDislikesModal={showDislikesModal}/>
                         </div>
-                        <PostComments comments={post.Comments}/>
+                        <PostComments comments={post.Comments} postComment={postComment} viewAllComments={viewAllComments}/>
                         <PostLikesModal/>
                         <PostDislikesModal/>
+                        <ViewPostModal/>
                     </div>
-                    
                 </div>
             </div>
         </React.Fragment>

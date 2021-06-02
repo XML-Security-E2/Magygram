@@ -159,6 +159,42 @@ export const postReducer = (state, action) => {
 					dislikes: []
 				}
 			};
+		case postConstants.COMMENT_POST_REQUEST:
+			return {
+				...state,
+			};
+		case postConstants.COMMENT_POST_SUCCESS:
+			strcpy =  {
+				...state,
+			};
+
+			postCopy = strcpy.timeline.posts.find(post => post.Id === action.postId);
+
+			if (postCopy.Comments.find(comment => comment.Id === action.comment.Id) === undefined){
+				postCopy.Comments.push(action.comment)
+			}
+			
+			return strcpy;
+		case postConstants.COMMENT_POST_FAILURE:
+			return {
+				...state,
+			};
+		case modalConstants.SHOW_VIEW_POST_MODAL:
+			return {
+				...state,
+				viewPostModal:{
+					showModal: true,
+					post: action.post
+				}
+			};
+		case modalConstants.HIDE_VIEW_POST_MODAL:
+			return {
+				...state,
+				viewPostModal: {
+					showModal:false,
+					post:action.post
+				}
+			};
 		default:
 			return state;
 	}

@@ -19,6 +19,7 @@ type PostHandler interface {
 	DislikePost(c echo.Context) error
 	UndislikePost(c echo.Context) error
 	GetPostsFirstImage(c echo.Context) error
+	AddComment(c echo.Context) error
 }
 
 type postHandler struct {
@@ -164,5 +165,25 @@ func (p postHandler) GetPostsFirstImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, postImage)
+}
+
+func (p postHandler) AddComment(c echo.Context) error {
+	commentRequest := &model.CommentRequest{}
+	if err := c.Bind(commentRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	retVal, err := p.PostService.AddComment(ctx, commentRequest.PostId, commentRequest.Content, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
 }
 
