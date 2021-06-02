@@ -56,8 +56,7 @@ const ViewPostModal = () => {
 
 	return (
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
-
-			<Modal.Body>
+			<Modal.Body >
             <div className="d-flex flex-row align-items-top">
 
                 <PostImageSliderModalView media={postState.viewPostModal.post.Media}/>

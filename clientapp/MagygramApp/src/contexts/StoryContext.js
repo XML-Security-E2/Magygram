@@ -12,6 +12,14 @@ const StoryContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		storyline: {
+			stories: []
+		},
+		storySliderModal: {
+			showModal: false,
+			stories: [],
+		},
+		iHaveAStory:true,
 	});
 
 	return <StoryContext.Provider value={{ storyState, dispatch }}>{props.children}</StoryContext.Provider>;

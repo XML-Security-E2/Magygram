@@ -33,6 +33,24 @@
 	height: 56px;
 	position: relative;
 	border-width: 2px !important;
+	border-color: red !important;
+}
+
+.story-profile-photo-add-story {
+	width: 56px;
+	height: 56px;
+	position: relative;
+	border-width: 3px !important;
+	border-color: gray !important;
+}
+
+
+.story-profile-photo-my-story {
+	width: 56px;
+	height: 56px;
+	position: relative;
+	border-width: 3px !important;
+	border-color: rgb(72, 49, 153) !important;
 }
 
 .post-profile-photo {
@@ -126,3 +144,19 @@ hr {
 	overflow-y: scroll;
 	max-height: 250px;
 }
+
+.modal-stories { 
+	background-color: rgb(43, 42, 42) !important; 
+
+ }
+ .modal-body-remove-margins {
+    position: relative;
+    overflow-y: auto;
+    margin: 0 ;
+    padding: 0;
+}
+.modal-content-remove-margins{
+    padding: 0;
+    margin: 0;
+}
+ 

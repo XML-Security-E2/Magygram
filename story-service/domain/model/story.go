@@ -66,7 +66,33 @@ const(
 )
 
 type UserInfo struct {
-	Id string
+	Id string `bson:"id"`
 	Username string
 	ImageURL string
+}
+
+type StoryResponse struct {
+	Id string
+	ContentType ContentType
+	Media []Media
+	UserInfo UserInfo
+}
+
+func NewStoryResponse(story *Story, media []Media) (*StoryResponse, error) {
+	return &StoryResponse{Id: story.Id,
+		Media: media,
+		UserInfo: story.UserInfo,
+		ContentType: story.ContentType,
+	}, nil
+}
+
+type StoryInfoResponse struct {
+	Id string
+	UserInfo UserInfo
+}
+
+func NewStoryInfoResponse(story *Story) (*StoryInfoResponse, error) {
+	return &StoryInfoResponse{Id: story.Id,
+		UserInfo: story.UserInfo,
+	}, nil
 }
