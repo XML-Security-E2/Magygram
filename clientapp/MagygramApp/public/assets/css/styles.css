@@ -94,8 +94,35 @@
 
 .carousel-item > img {
 	width: 100%;
+
 }
 
 video {
 	object-fit: fill;
+}
+
+hr {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	border: 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .comments-profile-photo {
+	width: 36px;
+	height: 36px;
+	position: relative;
+	border-width: 2px !important;
+}
+
+.description_label{
+    width: 300px;    
+    float: left;    
+    overflow: hidden;  
+	font-size: 14px;
+}
+
+.messagessss{
+	overflow-y: scroll;
+	max-height: 250px;
 }

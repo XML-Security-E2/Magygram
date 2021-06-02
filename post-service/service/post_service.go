@@ -3,12 +3,15 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/beevik/guid"
 	"github.com/go-playground/validator"
 	_ "net/http"
 	"post-service/domain/model"
 	"post-service/domain/repository"
 	"post-service/domain/service-contracts"
 	"post-service/service/intercomm"
+	"time"
 )
 
 
@@ -18,6 +21,7 @@ type postService struct {
 	intercomm.MediaClient
 	intercomm.UserClient
 }
+
 
 func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
 	return &postService{r , ic, uc}
@@ -138,10 +142,12 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 }
 
 func (p postService) UndislikePost(ctx context.Context, bearer string, postId string) error {
+
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
 		return err
 	}
+	fmt.Println(postId)
 
 	result, err := p.PostRepository.GetOne(ctx,postId)
 	if err != nil {
@@ -157,6 +163,35 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 
 	return nil
 }
+
+func (p postService) AddComment(ctx context.Context, postId string, content string, bearer string) (*model.Comment, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := p.PostRepository.GetOne(ctx,postId)
+	if err != nil {
+		return nil,err
+	}
+
+	var res model.Comment
+
+	res.Id= guid.New().String()
+	res.Content= content
+	res.CreatedBy= *userInfo
+	res.TimeCreated = time.Now()
+
+	result.Comments = append(result.Comments, res)
+
+	_, err = p.PostRepository.Update(ctx,result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
 
 func findAndDeleteDislikedBy(result *model.Post, info *model.UserInfo) []model.UserInfo {
 	index := 0

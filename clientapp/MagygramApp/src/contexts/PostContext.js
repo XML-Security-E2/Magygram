@@ -28,8 +28,34 @@ const PostContextProvider = (props) => {
 		},
 		loggedUserInfo: {
 			Id: "063d2368-9035-4184-8b0f-bdb255e6a492",
-			ImageURL: "",
+			ImageURL: "assets/images/profiles/profile-1.jpg",
 			Username: "nikolakolovic",
+		},
+		postLikedBy: {
+			showModal: false,
+			likedBy: [],
+		},
+		postDislikes: {
+			showModal: false,
+			dislikes: [],
+		},
+		viewPostModal: {
+			showModal: false,
+			post: {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [{}],
+				UserInfo: {},
+				LikedBy: [{}],
+				DislikedBy: [{}],
+				Comments: [{}],
+				Liked: false,
+				Disliked: false,
+			},
 		},
 	});
 

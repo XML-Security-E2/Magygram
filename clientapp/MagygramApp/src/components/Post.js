@@ -6,7 +6,10 @@ import PostInformation from "./PostInformation";
 import PostInteraction from "./PostInteraction";
 import { postService } from "../services/PostService";
 import { PostContext } from "../contexts/PostContext";
+import PostLikesModal from "./modals/PostLikesModal";
 import { modalConstants } from "../constants/ModalConstants";
+import PostDislikesModal from "./modals/PostDislikesModal";
+import ViewPostModal from "./modals/ViewPostModal";
 
 const Post = ({ post }) => {
 	const { dispatch } = useContext(PostContext);
@@ -40,8 +43,30 @@ const Post = ({ post }) => {
 	};
 
 	const deleteFromCollections = (postId) => {
-		console.log("DEL");
 		postService.deletePostFromCollection(postId, dispatch);
+	};
+
+	const showLikedByModal = () => {
+		dispatch({ type: modalConstants.SHOW_POST_LIKED_BY_DETAILS, LikedBy: post.LikedBy });
+	};
+
+	const showDislikesModal = () => {
+		dispatch({ type: modalConstants.SHOW_POST_DISLIKES_MODAL, Dislikes: post.DislikedBy });
+	};
+
+	const postComment = (comment) => {
+		if (comment.length >= 1) {
+			let postDTO = {
+				PostId: post.Id,
+				Content: comment,
+			};
+
+			postService.commentPost(postDTO, dispatch);
+		}
+	};
+
+	const viewAllComments = () => {
+		dispatch({ type: modalConstants.SHOW_VIEW_POST_MODAL, post });
 	};
 
 	return (
@@ -62,9 +87,19 @@ const Post = ({ post }) => {
 							deleteFromCollections={deleteFromCollections}
 						/>
 						<div className="pl-3 pr-3 pb-2">
-							<PostInformation username={post.UserInfo.Username} likes={post.LikedBy.length} dislikes={post.DislikedBy.length} description={post.Description} />
+							<PostInformation
+								username={post.UserInfo.Username}
+								likes={post.LikedBy.length}
+								dislikes={post.DislikedBy.length}
+								description={post.Description}
+								showLikedByModal={showLikedByModal}
+								showDislikesModal={showDislikesModal}
+							/>
 						</div>
-						<PostComments comments={post.Comments} />
+						<PostComments comments={post.Comments} postComment={postComment} viewAllComments={viewAllComments} />
+						<PostLikesModal />
+						<PostDislikesModal />
+						<ViewPostModal />
 					</div>
 				</div>
 			</div>

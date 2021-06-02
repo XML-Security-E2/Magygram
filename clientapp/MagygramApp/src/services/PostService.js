@@ -13,6 +13,7 @@ export const postService = {
 	unlikePost,
 	dislikePost,
 	undislikePost,
+	commentPost,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -307,5 +308,33 @@ function undislikePost(postId, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.UNDISLIKE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function commentPost(commentDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts/comments`, commentDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data, commentDTO.PostId));
+			} else {
+				dispatch(failure("Error"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: postConstants.COMMENT_POST_REQUEST };
+	}
+	function success(comment, postId) {
+		return { type: postConstants.COMMENT_POST_SUCCESS, comment, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.COMMENT_POST_FAILURE, errorMessage: message };
 	}
 }

@@ -273,6 +273,74 @@ export const postReducer = (state, action) => {
 			strcpy.userCollections.showSuccessMessage = false;
 			strcpy.userCollections.successMessage = "";
 			return strcpy;
+		case modalConstants.SHOW_POST_LIKED_BY_DETAILS:
+			return {
+				...state,
+				postLikedBy: {
+					showModal: true,
+					likedBy: action.LikedBy,
+				},
+			};
+		case modalConstants.HIDE_POST_LIKED_BY_DETAILS:
+			return {
+				...state,
+				postLikedBy: {
+					showModal: false,
+					likedBy: [],
+				},
+			};
+		case modalConstants.SHOW_POST_DISLIKES_MODAL:
+			return {
+				...state,
+				postDislikes: {
+					showModal: true,
+					dislikes: action.Dislikes,
+				},
+			};
+		case modalConstants.HIDE_POST_DISLIKES_MODAL:
+			return {
+				...state,
+				postDislikes: {
+					showModal: false,
+					dislikes: [],
+				},
+			};
+		case postConstants.COMMENT_POST_REQUEST:
+			return {
+				...state,
+			};
+		case postConstants.COMMENT_POST_SUCCESS:
+			strcpy = {
+				...state,
+			};
+
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+
+			if (postCopy.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
+				postCopy.Comments.push(action.comment);
+			}
+
+			return strcpy;
+		case postConstants.COMMENT_POST_FAILURE:
+			return {
+				...state,
+			};
+		case modalConstants.SHOW_VIEW_POST_MODAL:
+			return {
+				...state,
+				viewPostModal: {
+					showModal: true,
+					post: action.post,
+				},
+			};
+		case modalConstants.HIDE_VIEW_POST_MODAL:
+			return {
+				...state,
+				viewPostModal: {
+					showModal: false,
+					post: action.post,
+				},
+			};
 		default:
 			return state;
 	}
