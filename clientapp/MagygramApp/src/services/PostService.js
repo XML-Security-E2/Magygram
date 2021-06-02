@@ -6,6 +6,7 @@ export const postService = {
 	findPostsForTimeline,
 	findAllUsersCollections,
 	addPostToCollection,
+	deletePostFromCollection,
 	createPost,
 	likePost,
 	unlikePost,
@@ -104,7 +105,7 @@ function addPostToCollection(collectionDTO, dispatch) {
 		.then((res) => {
 			console.log(res);
 			if (res.status === 201) {
-				dispatch(success("Post successfully added to favourites"));
+				dispatch(success("Post successfully added to favourites", collectionDTO, collectionDTO.collectionName === ""));
 			} else {
 				dispatch(failure(res.data.message));
 			}
@@ -116,11 +117,38 @@ function addPostToCollection(collectionDTO, dispatch) {
 	function request() {
 		return { type: postConstants.ADD_POST_TO_COLLECTION_REQUEST };
 	}
-	function success(message) {
-		return { type: postConstants.ADD_POST_TO_COLLECTION_SUCCESS, successMessage: message };
+	function success(message, collectionDTO, defaultCollection) {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_SUCCESS, successMessage: message, collectionDTO, defaultCollection };
 	}
 	function failure(message) {
 		return { type: postConstants.ADD_POST_TO_COLLECTION_FAILURE, errorMessage: message };
+	}
+}
+
+function deletePostFromCollection(postId, dispatch) {
+	dispatch(request());
+
+	Axios.delete(`/api/users/collections/posts/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success("Post successfully deleted from favourites", postId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.DELETE_POST_FROM_COLLECTION_REQUEST };
+	}
+	function success(message, postId) {
+		return { type: postConstants.DELETE_POST_FROM_COLLECTION_SUCCESS, successMessage: message, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.DELETE_POST_FROM_COLLECTION_FAILURE, errorMessage: message };
 	}
 }
 

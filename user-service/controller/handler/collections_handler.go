@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
@@ -14,6 +15,7 @@ type CollectionsHandler interface {
 	GetUsersCollections(c echo.Context) error
 	GetUsersCollectionsExceptDefault(c echo.Context) error
 	CheckIfPostInFavourites(c echo.Context) error
+	DeleteFromCollection(c echo.Context) error
 }
 
 type collectionsHandler struct {
@@ -59,6 +61,10 @@ func (ch collectionsHandler) AddPostToCollection(c echo.Context) error {
 func (ch collectionsHandler) GetUsersCollections(c echo.Context) error {
 
 	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	bearer := c.Request().Header.Get("Authorization")
 	collection, err := ch.CollectionsService.GetUsersCollections(ctx,bearer, "")
 
@@ -71,6 +77,10 @@ func (ch collectionsHandler) GetUsersCollections(c echo.Context) error {
 
 func (ch collectionsHandler) GetUsersCollectionsExceptDefault(c echo.Context) error {
 	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	bearer := c.Request().Header.Get("Authorization")
 	collection, err := ch.CollectionsService.GetUsersCollections(ctx,bearer, model.DefaultCollection)
 
@@ -83,6 +93,10 @@ func (ch collectionsHandler) GetUsersCollectionsExceptDefault(c echo.Context) er
 
 func (ch collectionsHandler) CheckIfPostInFavourites(c echo.Context) error {
 	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	bearer := c.Request().Header.Get("Authorization")
 	postIds := &[]string{}
 
@@ -100,3 +114,19 @@ func (ch collectionsHandler) CheckIfPostInFavourites(c echo.Context) error {
 	return c.JSON(http.StatusOK, postsFavFlags)
 }
 
+func (ch collectionsHandler) DeleteFromCollection(c echo.Context) error {
+
+	postId := c.Param("postId")
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := ch.CollectionsService.DeletePostFromCollections(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}

@@ -39,6 +39,11 @@ const Post = ({ post }) => {
 		postService.addPostToCollection(collectionDTO, dispatch);
 	};
 
+	const deleteFromCollections = (postId) => {
+		console.log("DEL");
+		postService.deletePostFromCollection(postId, dispatch);
+	};
+
 	return (
 		<React.Fragment>
 			<div className="d-flex flex-column mt-4 mb-4">
@@ -54,6 +59,7 @@ const Post = ({ post }) => {
 							UndislikePost={UndislikePost}
 							showCollectionModal={showAddToCollectionModal}
 							addToDefaultCollection={addToDefaultCollection}
+							deleteFromCollections={deleteFromCollections}
 						/>
 						<div className="pl-3 pr-3 pb-2">
 							<PostInformation username={post.UserInfo.Username} likes={post.LikedBy.length} dislikes={post.DislikedBy.length} description={post.Description} />

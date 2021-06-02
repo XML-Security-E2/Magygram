@@ -19,6 +19,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.POST("/api/users/collections", h.CreateCollection)
 	e.POST("/api/users/collections/posts", h.AddPostToCollection)
+	e.DELETE("/api/users/collections/posts/:postId", h.DeleteFromCollection)
 	e.GET("/api/users/collections", h.GetUsersCollections)
 	e.GET("/api/users/collections/except-default", h.GetUsersCollectionsExceptDefault)
 	e.POST("/api/users/collections/check-favourites", h.CheckIfPostInFavourites)

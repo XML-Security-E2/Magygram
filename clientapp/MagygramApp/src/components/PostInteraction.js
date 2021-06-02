@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePost, showCollectionModal, addToDefaultCollection }) => {
+const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePost, showCollectionModal, addToDefaultCollection, deleteFromCollections }) => {
 	const [showAddToCollection, setShowAddToCollection] = useState(false);
 	const iconStyle = { fontSize: "35px", margin: "0px" };
 
@@ -8,6 +8,11 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 		addToDefaultCollection(postId);
 		setShowAddToCollection(true);
 		setTimeout(() => setShowAddToCollection(false), 5000);
+	};
+
+	const handleDeleteFromToCollection = (postId) => {
+		console.log("DDD");
+		deleteFromCollections(postId);
 	};
 
 	return (
@@ -48,7 +53,7 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 					</li>
 				</ul>
 				<div>
-					<button className="btn p-0" onClick={() => handleAddToCollection(post.Id)}>
+					<button className="btn p-0" onClick={() => (!post.Favourites ? handleAddToCollection(post.Id) : handleDeleteFromToCollection(post.Id))}>
 						<i width="1.6em" height="1.6em" fill="black" className={post.Favourites ? "fa fa-bookmark" : "fa fa-bookmark-o"} style={iconStyle} />
 					</button>
 				</div>

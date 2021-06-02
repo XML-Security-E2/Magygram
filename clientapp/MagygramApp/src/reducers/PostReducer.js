@@ -193,6 +193,23 @@ export const postReducer = (state, action) => {
 			strcpy = {
 				...state,
 			};
+
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.collectionDTO.postId);
+
+			if (action.defaultCollection) {
+				postCopy.Favourites = true;
+			} else {
+				let colCpy = [...strcpy.userCollections.collections[action.collectionDTO.collectionName]];
+				console.log(colCpy);
+				colCpy.push({
+					id: action.collectionDTO.postId,
+					media: { url: postCopy.Media[0].Url, mediaType: postCopy.Media[0].MediaType },
+				});
+				console.log(colCpy);
+				strcpy.userCollections.collections[action.collectionDTO.collectionName] = colCpy;
+			}
+			console.log(strcpy);
+
 			strcpy.userCollections.showError = false;
 			strcpy.userCollections.errorMessage = "";
 			strcpy.userCollections.showSuccessMessage = true;
@@ -207,6 +224,27 @@ export const postReducer = (state, action) => {
 			strcpy.userCollections.showSuccessMessage = false;
 			strcpy.userCollections.successMessage = "";
 			return strcpy;
+
+		case postConstants.DELETE_POST_FROM_COLLECTION_REQUEST:
+			return state;
+
+		case postConstants.DELETE_POST_FROM_COLLECTION_SUCCESS:
+			strcpy = {
+				...state,
+			};
+
+			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			postCopy.Favourites = false;
+
+			for (const [key] of Object.entries(strcpy.userCollections.collections)) {
+				strcpy.userCollections.collections[key] = strcpy.userCollections.collections[key].filter((collection) => collection.id !== action.postId);
+			}
+
+			console.log(strcpy);
+
+			return strcpy;
+		case postConstants.DELETE_POST_FROM_COLLECTION_FAILURE:
+			return state;
 		default:
 			return state;
 	}
