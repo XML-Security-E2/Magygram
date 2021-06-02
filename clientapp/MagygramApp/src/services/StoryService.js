@@ -4,6 +4,7 @@ import { authHeader } from "../helpers/auth-header";
 
 export const storyService = {
 	createStory,
+	findStoriesForStoryline,
 };
 
 function createStory(storyDTO, dispatch) {
@@ -35,6 +36,33 @@ function createStory(storyDTO, dispatch) {
 		return { type: storyConstants.CREATE_STORY_FAILURE, errorMessage: message };
 	}
 }
+
+async function findStoriesForStoryline(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/story`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure()
+			}
+		})
+			.catch((err) => {
+				failure()
+			});
+
+		function request() {
+			return { type: storyConstants.STORYLINE_STORY_REQUEST};
+		}
+
+		function success(data) {
+			return { type: storyConstants.STORYLINE_STORY_SUCCESS, stories: data };
+		}
+		function failure() {
+			return { type: storyConstants.STORYLINE_STORY_FAILURE };
+		}
+
+};
 
 function fetchFormData(storyDTO) {
 	let formData = new FormData();

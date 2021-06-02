@@ -10,6 +10,7 @@ import StoryButton from "../components/StoryButton";
 import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
 import Header from "../components/Header";
+import Storyline from "../components/Storyline"
 
 const HomePage = () => {
 	const history = useHistory();
@@ -18,7 +19,6 @@ const HomePage = () => {
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 	const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 	const [name, setName] = useState("");
-	const imgStyle2 = {"transform":"scale(1.5)","width":"100%","position":"absolute","left":"0"};
 
 	const handleLogout = () => {
 		userService.logout();
@@ -56,8 +56,7 @@ const HomePage = () => {
 							<div class="col-9">
 								<div class="row">
 									<div class="col-8">
-										<StoryButton />
-
+										<Storyline/>
 										<PostContextProvider>
 											<Timeline />
 										</PostContextProvider>

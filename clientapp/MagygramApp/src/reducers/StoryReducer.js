@@ -48,6 +48,27 @@ export const storyReducer = (state, action) => {
 					successMessage: "",
 				},
 			};
+		case storyConstants.STORYLINE_STORY_REQUEST:
+			return {
+				...state,
+				storyline: {		
+					stories : []
+				}
+			};
+		case storyConstants.STORYLINE_STORY_SUCCESS:
+			return {
+				...state,
+				storyline: {		
+					stories : action.stories
+				}
+			};
+		case storyConstants.STORYLINE_STORY_FAILURE:
+			return {
+				...state,
+				storyline: {		
+					stories : []
+				}
+			};
 		default:
 			return state;
 	}
