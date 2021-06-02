@@ -4,7 +4,6 @@ import { StoryContext } from "../contexts/StoryContext";
 
 const StoryButton = () => {
 	const { dispatch } = useContext(StoryContext);
-	const imgStyle = {"transform":"scale(1.5)","width":"100%","position":"absolute","left":"0"};
 
 	const handleOpenStory = () => {
 		dispatch({ type: modalConstants.OPEN_CREATE_STORY_MODAL });

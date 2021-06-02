@@ -1,4 +1,4 @@
-import React, {useContext} from "react";;
+import React from "react";;
 
 const Story = ({story,openStorySlider}) => {
 	const imgStyle = {"transform":"scale(1.5)","width":"100%","position":"absolute","left":"0"};

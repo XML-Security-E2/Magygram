@@ -2,13 +2,32 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/AddCollectionButton.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/CollectionButton.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/AddPostToFavouritesModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/public/assets/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Story.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Story.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Storyline.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Storyline.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/StoryReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/StoryReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Post.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/PostInteraction.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/PostInteraction.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/constants/ModalConstants.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/constants/ModalConstants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/constants/PostConstants.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/constants/PostConstants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/contexts/PostContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/contexts/PostContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/helpers/auth-header.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/helpers/auth-header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/EditProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/EditProfile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/ProfilePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/PostReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/PostReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/PostService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/PostService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway/api_gateway.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/intercomm/media_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/model/post.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/post_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../story-service/service/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/story_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/collections_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/collections_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/domain/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/domain/model/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/domain/service-contracts/collections_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/domain/service-contracts/collections_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/collections_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/collections_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +41,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
+  <component name="GOROOT" url="file://$USER_HOME$/go/go1.16.3" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
@@ -48,16 +67,36 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../story-service" />
   </component>
   <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="media-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="media-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>

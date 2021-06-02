@@ -47,42 +47,15 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 }
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryResponse, error) {
-	//result, err := p.StoryRepository.GetAll(ctx)
+	//TODO: napraviti getStory za usera koji eliminise njegove storije a onda izbrisati iz mapStories proveru
+	result, err := p.StoryRepository.GetAll(ctx)
 
-	//userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	var retVal []*model.StoryResponse
-	story1 := model.StoryResponse{Id: "123",
-		Media: model.Media{
-			Url: "http://lorempixel.com/1000/600/nature/2/",
-			MediaType: "IMAGE",
-		},
-		UserInfo: model.UserInfo{
-			Id: "123",
-			Username: "nikolakolovic",
-			ImageURL: "http://lorempixel.com/1000/600/nature/2/",
-		},
-		ContentType: "REGULAR",
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
 	}
-	retVal=append(retVal, &story1)
-	story2 := model.StoryResponse{Id: "123",
-		Media: model.Media{
-			Url: "http://lorempixel.com/1000/600/nature/1/",
-			MediaType: "IMAGE",
-		},
-		UserInfo: model.UserInfo{
-			Id: "123",
-			Username: "nkl",
-			ImageURL: "assets/images/profiles/profile-1.jpg",
-		},
-		ContentType: "REGULAR",
-	}
-	retVal=append(retVal, &story2)
 
-	//retVal := mapStoriesToResponseStoriesDTO(result, userInfo.Id)
+	retVal := mapStoriesToResponseStoriesDTO(result, userInfo.Id)
 
 	return retVal, nil
 }
@@ -91,11 +64,13 @@ func mapStoriesToResponseStoriesDTO(result []*model.Story, id string) []*model.S
 	var retVal []*model.StoryResponse
 
 	for _, story := range result {
-		res, err := model.NewStoryResponse(story)
+		if story.UserInfo.Id!=id {
+			res, err := model.NewStoryResponse(story)
 
-		if err != nil { return nil}
+			if err != nil { return nil}
 
-		retVal = append(retVal, res)
+			retVal = append(retVal, res)
+		}
 	}
 
 	return retVal

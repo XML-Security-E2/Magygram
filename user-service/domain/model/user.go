@@ -62,10 +62,14 @@ type FavouritePostRequest struct {
 	CollectionName string `json:"collectionName"`
 }
 
+type PostIdFavouritesFlag struct {
+	Id string `json:"id"`
+	Favourites bool `json:"favourites"`
+}
 
 type Media struct {
-	Url string
-	MediaType string
+	Url string `json:"url"`
+	MediaType string `json:"mediaType"`
 }
 
 type MediaType string
@@ -75,11 +79,15 @@ const(
 	VIDEO
 )
 
+var (
+	DefaultCollection = "all posts"
+)
+
 func NewUser(userRequest *UserRequest) *User {
 	return &User{Id: guid.New().String(),
 		Name:     html.EscapeString(userRequest.Name),
 		Surname:  html.EscapeString(userRequest.Surname),
 		Username: html.EscapeString(userRequest.Username),
 		Email:    html.EscapeString(userRequest.Email),
-		FavouritePosts: map[string][]IdWithMedia{}}
+		FavouritePosts: map[string][]IdWithMedia{ DefaultCollection: {}}}
 }
