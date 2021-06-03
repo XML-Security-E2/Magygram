@@ -29,6 +29,7 @@ func (m mediaClient) SaveMedia(media *multipart.FileHeader) (model.Media, error)
 	writer.Close()
 
 	retMedia, statusCode, err := handleSaveMediaRequest(body, writer)
+
 	if err != nil || statusCode != http.StatusCreated {
 		return model.Media{}, err
 	}
