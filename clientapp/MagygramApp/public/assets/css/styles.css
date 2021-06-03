@@ -36,6 +36,14 @@
 	border-color: red !important;
 }
 
+.story-profile-photo-visited {
+	width: 56px;
+	height: 56px;
+	position: relative;
+	border-width: 2px !important;
+	border-color: rgb(153, 151, 151) !important;
+}
+
 .story-profile-photo-add-story {
 	width: 56px;
 	height: 56px;

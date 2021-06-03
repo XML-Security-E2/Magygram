@@ -7,6 +7,7 @@ export const storyService = {
 	createStory,
 	findStoriesForStoryline,
 	GetStoriesForUser,
+	visitedByUser,
 };
 
 function createStory(storyDTO, dispatch) {
@@ -82,6 +83,29 @@ function GetStoriesForUser(userId, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(res.data));
+			} else {
+				//failure()
+			}
+		})
+		.catch((err) => {
+			//failure()
+		});
+
+
+		function success(data) {
+			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+		}
+		//function failure() {
+		//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
+		//}
+
+};
+
+function visitedByUser(storyId, dispatch) {
+	Axios.put(`/api/story/${storyId}/visited`,{}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				//dispatch(success(res.data));
 			} else {
 				//failure()
 			}

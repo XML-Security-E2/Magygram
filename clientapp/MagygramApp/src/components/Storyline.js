@@ -28,10 +28,10 @@ const Storyline = () => {
 					<ul className="list-unstyled mb-0">
 						<StoryButton/>
 						<MyStoryButton openStorySlider={openStorySlider}/>
+						
 						{storyState.storyline.stories.map((story) => {
 							return <Story story={story} openStorySlider={openStorySlider}/>; })}
 						<StorySliderModal/>
-
 					</ul>
 				</div>
 			</div>
