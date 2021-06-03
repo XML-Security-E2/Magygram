@@ -27,7 +27,7 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 }
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
-	user := model.NewUser(userRequest)
+	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err!= nil {
 		return "", err
 	}

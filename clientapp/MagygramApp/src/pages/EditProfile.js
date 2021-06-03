@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { userService } from "../services/UserService";
 import Axios from "axios";
@@ -22,11 +22,47 @@ const EditProfile = () => {
     const sectionStyle = { left: "20",  marginLeft: "100px"}
    
 	const [surname, setSurname] = useState("");
-    const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
-	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [repeatedPassword, setRepeatedPassword] = useState("");
+
+	const [name, setName] = useState("");
+	const [username, setUsername] = useState("");
+	const [bio, setBio] = useState("");
+	const [img, setImg] = useState("");
+	const [website, setWebsite] = useState("");
+	const [number, setNumber] = useState("");
+
+
+	
+	useEffect(() => {
+        Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+
+                if(res.data.imageUrl == "")
+                    setImg("assets/img/profile.jpg");
+                else
+                	setImg(res.data.imageUrl);
+
+
+				Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+				.then((res) => {
+					
+					console.log(res.data);
+					setName(res.data.Name);
+					setUsername(res.data.Username);
+					setBio(res.data.Bio);
+					setEmail(res.data.Email);
+					setWebsite(res.data.Website);
+					setNumber(res.data.Number);
+
+				})
+				.catch((err) => {console.log(err);});
+
+			})
+			.catch((err) => {console.log(err);});
+	
+	});
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -48,23 +84,13 @@ const EditProfile = () => {
 
 	const handleProfile = () => {
 
-        
-		let path = `/profile`; 
-		history.push(path);
-        
-		Axios.get(`${config.API_URL}/api/users/logged`,{
-			validateStatus: () => true,
-			headers: { Authorization: authHeader() }
-		})
-			.then((res) => {
-				console.log(res.data);
-				setName(res.data.Name);
-			})
-			.catch((err) => {console.log(err);});
+        window.location =  `#/profile`; 
+		
+
 	};
 
 	const handleSettings = () => {
-		alert("TOD1O");
+		
 	};
 
 	return (
@@ -87,7 +113,7 @@ const EditProfile = () => {
 							<i className="la la-wechat" style={iconStyle} />
 							<i className="la la-compass" style={iconStyle} />
 							<i className="fa fa-heart-o" style={iconStyle} />
-							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage" />
+							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src={img} alt="ProfileImage" />
 							<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
 								<li>
 									<button className="la la-user btn shadow-none" onClick={handleProfile}>
@@ -136,15 +162,15 @@ const EditProfile = () => {
 				</div>
 
 				<div className="form-group">
-					<input className="form-control" required type="text" name="websiteInput" placeholder="Website" value={name} onChange={(e) => setName(e.target.value)} />
+					<input className="form-control" required type="text" name="websiteInput" placeholder="Website" value={website} onChange={(e) => setWebsite(e.target.value)} />
 				</div>
 
                 <div className="form-group">
-					<input className="form-control" required type="text" name="bioInput" placeholder="Bio" value={name} onChange={(e) => setName(e.target.value)} />
+					<input className="form-control" required type="text" name="bioInput" placeholder="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
 				</div>
 
                 <div className="form-group">
-					<input className="form-control" required type="text" name="numberInput" placeholder="Number" value={name} onChange={(e) => setName(e.target.value)} />
+					<input className="form-control" required type="text" name="numberInput" placeholder="Number" value={number} onChange={(e) => setNumber(e.target.value)} />
 				</div>
 
             

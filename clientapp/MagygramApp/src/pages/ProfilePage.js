@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
 import { useHistory } from "react-router-dom";
 import { config } from "../config/config";
+import { UserContext } from "../contexts/UserContext";
 import { authHeader } from "../helpers/auth-header";
 
 const ProfilePage = () => {
@@ -17,23 +18,60 @@ const ProfilePage = () => {
     const editStyle = {color: "black", left: "20",  marginLeft: "13px",marginRight: "13px", borderWidth: "1px", borderStyle: "solid" }
     const sectionStyle = { left: "20",  marginLeft: "100px"}
     const [name, setName] = useState("");
+	const [username, setUsername] = useState("");
+	const [bio, setBio] = useState("");
+	const [img, setImg] = useState("");
 
 	const handleLogout = () => {
 		userService.logout();
 	};
 
-	const handleProfile = () => {
-
-		let path = `/profile`; 
-		history.push(path);
-
-		Axios.get(`${config.API_URL}/api/users/logged`,{
-			validateStatus: () => true,
-			headers: { Authorization: authHeader() }
-		})
+    useEffect(() => {
+        Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
-				setName(res.data.Name);
+                setUsername(res.data.username);
+                if(res.data.imageUrl == "")
+                    setImg("assets/img/profile.jpg");
+                else
+                setImg(res.data.imageUrl);
+                
+                Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+                    .then((res) => {
+                        
+				        console.log(res.data);
+                        setName(res.data.Name);
+                        setBio(res.data.Bio);
+
+                    })
+                    .catch((err) => {console.log(err);});
+
+			})
+			.catch((err) => {console.log(err);});
+    
+      });
+
+
+
+	const handleProfile = () => {
+
+		window.location =  `#/profile`; 
+
+		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res.data);
+                setUsername(res.data.username);
+                
+                Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+                    .then((res) => {
+                        
+				        console.log(res.data);
+                        setName(res.data.Name);
+                        setBio(res.data.Bio);
+
+                    })
+                    .catch((err) => {console.log(err);});
+
 			})
 			.catch((err) => {console.log(err);});
 	};
@@ -62,7 +100,7 @@ const ProfilePage = () => {
 							<i className="la la-wechat" style={iconStyle} />
 							<i className="la la-compass" style={iconStyle} />
 							<i className="fa fa-heart-o" style={iconStyle} />
-							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage" />
+							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src={img} alt="ProfileImage" />
 							<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
 								<li>
 									<button className="la la-user btn shadow-none" onClick={handleProfile}>
@@ -93,12 +131,12 @@ const ProfilePage = () => {
 				
                 <div class="flexbox-container">
                     <div>
-                        <img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src="assets/img/hitmanImage.jpeg" />
+                        <img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src={img} />
                     </div>
                     <section style={sectionStyle}>
                     <div class="flexbox-container">
                         <div>
-                            <h2 >username</h2>
+                            <h2 >{username}</h2>
                         </div>
                         <div>
                             <a style = {editStyle} href="#/edit-profile" tabindex="0">Edit Profile</a>
@@ -117,10 +155,10 @@ const ProfilePage = () => {
                     </div>
                     <br/>
                     <div>
-                        <h4>name</h4>
+                        <h4>{name}</h4>
                     </div>
                     <div>
-                        bio
+                        {bio}
                     </div>
                     </section>
                 </div>
