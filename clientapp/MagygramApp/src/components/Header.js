@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
+import { useHistory } from "react-router-dom";
+import { config } from "../config/config";
+import { authHeader } from "../helpers/auth-header";
 
 const Header = () => {
+	const history = useHistory();
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
@@ -15,12 +19,20 @@ const Header = () => {
 	};
 
 	const handleProfile = () => {
-		Axios.get(`/users/637300ee-4abd-484a-8422-bc87f7cf82ff`, { validateStatus: () => true })
+		let path = `/profile`;
+		history.push(path);
+
+		Axios.get(`${config.API_URL}/users/logged`, {
+			validateStatus: () => true,
+			headers: { Authorization: authHeader() },
+		})
 			.then((res) => {
 				console.log(res.data);
 				setName(res.data.Name);
 			})
-			.catch((err) => {});
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	const handleSettings = () => {

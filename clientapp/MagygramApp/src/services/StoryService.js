@@ -1,9 +1,13 @@
 import Axios from "axios";
+import { modalConstants } from "../constants/ModalConstants";
 import { storyConstants } from "../constants/StoryConstants";
 import { authHeader } from "../helpers/auth-header";
 
 export const storyService = {
 	createStory,
+	findStoriesForStoryline,
+	GetStoriesForUser,
+	visitedByUser,
 };
 
 function createStory(storyDTO, dispatch) {
@@ -36,6 +40,33 @@ function createStory(storyDTO, dispatch) {
 	}
 }
 
+async function findStoriesForStoryline(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/story`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure()
+			}
+		})
+			.catch((err) => {
+				failure()
+			});
+
+		function request() {
+			return { type: storyConstants.STORYLINE_STORY_REQUEST};
+		}
+
+		function success(data) {
+			return { type: storyConstants.STORYLINE_STORY_SUCCESS, stories: data };
+		}
+		function failure() {
+			return { type: storyConstants.STORYLINE_STORY_FAILURE };
+		}
+
+};
+
 function fetchFormData(storyDTO) {
 	let formData = new FormData();
 
@@ -46,3 +77,49 @@ function fetchFormData(storyDTO) {
 	}
 	return formData;
 }
+
+function GetStoriesForUser(userId, dispatch) {
+	Axios.get(`/api/story/` + userId, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				//failure()
+			}
+		})
+		.catch((err) => {
+			//failure()
+		});
+
+
+		function success(data) {
+			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+		}
+		//function failure() {
+		//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
+		//}
+
+};
+
+function visitedByUser(storyId, dispatch) {
+	Axios.put(`/api/story/${storyId}/visited`,{}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				//dispatch(success(res.data));
+			} else {
+				//failure()
+			}
+		})
+		.catch((err) => {
+			//failure()
+		});
+
+
+		function success(data) {
+			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+		}
+		//function failure() {
+		//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
+		//}
+
+};
