@@ -12,8 +12,22 @@ type User struct {
 	Name  string `bson:"name" validate:"required,min=2"`
 	Email string `bson:"email" validate:"required,email"`
 	Surname string `bson:"surname" validate:"required,min=2"`
+	Website string `bson:"website" `
+	Bio string `bson:"bio" `
+	Number string `bson:"number" `
+	Gender Gender `bson:"gender"`
 	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
 }
+
+
+type Gender string
+
+const(
+	MALE = iota
+	FEMALE
+)
+
+
 
 type UserInfo struct {
 	Id string `json:"id"`
@@ -79,15 +93,30 @@ const(
 	VIDEO
 )
 
+func NewUser(userRequest *UserRequest, gender Gender) (*User, error) {
+	err := validateGenderEnums(gender)
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{Id: guid.New().String(),
+		Name:           html.EscapeString(userRequest.Name),
+		Surname:        html.EscapeString(userRequest.Surname),
+		Username:       html.EscapeString(userRequest.Username),
+		Email:          html.EscapeString(userRequest.Email),
+		Gender:         gender,
+		FavouritePosts: map[string][]IdWithMedia{},
+	}, nil
+}
+
+func validateGenderEnums(pt Gender) error {
+	switch pt {
+	case "MALE", "FEMALE":
+		return nil
+	}
+	return errors.New("Invalid gender type")
+}
+
 var (
 	DefaultCollection = "all posts"
 )
-
-func NewUser(userRequest *UserRequest) *User {
-	return &User{Id: guid.New().String(),
-		Name:     html.EscapeString(userRequest.Name),
-		Surname:  html.EscapeString(userRequest.Surname),
-		Username: html.EscapeString(userRequest.Username),
-		Email:    html.EscapeString(userRequest.Email),
-		FavouritePosts: map[string][]IdWithMedia{ DefaultCollection: {}}}
-}

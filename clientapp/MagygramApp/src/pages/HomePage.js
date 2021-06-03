@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
 import { config } from "../config/config";
@@ -7,11 +7,8 @@ import PostContextProvider from "../contexts/PostContext";
 import StoryContextProvider from "../contexts/StoryContext";
 import CreateStoryModal from "../components/modals/CreateStoryModal";
 import StoryButton from "../components/StoryButton";
-import AddPostToFavouritesModal from "../components/modals/AddPostToFavouritesModal";
 import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
-import OptionsModal from "../components/modals/OptionsModal";
-import EditPostModal from "../components/modals/EditPostModal";
 
 const HomePage = () => {
 	const history = useHistory();
@@ -19,28 +16,34 @@ const HomePage = () => {
 	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 	const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
-	const [name, setName] = useState("");
+    const [name, setName] = useState("");
+	const [username, setUsername] = useState("");
+	const [bio, setBio] = useState("");
+	const [img, setImg] = useState("");
 
 	const handleLogout = () => {
 		userService.logout();
 	};
 
 	const handleProfile = () => {
-		let path = `/profile`;
-		history.push(path);
 
-		Axios.get(`${config.API_URL}/users/logged`, {
-			validateStatus: () => true,
-			headers: { Authorization: authHeader() },
-		})
-			.then((res) => {
-				console.log(res.data);
-				setName(res.data.Name);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		window.location =  `#/profile`; 
+
 	};
+
+
+	useEffect(() => {
+        Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+
+                if(res.data.imageUrl == "")
+                    setImg("assets/img/profile.jpg");
+                else
+                	setImg(res.data.imageUrl);
+			})
+			.catch((err) => {console.log(err);});
+	
+	});
 
 	const handleSettings = () => {
 		alert("TOD1O");
@@ -66,7 +69,7 @@ const HomePage = () => {
 							<i className="la la-wechat" style={iconStyle} />
 							<i className="la la-compass" style={iconStyle} />
 							<i className="fa fa-heart-o" style={iconStyle} />
-							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage" />
+							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src={img} alt="ProfileImage" />
 							<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
 								<li>
 									<button className="la la-user btn shadow-none" onClick={handleProfile}>
@@ -94,29 +97,26 @@ const HomePage = () => {
 				</nav>
 			</div>
 			<StoryContextProvider>
-				<PostContextProvider>
-					<CreateStoryModal />
-					<AddPostToFavouritesModal />
-					<OptionsModal />
-					<EditPostModal />
-					<div>
-						<div class="mt-4">
-							<div class="container d-flex justify-content-center">
-								<div class="col-9">
-									<div class="row">
-										<div class="col-8">
-											<StoryButton />
+				<CreateStoryModal />
+				<div>
+					<div class="mt-4">
+						<div class="container d-flex justify-content-center">
+							<div class="col-9">
+								<div class="row">
+									<div class="col-8">
+										<StoryButton />
+										<PostContextProvider>
 											<Timeline />
-										</div>
+										</PostContextProvider>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</PostContextProvider>
+				</div>
 			</StoryContextProvider>
 		</React.Fragment>
 	);
 };
 
-export default HomePage;
+export default HomePage
