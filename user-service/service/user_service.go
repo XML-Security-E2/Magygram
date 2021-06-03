@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/go-playground/validator"
 	"user-service/domain/model"
 	"user-service/domain/repository"
@@ -31,19 +30,17 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	if err := validator.New().Struct(user); err!= nil {
 		return "", err
 	}
-	fmt.Println("test1")
+
 	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil { return "", err}
-	fmt.Println("test2")
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
-	fmt.Println("test3")
 
 	result, err := u.UserRepository.Create(ctx, user)
 
 	if err != nil { return "", err}
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
-	fmt.Println(result.InsertedID.(string))
+
 	if userId, ok := result.InsertedID.(string); ok {
 		return userId, nil
 	}

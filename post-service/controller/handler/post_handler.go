@@ -20,6 +20,7 @@ type PostHandler interface {
 	UndislikePost(c echo.Context) error
 	GetPostsFirstImage(c echo.Context) error
 	AddComment(c echo.Context) error
+	EditPost(c echo.Context) error
 }
 
 type postHandler struct {
@@ -187,3 +188,22 @@ func (p postHandler) AddComment(c echo.Context) error {
 	return c.JSON(http.StatusOK, retVal)
 }
 
+func (p postHandler) EditPost(c echo.Context) error {
+	editRequest := &model.PostEditRequest{}
+	if err := c.Bind(editRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.EditPost(ctx, bearer, editRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, "")
+}

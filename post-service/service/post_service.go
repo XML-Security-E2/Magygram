@@ -22,7 +22,6 @@ type postService struct {
 	intercomm.UserClient
 }
 
-
 func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
 	return &postService{r , ic, uc}
 }
@@ -289,3 +288,21 @@ func (p postService) GetPostsFirstImage(ctx context.Context, postId string) (*mo
 	return nil, nil
 }
 
+func (p postService) EditPost(ctx context.Context, bearer string, postRequest *model.PostEditRequest) error {
+	post, err := p.PostRepository.GetByID(ctx, postRequest.Id)
+	if err != nil {
+		return errors.New("invalid post id")
+	}
+
+	post.Tags = postRequest.Tags
+	post.Description = postRequest.Description
+	post.Location = postRequest.Location
+	post.HashTags = model.GetHashTagsFromDescription(postRequest.Description)
+
+	_, err = p.PostRepository.Update(ctx, post)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
