@@ -11,40 +11,69 @@ const PostContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		editPost: {
+			showModal: false,
+			post: {
+				id: "",
+				location: "",
+				tags: [],
+				description: "",
+				media: [],
+			},
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
+		postOptions: {
+			showModal: false,
+		},
 		timeline: {
-			posts: []
+			posts: [],
+		},
+		addToFavouritesModal: {
+			renderCollectionSwitch: false,
+			showModal: false,
+			selectedPostId: "",
+		},
+		userCollections: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+			collections: [],
 		},
 		loggedUserInfo: {
 			Id: "063d2368-9035-4184-8b0f-bdb255e6a492",
 			ImageURL: "assets/images/profiles/profile-1.jpg",
 			Username: "nikolakolovic",
 		},
-		postLikedBy:{
+		postLikedBy: {
 			showModal: false,
-			likedBy: []
+			likedBy: [],
 		},
-		postDislikes:{
+		postDislikes: {
 			showModal: false,
-			dislikes: []
+			dislikes: [],
 		},
-		viewPostModal:{
+		viewPostModal: {
 			showModal: false,
 			post: {
-				Id :"",
-				Description:"",
-				Location:"",
-				ContentType:"",
-				Tags:null,
-				HashTags:null,
-				Media:[{}],
-				UserInfo:{},
-				LikedBy:[{}],
-				DislikedBy:[{}],
-				Comments:[{}],
-				Liked:false,
-				Disliked:false
-		 }
-		}
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [{}],
+				UserInfo: {},
+				LikedBy: [{}],
+				DislikedBy: [{}],
+				Comments: [{}],
+				Liked: false,
+				Disliked: false,
+			},
+		},
 	});
 
 	return <PostContext.Provider value={{ postState, dispatch }}>{props.children}</PostContext.Provider>;

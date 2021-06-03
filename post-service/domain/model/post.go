@@ -47,6 +47,12 @@ const(
 	CAMPAIGN
 )
 
+type PostEditRequest struct {
+	Id string `json:"id"`
+	Description string `json:"description"`
+	Location string `json:"location"`
+	Tags []string `json:"tags"`
+}
 
 type PostRequest struct {
 	Description string `json:"description"`
@@ -69,7 +75,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
 		Location:    postRequest.Location,
-		HashTags: getHashTagsFromDescription(postRequest.Description),
+		HashTags: GetHashTagsFromDescription(postRequest.Description),
 		UserInfo: postOwner,
 		Media: media,
 		Tags: postRequest.Tags,
@@ -80,7 +86,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 	}, nil
 }
 
-func getHashTagsFromDescription(description string) []string {
+func GetHashTagsFromDescription(description string) []string {
 	var hashTags []string
 	words := strings.Fields(description)
 	for _, w := range words {
@@ -150,13 +156,17 @@ type PostResponse struct {
 	LikedBy []UserInfo
 	DislikedBy []UserInfo
 	Comments []Comment
+	Favourites bool
 	Liked bool
 	Disliked bool
 }
 
+type PostIdFavouritesFlag struct {
+	Id string `json:"id"`
+	Favourites bool `json:"favourites"`
+}
 
-
-func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, error) {
+func NewPostResponse(post *Post, liked bool, disliked bool, favourites bool) (*PostResponse, error) {
 	return &PostResponse{Id: post.Id,
 		Description:   post.Description,
 		Location:    post.Location,
@@ -167,7 +177,9 @@ func NewPostResponse(post *Post, liked bool, disliked bool) (*PostResponse, erro
 		DislikedBy: post.DislikedBy,
 		Comments: post.Comments,
 		Liked: liked,
+		Tags: post.Tags,
 		Disliked: disliked,
+		Favourites: favourites,
 	}, nil
 }
 

@@ -76,10 +76,14 @@ type FavouritePostRequest struct {
 	CollectionName string `json:"collectionName"`
 }
 
+type PostIdFavouritesFlag struct {
+	Id string `json:"id"`
+	Favourites bool `json:"favourites"`
+}
 
 type Media struct {
-	Url string
-	MediaType string
+	Url string `json:"url"`
+	MediaType string `json:"mediaType"`
 }
 
 type MediaType string
@@ -112,3 +116,7 @@ func validateGenderEnums(pt Gender) error {
 	}
 	return errors.New("Invalid gender type")
 }
+
+var (
+	DefaultCollection = "all posts"
+)

@@ -2,10 +2,14 @@ import Axios from "axios";
 import { postConstants } from "../constants/PostConstants";
 import { authHeader } from "../helpers/auth-header";
 
-
 export const postService = {
 	findPostsForTimeline,
+	findAllUsersCollections,
+	addPostToCollection,
+	createCollection,
+	deletePostFromCollection,
 	createPost,
+	editPost,
 	likePost,
 	unlikePost,
 	dislikePost,
@@ -17,28 +21,55 @@ async function findPostsForTimeline(dispatch) {
 	dispatch(request());
 	await Axios.get(`/api/posts`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
+			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
 			} else {
-				failure()
+				failure();
 			}
 		})
-			.catch((err) => {
-				failure()
-			});
+		.catch((err) => {
+			failure();
+		});
 
-		function request() {
-			return { type: postConstants.TIMELINE_POSTS_REQUEST};
-		}
+	function request() {
+		return { type: postConstants.TIMELINE_POSTS_REQUEST };
+	}
 
-		function success(data) {
-			return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
-		}
-		function failure() {
-			return { type: postConstants.TIMELINE_POSTS_FAILURE };
-		}
+	function success(data) {
+		return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
+	}
+	function failure() {
+		return { type: postConstants.TIMELINE_POSTS_FAILURE };
+	}
+}
 
-};
+async function findAllUsersCollections(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/users/collections/except-default`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure("Error while loading collections");
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: postConstants.SET_USER_COLLECTIONS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.SET_USER_COLLECTIONS_SUCCESS, collections: data };
+	}
+	function failure(message) {
+		return { type: postConstants.SET_USER_COLLECTIONS_FAILURE, errorMessage: message };
+	}
+}
 
 function createPost(postDTO, dispatch) {
 	const formData = fetchFormData(postDTO);
@@ -70,6 +101,117 @@ function createPost(postDTO, dispatch) {
 	}
 }
 
+function editPost(postDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts`, postDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success("Post successfully updated", postDTO));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.EDIT_POST_REQUEST };
+	}
+	function success(message, post) {
+		return { type: postConstants.EDIT_POST_SUCCESS, successMessage: message, post };
+	}
+	function failure(message) {
+		return { type: postConstants.EDIT_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function addPostToCollection(collectionDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/users/collections/posts`, collectionDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 201) {
+				dispatch(success("Post successfully added to favourites", collectionDTO, collectionDTO.collectionName === ""));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_REQUEST };
+	}
+	function success(message, collectionDTO, defaultCollection) {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_SUCCESS, successMessage: message, collectionDTO, defaultCollection };
+	}
+	function failure(message) {
+		return { type: postConstants.ADD_POST_TO_COLLECTION_FAILURE, errorMessage: message };
+	}
+}
+
+function createCollection(collectionName, dispatch) {
+	let formData = new FormData();
+	formData.append("name", collectionName);
+
+	dispatch(request());
+
+	Axios.post(`/api/users/collections`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 201) {
+				dispatch(success("Collection successfully created", collectionName));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.CREATE_COLLECTION_REQUEST };
+	}
+	function success(message, collectionName) {
+		return { type: postConstants.CREATE_COLLECTION_SUCCESS, successMessage: message, collectionName };
+	}
+	function failure(message) {
+		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function deletePostFromCollection(postId, dispatch) {
+	dispatch(request());
+
+	Axios.delete(`/api/users/collections/posts/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success("Post successfully deleted from favourites", postId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.DELETE_POST_FROM_COLLECTION_REQUEST };
+	}
+	function success(message, postId) {
+		return { type: postConstants.DELETE_POST_FROM_COLLECTION_SUCCESS, successMessage: message, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.DELETE_POST_FROM_COLLECTION_FAILURE, errorMessage: message };
+	}
+}
+
 function fetchFormData(postDTO) {
 	let formData = new FormData();
 
@@ -89,8 +231,8 @@ function fetchFormData(postDTO) {
 function likePost(postId, dispatch) {
 	dispatch(request());
 
-	Axios.put(`/api/posts/${postId}/like`, {} ,{ validateStatus: () => true, headers: authHeader() })
-	.then((res) => {		
+	Axios.put(`/api/posts/${postId}/like`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
 				dispatch(success(postId));
@@ -116,8 +258,8 @@ function likePost(postId, dispatch) {
 
 function unlikePost(postId, dispatch) {
 	dispatch(request());
-	Axios.put(`/api/posts/${postId}/unlike`, {} ,{ validateStatus: () => true, headers: authHeader() })
-	.then((res) => {		
+	Axios.put(`/api/posts/${postId}/unlike`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
 				dispatch(success(postId));
@@ -144,8 +286,8 @@ function unlikePost(postId, dispatch) {
 function dislikePost(postId, dispatch) {
 	dispatch(request());
 
-	Axios.put(`/api/posts/${postId}/dislike`, {} ,{ validateStatus: () => true, headers: authHeader() })
-	.then((res) => {		
+	Axios.put(`/api/posts/${postId}/dislike`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
 				dispatch(success(postId));
@@ -172,8 +314,8 @@ function dislikePost(postId, dispatch) {
 function undislikePost(postId, dispatch) {
 	dispatch(request());
 
-	Axios.put(`/api/posts/${postId}/undislike`, {} ,{ validateStatus: () => true, headers: authHeader() })
-	.then((res) => {		
+	Axios.put(`/api/posts/${postId}/undislike`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
 				dispatch(success(postId));
@@ -200,8 +342,8 @@ function undislikePost(postId, dispatch) {
 function commentPost(commentDTO, dispatch) {
 	dispatch(request());
 
-	Axios.put(`/api/posts/comments`, commentDTO ,{ validateStatus: () => true, headers: authHeader() })
-	.then((res) => {		
+	Axios.put(`/api/posts/comments`, commentDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
 				dispatch(success(res.data, commentDTO.PostId));

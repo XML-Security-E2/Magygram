@@ -25,7 +25,7 @@ function App() {
 				<ProtectedRoute roles={[]} redirectTo="/" path="/blocked-user/:id" component={UserActivateRequestPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/" path="/profile" component={ProfilePage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/" path="/edit-profile" component={EditProfilePage} />
-				<Route path="/add-posts" component={CreatePostPage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/" path="/add-posts" component={CreatePostPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 

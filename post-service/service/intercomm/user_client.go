@@ -1,6 +1,7 @@
 package intercomm
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 
 type UserClient interface {
 	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
+	MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
 }
 
 type userClient struct {}
@@ -43,4 +45,30 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 	_ = json.Unmarshal(bodyBytes, &userInfo)
 
 	return &userInfo, nil
+}
+
+func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag, error) {
+
+	jsonStr, err:= json.Marshal(postIds)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/collections/check-favourites", baseUsersUrl), bytes.NewReader(jsonStr))
+	req.Header.Add("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return nil, errors.New("unauthorized")
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var postIdFav []*model.PostIdFavouritesFlag
+	_ = json.Unmarshal(bodyBytes, &postIdFav)
+
+	return postIdFav, nil
 }

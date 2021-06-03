@@ -1,19 +1,31 @@
 import React from "react";
 
-const PostHeader = ({username, image}) => {
-	const imgStyle = {"transform":"scale(1.5)","width":"100%","position":"absolute","left":"0"};
+const PostHeader = ({ username, image, openOptionsModal }) => {
+	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 
 	return (
-        <React.Fragment>
-            <div className="card-header p-3" >
-                <div className="d-flex flex-row align-items-center">
-                    <div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger post-profile-photo mr-3">
-                        <img src={image} alt="..." style={imgStyle}/>
-                    </div>
-                    <span className="font-weight-bold">{username}</span>
-                </div>
-            </div>
-        </React.Fragment>
+		<React.Fragment>
+			<div className="card-header p-3">
+				<div className="d-flex flex-row justify-content-between">
+					<ul className="list-inline d-flex flex-row align-items-center m-0">
+						<li className="list-inline-item">
+							<div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger post-profile-photo ">
+								<img src={image} alt="..." style={imgStyle} />
+							</div>
+						</li>
+						<li className="list-inline-item">
+							<span className="font-weight-bold">{username}</span>
+						</li>
+					</ul>
+
+					<div className="d-flex justify-content-end">
+						<button className="btn p-0" onClick={openOptionsModal}>
+							<i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</React.Fragment>
 	);
 };
 

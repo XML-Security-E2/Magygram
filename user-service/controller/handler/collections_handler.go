@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"user-service/domain/model"
@@ -10,6 +12,10 @@ import (
 type CollectionsHandler interface {
 	CreateCollection(c echo.Context) error
 	AddPostToCollection(c echo.Context) error
+	GetUsersCollections(c echo.Context) error
+	GetUsersCollectionsExceptDefault(c echo.Context) error
+	CheckIfPostInFavourites(c echo.Context) error
+	DeleteFromCollection(c echo.Context) error
 }
 
 type collectionsHandler struct {
@@ -50,4 +56,77 @@ func (ch collectionsHandler) AddPostToCollection(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, "")
+}
+
+func (ch collectionsHandler) GetUsersCollections(c echo.Context) error {
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	collection, err := ch.CollectionsService.GetUsersCollections(ctx,bearer, "")
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, collection)
+}
+
+func (ch collectionsHandler) GetUsersCollectionsExceptDefault(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	collection, err := ch.CollectionsService.GetUsersCollections(ctx,bearer, model.DefaultCollection)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, collection)
+}
+
+func (ch collectionsHandler) CheckIfPostInFavourites(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	postIds := &[]string{}
+
+	if err := c.Bind(postIds); err != nil {
+		fmt.Println(err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	postsFavFlags, err := ch.CollectionsService.CheckIfPostsInFavourites(ctx,bearer, postIds)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, postsFavFlags)
+}
+
+func (ch collectionsHandler) DeleteFromCollection(c echo.Context) error {
+
+	postId := c.Param("postId")
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := ch.CollectionsService.DeletePostFromCollections(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
