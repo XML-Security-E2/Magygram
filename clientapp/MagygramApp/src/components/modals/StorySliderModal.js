@@ -14,7 +14,7 @@ const StorySliderModal = () => {
 	}
 
 	const onAllStoriesEnd = (test) => {
-		alert(test)
+		//alert(test)
 	}
 
 	const onStoryStart =(index,story)=>{
