@@ -1,18 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
 import { useHistory } from "react-router-dom";
 import { config } from "../config/config";
 import { authHeader } from "../helpers/auth-header";
+import AsyncSelect from "react-select/async"
 
 const Header = () => {
 	const history = useHistory();
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
-	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 	const imgStyle = { width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 
 	const [name, setName] = useState("");
+
+	const [search, setSearch] = useState("");
+
+	const loadOptions = (value, callback) => {
+		setTimeout(() => {
+			var options;
+			Axios.get(`https://localhost:460/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res.data);
+				if (res.status === 200) {
+					options = res.data.map(option => ({ value: option.Username, label: option.Username}))
+					callback(options);
+				}})
+			.catch((err) => {
+				console.log(err)
+			});
+		}, 1000);
+	  };
+
+	const onInputChange = (inputValue, { action }) => {
+		switch (action) {
+			case 'set-value':
+				console.log("redirect to profile page");
+				return;
+			case 'menu-close':
+				setSearch("");
+				return;
+			case 'input-change':
+				setSearch(inputValue);
+				return;
+			default:
+				return;
+		}
+	};
+	
 
 	const handleLogout = () => {
 		userService.logout();
@@ -49,8 +84,14 @@ const Header = () => {
 					<span className="sr-only">Toggle navigation</span>
 					<span className="navbar-toggler-icon"></span>
 				</button>
-				<div>
-					<input type="text" style={inputStyle} placeholder="Search" value="Search" />
+				<div style={{width: '300px'}}>
+					<AsyncSelect
+						defaultOptions
+						loadOptions={loadOptions}
+						onInputChange={onInputChange}
+						placeholder="search"
+						inputValue={search}
+					/>
 				</div>
 				<div className="d-xl-flex align-items-xl-center dropdown">
 					<i className="fa fa-home" style={iconStyle} />
