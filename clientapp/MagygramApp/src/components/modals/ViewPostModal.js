@@ -51,7 +51,6 @@ const ViewPostModal = () => {
 
     const showDislikesModal = () => {
         dispatch({ type: modalConstants.SHOW_POST_DISLIKES_MODAL, Dislikes: postState.viewPostModal.post.DislikedBy })
-
     }
 
 	return (

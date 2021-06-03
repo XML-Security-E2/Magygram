@@ -12,6 +12,7 @@ type StoryHandler interface {
 	CreateStory(c echo.Context) error
 	GetStoriesForStoryline(c echo.Context) error
 	GetStoriesForUser(c echo.Context) error
+	VisitedStoryByUser(c echo.Context) error
 }
 
 type storyHandler struct {
@@ -67,10 +68,28 @@ func (p storyHandler) GetStoriesForUser(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	stories, err := p.StoryService.GetStoriesForUser(ctx,userId)
+	bearer := c.Request().Header.Get("Authorization")
+	stories, err := p.StoryService.GetStoriesForUser(ctx,userId,bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, stories)
+}
+
+func (p storyHandler) VisitedStoryByUser(c echo.Context) error {
+	storyId := c.Param("storyId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := p.StoryService.VisitedStoryByUser(ctx,storyId,bearer);
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }

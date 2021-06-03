@@ -10,6 +10,7 @@ type Story struct {
 	ContentType ContentType `bson:"content_type"`
 	Media Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
+	VisitedBy []UserInfo `bson:"visited_by"`
 }
 
 type ContentType string
@@ -34,6 +35,7 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media) (*Story, e
 				ContentType: storyType,
 				Media: media,
 				UserInfo: postOwner,
+				VisitedBy: []UserInfo{},
 	}, nil
 }
 
@@ -72,27 +74,37 @@ type UserInfo struct {
 }
 
 type StoryResponse struct {
-	Id string
 	ContentType ContentType
-	Media []Media
+	Media []MediaContent
 	UserInfo UserInfo
+	FirstUnvisitedStory int
 }
 
-func NewStoryResponse(story *Story, media []Media) (*StoryResponse, error) {
-	return &StoryResponse{Id: story.Id,
+type MediaContent struct{
+	Url string
+	MediaType string
+	StoryId string
+}
+
+
+func NewStoryResponse(story *Story, media []MediaContent,firstUnvisitedStory int) (*StoryResponse, error) {
+	return &StoryResponse{
 		Media: media,
 		UserInfo: story.UserInfo,
 		ContentType: story.ContentType,
+		FirstUnvisitedStory: firstUnvisitedStory,
 	}, nil
 }
 
 type StoryInfoResponse struct {
 	Id string
 	UserInfo UserInfo
+	Visited bool
 }
 
-func NewStoryInfoResponse(story *Story) (*StoryInfoResponse, error) {
+func NewStoryInfoResponse(story *Story, visited bool) (*StoryInfoResponse, error) {
 	return &StoryInfoResponse{Id: story.Id,
 		UserInfo: story.UserInfo,
+		Visited: visited,
 	}, nil
 }

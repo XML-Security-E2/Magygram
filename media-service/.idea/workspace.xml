@@ -2,8 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/StoryReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/StoryReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/StorySliderModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/StorySliderModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/ViewPostModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/ViewPostModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/controller/handler/story_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/controller/handler/story_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/domain/model/story.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/domain/model/story.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/domain/repository/stories.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/domain/repository/stories.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/domain/service-contracts/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/domain/service-contracts/story_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../story-service/infrastructure/persistence/mongodb/stories.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/infrastructure/persistence/mongodb/stories.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../story-service/service/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/story_service.go" afterDir="false" />
     </list>
@@ -50,31 +56,12 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../story-service" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="media-service" />
-      <working_directory value="$PROJECT_DIR$" />
-      <go_parameters value="-i" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="media-service" />
-      <working_directory value="$PROJECT_DIR$" />
-      <go_parameters value="-i" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>

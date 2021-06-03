@@ -18,6 +18,7 @@ const StoryContextProvider = (props) => {
 		storySliderModal: {
 			showModal: false,
 			stories: [],
+			firstUnvisitedStory: 0
 		},
 		iHaveAStory:true,
 	});

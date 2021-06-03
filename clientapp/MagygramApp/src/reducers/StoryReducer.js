@@ -75,6 +75,7 @@ export const storyReducer = (state, action) => {
 				storySliderModal: {
 					showModal: true,
 					stories: createStories(action.stories),
+					firstUnvisitedStory: action.stories.FirstUnvisitedStory
 				}
 			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
@@ -83,6 +84,7 @@ export const storyReducer = (state, action) => {
 				storySliderModal: {
 					showModal: false,
 					stories: action.stories,
+					firstUnvisitedStory: 0,
 				}
 			};
 		default:
@@ -99,6 +101,7 @@ function createStories(stories){
 			header: {
 				heading: stories.UserInfo.Username,
 				profileImage: stories.UserInfo.ImageURL,
+				storyId: media.StoryId
 			},
 			type: media.MediaType==='VIDEO'?'video':'image',
 		})
