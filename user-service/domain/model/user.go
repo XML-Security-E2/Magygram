@@ -27,8 +27,6 @@ const(
 	FEMALE
 )
 
-
-
 type UserInfo struct {
 	Id string `json:"id"`
 	Username  string `json:"username"`
@@ -93,18 +91,12 @@ const(
 	VIDEO
 )
 
-func NewUser(userRequest *UserRequest, gender Gender) (*User, error) {
-	err := validateGenderEnums(gender)
-	if err != nil {
-		return nil, err
-	}
-
+func NewUser(userRequest *UserRequest) (*User, error) {
 	return &User{Id: guid.New().String(),
 		Name:           html.EscapeString(userRequest.Name),
 		Surname:        html.EscapeString(userRequest.Surname),
 		Username:       html.EscapeString(userRequest.Username),
 		Email:          html.EscapeString(userRequest.Email),
-		Gender:         gender,
 		FavouritePosts: map[string][]IdWithMedia{},
 	}, nil
 }

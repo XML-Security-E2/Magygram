@@ -1,5 +1,6 @@
 package conf
 
+
 import (
 	"fmt"
 	"github.com/spf13/viper"
@@ -24,26 +25,9 @@ type Config struct {
 		Host 	 string
 		Port 	 string
 	}
-
-	Authservice struct {
+	Userservice struct {
 		Protocol   string
 		Domain string
-		Port 	 string
-	}
-
-	Relationshipservice struct {
-		Protocol   string
-		Domain string
-		Port 	 string
-	}
-
-	Postservice struct {
-		Protocol   string
-		Domain string
-		Port 	 string
-	}
-
-	Gateway struct {
 		Port 	 string
 	}
 }

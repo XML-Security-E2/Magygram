@@ -15,4 +15,5 @@ type UserService interface {
 	GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error)
+	SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error)
 }

@@ -20,6 +20,7 @@ type UserHandler interface {
 	GetUserEmailIfUserExist(c echo.Context) error
 	GetUserById(c echo.Context) error
 	GetLoggedUserInfo(c echo.Context) error
+	SearchForUsersByUsername(c echo.Context) error
 }
 
 var (
@@ -172,6 +173,24 @@ func (h *userHandler) GetUserById(c echo.Context) error {
 
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *userHandler) SearchForUsersByUsername(c echo.Context) error {
+	username := c.Param("username")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	users, err := h.UserService.SearchForUsersByUsername(ctx, username)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, users)
 }
 
 func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {

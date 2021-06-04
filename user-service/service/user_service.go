@@ -15,14 +15,15 @@ type userService struct {
 	service_contracts.AccountActivationService
 	service_contracts.ResetPasswordService
 	intercomm.AuthClient
+	intercomm.RelationshipClient
 }
 
 var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService) service_contracts.UserService {
-	return &userService{r, a,  rp , ic}
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient) service_contracts.UserService {
+	return &userService{r, a,  rp , ic, rC}
 }
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
@@ -32,6 +33,9 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	}
 
 	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
+	if err != nil { return "", err}
+
+	err = u.RelationshipClient.CreateUser(user)
 	if err != nil { return "", err}
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
@@ -143,6 +147,16 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 	}
 
 	return user, err
+}
+
+func (u *userService) SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error) {
+	users, err := u.UserRepository.SearchForUsersByUsername(ctx, username)
+
+	if err != nil {
+		return nil, errors.New("Couldn't find any users")
+	}
+
+	return users, err
 }
 
 func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
