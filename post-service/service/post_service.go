@@ -10,6 +10,7 @@ import (
 	"post-service/domain/model"
 	"post-service/domain/repository"
 	"post-service/domain/service-contracts"
+	"post-service/domain/service-contracts/exceptions"
 	"post-service/service/intercomm"
 	"time"
 )
@@ -294,6 +295,15 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 		return errors.New("invalid post id")
 	}
 
+	isOwner, err := p.CheckIfUsersPostFromBearer(bearer, post.UserInfo.Id)
+	if err != nil {
+		return err
+	}
+
+	if !isOwner {
+		return &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
 	post.Tags = postRequest.Tags
 	post.Description = postRequest.Description
 	post.Location = postRequest.Location
@@ -305,4 +315,16 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 	}
 
 	return nil
+}
+
+func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return false, err
+	}
+
+	if postOwnerId != userInfo.Id {
+		return false, nil
+	}
+	return true, nil
 }

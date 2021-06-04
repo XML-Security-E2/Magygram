@@ -16,6 +16,7 @@ mail :
   host : "smtp.gmail.com"
   port : "587"
 
+
 authservice:
   protocol: "https://"
   domain: "localhost"
@@ -28,3 +29,5 @@ postservice:
 
 gateway:
   port: "8085"
+  protocol: "https://"
+  domain: "localhost"

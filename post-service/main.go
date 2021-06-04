@@ -14,13 +14,13 @@ import (
 	"time"
 )
 
-var runServer = flag.Bool("server", false, "production is -server option require")
+var runServer = flag.Bool("post-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
 func main() {
 
+
 	conf.NewConfig(*runServer)
-	mongoDbInfo := fmt.Sprintf("%s:%s",
-		conf.Current.Database.Host, conf.Current.Database.Port)
+	mongoDbInfo := fmt.Sprintf("%s:%s", conf.Current.Database.Host, conf.Current.Database.Port)
 
 	mongoURI := flag.String("mongoURI", mongoDbInfo, "Database hostname url")
 	mongoDatabase := flag.String("mongoDatabse", conf.Current.Database.Database, "Database name")
@@ -61,5 +61,9 @@ func main() {
 
 	router.NewRouter(e, h)
 
-	e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+	if os.Getenv("IS_PRODUCTION") == "true" {
+		e.Start(":"+ conf.Current.Server.Port)
+	} else {
+		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+	}
 }

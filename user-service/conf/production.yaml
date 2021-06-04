@@ -1,0 +1,32 @@
+server:
+    port: "460"
+    host: "user-service"
+    secret: "MagyGram"
+
+database:
+    host: "mongodb://mongo-db"
+    port: "27017"
+    user: "root"
+    password: "root"
+    database: "no-waiter-user-service"
+
+mail:
+    sender: "info.magygram@gmail.com"
+    password: "magygramxml"
+    host: "smtp.gmail.com"
+    port: "587"
+
+authservice:
+    protocol: "http://"
+    domain: "auth-service"
+    port: "461"
+
+postservice:
+    protocol: "http://"
+    domain: "post-service"
+    port: "462"
+
+gateway:
+    port: "8085"
+    protocol: "http://"
+    domain: "localhost"

@@ -39,6 +39,8 @@ type Config struct {
 
 	Gateway struct {
 		Port 	 string
+		Protocol   string
+		Domain string
 	}
 }
 
@@ -47,7 +49,7 @@ var Current *Config
 func NewConfig(runServer bool) {
 	var C Config
 	Current = &C
-	viper.AddConfigPath(".\\conf")
+	viper.AddConfigPath("./conf")
 	viper.SetConfigType("yml")
 
 	if runServer {

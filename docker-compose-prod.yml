@@ -1,0 +1,79 @@
+services:
+    gateway:
+        image: nginx:1.19.8-alpine
+        ports:
+            - 8085:8085
+        networks:
+            - backend
+        volumes:
+            - ./gateway/nginx_prod.conf:/etc/nginx/nginx.conf
+            - ./gateway/api_gateway_prod.conf:/etc/nginx/api_gateway.conf
+            - ./gateway/certificate.pem:/etc/nginx/ssl/certificate.pem
+            - ./gateway/certificate-key.pem:/etc/nginx/ssl/certificate-key.pem
+
+    user-service:
+        image: user-service
+        build:
+            context: ./user-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
+    auth-service:
+        image: auth-service
+        build:
+            context: ./auth-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
+    media-service:
+        image: media-service
+        build:
+            context: ./media-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
+    post-service:
+        image: post-service
+        build:
+            context: ./post-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
+    story-service:
+        image: story-service
+        build:
+            context: ./story-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
+    mongo-db:
+        image: mongo
+        restart: always
+        networks:
+            - backend
+        volumes:
+            # if you wish to setup additional user accounts specific per DB or with different roles you can use following entry point
+            - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
+
+volumes:
+    mongodbdata:
+
+networks:
+    backend:
+        name: magygram
+        driver: bridge
