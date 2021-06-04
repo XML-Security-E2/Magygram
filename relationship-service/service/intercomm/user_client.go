@@ -30,7 +30,7 @@ type privateFlag struct {
 }
 
 func (u userClient) IsPrivate(id string) (bool, error) {
-	return true, nil
+	return false, nil
 	resp, err := http.Get(fmt.Sprintf("%s/is-private/%s", baseUrl, id))
 	if err != nil || resp.StatusCode != 200 {
 		return false, errors.New("could not get user profile private flag")

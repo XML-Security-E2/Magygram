@@ -23,7 +23,7 @@ const Header = () => {
 			.then((res) => {
 				console.log(res.data);
 				if (res.status === 200) {
-					options = res.data.map(option => ({ value: option.Username, label: option.Username}))
+					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
 					callback(options);
 				}})
 			.catch((err) => {
@@ -35,7 +35,6 @@ const Header = () => {
 	const onInputChange = (inputValue, { action }) => {
 		switch (action) {
 			case 'set-value':
-				console.log("redirect to profile page");
 				return;
 			case 'menu-close':
 				setSearch("");
@@ -46,6 +45,12 @@ const Header = () => {
 			default:
 				return;
 		}
+	};
+
+	const onChange = (option) => {
+		console.log(option);
+		window.location = "#/user/" + option.id;
+		return false;
 	};
 	
 
@@ -89,6 +94,7 @@ const Header = () => {
 						defaultOptions
 						loadOptions={loadOptions}
 						onInputChange={onInputChange}
+						onChange={onChange}
 						placeholder="search"
 						inputValue={search}
 					/>
