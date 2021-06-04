@@ -48,6 +48,8 @@ func (h *userHandler) RegisterUser(c echo.Context) error {
 	userId, err := h.UserService.RegisterUser(ctx, userRequest)
 	fmt.Println(userId)
 	if err != nil {
+		fmt.Println(err)
+
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

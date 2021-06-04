@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"post-service/domain/model"
 	"post-service/domain/service-contracts"
+	"post-service/domain/service-contracts/exceptions"
 )
 
 
@@ -202,8 +203,15 @@ func (p postHandler) EditPost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	err := p.PostService.EditPost(ctx, bearer, editRequest)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
 	}
+
+
 	return c.JSON(http.StatusOK, "")
 }

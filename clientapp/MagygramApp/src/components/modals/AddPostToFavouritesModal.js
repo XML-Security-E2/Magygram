@@ -68,7 +68,7 @@ const AddPostToFavouritesModal = () => {
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button>Close</Button>
+				<Button onClick={handleModalClose}>Close</Button>
 			</Modal.Footer>
 		</Modal>
 	);

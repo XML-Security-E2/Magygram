@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var runServer = flag.Bool("server", false, "production is -server option require")
+var runServer = flag.Bool("story-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
 func main() {
 
@@ -61,5 +61,8 @@ func main() {
 
 	router.NewRouter(e, h)
 
-	e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
-}
+	if os.Getenv("IS_PRODUCTION") == "true" {
+		e.Start(":"+ conf.Current.Server.Port)
+	} else {
+		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+	}}

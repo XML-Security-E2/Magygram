@@ -28,7 +28,10 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 		return "", err
 	}
 	result, err := u.UserRepository.Create(ctx, user)
-	if err != nil { return "", err}
+
+	if err != nil { 	
+		return "", err
+	}
 	if userId, ok := result.InsertedID.(primitive.ObjectID); ok {
 		return userId.String(), nil
 	}

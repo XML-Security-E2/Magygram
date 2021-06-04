@@ -32,7 +32,7 @@ func SendActivationMail(receiver string, name string, activationId string) {
 		URL  string
 	}{
 		Name: name,
-		URL: "https://" + conf.Current.Server.Host + ":" + conf.Current.Gateway.Port + "/api/users/activate/" + activationId,
+		URL: conf.Current.Gateway.Protocol + conf.Current.Gateway.Domain + ":" + conf.Current.Gateway.Port + "/api/users/activate/" + activationId,
 	}
 	r := NewRequest([]string{receiver}, "Hello "+ name + "!", "Hello "+ name + "!")
 	if err := r.parseTemplate("mailActivation.html", templateData); err == nil {
@@ -48,7 +48,7 @@ func SendResetPasswordMail(receiver string, name string, activationId string) {
 		URL  string
 	}{
 		Name: name,
-		URL: "https://" + conf.Current.Server.Host + ":" + conf.Current.Gateway.Port + "/api/users/reset-password/" + activationId,
+		URL: conf.Current.Gateway.Protocol + conf.Current.Gateway.Domain + ":" + conf.Current.Gateway.Port + "/api/users/reset-password/" + activationId,
 	}
 	r := NewRequest([]string{receiver}, "Hello "+ name + "!", "Hello "+ name + "!")
 	if err := r.parseTemplate("mailResetPassword.html", templateData); err == nil {
