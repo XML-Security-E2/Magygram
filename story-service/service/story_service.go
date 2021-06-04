@@ -16,7 +16,6 @@ type storyService struct {
 	intercomm.UserClient
 }
 
-
 func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.StoryService {
 	return &storyService{r , ic, uc}
 }
@@ -128,6 +127,32 @@ func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bear
 
 	return res, nil
 }
+
+
+func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*model.UsersStoryResponse, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var userStories []*model.UsersStoryResponse
+	result, err := p.StoryRepository.GetStoriesForUser(ctx, userInfo.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, story := range result {
+		userStories = append(userStories, &model.UsersStoryResponse{
+			Id: story.Id,
+			ContentType: story.ContentType,
+			Media:      story.Media,
+			DateTime:    "",
+		})
+	}
+
+	return userStories, nil
+}
+
 
 func (p storyService) VisitedStoryByUser(ctx context.Context, storyId string, bearer string) error {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)

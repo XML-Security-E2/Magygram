@@ -1,6 +1,8 @@
 import { modalConstants } from "../constants/ModalConstants";
 import { storyConstants } from "../constants/StoryConstants";
 
+let storyCopy = {};
+
 export const storyReducer = (state, action) => {
 	switch (action.type) {
 		case storyConstants.CREATE_STORY_REQUEST:
@@ -51,23 +53,23 @@ export const storyReducer = (state, action) => {
 		case storyConstants.STORYLINE_STORY_REQUEST:
 			return {
 				...state,
-				storyline: {		
-					stories : []
-				}
+				storyline: {
+					stories: [],
+				},
 			};
 		case storyConstants.STORYLINE_STORY_SUCCESS:
 			return {
 				...state,
-				storyline: {		
-					stories : action.stories
-				}
+				storyline: {
+					stories: action.stories,
+				},
 			};
 		case storyConstants.STORYLINE_STORY_FAILURE:
 			return {
 				...state,
-				storyline: {		
-					stories : []
-				}
+				storyline: {
+					stories: [],
+				},
 			};
 		case modalConstants.SHOW_STORY_SLIDER_MODAL:
 			return {
@@ -75,8 +77,8 @@ export const storyReducer = (state, action) => {
 				storySliderModal: {
 					showModal: true,
 					stories: createStories(action.stories),
-					firstUnvisitedStory: action.stories.FirstUnvisitedStory
-				}
+					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
+				},
 			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
 			return {
@@ -85,27 +87,51 @@ export const storyReducer = (state, action) => {
 					showModal: false,
 					stories: action.stories,
 					firstUnvisitedStory: 0,
-				}
+				},
 			};
+
+		case storyConstants.USER_HIGHLIGHTS_STORY_REQUEST:
+			storyCopy = { ...state };
+			state.highlights.stories = [];
+			return storyCopy;
+		case storyConstants.USER_HIGHLIGHTS_STORY_SUCCESS:
+			storyCopy = { ...state };
+			state.highlights.stories = action.stories;
+			return storyCopy;
+
+		case storyConstants.USER_HIGHLIGHTS_STORY_SUCCESS:
+			storyCopy = { ...state };
+			state.highlights.stories = [];
+			return storyCopy;
+
+		case modalConstants.SHOW_STORY_SELECT_HIGHLIGHTS_MODAL:
+			storyCopy = { ...state };
+			state.highlights.showModal = true;
+			return storyCopy;
+
+		case modalConstants.HIDE_STORY_SELECT_HIGHLIGHTS_MODAL:
+			storyCopy = { ...state };
+			state.highlights.showModal = false;
+			return storyCopy;
 		default:
 			return state;
 	}
 };
 
-function createStories(stories){
-	var retVal =[]
+function createStories(stories) {
+	var retVal = [];
 
-	stories.Media.forEach(media =>{
+	stories.Media.forEach((media) => {
 		retVal.push({
-			url:media.Url,
+			url: media.Url,
 			header: {
 				heading: stories.UserInfo.Username,
 				profileImage: stories.UserInfo.ImageURL,
-				storyId: media.StoryId
+				storyId: media.StoryId,
 			},
-			type: media.MediaType==='VIDEO'?'video':'image',
-		})
-	})
+			type: media.MediaType === "VIDEO" ? "video" : "image",
+		});
+	});
 
 	return retVal;
 }

@@ -9,5 +9,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/story", h.CreateStory)
 	e.GET("/api/story", h.GetStoriesForStoryline)
 	e.GET("/api/story/:userId", h.GetStoriesForUser)
+	e.GET("/api/story/user", h.GetAllUserStories)
 	e.PUT("/api/story/:storyId/visited", h.VisitedStoryByUser)
 }

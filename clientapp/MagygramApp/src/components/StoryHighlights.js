@@ -1,17 +1,17 @@
 import React, { useContext, useEffect } from "react";
+import { colorConstants } from "../constants/ColorConstants";
 import { StoryContext } from "../contexts/StoryContext";
 import { storyService } from "../services/StoryService";
+import CreateStoryHighlightsButton from "./CreateStoryHighlightsButton";
 import StorySliderModal from "./modals/StorySliderModal";
 import Story from "./Story";
-import StoryButton from "./StoryButton";
-import MyStoryButton from "../components/MyStoryButton";
 
-const Storyline = () => {
+const StoryHighlights = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
 	useEffect(() => {
 		const getStoriesHandler = async () => {
-			await storyService.findStoriesForStoryline(dispatch);
+			await storyService.findAllUserStories(dispatch);
 		};
 		getStoriesHandler();
 	}, [dispatch]);
@@ -22,17 +22,14 @@ const Storyline = () => {
 
 	return (
 		<React.Fragment>
-			<div className="card">
+			<div className="card border-0" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 				<div className="card-body d-flex justify-content-start">
 					<ul className="list-unstyled mb-0">
-						<StoryButton />
-						<MyStoryButton openStorySlider={openStorySlider} />
-
-						{storyState.storyline.stories !== null &&
-							storyState.storyline.stories.map((story) => {
-								return <Story story={story} openStorySlider={openStorySlider} />;
-							})}
+						{storyState.storyline.stories.map((story) => {
+							return <Story story={story} openStorySlider={openStorySlider} />;
+						})}
 						<StorySliderModal />
+						<CreateStoryHighlightsButton />
 					</ul>
 				</div>
 			</div>
@@ -40,4 +37,4 @@ const Storyline = () => {
 	);
 };
 
-export default Storyline;
+export default StoryHighlights;

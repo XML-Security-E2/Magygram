@@ -6,6 +6,7 @@ import { authHeader } from "../helpers/auth-header";
 export const storyService = {
 	createStory,
 	findStoriesForStoryline,
+	findAllUserStories,
 	GetStoriesForUser,
 	visitedByUser,
 };
@@ -47,25 +48,51 @@ async function findStoriesForStoryline(dispatch) {
 			if (res.status === 200) {
 				dispatch(success(res.data));
 			} else {
-				failure()
+				failure();
 			}
 		})
-			.catch((err) => {
-				failure()
-			});
+		.catch((err) => {
+			failure();
+		});
 
-		function request() {
-			return { type: storyConstants.STORYLINE_STORY_REQUEST};
-		}
+	function request() {
+		return { type: storyConstants.STORYLINE_STORY_REQUEST };
+	}
 
-		function success(data) {
-			return { type: storyConstants.STORYLINE_STORY_SUCCESS, stories: data };
-		}
-		function failure() {
-			return { type: storyConstants.STORYLINE_STORY_FAILURE };
-		}
+	function success(data) {
+		return { type: storyConstants.STORYLINE_STORY_SUCCESS, stories: data };
+	}
+	function failure() {
+		return { type: storyConstants.STORYLINE_STORY_FAILURE };
+	}
+}
 
-};
+async function findAllUserStories(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/story/user`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: storyConstants.USER_HIGHLIGHTS_STORY_REQUEST };
+	}
+
+	function success(data) {
+		return { type: storyConstants.USER_HIGHLIGHTS_STORY_SUCCESS, stories: data };
+	}
+	function failure() {
+		return { type: storyConstants.USER_HIGHLIGHTS_STORY_FAILURE };
+	}
+}
 
 function fetchFormData(storyDTO) {
 	let formData = new FormData();
@@ -91,18 +118,16 @@ function GetStoriesForUser(userId, dispatch) {
 			//failure()
 		});
 
-
-		function success(data) {
-			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
-		}
-		//function failure() {
-		//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
-		//}
-
-};
+	function success(data) {
+		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+	}
+	//function failure() {
+	//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
+	//}
+}
 
 function visitedByUser(storyId, dispatch) {
-	Axios.put(`/api/story/${storyId}/visited`,{}, { validateStatus: () => true, headers: authHeader() })
+	Axios.put(`/api/story/${storyId}/visited`, {}, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
 				//dispatch(success(res.data));
@@ -114,12 +139,10 @@ function visitedByUser(storyId, dispatch) {
 			//failure()
 		});
 
-
-		function success(data) {
-			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
-		}
-		//function failure() {
-		//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
-		//}
-
-};
+	function success(data) {
+		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+	}
+	//function failure() {
+	//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
+	//}
+}
