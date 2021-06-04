@@ -21,10 +21,12 @@ type Interactor interface {
 
 type interactor struct {
 	PostCol *mongo.Collection
+	locationCol *mongo.Collection
+	tagCol *mongo.Collection
 }
 
-func NewInteractor(PostCol *mongo.Collection) Interactor {
-	return &interactor{PostCol}
+func NewInteractor(PostCol *mongo.Collection, locationCol *mongo.Collection, tagCol *mongo.Collection) Interactor {
+	return &interactor{PostCol, locationCol, tagCol}
 }
 
 type appHandler struct {
@@ -46,7 +48,7 @@ func (i *interactor) NewUserClient() intercomm.UserClient {
 }
 
 func (i *interactor) NewPostRepository() repository.PostRepository {
-	return mongodb.NewPostRepository(i.PostCol)
+	return mongodb.NewPostRepository(i.PostCol, i.locationCol, i.tagCol)
 }
 
 func (i *interactor) NewPostService() service_contracts.PostService {

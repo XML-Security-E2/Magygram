@@ -54,9 +54,11 @@ func main() {
 	}()
 
 	postCol := client.Database(*mongoDatabase).Collection("posts")
+	locationCol := client.Database(*mongoDatabase).Collection("locations")
+	tagCol := client.Database(*mongoDatabase).Collection("tags")
 
 	e := echo.New()
-	i := interactor.NewInteractor(postCol)
+	i := interactor.NewInteractor(postCol, locationCol, tagCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

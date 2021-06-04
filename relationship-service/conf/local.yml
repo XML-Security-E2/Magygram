@@ -1,0 +1,22 @@
+server :
+  port : "463"
+  host : "localhost"
+  secret : "MagyGram"
+
+database :
+  host : "bolt://localhost"
+  port : "7687"
+  user : "neo4j"
+  password : "neo4jdb"
+  database : "no-waiter-relationship-service"
+
+mail :
+  sender : "info.magygram@gmail.com"
+  password : "magygramxml"
+  host : "smtp.gmail.com"
+  port : "587"
+
+userservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "460"

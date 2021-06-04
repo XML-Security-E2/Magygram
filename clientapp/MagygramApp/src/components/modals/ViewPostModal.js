@@ -51,13 +51,11 @@ const ViewPostModal = () => {
 
     const showDislikesModal = () => {
         dispatch({ type: modalConstants.SHOW_POST_DISLIKES_MODAL, Dislikes: postState.viewPostModal.post.DislikedBy })
-
     }
 
 	return (
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
-
-			<Modal.Body>
+			<Modal.Body >
             <div className="d-flex flex-row align-items-top">
 
                 <PostImageSliderModalView media={postState.viewPostModal.post.Media}/>

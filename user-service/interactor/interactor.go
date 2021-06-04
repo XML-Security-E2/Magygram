@@ -45,6 +45,10 @@ func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
 }
 
+func (i *interactor) NewRelationshipClient() intercomm.RelationshipClient {
+	return intercomm.NewRelationshipClient()
+}
+
 func (i *interactor) NewPostClient() intercomm.PostClient {
 	return intercomm.NewPostClient()
 }
@@ -77,7 +81,7 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService())
+	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient())
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {

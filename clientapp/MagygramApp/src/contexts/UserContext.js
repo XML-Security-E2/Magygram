@@ -32,6 +32,11 @@ const UserContextProvider = (props) => {
 			showSuccessMessage: false,
 			emailAddress: "",
 		},
+		loggedUser: {
+			id:'3b88ea7b-4a1d-43d5-b741-d08c413336a7',
+			username: 'nikolakolovic',
+			imageURL:'assets/images/profiles/profile-1.jpg'
+		}
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

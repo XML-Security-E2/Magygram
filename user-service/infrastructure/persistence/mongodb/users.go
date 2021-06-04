@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 )
@@ -40,6 +41,27 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error) {
+	var users []model.User
+	log.Println("param: " + username)
+	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}})
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.User
+			err := cursor.Decode(&record)
+			users = append(users, record)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return users, nil
 }
 
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {

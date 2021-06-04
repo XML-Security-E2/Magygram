@@ -191,3 +191,13 @@ type CommentRequest struct {
 	PostId string
 	Content string
 }
+
+type Location struct {
+	Id string `bson:"_id,omitempty"`
+	Name string `bson:"name"`
+}
+
+type Tag struct {
+	Id string `bson:"_id,omitempty"`
+	Name string `bson:"name"`
+}
