@@ -27,7 +27,7 @@ const ProfilePage = () => {
 	};
 
     useEffect(() => {
-        Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+        Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
                 setUsername(res.data.username);
@@ -36,7 +36,7 @@ const ProfilePage = () => {
                 else
                 setImg(res.data.imageUrl);
                 
-                Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+                Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
                     .then((res) => {
                         
 				        console.log(res.data);
@@ -57,12 +57,12 @@ const ProfilePage = () => {
 
 		window.location =  `#/profile`; 
 
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
                 setUsername(res.data.username);
                 
-                Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+                Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
                     .then((res) => {
                         
 				        console.log(res.data);

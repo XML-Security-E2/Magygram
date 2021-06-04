@@ -19,7 +19,7 @@ const Header = () => {
 
 
 	useEffect(() => {
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
                 if(res.data.imageUrl == "")
@@ -78,7 +78,7 @@ const Header = () => {
 		let path = `/profile`;
 		history.push(path);
 
-		Axios.get(`${config.API_URL}/users/logged`, {
+		Axios.get(`api/users/logged`, {
 			validateStatus: () => true,
 			headers: { Authorization: authHeader() },
 		})
