@@ -26,6 +26,23 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 	return &userService{r, a,  rp , ic, rC}
 }
 
+func (u *userService) EditUser(ctx context.Context, userRequest *model.EditUserRequest) (string, error) {
+	user, _ := model.NewEditUser(userRequest)
+	if err := validator.New().Struct(user); err!= nil {
+		return "", err
+	}
+
+
+	result, err := u.UserRepository.UpdateUserDetails(ctx, user)
+
+	if err != nil { return "", err}
+
+	if userId, ok := result.UpsertedID.(string); ok {
+		return userId, nil
+	}
+	return "", err
+}
+
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err!= nil {

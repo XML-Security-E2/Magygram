@@ -42,6 +42,13 @@ type UserRequest struct {
 	RepeatedPassword string `json:"repeatedPassword"`
 }
 
+type EditUserRequest struct {
+	Name  string `json:"name"`
+	Surname string `json:"surname"`
+	Username  string `json:"username"`
+	Email string `json:"email"`
+}
+
 type ResetPasswordRequest struct {
 	Email string `json:"email"`
 }
@@ -98,6 +105,15 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Username:       html.EscapeString(userRequest.Username),
 		Email:          html.EscapeString(userRequest.Email),
 		FavouritePosts: map[string][]IdWithMedia{},
+	}, nil
+}
+
+func NewEditUser(userRequest *EditUserRequest) (*User, error) {
+	return &User{Id: guid.New().String(),
+		Name:           html.EscapeString(userRequest.Name),
+		Surname:        html.EscapeString(userRequest.Surname),
+		Username:       html.EscapeString(userRequest.Username),
+		Email:          html.EscapeString(userRequest.Email),
 	}, nil
 }
 

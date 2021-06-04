@@ -41,7 +41,7 @@ const EditProfile = () => {
 	
 	useEffect(() => {
 		
-        Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+        Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				setId(res.data.id)
 				console.log(res.data)
@@ -51,7 +51,7 @@ const EditProfile = () => {
                 	setImg(res.data.imageUrl);
 
 
-				Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+				Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
 				.then((res) => {
 					
 					console.log(res.data);
