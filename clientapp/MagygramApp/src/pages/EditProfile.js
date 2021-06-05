@@ -21,11 +21,8 @@ const EditProfile = () => {
     const editStyle = {color: "black", left: "20",  marginLeft: "13px",marginRight: "13px", borderWidth: "1px", borderStyle: "solid" }
     const sectionStyle = { left: "20",  marginLeft: "100px"}
    
-	const [surname, setSurname] = useState("");
 	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [repeatedPassword, setRepeatedPassword] = useState("");
-
+	const [id, setId] = useState("");
 	const [name, setName] = useState("");
 	const [username, setUsername] = useState("");
 	const [bio, setBio] = useState("");
@@ -33,12 +30,21 @@ const EditProfile = () => {
 	const [website, setWebsite] = useState("");
 	const [number, setNumber] = useState("");
 
+	const [emailInput, setEmailInput] = useState("");
+	const [nameInput, setNameInput] = useState("");
+	const [usernameInput, setUsernameInput] = useState("");
+	const [bioInput, setBioInput] = useState("");
+	const [imgInput, setImgInput] = useState("");
+	const [websiteInput, setWebsiteInput] = useState("");
+	const [numberInput, setNumberInput] = useState("");
 
 	
 	useEffect(() => {
+		
         Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
-
+				setId(res.data.id)
+				console.log(res.data)
                 if(res.data.imageUrl == "")
                     setImg("assets/img/profile.jpg");
                 else
@@ -64,18 +70,23 @@ const EditProfile = () => {
 	
 	});
 
+	const handleSettings = () => {
+		alert("TOD1O");
+	};
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
 		let user = {
-			name,
-			surname,
-			email,
-			username,
-			password,
-			repeatedPassword,
+			id,
+			nameInput,
+			usernameInput,
+			emailInput,
+			bioInput,
+			websiteInput,
+			numberInput
 		};
-
+	
 	};
 
 	const handleLogout = () => {
@@ -89,9 +100,10 @@ const EditProfile = () => {
 
 	};
 
-	const handleSettings = () => {
-		
-	};
+
+	const handleChange = e => {
+		setName(e.target.value);
+	  };
 
 	return (
 		<React.Fragment>
@@ -150,27 +162,33 @@ const EditProfile = () => {
 				</h2>
                 <br/>
 				<div className="form-group">
-					<input className="form-control" required type="text" name="nameInput" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+					<text>Name</text>
+					<input className="form-control" required type="text" name="name" placeholder={name} value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
 				</div>
                 
 				<div className="form-group">
-					<input className="form-control" required type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+					<text>Email</text>
+					<input className="form-control" required type="email" name="email" placeholder={email} value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
 				</div>
 
 				<div className="form-group">
-					<input className="form-control" required type="username" name="username" placeholder="@Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+					<text>Username</text>
+					<input className="form-control" required type="username" name="username" placeholder={username} value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} />
 				</div>
 
 				<div className="form-group">
-					<input className="form-control" required type="text" name="websiteInput" placeholder="Website" value={website} onChange={(e) => setWebsite(e.target.value)} />
+					<text>Website</text>
+					<input className="form-control" required type="text" name="websiteInput" placeholder={website} value={websiteInput} onChange={(e) => setWebsiteInput(e.target.value)} />
 				</div>
 
                 <div className="form-group">
-					<input className="form-control" required type="text" name="bioInput" placeholder="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
+					<text>Bio</text>
+					<input className="form-control" required type="text" name="bioInput" placeholder={bio} value={bioInput} onChange={(e) => setBioInput(e.target.value)} />
 				</div>
 
                 <div className="form-group">
-					<input className="form-control" required type="text" name="numberInput" placeholder="Number" value={number} onChange={(e) => setNumber(e.target.value)} />
+					<text>Number</text>
+					<input className="form-control" required type="text" name="numberInput" placeholder={number} value={numberInput} onChange={(e) => setNumberInput(e.target.value)} />
 				</div>
 
             
