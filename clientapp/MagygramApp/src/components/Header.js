@@ -13,15 +13,16 @@ const Header = () => {
 	const imgStyle = { width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 
 	const [name, setName] = useState("");
-
 	const [img, setImg] = useState("");
+	const [currentId, setCurrentId] = useState();
 	const [search, setSearch] = useState("");
 
 
 	useEffect(() => {
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
+				setCurrentId(res.data.id);
                 if(res.data.imageUrl == "")
                     setImg("assets/img/profile.jpg");
                 else
@@ -35,7 +36,7 @@ const Header = () => {
 	const loadOptions = (value, callback) => {
 		setTimeout(() => {
 			var options;
-			Axios.get(`https://localhost:460/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
+			Axios.get(`/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
 				if (res.status === 200) {
@@ -64,8 +65,11 @@ const Header = () => {
 	};
 
 	const onChange = (option) => {
-		console.log(option);
-		window.location = "#/user/" + option.id;
+		if (currentId === option.id) {
+			window.location = "#/profile";
+		} else {
+			window.location = "#/user/" + option.id;
+		}
 		return false;
 	};
 	

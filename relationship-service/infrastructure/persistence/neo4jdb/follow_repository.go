@@ -15,6 +15,7 @@ type FollowRepository interface {
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
 	AcceptFollowRequest(followRequest *model.FollowRequest) error
+	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
 }
 
 type followRepository struct {
@@ -63,6 +64,30 @@ func (f *followRepository) CreateFollowRequest(followRequest *model.FollowReques
 		return err
 	}
 	return nil
+}
+
+func (f *followRepository) IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error){
+		query := "MATCH (subject:User)-[f:FOLLOW]->(object:User) WHERE subject.id = $subjectId AND object.id = $objectId RETURN f"
+		parameters := map[string]interface{}{
+			"subjectId": followRequest.SubjectId,
+			"objectId": followRequest.ObjectId,
+		}
+		records, err := tx.Run(query, parameters)
+		for records.Next() {
+			return true, err
+		}
+		return false, err
+	});
+	if err != nil {
+		return false, err
+	}
+	return result, nil
 }
 
 func (f *followRepository) AcceptFollowRequest(followRequest *model.FollowRequest) error {
