@@ -73,6 +73,7 @@ type EditUserRequest struct {
 	Website string `json:"websiteInput" `
 	Bio string `json:"bioInput" `
 	Number string `json:"numberInput" `
+	Gender Gender `json:"gender" `
 }
 
 type ResetPasswordRequest struct {
@@ -144,6 +145,7 @@ func NewEditUser(userRequest *EditUserRequest) (*User, error) {
 		Website:          html.EscapeString(userRequest.Website),
 		Bio:          html.EscapeString(userRequest.Bio),
 		Number:          html.EscapeString(userRequest.Number),
+		Gender: 		userRequest.Gender,
 	}, nil
 }
 

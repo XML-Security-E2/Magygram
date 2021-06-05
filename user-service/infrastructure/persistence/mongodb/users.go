@@ -39,6 +39,7 @@ func (r *userRepository) UpdateUserDetails(ctx context.Context, user *model.User
 		{"website" , user.Website},
 		{"bio" , user.Bio},
 		{"number" , user.Number},
+		{"gender" , user.Gender},
 	}}})
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 import { authHeader } from "../helpers/auth-header";
 import { colorConstants } from "../constants/ColorConstants";
 import Header from "../components/Header";
@@ -22,6 +23,7 @@ const ProfilePage = () => {
 	const [name, setName] = useState("");
 	const [username, setUsername] = useState("");
 	const [bio, setBio] = useState("");
+	const [website, setWebsite] = useState("");
 	const [img, setImg] = useState("");
 
 	const handleLogout = () => {
@@ -44,6 +46,7 @@ const ProfilePage = () => {
 				        console.log(res.data);
                         setName(res.data.Name);
                         setBio(res.data.Bio);
+                        setWebsite(res.data.Website);
 
                     })
                     .catch((err) => {console.log(err);});
@@ -75,9 +78,6 @@ const ProfilePage = () => {
 			});
 	};
 
-	const handleSettings = () => {
-		alert("TOD1O");
-	};
 
 	return (
 		<React.Fragment>
@@ -115,6 +115,7 @@ const ProfilePage = () => {
 														<h4>{name}</h4>
 													</div>
 													<div>{bio}</div>
+													<div><a href={website}>{website}</a></div>
 												</section>
 											</div>
 										</nav>

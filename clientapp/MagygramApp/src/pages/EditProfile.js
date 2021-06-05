@@ -27,6 +27,7 @@ const EditProfile = () => {
 	const [img, setImg] = useState("");
 	const [website, setWebsite] = useState("");
 	const [number, setNumber] = useState("");
+	const [gender, setGender] = useState("");
 
 	const [emailInput, setEmailInput] = useState("");
 	const [nameInput, setNameInput] = useState("");
@@ -36,6 +37,7 @@ const EditProfile = () => {
 	//const [imgInput, setImgInput] = useState("");
 	const [websiteInput, setWebsiteInput] = useState("");
 	const [numberInput, setNumberInput] = useState("");
+	const [genderInput, setGenderInput] = useState("");
 
 	useEffect(() => {
 
@@ -47,7 +49,7 @@ const EditProfile = () => {
 
 				Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
 				.then((res) => {
-					
+					console.log(res.data)
 					setName(res.data.Name);
 					setSurname(res.data.Surname);
 					setUsername(res.data.Username);
@@ -55,6 +57,7 @@ const EditProfile = () => {
 					setEmail(res.data.Email);
 					setWebsite(res.data.Website);
 					setNumber(res.data.Number);
+					setGenderInput(res.data.Gender);
 
 				})
 				.catch((err) => {console.log(err);});
@@ -79,6 +82,13 @@ const EditProfile = () => {
 		var w = website;
 		var num = num;
 		var b = bio;
+		var g = genderInput;
+
+		if(gender == ""){
+			g = "MALE";
+		}else{
+			g = gender;
+		}
 
 		if(nameInput == ""){
 			n = name;
@@ -86,7 +96,7 @@ const EditProfile = () => {
 			n = nameInput;
 		}
 		if(numberInput == ""){
-			num = num;
+			num = number;
 		}else{
 			num = numberInput;
 		}
@@ -126,50 +136,22 @@ const EditProfile = () => {
 				emailInput: e,
 				websiteInput: w,
 				numberInput: num,
-				bioInput: b
+				bioInput: b,
+				gender: g
 			};
 			console.log(user)
+			
 			Axios.post(`/api/users/edit`, user, { validateStatus: () => true })
-				.then((res) => {
-					window.location = "#/profile";
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		
+			.then((res) => {
+				window.location = "#/profile";
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 
 
 	};
 
-	function validate() {
-
-		if(nameInput == ""){
-			setNameInput(name);
-			console.log(name)
-			console.log(nameInput)
-			console.log("asdasd")
-		}
-		
-		if(surnameInput == "")
-			setSurnameInput(surname)
-		
-		if(usernameInput == "")
-			setUsernameInput(username)
-			
-		if(emailInput == "")
-			setEmailInput(email)
-			
-		if(websiteInput == "")
-			setWebsiteInput(website)
-		
-		if(bioInput == "")
-			setBioInput(bio)
-		
-		if(numberInput == "")
-			setNumberInput(number)
-
-		return true
-	}
 
 	const handleLogout = () => {
 		userService.logout();
@@ -237,20 +219,14 @@ const EditProfile = () => {
 								<text>Number</text>
 								<input className="form-control"  type="text" name="numberInput" placeholder={number} value={numberInput} onChange={(e) => setNumberInput(e.target.value)} />
 							</div>
-
-							<div class="flexbox-container">
-								<div>Date of birth</div>
-								<div style={sectionStyle}>
-									<DatePicker />
-								</div>
-							</div>
 							<br />
 							<div class="flexbox-container">
-								<div>Gender</div>
+								<div>Gender:</div>
+								<div>{genderInput}</div>
 								<div style={sectionStyle}>
-									<select id="dropdown">
-										<option value="1"> Male</option>
-										<option value="2"> Female</option>
+									<select id="dropdown" onChange={(e) => setGender(e.target.value)}>
+										<option value="MALE"> Male</option>
+										<option value="FEMALE"> Female</option>
 									</select>
 								</div>
 							</div>
