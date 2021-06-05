@@ -43,6 +43,12 @@ type Config struct {
 		Port 	 string
 	}
 
+	Storyservice struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
+
 	Gateway struct {
 		Port 	 string
 		Protocol   string

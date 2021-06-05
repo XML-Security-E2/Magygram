@@ -3,21 +3,21 @@ import { colorConstants } from "../constants/ColorConstants";
 import { StoryContext } from "../contexts/StoryContext";
 import { storyService } from "../services/StoryService";
 import CreateStoryHighlightsButton from "./CreateStoryHighlightsButton";
-import StorySliderModal from "./modals/StorySliderModal";
-import Story from "./Story";
+import Highlight from "./Highlight";
+import StorySliderHighlightsModal from "./modals/StorySliderHighlightsModal";
 
 const StoryHighlights = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
 	useEffect(() => {
-		const getStoriesHandler = async () => {
-			await storyService.findAllUserStories(dispatch);
+		const getHighlightsHandler = async () => {
+			await storyService.findAllProfileHighlights(dispatch);
 		};
-		getStoriesHandler();
+		getHighlightsHandler();
 	}, [dispatch]);
 
-	const openStorySlider = (userId) => {
-		storyService.GetStoriesForUser(userId, dispatch);
+	const openHighlightSlider = (name) => {
+		storyService.findAllStoriesByHighlightName(name, dispatch);
 	};
 
 	return (
@@ -25,10 +25,11 @@ const StoryHighlights = () => {
 			<div className="card border-0" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 				<div className="card-body d-flex justify-content-start">
 					<ul className="list-unstyled mb-0">
-						{storyState.storyline.stories.map((story) => {
-							return <Story story={story} openStorySlider={openStorySlider} />;
-						})}
-						<StorySliderModal />
+						{storyState.profileHighlights.highlights !== null &&
+							storyState.profileHighlights.highlights.map((highlight) => {
+								return <Highlight highlight={highlight} openHighlightSlider={openHighlightSlider} />;
+							})}
+						<StorySliderHighlightsModal />
 						<CreateStoryHighlightsButton />
 					</ul>
 				</div>

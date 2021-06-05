@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
+	"story-service/domain/model"
 	"story-service/domain/service-contracts"
 )
 
@@ -14,6 +15,7 @@ type StoryHandler interface {
 	GetStoriesForUser(c echo.Context) error
 	GetAllUserStories(c echo.Context) error
 	VisitedStoryByUser(c echo.Context) error
+	GetStoryHighlight(c echo.Context) error
 }
 
 type storyHandler struct {
@@ -107,4 +109,23 @@ func (p storyHandler) GetAllUserStories(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, stories)
+}
+
+func (p storyHandler) GetStoryHighlight(c echo.Context) error {
+	highRequest := &model.HighlightRequest{}
+	if err := c.Bind(highRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	highlight, err := p.StoryService.GetStoryHighlight(ctx, bearer, highRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, highlight)
 }

@@ -89,30 +89,131 @@ export const storyReducer = (state, action) => {
 					firstUnvisitedStory: 0,
 				},
 			};
-
+		case storyConstants.PROFILE_HIGHLIGHTS_REQUEST:
+			return {
+				...state,
+				profileHighlights: {
+					highlights: [],
+				},
+			};
+		case storyConstants.PROFILE_HIGHLIGHTS_SUCCESS:
+			return {
+				...state,
+				profileHighlights: {
+					highlights: action.highlights,
+				},
+			};
+		case storyConstants.PROFILE_HIGHLIGHTS_FAILURE:
+			return {
+				...state,
+				profileHighlights: {
+					highlights: [],
+				},
+			};
 		case storyConstants.USER_HIGHLIGHTS_STORY_REQUEST:
 			storyCopy = { ...state };
-			state.highlights.stories = [];
+			storyCopy.highlights.stories = [];
 			return storyCopy;
 		case storyConstants.USER_HIGHLIGHTS_STORY_SUCCESS:
 			storyCopy = { ...state };
-			state.highlights.stories = action.stories;
+			storyCopy.highlights.stories = action.stories;
 			return storyCopy;
 
 		case storyConstants.USER_HIGHLIGHTS_STORY_SUCCESS:
 			storyCopy = { ...state };
-			state.highlights.stories = [];
+			storyCopy.highlights.stories = [];
 			return storyCopy;
 
 		case modalConstants.SHOW_STORY_SELECT_HIGHLIGHTS_MODAL:
 			storyCopy = { ...state };
-			state.highlights.showModal = true;
+			storyCopy.highlights.showModal = true;
 			return storyCopy;
 
 		case modalConstants.HIDE_STORY_SELECT_HIGHLIGHTS_MODAL:
 			storyCopy = { ...state };
-			state.highlights.showModal = false;
+			storyCopy.highlights.showModal = false;
+			storyCopy.highlights.showError = false;
+			storyCopy.highlights.errorMessage = "";
+			storyCopy.highlights.showHighlightsName = false;
 			return storyCopy;
+
+		case storyConstants.SHOW_HIGHLIGHTS_NAME_INPUT:
+			storyCopy = { ...state };
+			storyCopy.highlights.showHighlightsName = true;
+			return storyCopy;
+
+		case storyConstants.HIDE_HIGHLIGHTS_NAME_INPUT:
+			storyCopy = { ...state };
+			storyCopy.highlights.showHighlightsName = false;
+			return storyCopy;
+
+		case storyConstants.SHOW_HIGHLIGHTS_MODAL_ERROR_MESSAGE:
+			storyCopy = { ...state };
+
+			storyCopy.highlights.showError = true;
+			storyCopy.highlights.errorMessage = action.errorMessage;
+			return storyCopy;
+
+		case storyConstants.HIDE_HIGHLIGHTS_MODAL_ERROR_MESSAGE:
+			storyCopy = { ...state };
+			storyCopy.highlights.showError = false;
+			storyCopy.highlights.errorMessage = "";
+
+			return storyCopy;
+
+		case storyConstants.CREATE_HIGHLIGHTS_STORY_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.highlights.showError = false;
+			storyCopy.highlights.errorMessage = "";
+			return storyCopy;
+
+		case storyConstants.CREATE_HIGHLIGHTS_STORY_SUCCESS:
+			return {
+				...state,
+				highlights: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showHighlightsName: false,
+					stories: [...state.highlights.stories],
+				},
+				profileHighlights: {
+					highlights: [...state.profileHighlights.highlights, action.highlight],
+				},
+			};
+
+		case storyConstants.CREATE_HIGHLIGHTS_STORY_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.highlights.showError = true;
+			storyCopy.highlights.errorMessage = action.errorMessage;
+
+			return storyCopy;
+
+		case storyConstants.FIND_HIGHLIGHT_BY_NAME_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.highlightsSliderModal.showModal = false;
+			storyCopy.highlightsSliderModal.highlights = [];
+			return storyCopy;
+
+		case storyConstants.FIND_HIGHLIGHT_BY_NAME_SUCCESS:
+			storyCopy = { ...state };
+
+			storyCopy.highlightsSliderModal.showModal = true;
+			storyCopy.highlightsSliderModal.highlights = createHighlights(action.highlights, action.name);
+			return storyCopy;
+
+		case storyConstants.FIND_HIGHLIGHT_BY_NAME_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.highlightsSliderModal.showModal = false;
+			storyCopy.highlightsSliderModal.highlights = [];
+
+			return storyCopy;
+
+		case modalConstants.HIDE_STORY_SLIDER_HIGHLIGHTS_MODAL:
+			storyCopy = { ...state };
+			storyCopy.highlightsSliderModal.showModal = false;
+			return storyCopy;
+
 		default:
 			return state;
 	}
@@ -133,5 +234,24 @@ function createStories(stories) {
 		});
 	});
 
+	return retVal;
+}
+
+function createHighlights(highlights, name) {
+	var retVal = [];
+
+	console.log(highlights);
+	highlights.media.forEach((media) => {
+		retVal.push({
+			url: media.media.url,
+			header: {
+				heading: name,
+				profileImage: highlights.url,
+				storyId: media.id,
+			},
+			type: media.media.mediaType === "VIDEO" ? "video" : "image",
+		});
+	});
+	console.log(retVal);
 	return retVal;
 }

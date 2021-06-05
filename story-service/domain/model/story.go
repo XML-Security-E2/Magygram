@@ -93,6 +93,20 @@ type MediaContent struct{
 	StoryId string
 }
 
+type HighlightImageWithMedia struct {
+	Url  string `json:"url"`
+	Media  []IdWithMedia `json:"media"`
+}
+type IdWithMedia struct {
+	Id string `json:"id"`
+	Media Media `json:"media"`
+}
+
+type HighlightRequest struct {
+	Name  string `json:"name"`
+	StoryIds  []string `json:"storyIds"`
+}
+
 
 func NewStoryResponse(story *Story, media []MediaContent,firstUnvisitedStory int) (*StoryResponse, error) {
 	return &StoryResponse{

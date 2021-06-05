@@ -30,6 +30,44 @@
 	text-align: center;
 }
 
+.container-select-img {
+	position: relative;
+	width: 100%;
+}
+
+.overlay-select-img {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 1;
+	transition: 0.3s ease;
+	background-color: transparent;
+}
+
+.story-time {
+	font-size: 20px;
+	position: absolute;
+	top: 90%;
+	left: 80%;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	text-align: center;
+}
+
+.icon-select-img {
+	font-size: 20px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	text-align: center;
+}
+
 .link-menu {
 	color: black;
 }

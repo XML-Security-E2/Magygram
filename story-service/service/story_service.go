@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/go-playground/validator"
 	"mime/multipart"
 	"story-service/domain/model"
@@ -14,10 +15,11 @@ type storyService struct {
 	repository.StoryRepository
 	intercomm.MediaClient
 	intercomm.UserClient
+	intercomm.AuthClient
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.StoryService {
-	return &storyService{r , ic, uc}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient) service_contracts.StoryService {
+	return &storyService{r , ic, uc,ac}
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
@@ -151,6 +153,39 @@ func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*
 	}
 
 	return userStories, nil
+}
+
+func (p storyService) GetStoryHighlight(ctx context.Context, bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error) {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	highlights := &model.HighlightImageWithMedia{
+		Url:   "",
+		Media: []model.IdWithMedia{},
+	}
+	for _, storyId := range request.StoryIds {
+		story, errs := p.StoryRepository.GetByID(ctx, storyId)
+
+		if errs != nil {
+			return nil, err
+		}
+		if story.UserInfo.Id != userId {
+			return nil, errors.New("desired stories cannot be in users highlights")
+		}
+		highlights.Media = append(highlights.Media, model.IdWithMedia{
+			Id:    story.Id,
+			Media: story.Media,
+		})
+
+		if story.Media.MediaType == "IMAGE" && highlights.Url == "" {
+			highlights.Url = story.Media.Url
+		}
+
+	}
+
+	return highlights, nil
 }
 
 

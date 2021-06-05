@@ -27,6 +27,7 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"username" , user.Username},
 																{"name" , user.Name},
 																{"favouritePosts" , user.FavouritePosts},
+																{"highlightsStory" , user.HighlightsStory},
 																{"surname" , user.Surname}}}})
 }
 

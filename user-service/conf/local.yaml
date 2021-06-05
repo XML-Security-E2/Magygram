@@ -32,6 +32,11 @@ postservice:
   domain: "localhost"
   port: "462"
 
+storyservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "464"
+
 gateway:
   port: "8085"
   protocol: "https://"

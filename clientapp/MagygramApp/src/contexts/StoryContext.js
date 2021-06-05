@@ -17,7 +17,17 @@ const StoryContextProvider = (props) => {
 		},
 		highlights: {
 			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showHighlightsName: false,
 			stories: [],
+		},
+		highlightsSliderModal: {
+			showModal: false,
+			highlights: [],
+		},
+		profileHighlights: {
+			highlights: [],
 		},
 		storySliderModal: {
 			showModal: false,
