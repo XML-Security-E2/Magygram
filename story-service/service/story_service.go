@@ -17,10 +17,11 @@ type storyService struct {
 	intercomm.MediaClient
 	intercomm.UserClient
 	intercomm.AuthClient
+	intercomm.RelationshipClient
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient) service_contracts.StoryService {
-	return &storyService{r , ic, uc,ac}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient) service_contracts.StoryService {
+	return &storyService{r , ic, uc,ac,rc}
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
@@ -51,11 +52,23 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {
 	//TODO 1: napraviti getStory za usera koji eliminise njegove storije a onda izbrisati iz mapStories proveru
-	stories, err := p.StoryRepository.GetAll(ctx)
 
+	var stories []*model.Story
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
 		return nil, err
+	}
+
+	var followedUsers model.FollowedUsersResponse
+	followedUsers, err = p.RelationshipClient.GetFollowedUsers(userInfo.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, userId := range followedUsers.Users {
+		var userStories []*model.Story
+		userStories, _ = p.StoryRepository.GetStoriesForUser(ctx,userId)
+		stories= append(stories, userStories...)
 	}
 
     storiesMap := makeStoriesMapFromArray(stories, userInfo)

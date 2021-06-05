@@ -50,13 +50,16 @@ func (i *interactor) NewMediaClient() intercomm.MediaClient {
 func (i *interactor) NewUserClient() intercomm.UserClient {
 	return intercomm.NewUserClient()
 }
+func (i *interactor) NewRelationshipClient() intercomm.RelationshipClient {
+	return intercomm.NewRelationshipClient()
+}
 
 func (i *interactor) NewStoryRepository() repository.StoryRepository {
 	return mongodb.NewStoryRepository(i.StoryCol)
 }
 
 func (i *interactor) NewStoryService() service_contracts.StoryService {
-	return service.NewStoryService(i.NewStoryRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewAuthClient())
+	return service.NewStoryService(i.NewStoryRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewAuthClient(),i.NewRelationshipClient())
 }
 
 func (i *interactor) NewStoryHandler() handler.StoryHandler {

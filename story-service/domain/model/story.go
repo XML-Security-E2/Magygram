@@ -129,3 +129,7 @@ func NewStoryInfoResponse(story *Story, visited bool) (*StoryInfoResponse, error
 		Visited: visited,
 	}, nil
 }
+
+type FollowedUsersResponse struct {
+	Users []string
+}
