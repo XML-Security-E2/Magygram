@@ -17,6 +17,9 @@ type Interactor interface {
 	NewUserService() service_contracts.UserService
 	NewAccountActivationService() service_contracts.AccountActivationService
 	NewAuthClient() intercomm.AuthClient
+	NewStoryClient() intercomm.StoryClient
+	NewHighlightsHandler() handler.HighlightsHandler
+	NewHighlightsService() service_contracts.HighlightsService
 	NewPostClient() intercomm.PostClient
 	NewUserHandler() handler.UserHandler
 	NewCollectionsHandler() handler.CollectionsHandler
@@ -30,7 +33,6 @@ type interactor struct {
 }
 
 
-
 func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection) Interactor {
 	return &interactor{UserCol, AccCol,  ResPwdCol}
 }
@@ -38,6 +40,7 @@ func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCo
 type appHandler struct {
 	handler.UserHandler
 	handler.CollectionsHandler
+	handler.HighlightsHandler
 	// embed all handler interfaces
 }
 
@@ -53,15 +56,27 @@ func (i *interactor) NewPostClient() intercomm.PostClient {
 	return intercomm.NewPostClient()
 }
 
+func (i *interactor) NewStoryClient() intercomm.StoryClient {
+	return intercomm.NewStoryClient()
+}
 func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.UserHandler = i.NewUserHandler()
 	appHandler.CollectionsHandler = i.NewCollectionsHandler()
+	appHandler.HighlightsHandler = i.NewHighlightsHandler()
 	return appHandler
 }
 
 func (i *interactor) NewCollectionsHandler() handler.CollectionsHandler {
 	return handler.NewCollectionsHandler(i.NewCollectionsService())
+}
+
+func (i *interactor) NewHighlightsHandler() handler.HighlightsHandler {
+	return handler.NewHighlightsHandler(i.NewHighlightsService())
+}
+
+func (i *interactor) NewHighlightsService() service_contracts.HighlightsService {
+	return service.NewHighlightsService(i.NewUserRepository(), i.NewAuthClient(), i.NewStoryClient())
 }
 
 func (i *interactor) NewCollectionsService() service_contracts.CollectionsService {

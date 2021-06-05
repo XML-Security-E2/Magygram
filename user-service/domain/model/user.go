@@ -17,6 +17,7 @@ type User struct {
 	Number string `bson:"number" `
 	Gender Gender `bson:"gender"`
 	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
+	HighlightsStory map[string]HighlightImageWithMedia `bson:"highlightsStory"`
 }
 
 
@@ -26,6 +27,27 @@ const(
 	MALE = iota
 	FEMALE
 )
+
+type HighlightImageWithMedia struct {
+	Url  string `json:"url"`
+	Media  []IdWithMedia `json:"media"`
+}
+
+type HighlightRequest struct {
+	Name  string `json:"name"`
+	StoryIds  []string `json:"storyIds"`
+}
+
+type HighlightProfileResponse struct {
+	Name  string `json:"name"`
+	Url  string `json:"url"`
+}
+
+type StoryHighlight struct {
+	Id string `json:"id"`
+	Username  string `json:"username"`
+	ImageURL  string `json:"imageUrl"`
+}
 
 type UserInfo struct {
 	Id string `json:"id"`
@@ -43,10 +65,14 @@ type UserRequest struct {
 }
 
 type EditUserRequest struct {
-	Name  string `json:"name"`
-	Surname string `json:"surname"`
-	Username  string `json:"username"`
-	Email string `json:"email"`
+	Id string `json:"id"`
+	Name  string `json:"nameInput"`
+	Surname  string `json:"surnameInput"`
+	Username  string `json:"usernameInput"`
+	Email string `json:"emailInput"`
+	Website string `json:"websiteInput" `
+	Bio string `json:"bioInput" `
+	Number string `json:"numberInput" `
 }
 
 type ResetPasswordRequest struct {
@@ -105,15 +131,19 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Username:       html.EscapeString(userRequest.Username),
 		Email:          html.EscapeString(userRequest.Email),
 		FavouritePosts: map[string][]IdWithMedia{},
+		HighlightsStory: map[string]HighlightImageWithMedia{},
 	}, nil
 }
 
 func NewEditUser(userRequest *EditUserRequest) (*User, error) {
-	return &User{Id: guid.New().String(),
+	return &User{Id: userRequest.Id,
 		Name:           html.EscapeString(userRequest.Name),
-		Surname:        html.EscapeString(userRequest.Surname),
+		Surname:           html.EscapeString(userRequest.Surname),
 		Username:       html.EscapeString(userRequest.Username),
 		Email:          html.EscapeString(userRequest.Email),
+		Website:          html.EscapeString(userRequest.Website),
+		Bio:          html.EscapeString(userRequest.Bio),
+		Number:          html.EscapeString(userRequest.Number),
 	}, nil
 }
 

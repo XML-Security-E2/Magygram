@@ -73,6 +73,13 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type UsersStoryResponse struct {
+	Id string `json:"id"`
+	ContentType ContentType `json:"contentType"`
+	Media Media `json:"media"`
+	DateTime string `json:"dateTime"`
+}
+
 type StoryResponse struct {
 	ContentType ContentType
 	Media []MediaContent
@@ -84,6 +91,20 @@ type MediaContent struct{
 	Url string
 	MediaType string
 	StoryId string
+}
+
+type HighlightImageWithMedia struct {
+	Url  string `json:"url"`
+	Media  []IdWithMedia `json:"media"`
+}
+type IdWithMedia struct {
+	Id string `json:"id"`
+	Media Media `json:"media"`
+}
+
+type HighlightRequest struct {
+	Name  string `json:"name"`
+	StoryIds  []string `json:"storyIds"`
 }
 
 

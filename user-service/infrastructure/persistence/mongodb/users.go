@@ -27,6 +27,7 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"username" , user.Username},
 																{"name" , user.Name},
 																{"favouritePosts" , user.FavouritePosts},
+																{"highlightsStory" , user.HighlightsStory},
 																{"surname" , user.Surname}}}})
 }
 
@@ -34,8 +35,11 @@ func (r *userRepository) UpdateUserDetails(ctx context.Context, user *model.User
 	return r.Col.UpdateOne(ctx, bson.M{"_id":  user.Id},bson.D{{"$set", bson.D{{"email" , user.Email},
 		{"username" , user.Username},
 		{"name" , user.Name},
-		{"favouritePosts" , user.FavouritePosts},
-		{"surname" , user.Surname}}}})
+		{"surname" , user.Surname},
+		{"website" , user.Website},
+		{"bio" , user.Bio},
+		{"number" , user.Number},
+	}}})
 }
 
 func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, error) {
