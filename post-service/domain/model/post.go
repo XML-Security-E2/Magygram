@@ -201,3 +201,12 @@ type Tag struct {
 	Id string `bson:"_id,omitempty"`
 	Name string `bson:"name"`
 }
+
+type UserRequest struct {
+	Id string
+}
+
+
+type FollowedUsersResponse struct {
+	Users []string
+}

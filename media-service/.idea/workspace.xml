@@ -2,30 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway/api_gateway.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/16c2a3c2-08a1-4887-acf8-92d17cd71856.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/3e9cb7b9-03a5-4a53-a9bc-fe7e1bdf53dc.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/41992f10-d117-4f17-9624-f2cbf38689b6.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/6200a256-e218-490b-8fbf-23e662e5226a.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/7da7a918-9158-4ff7-b1bf-5b5018d2ecc0.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/9390931a-8fa7-4090-90cf-4b422f4555fa.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/9dc52367-6992-4578-80e3-1708880edbee.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/a473565c-b571-4cd0-b131-949b92b48d7c.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/a58c98f7-3611-4164-a632-669232e9202a.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/aac0ca5e-a4d2-44f9-a460-add185d3d966.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/f2833e45-6ccf-4a2f-b60f-dbfdad217f5e.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/local.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/conf/local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/model/post.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/interactor/interactor.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/interactor/interactor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/post_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/handler/follow_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/handler/follow_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/router/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../story-service/controller/handler/story_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/controller/handler/story_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../story-service/service/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/story_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user-service/conf/local.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/conf/local.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/app_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/app_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/user_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

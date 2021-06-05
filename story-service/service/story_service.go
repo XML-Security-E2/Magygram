@@ -117,16 +117,13 @@ func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bear
 
 	var media []model.MediaContent
 	media = mapStoriesToMediaArray(result)
-	fmt.Println("test4")
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
-	fmt.Println("test5")
 
 	if err != nil {
 		return nil, err
 	}
 	_, index := hasUserVisitedStories(result,userInfo.Id)
-	fmt.Println("test6")
 
 	res, err := model.NewStoryResponse(result[0], media, index)
 	if err != nil {

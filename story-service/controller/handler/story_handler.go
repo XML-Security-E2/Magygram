@@ -68,19 +68,17 @@ func (p storyHandler) GetStoriesForStoryline(c echo.Context) error {
 
 func (p storyHandler) GetStoriesForUser(c echo.Context) error {
 	userId := c.Param("userId")
-	fmt.Println("test1")
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	fmt.Println("test2")
 
 	bearer := c.Request().Header.Get("Authorization")
 	stories, err := p.StoryService.GetStoriesForUser(ctx,userId,bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	fmt.Println("test3")
 
 	return c.JSON(http.StatusOK, stories)
 }
