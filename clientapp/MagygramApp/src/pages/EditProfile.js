@@ -4,6 +4,7 @@ import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Header from "../components/Header";
 
 const EditProfile = () => {
 	// history = useHistory();
@@ -20,41 +21,48 @@ const EditProfile = () => {
 	const [email, setEmail] = useState("");
 	const [id, setId] = useState("");
 	const [name, setName] = useState("");
+	const [surname, setSurname] = useState("");
 	const [username, setUsername] = useState("");
 	const [bio, setBio] = useState("");
 	const [img, setImg] = useState("");
 	const [website, setWebsite] = useState("");
 	const [number, setNumber] = useState("");
+	const [gender, setGender] = useState("");
 
 	const [emailInput, setEmailInput] = useState("");
 	const [nameInput, setNameInput] = useState("");
+	const [surnameInput, setSurnameInput] = useState("");
 	const [usernameInput, setUsernameInput] = useState("");
 	const [bioInput, setBioInput] = useState("");
 	//const [imgInput, setImgInput] = useState("");
 	const [websiteInput, setWebsiteInput] = useState("");
 	const [numberInput, setNumberInput] = useState("");
+	const [genderInput, setGenderInput] = useState("");
 
 	useEffect(() => {
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+
+        Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				setId(res.data.id);
-				console.log(res.data);
 				if (res.data.imageUrl == "") setImg("assets/img/profile.jpg");
 				else setImg(res.data.imageUrl);
 
-				Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
-					.then((res) => {
-						console.log(res.data);
-						setName(res.data.Name);
-						setUsername(res.data.Username);
-						setBio(res.data.Bio);
-						setEmail(res.data.Email);
-						setWebsite(res.data.Website);
-						setNumber(res.data.Number);
-					})
-					.catch((err) => {
-						console.log(err);
-					});
+				Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+				.then((res) => {
+					console.log(res.data)
+					setName(res.data.Name);
+					setSurname(res.data.Surname);
+					setUsername(res.data.Username);
+					setBio(res.data.Bio);
+					setEmail(res.data.Email);
+					setWebsite(res.data.Website);
+					setNumber(res.data.Number);
+					setGenderInput(res.data.Gender);
+
+				})
+				.catch((err) => {console.log(err);});
+
+
 			})
 			.catch((err) => {
 				console.log(err);
@@ -67,17 +75,83 @@ const EditProfile = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		var n = name;
+		var sur = surname;
+		var un = username;
+		var e = email;
+		var w = website;
+		var num = num;
+		var b = bio;
+		var g = genderInput;
 
-		let user = {
-			id,
-			nameInput,
-			usernameInput,
-			emailInput,
-			bioInput,
-			websiteInput,
-			numberInput,
-		};
+		if(gender == ""){
+			g = "MALE";
+		}else{
+			g = gender;
+		}
+
+		if(nameInput == ""){
+			n = name;
+		}else{
+			n = nameInput;
+		}
+		if(numberInput == ""){
+			num = number;
+		}else{
+			num = numberInput;
+		}
+		if(bioInput == ""){
+			b = bio;
+		}else{
+			b = bioInput;
+		}
+		if(surnameInput == ""){
+			sur = surname;
+		}else{
+			sur = surnameInput;
+		}
+
+		if(usernameInput == ""){
+			un = username;
+		}else{
+			un = usernameInput;
+		}
+
+		if(emailInput == ""){
+			e = email;
+		}else{
+			e = emailInput;
+		}
+
+		if(websiteInput == ""){
+			w = website;
+		}else{
+			w = websiteInput;
+		}
+			let user = {
+				id,
+				nameInput: n,
+				surnameInput: sur,
+				usernameInput: un,
+				emailInput: e,
+				websiteInput: w,
+				numberInput: num,
+				bioInput: b,
+				gender: g
+			};
+			console.log(user)
+			
+			Axios.post(`/api/users/edit`, user, { validateStatus: () => true })
+			.then((res) => {
+				window.location = "#/profile";
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+
+
 	};
+
 
 	const handleLogout = () => {
 		userService.logout();
@@ -93,50 +167,9 @@ const EditProfile = () => {
 
 	return (
 		<React.Fragment>
+		<Header />
 			<div>
-				<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
-					<div className="container">
-						<div>
-							<img src="assets/img/logotest.png" alt="NistagramLogo" />
-						</div>
-						<button className="navbar-toggler" data-toggle="collapse">
-							<span className="sr-only">Toggle navigation</span>
-							<span className="navbar-toggler-icon"></span>
-						</button>
-						<div>
-							<input type="text" style={inputStyle} placeholder="Search" value="Search" />
-						</div>
-						<div className="d-xl-flex align-items-xl-center dropdown">
-							<i className="fa fa-home" style={iconStyle} />
-							<i className="la la-wechat" style={iconStyle} />
-							<i className="la la-compass" style={iconStyle} />
-							<i className="fa fa-heart-o" style={iconStyle} />
-							<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src={img} alt="ProfileImage" />
-							<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
-								<li>
-									<button className="la la-user btn shadow-none" onClick={handleProfile}>
-										{" "}
-										Profile
-									</button>
-								</li>
-								<li>
-									<button className="la la-cog btn shadow-none" onClick={handleSettings}>
-										{" "}
-										Settings
-									</button>
-								</li>
-								<hr className="solid" />
-								<li>
-									<button className=" btn shadow-none" onClick={handleLogout}>
-										{" "}
-										Logout
-									</button>
-								</li>
-							</ul>
-						</div>
-						<div>{name}</div>
-					</div>
-				</nav>
+				
 				<br />
 				<br />
 				<div className="container">
@@ -148,19 +181,22 @@ const EditProfile = () => {
 							<br />
 							<div className="form-group">
 								<text>Name</text>
-								<input className="form-control" required type="text" name="name" placeholder={name} value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
+								<input className="form-control"  type="text" name="name" placeholder={name} value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
 							</div>
-
+							<div className="form-group">
+								<text>Surname</text>
+								<input className="form-control"  type="text" name="surname" placeholder={surname} value={surnameInput} onChange={(e) => setSurnameInput(e.target.value)} />
+							</div>
 							<div className="form-group">
 								<text>Email</text>
-								<input className="form-control" required type="email" name="email" placeholder={email} value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
+								<input className="form-control"  type="email" name="email" placeholder={email} value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Username</text>
 								<input
 									className="form-control"
-									required
+									
 									type="username"
 									name="username"
 									placeholder={username}
@@ -171,32 +207,26 @@ const EditProfile = () => {
 
 							<div className="form-group">
 								<text>Website</text>
-								<input className="form-control" required type="text" name="websiteInput" placeholder={website} value={websiteInput} onChange={(e) => setWebsiteInput(e.target.value)} />
+								<input className="form-control"  type="text" name="websiteInput" placeholder={website} value={websiteInput} onChange={(e) => setWebsiteInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Bio</text>
-								<input className="form-control" required type="text" name="bioInput" placeholder={bio} value={bioInput} onChange={(e) => setBioInput(e.target.value)} />
+								<input className="form-control"  type="text" name="bioInput" placeholder={bio} value={bioInput} onChange={(e) => setBioInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Number</text>
-								<input className="form-control" required type="text" name="numberInput" placeholder={number} value={numberInput} onChange={(e) => setNumberInput(e.target.value)} />
-							</div>
-
-							<div class="flexbox-container">
-								<div>Date of birth</div>
-								<div style={sectionStyle}>
-									<DatePicker />
-								</div>
+								<input className="form-control"  type="text" name="numberInput" placeholder={number} value={numberInput} onChange={(e) => setNumberInput(e.target.value)} />
 							</div>
 							<br />
 							<div class="flexbox-container">
-								<div>Gender</div>
+								<div>Gender:</div>
+								<div>{genderInput}</div>
 								<div style={sectionStyle}>
-									<select id="dropdown">
-										<option value="1"> Male</option>
-										<option value="2"> Female</option>
+									<select id="dropdown" onChange={(e) => setGender(e.target.value)}>
+										<option value="MALE"> Male</option>
+										<option value="FEMALE"> Female</option>
 									</select>
 								</div>
 							</div>
