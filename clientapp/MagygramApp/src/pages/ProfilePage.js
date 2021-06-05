@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
-import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
 import { colorConstants } from "../constants/ColorConstants";
 import Header from "../components/Header";
@@ -10,12 +9,12 @@ import StoryContextProvider from "../contexts/StoryContext";
 import UserStoriesModal from "../components/modals/UserStoriesModal";
 
 const ProfilePage = () => {
-	const history = useHistory();
-	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
-	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
-	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
+	// const history = useHistory();
+	// const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
+	// const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
+	// const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 	const iconStyle1 = { fontSize: "30px", margin: "0px", marginLeft: "200px" };
-	const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
+	//const imgStyle = { left: "0", width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 	const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
 	const nameStyle = { left: "20", marginLeft: "13px" };
 	const editStyle = { color: "black", left: "20", marginLeft: "13px", marginRight: "13px", borderWidth: "1px", borderStyle: "solid" };
@@ -92,7 +91,7 @@ const ProfilePage = () => {
 										<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 											<div className="flexbox-container">
 												<div>
-													<img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src={img} />
+													<img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src={img} alt="" />
 												</div>
 												<section style={sectionStyle}>
 													<div className="flexbox-container">

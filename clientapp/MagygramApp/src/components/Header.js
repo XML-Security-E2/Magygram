@@ -17,20 +17,17 @@ const Header = () => {
 	const [img, setImg] = useState("");
 	const [search, setSearch] = useState("");
 
-
 	useEffect(() => {
 		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
-                if(res.data.imageUrl == "")
-                    setImg("assets/img/profile.jpg");
-                else
-                setImg(res.data.imageUrl);
-                
+				if (res.data.imageUrl === "") setImg("assets/img/profile.jpg");
+				else setImg(res.data.imageUrl);
 			})
-			.catch((err) => {console.log(err);});
+			.catch((err) => {
+				console.log(err);
+			});
 	});
-
 
 	const loadOptions = (value, callback) => {
 		// setTimeout(() => {

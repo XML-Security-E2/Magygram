@@ -119,7 +119,7 @@ export const storyReducer = (state, action) => {
 			storyCopy.highlights.stories = action.stories;
 			return storyCopy;
 
-		case storyConstants.USER_HIGHLIGHTS_STORY_SUCCESS:
+		case storyConstants.USER_HIGHLIGHTS_STORY_FAILURE:
 			storyCopy = { ...state };
 			storyCopy.highlights.stories = [];
 			return storyCopy;

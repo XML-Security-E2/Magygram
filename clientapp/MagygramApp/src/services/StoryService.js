@@ -74,7 +74,7 @@ function createHighlight(highlightDTO, dispatch) {
 }
 
 function validateHighlights(highlightDTO, dispatch) {
-	if (highlightDTO.storyIds.length == 0) {
+	if (highlightDTO.storyIds.length === 0) {
 		dispatch(failure("You must select story"));
 		return false;
 	} else {
@@ -237,9 +237,9 @@ function visitedByUser(storyId, dispatch) {
 			//failure()
 		});
 
-	function success(data) {
-		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
-	}
+	// function success(data) {
+	// 	return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data };
+	// }
 	//function failure() {
 	//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
 	//}
