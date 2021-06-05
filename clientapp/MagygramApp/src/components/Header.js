@@ -13,16 +13,19 @@ const Header = () => {
 	const imgStyle = { width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 
 	const [name, setName] = useState("");
-
 	const [img, setImg] = useState("");
+	const [currentId, setCurrentId] = useState();
 	const [search, setSearch] = useState("");
 
 	useEffect(() => {
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
-				if (res.data.imageUrl === "") setImg("assets/img/profile.jpg");
-				else setImg(res.data.imageUrl);
+				setCurrentId(res.data.id);
+                if(res.data.imageUrl == "")
+                    setImg("assets/img/profile.jpg");
+                else
+                	setImg(res.data.imageUrl);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -30,20 +33,20 @@ const Header = () => {
 	});
 
 	const loadOptions = (value, callback) => {
-		// setTimeout(() => {
-		// 	var options;
-		// 	Axios.get(`https://localhost:460/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
-		// 	.then((res) => {
-		// 		console.log(res.data);
-		// 		if (res.status === 200) {
-		// 			options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
-		// 			callback(options);
-		// 		}})
-		// 	.catch((err) => {
-		// 		console.log(err)
-		// 	});
-		// }, 1000);
-	};
+		setTimeout(() => {
+			var options;
+			Axios.get(`/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res.data);
+				if (res.status === 200) {
+					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
+					callback(options);
+				}})
+			.catch((err) => {
+				console.log(err)
+			});
+		}, 1000);
+	  };
 
 	const onInputChange = (inputValue, { action }) => {
 		switch (action) {
@@ -61,8 +64,11 @@ const Header = () => {
 	};
 
 	const onChange = (option) => {
-		console.log(option);
-		window.location = "#/user/" + option.id;
+		if (currentId === option.id) {
+			window.location = "#/profile";
+		} else {
+			window.location = "#/user/" + option.id;
+		}
 		return false;
 	};
 

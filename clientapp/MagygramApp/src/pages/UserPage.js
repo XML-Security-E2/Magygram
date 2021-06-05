@@ -7,23 +7,32 @@ const UserPage = (props) => {
     const userId = props.match.params.id;
 	const [username, setUsername] = useState("");
 	const [logged, setLogged] = useState();
+	const [isFollowed, setIsFollowed] = useState(false);
 
 	useEffect(() => {
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
-				console.log(res.data);
                 setLogged(res.data.id);
+
+				var followRequest = {subjectId: res.data.id, objectId: userId}
+				console.log(followRequest);
+				Axios.post(`https://localhost:463/api/relationship/is-user-followed`, followRequest, { validateStatus: () => true, headers: authHeader() })
+					.then((res) => {
+						if (res.status === 200) {
+							setIsFollowed(res.data);
+						}
+					})
+				.catch((err) => {console.log(err);});
 			})
 			.catch((err) => {console.log(err);});
 
-        Axios.get(`https://localhost:460/api/users/` + userId, { validateStatus: () => true, headers: authHeader() })
+        Axios.get(`/api/users/` + userId, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				if (res.status === 200) {
 					setUsername(res.data.Username);
 				}
 			})
 			.catch((err) => {console.log(err);});
-    
       });
 
 	const handleFollowRequest = () => {
@@ -32,7 +41,7 @@ const UserPage = (props) => {
 
 		Axios.post(`https://localhost:463/api/relationship/follow`, followRequest, { validateStatus: () => true })
 		.then((res) => {
-
+			setIsFollowed(true);
 		})
 		.catch((err) => {
 			console.log(err);
@@ -42,7 +51,7 @@ const UserPage = (props) => {
 	return (
 		<React.Fragment>
             <label>{username}</label>
-			<button onClick={handleFollowRequest}>Follow</button>
+			<button disabled={isFollowed} onClick={handleFollowRequest}>Follow</button>
 		</React.Fragment>
 	);
 };

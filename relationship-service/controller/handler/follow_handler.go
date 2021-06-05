@@ -10,6 +10,7 @@ import (
 type FollowHandler interface {
 	FollowRequest(ctx echo.Context) error
 	CreateUser(ctx echo.Context) error
+	IsUserFollowed(ctx echo.Context) error
 	ReturnFollowedUsers(ctx echo.Context) error
 	ReturnFollowRequests(ctx echo.Context) error
 	AcceptFollowRequest(ctx echo.Context) error
@@ -88,4 +89,18 @@ func (f *followHandler) ReturnFollowRequests(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusCreated, result)
+}
+
+func (f *followHandler) IsUserFollowed(ctx echo.Context) error {
+	followRequest := &model.FollowRequest{}
+	if err := ctx.Bind(followRequest); err != nil {
+		return err
+	}
+
+	exists, err := f.FollowService.IsUserFollowed(followRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, exists)
 }
