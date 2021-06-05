@@ -21,6 +21,11 @@ mediaservice:
     domain: "media-service"
     port: "463"
 
+authservice:
+    protocol: "http://"
+    domain: "auth-service"
+    port: "461"
+
 userservice:
     protocol: "http://"
     domain: "user-service"

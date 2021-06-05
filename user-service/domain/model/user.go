@@ -17,6 +17,7 @@ type User struct {
 	Number string `bson:"number" `
 	Gender Gender `bson:"gender"`
 	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
+	HighlightsStory map[string]HighlightImageWithMedia `bson:"highlightsStory"`
 }
 
 
@@ -26,6 +27,27 @@ const(
 	MALE = iota
 	FEMALE
 )
+
+type HighlightImageWithMedia struct {
+	Url  string `json:"url"`
+	Media  []IdWithMedia `json:"media"`
+}
+
+type HighlightRequest struct {
+	Name  string `json:"name"`
+	StoryIds  []string `json:"storyIds"`
+}
+
+type HighlightProfileResponse struct {
+	Name  string `json:"name"`
+	Url  string `json:"url"`
+}
+
+type StoryHighlight struct {
+	Id string `json:"id"`
+	Username  string `json:"username"`
+	ImageURL  string `json:"imageUrl"`
+}
 
 type UserInfo struct {
 	Id string `json:"id"`
@@ -98,6 +120,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Username:       html.EscapeString(userRequest.Username),
 		Email:          html.EscapeString(userRequest.Email),
 		FavouritePosts: map[string][]IdWithMedia{},
+		HighlightsStory: map[string]HighlightImageWithMedia{},
 	}, nil
 }
 
