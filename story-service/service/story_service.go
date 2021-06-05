@@ -75,7 +75,24 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 
     retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
 
+	retVal = sortFirstUnvisited(retVal)
+
 	return retVal, nil
+}
+
+func sortFirstUnvisited(stories []*model.StoryInfoResponse) []*model.StoryInfoResponse {
+	var visited []*model.StoryInfoResponse
+	var unvisited []*model.StoryInfoResponse
+
+	for _, story := range stories {
+		if story.Visited==true{
+			visited= append(visited, story)
+		}else{
+			unvisited= append(unvisited,story)
+		}
+	}
+
+	return append(visited, unvisited...)
 }
 
 func mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap map[string][]*model.Story, userId string) []*model.StoryInfoResponse {

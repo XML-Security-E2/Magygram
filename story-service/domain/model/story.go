@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"time"
 )
 
 type Story struct {
@@ -11,6 +12,7 @@ type Story struct {
 	Media Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
 	VisitedBy []UserInfo `bson:"visited_by"`
+	CreatedTime time.Time `bson:"created_time"`
 }
 
 type ContentType string
@@ -36,6 +38,7 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media) (*Story, e
 				Media: media,
 				UserInfo: postOwner,
 				VisitedBy: []UserInfo{},
+				CreatedTime: time.Now(),
 	}, nil
 }
 

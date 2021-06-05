@@ -49,11 +49,12 @@ export const userReducer = (state, action) => {
 			return {
 				loginError: {
 					showError: true,
-					errorMessage: "Sorry, your email or password was incorrect. Please double-check your password.",
+					errorMessage: action.error,
 				},
 			};
 		case userConstants.LOGIN_SUCCESS:
 			return {
+				...state,
 				loginError: {
 					showError: false,
 					errorMessage: "",

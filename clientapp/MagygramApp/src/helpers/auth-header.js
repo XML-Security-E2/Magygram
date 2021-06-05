@@ -9,6 +9,14 @@ export function authHeader() {
 	}
 }
 
+export function getUserInfo(){
+	return {
+		Id: localStorage.getItem("userId"),
+		Username: localStorage.getItem("username"),
+		ImageURL: localStorage.getItem("imageURL")
+	}
+}
+
 export function setAuthInLocalStorage(data) {
 	localStorage.setItem("accessToken", data.accessToken);
 	localStorage.setItem("expireTime", data.expireTime);
@@ -67,4 +75,8 @@ export function deleteLocalStorage() {
 	localStorage.removeItem("accessToken");
 	localStorage.removeItem("roles");
 	localStorage.removeItem("expireTime");
+	localStorage.removeItem("userId");
+	localStorage.removeItem("imageURL");
+	localStorage.removeItem("username");
+
 }

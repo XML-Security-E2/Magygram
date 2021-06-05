@@ -6,20 +6,23 @@ import PostInformation from "./PostInformation";
 import PostInteraction from "./PostInteraction";
 import { postService } from "../services/PostService";
 import { PostContext } from "../contexts/PostContext";
+import { UserContext } from "../contexts/UserContext";
 import PostLikesModal from "./modals/PostLikesModal";
 import { modalConstants } from "../constants/ModalConstants";
 import PostDislikesModal from "./modals/PostDislikesModal";
 import ViewPostModal from "./modals/ViewPostModal";
+import { getUserInfo } from "../helpers/auth-header";
 
 const Post = ({ post }) => {
 	const { dispatch } = useContext(PostContext);
+	const { userState } = useContext(UserContext);
 
 	const LikePost = (postId) => {
-		postService.likePost(postId, dispatch);
+		postService.likePost(postId, getUserInfo(), dispatch);
 	};
 
 	const UnlikePost = (postId) => {
-		postService.unlikePost(postId, dispatch);
+		postService.unlikePost(postId, getUserInfo(), dispatch);
 	};
 
 	const DislikePost = (postId) => {

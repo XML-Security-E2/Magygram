@@ -228,14 +228,14 @@ function fetchFormData(postDTO) {
 	return formData;
 }
 
-function likePost(postId, dispatch) {
+function likePost(postId, loggedUser, dispatch) {
 	dispatch(request());
 
 	Axios.put(`/api/posts/${postId}/like`, {}, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(postId));
+				dispatch(success(postId,loggedUser));
 			} else {
 				dispatch(failure("Error"));
 			}
@@ -248,21 +248,21 @@ function likePost(postId, dispatch) {
 	function request() {
 		return { type: postConstants.LIKE_POST_REQUEST };
 	}
-	function success(postId) {
-		return { type: postConstants.LIKE_POST_SUCCESS, postId };
+	function success(postId, loggedUser) {
+		return { type: postConstants.LIKE_POST_SUCCESS, postId , loggedUser };
 	}
 	function failure(message) {
 		return { type: postConstants.LIKE_POST_FAILURE, errorMessage: message };
 	}
 }
 
-function unlikePost(postId, dispatch) {
+function unlikePost(postId, loggedUser, dispatch) {
 	dispatch(request());
 	Axios.put(`/api/posts/${postId}/unlike`, {}, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(postId));
+				dispatch(success(postId,loggedUser));
 			} else {
 				dispatch(failure("Error"));
 			}
@@ -275,8 +275,8 @@ function unlikePost(postId, dispatch) {
 	function request() {
 		return { type: postConstants.UNLIKE_POST_REQUEST };
 	}
-	function success(postId) {
-		return { type: postConstants.UNLIKE_POST_SUCCESS, postId };
+	function success(postId,loggedUser) {
+		return { type: postConstants.UNLIKE_POST_SUCCESS, postId,loggedUser };
 	}
 	function failure(message) {
 		return { type: postConstants.UNLIKE_POST_FAILURE, errorMessage: message };
