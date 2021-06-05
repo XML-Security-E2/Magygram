@@ -18,6 +18,7 @@ type relationshipClient struct {
 
 }
 
+
 var (
 	baseRelationshipUrl = ""
 )

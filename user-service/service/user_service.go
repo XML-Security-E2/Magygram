@@ -18,6 +18,7 @@ type userService struct {
 	intercomm.RelationshipClient
 }
 
+
 var (
 	MaxUnsuccessfulLogins = 3
 )
@@ -35,8 +36,8 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil { return "", err}
 
-	//err = u.RelationshipClient.CreateUser(user)
-	//if err != nil { return "", err}
+	err = u.RelationshipClient.CreateUser(user)
+	if err != nil { return "", err}
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
 

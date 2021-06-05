@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/go-playground/validator"
 	"mime/multipart"
 	"story-service/domain/model"
@@ -109,18 +110,23 @@ func makeStoriesMapFromArray(stories []*model.Story, userInfo *model.UserInfo) m
 
 func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bearer string) (*model.StoryResponse, error) {
 	result, err := p.StoryRepository.GetStoriesForUser(ctx, userId)
-
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(len(result))
+
 	var media []model.MediaContent
 	media = mapStoriesToMediaArray(result)
+	fmt.Println("test4")
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	fmt.Println("test5")
+
 	if err != nil {
 		return nil, err
 	}
 	_, index := hasUserVisitedStories(result,userInfo.Id)
+	fmt.Println("test6")
 
 	res, err := model.NewStoryResponse(result[0], media, index)
 	if err != nil {

@@ -82,6 +82,9 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	if posts==nil{
+		return c.JSON(http.StatusOK, []model.PostResponse{})
+	}
 	return c.JSON(http.StatusOK, posts)
 }
 

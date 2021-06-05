@@ -25,7 +25,7 @@ authservice:
 relationshipservice:
   protocol: "https://"
   domain: "localhost"
-  port: "463"
+  port: "467"
 
 postservice:
   protocol: "https://"

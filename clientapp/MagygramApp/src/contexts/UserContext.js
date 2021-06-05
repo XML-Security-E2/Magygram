@@ -33,7 +33,7 @@ const UserContextProvider = (props) => {
 			emailAddress: "",
 		},
 		loggedUser: {
-			id:'3b88ea7b-4a1d-43d5-b741-d08c413336a7',
+			id:'732c397d-f6a3-4fdd-8388-85a55420bf3a',
 			username: 'nikolakolovic',
 			imageURL:'assets/images/profiles/profile-1.jpg'
 		}
