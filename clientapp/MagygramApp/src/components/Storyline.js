@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, { useContext, useEffect } from "react";
 import { StoryContext } from "../contexts/StoryContext";
 import { storyService } from "../services/StoryService";
 import StorySliderModal from "./modals/StorySliderModal";
@@ -14,28 +14,29 @@ const Storyline = () => {
 			await storyService.findStoriesForStoryline(dispatch);
 		};
 		getStoriesHandler();
-
 	}, [dispatch]);
 
-	const openStorySlider = (userId) =>{
-		storyService.GetStoriesForUser(userId, dispatch)
-	}
+	const openStorySlider = (userId) => {
+		storyService.GetStoriesForUser(userId, dispatch);
+	};
 
 	return (
-        <React.Fragment>
-            <div className="card">
+		<React.Fragment>
+			<div className="card">
 				<div className="card-body d-flex justify-content-start">
 					<ul className="list-unstyled mb-0">
-						<StoryButton/>
-						<MyStoryButton openStorySlider={openStorySlider}/>
-						
-						{storyState.storyline.stories.map((story) => {
-							return <Story story={story} openStorySlider={openStorySlider}/>; })}
-						<StorySliderModal/>
+						<StoryButton />
+						<MyStoryButton openStorySlider={openStorySlider} />
+
+						{storyState.storyline.stories !== null &&
+							storyState.storyline.stories.map((story) => {
+								return <Story story={story} openStorySlider={openStorySlider} />;
+							})}
+						<StorySliderModal />
 					</ul>
 				</div>
 			</div>
-        </React.Fragment>
+		</React.Fragment>
 	);
 };
 

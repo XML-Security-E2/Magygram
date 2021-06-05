@@ -18,6 +18,11 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/:userId", h.GetUserById)
 	e.GET("/api/users/search/:username", h.SearchForUsersByUsername)
 
+	e.POST("/api/users/highlights", h.CreateHighlights)
+	e.GET("/api/users/highlights", h.GetProfileHighlights)
+	e.GET("/api/users/highlights/:name", h.GetProfileHighlightsByHighlightName)
+
+
 	e.POST("/api/users/collections", h.CreateCollection)
 	e.POST("/api/users/collections/posts", h.AddPostToCollection)
 	e.DELETE("/api/users/collections/posts/:postId", h.DeleteFromCollection)

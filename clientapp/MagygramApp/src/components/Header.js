@@ -4,7 +4,7 @@ import Axios from "axios";
 import { useHistory } from "react-router-dom";
 import { config } from "../config/config";
 import { authHeader } from "../helpers/auth-header";
-import AsyncSelect from "react-select/async"
+import AsyncSelect from "react-select/async";
 
 const Header = () => {
 	const history = useHistory();
@@ -17,45 +17,42 @@ const Header = () => {
 	const [img, setImg] = useState("");
 	const [search, setSearch] = useState("");
 
-
 	useEffect(() => {
 		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
-                if(res.data.imageUrl == "")
-                    setImg("assets/img/profile.jpg");
-                else
-                setImg(res.data.imageUrl);
-                
+				if (res.data.imageUrl === "") setImg("assets/img/profile.jpg");
+				else setImg(res.data.imageUrl);
 			})
-			.catch((err) => {console.log(err);});
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 
-
 	const loadOptions = (value, callback) => {
-		setTimeout(() => {
-			var options;
-			Axios.get(`https://localhost:460/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res.data);
-				if (res.status === 200) {
-					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
-					callback(options);
-				}})
-			.catch((err) => {
-				console.log(err)
-			});
-		}, 1000);
-	  };
+		// setTimeout(() => {
+		// 	var options;
+		// 	Axios.get(`https://localhost:460/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
+		// 	.then((res) => {
+		// 		console.log(res.data);
+		// 		if (res.status === 200) {
+		// 			options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
+		// 			callback(options);
+		// 		}})
+		// 	.catch((err) => {
+		// 		console.log(err)
+		// 	});
+		// }, 1000);
+	};
 
 	const onInputChange = (inputValue, { action }) => {
 		switch (action) {
-			case 'set-value':
+			case "set-value":
 				return;
-			case 'menu-close':
+			case "menu-close":
 				setSearch("");
 				return;
-			case 'input-change':
+			case "input-change":
 				setSearch(inputValue);
 				return;
 			default:
@@ -68,7 +65,6 @@ const Header = () => {
 		window.location = "#/user/" + option.id;
 		return false;
 	};
-	
 
 	const handleLogout = () => {
 		userService.logout();
@@ -105,15 +101,8 @@ const Header = () => {
 					<span className="sr-only">Toggle navigation</span>
 					<span className="navbar-toggler-icon"></span>
 				</button>
-				<div style={{width: '300px'}}>
-					<AsyncSelect
-						defaultOptions
-						loadOptions={loadOptions}
-						onInputChange={onInputChange}
-						onChange={onChange}
-						placeholder="search"
-						inputValue={search}
-					/>
+				<div style={{ width: "300px" }}>
+					<AsyncSelect defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
 				</div>
 				<div className="d-xl-flex align-items-xl-center dropdown">
 					<i className="fa fa-home" style={iconStyle} />

@@ -26,6 +26,11 @@ postservice:
     domain: "post-service"
     port: "462"
 
+storyservice:
+    protocol: "http://"
+    domain: "story-service"
+    port: "464"
+
 gateway:
     port: "8085"
     protocol: "http://"
