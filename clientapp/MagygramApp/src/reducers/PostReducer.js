@@ -420,7 +420,6 @@ export const postReducer = (state, action) => {
 					showModal: false,
 				},
 			};
-
 		case modalConstants.SHOW_POST_EDIT_MODAL:
 			strcpy = {
 				...state,
@@ -447,6 +446,27 @@ export const postReducer = (state, action) => {
 				},
 				postOptions: {
 					showModal: false,
+				},
+			};
+		case postConstants.GUEST_TIMELINE_POSTS_REQUEST:
+			return {
+				...state,
+				guestTimeline: {
+					posts: [],
+				},
+			};
+		case postConstants.GUEST_TIMELINE_POSTS_SUCCESS:
+			return {
+				...state,
+				guestTimeline: {
+					posts: action.posts,
+				},
+			};
+		case postConstants.GUEST_TIMELINE_POSTS_FAILURE:
+			return {
+				...state,
+				guestTimeline: {
+					posts: [],
 				},
 			};
 		default:

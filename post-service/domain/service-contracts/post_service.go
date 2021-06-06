@@ -16,4 +16,6 @@ type PostService interface {
 	GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error)
 	AddComment(ctx context.Context,  postId string,  content string, bearer string) (*model.Comment, error)
 	CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error)
+	SearchForPostsByHashTagByGuest(ctx context.Context,  hashTagValue string) ([]*model.HashTageSearchResponseDTO , error)
+	GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse , error)
 }

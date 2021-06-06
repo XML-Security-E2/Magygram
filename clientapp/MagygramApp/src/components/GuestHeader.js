@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import Axios from "axios";
-import { authHeader } from "../helpers/auth-header";
+import React, { useState, useContext } from "react";
 import AsyncSelect from "react-select/async";
+import { PostContext } from "../contexts/PostContext";
 import { searchService } from "../services/SearchService"
+import { postService } from "../services/PostService";
 
 const GuestHeader = () => {
+	const { postState, dispatch } = useContext(PostContext);
+
     const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
 
-	const [currentId, setCurrentId] = useState();
 	const [search, setSearch] = useState("");
 
 	const loadOptions = (value, callback) => {
@@ -39,8 +40,8 @@ const GuestHeader = () => {
 	};
 
 	const onChange = (option) => {
-		if (currentId === option.id) {
-			window.location = "#/profile";
+		if (option.searchType === "hashtag") {
+			postService.findPostsForGuestByHashtag(option.value,dispatch);
 		} else {
 			window.location = "#/user/" + option.id;
 		}

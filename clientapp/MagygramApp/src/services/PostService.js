@@ -15,6 +15,7 @@ export const postService = {
 	dislikePost,
 	undislikePost,
 	commentPost,
+	findPostsForGuestByHashtag,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -364,5 +365,32 @@ function commentPost(commentDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.COMMENT_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function findPostsForGuestByHashtag(hashtag,dispatch){
+	dispatch(request());
+	Axios.get(`/api/posts/hashtag/${hashtag}/guest`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: postConstants.GUEST_TIMELINE_POSTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.GUEST_TIMELINE_POSTS_SUCCESS, posts: data };
+	}
+	function failure() {
+		return { type: postConstants.GUEST_TIMELINE_POSTS_FAILURE };
 	}
 }

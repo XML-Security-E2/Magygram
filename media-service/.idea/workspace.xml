@@ -2,8 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/StorySliderModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/modals/StorySliderModal.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/StoryReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/reducers/StoryReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/GuestHeader.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/GuestHeader.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/SearchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/SearchService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway/api_gateway.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/model/post.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/domain/service-contracts/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/service-contracts/post_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/post_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,12 +59,31 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../post-service" />
   </component>
   <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="media-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="media-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>

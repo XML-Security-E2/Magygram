@@ -13,4 +13,6 @@ type PostRepository interface {
 	Update(ctx context.Context, post *model.Post) (*mongo.UpdateResult, error)
 	GetByID(ctx context.Context, id string) (*model.Post, error)
 	GetPostsForUser(ctx context.Context, userId string) ([]*model.Post, error)
+	GetPostsThatContainHashTag(ctx context.Context, hashTag string) ([]*model.Post, error)
+	GetPostsByHashTagForGuest(ctx context.Context, hashTag string) ([]*model.Post, error)
 }

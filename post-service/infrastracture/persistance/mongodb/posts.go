@@ -18,8 +18,6 @@ type postRepository struct {
 	tagCol *mongo.Collection
 }
 
-
-
 func NewPostRepository(Col *mongo.Collection, locationCol *mongo.Collection, tagCol *mongo.Collection) repository.PostRepository {
 	return &postRepository{Col, locationCol, tagCol}
 }
@@ -127,3 +125,51 @@ func (r *postRepository) GetPostsForUser(ctx context.Context, userId string) ([]
 	return results, nil
 }
 
+func (r *postRepository) GetPostsThatContainHashTag(ctx context.Context, hashTag string) ([]*model.Post, error) {
+	var posts []*model.Post
+
+	cursor, err := r.Col.Find(ctx, bson.M{"hashTags": bson.M{"$regex": hashTag, "$options": "i"}})
+
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.Post
+			err := cursor.Decode(&record)
+			posts = append(posts,&record)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return posts, nil
+}
+
+func (r *postRepository) GetPostsByHashTagForGuest(ctx context.Context, hashTag string) ([]*model.Post, error) {
+	var posts []*model.Post
+
+	var arr []string
+	arr=append(arr, hashTag)
+
+	cursor, err := r.Col.Find(ctx, bson.M{"hashTags": bson.M{"$in": arr }})
+
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.Post
+			err := cursor.Decode(&record)
+			posts = append(posts,&record)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return posts, nil
+}

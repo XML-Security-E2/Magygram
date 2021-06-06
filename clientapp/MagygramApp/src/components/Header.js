@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 import { config } from "../config/config";
 import { authHeader } from "../helpers/auth-header";
 import AsyncSelect from "react-select/async";
+import { searchService } from "../services/SearchService";
 
 const Header = () => {
 	const history = useHistory();
@@ -32,19 +33,16 @@ const Header = () => {
 	});
 
 	const loadOptions = (value, callback) => {
-		setTimeout(() => {
-			var options;
-			Axios.get(`/api/users/search/${value}/user`, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res.data);
-				if (res.status === 200) {
-					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
-					callback(options);
-				}})
-			.catch((err) => {
-				console.log(err)
-			});
-		}, 1000);
+		if(value.startsWith('#')){
+            setTimeout(() => {
+                searchService.guestSearchHashtagPosts(value,callback)
+            }, 1000);
+        }else{
+            setTimeout(() => {
+                searchService.userSearchUsers(value,callback)
+            }, 1000);
+        }
+
 	  };
 
 	const onInputChange = (inputValue, { action }) => {

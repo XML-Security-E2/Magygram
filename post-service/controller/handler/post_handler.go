@@ -22,6 +22,8 @@ type PostHandler interface {
 	GetPostsFirstImage(c echo.Context) error
 	AddComment(c echo.Context) error
 	EditPost(c echo.Context) error
+	SearchPostsByHashTagByGuest(c echo.Context) error
+	GetPostForGuestLineByHashTag(c echo.Context) error
 }
 
 type postHandler struct {
@@ -216,4 +218,40 @@ func (p postHandler) EditPost(c echo.Context) error {
 
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	hashTagsPosts, err := p.PostService.GetPostsByHashTagForGuest(ctx, hashTag)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsPosts)
+}
+
+func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	hashTagsInfo, err := p.PostService.SearchForPostsByHashTagByGuest(ctx, hashTag)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsInfo)
 }
