@@ -2,19 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/GuestHeader.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/GuestHeader.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/components/Header.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/pages/HomePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/SearchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/SearchService.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway/api_gateway.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/model/post.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/domain/service-contracts/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/service-contracts/post_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/post_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/domain/service-contracts/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/domain/service-contracts/user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/user_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

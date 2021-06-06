@@ -23,6 +23,7 @@ type UserHandler interface {
 	GetLoggedUserInfo(c echo.Context) error
 	SearchForUsersByUsername(c echo.Context) error
 	SearchForUsersByUsernameByGuest(c echo.Context) error
+	IsUserPrivate(c echo.Context) error
 }
 
 var (
@@ -31,6 +32,7 @@ var (
 type userHandler struct {
 	UserService service_contracts.UserService
 }
+
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
@@ -250,4 +252,21 @@ func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, userInfo)
+}
+
+func (h *userHandler) IsUserPrivate(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := h.UserService.IsUserPrivate(ctx, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	return c.JSON(http.StatusOK, retVal)
+
 }

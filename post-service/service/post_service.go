@@ -392,7 +392,22 @@ func (p postService) GetPostsByHashTagForGuest(ctx context.Context, hashtag stri
 		return nil,err
 	}
 
-	retVal := p.mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(posts)
+	var publicPosts []*model.Post
+
+	for _,post := range posts{
+		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+
+		if err!=nil{
+			log.Println(err)
+			return nil,err
+		}
+
+		if !value {
+			publicPosts=append(publicPosts, post)
+		}
+	}
+
+	retVal := p.mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(publicPosts)
 
 	return retVal, nil
 }

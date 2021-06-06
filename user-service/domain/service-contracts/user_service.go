@@ -18,4 +18,5 @@ type UserService interface {
 	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error)
 	SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
+	IsUserPrivate(ctx context.Context, userId string) (bool, error)
 }

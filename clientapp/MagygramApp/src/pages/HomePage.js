@@ -52,7 +52,6 @@ const HomePage = () => {
 										<div class="row">
 											<div class="col-8">
 												<GuestTimeline />
-												test
 										</div>
 									</div>
 								</div>

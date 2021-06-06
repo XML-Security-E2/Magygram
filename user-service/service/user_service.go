@@ -19,7 +19,6 @@ type userService struct {
 }
 
 
-
 var (
 	MaxUnsuccessfulLogins = 3
 )
@@ -210,4 +209,13 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 		Username: user.Username,
 		ImageURL: "",
 	}, nil
+}
+
+func (u *userService) IsUserPrivate(ctx context.Context, userId string) (bool, error) {
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return false, errors.New("invalid user id")
+	}
+
+	return user.IsPrivate, nil
 }
