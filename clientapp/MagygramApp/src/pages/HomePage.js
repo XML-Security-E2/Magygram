@@ -40,6 +40,9 @@ const HomePage = () => {
 				</StoryContextProvider>
 				</UserContextProvider>
 			</div>
+			<div hidden={role==="user"}>
+
+			</div>
 		</React.Fragment>
 	);
 };
