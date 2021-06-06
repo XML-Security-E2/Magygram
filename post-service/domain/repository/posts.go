@@ -14,5 +14,5 @@ type PostRepository interface {
 	GetByID(ctx context.Context, id string) (*model.Post, error)
 	GetPostsForUser(ctx context.Context, userId string) ([]*model.Post, error)
 	GetPostsThatContainHashTag(ctx context.Context, hashTag string) ([]*model.Post, error)
-	GetPostsByHashTagForGuest(ctx context.Context, hashTag string) ([]*model.Post, error)
+	GetPostsByHashTag(ctx context.Context, hashTag string) ([]*model.Post, error)
 }

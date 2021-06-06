@@ -386,7 +386,7 @@ func makeHashTagMap(posts []*model.Post, hashTagValue string) map[string]int {
 }
 
 func (p postService) GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse, error) {
-	posts, err := p.PostRepository.GetPostsByHashTagForGuest(ctx, hashtag)
+	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
 
 	if err!=nil{
 		return nil,err
@@ -424,4 +424,32 @@ func (p postService) mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(post
 	}
 
 	return retVal
+}
+
+func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string, bearer string) ([]*model.PostResponse, error) {
+	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
+	if err!=nil{
+		return nil,err
+	}
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var publicPosts []*model.Post
+	for _,post := range posts{
+		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+		if err!=nil{
+			return nil,err
+		}
+
+		if !value {
+			publicPosts=append(publicPosts, post)
+		}
+	}
+
+	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+
+	return retVal, nil
 }

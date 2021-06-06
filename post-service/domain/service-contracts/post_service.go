@@ -18,4 +18,5 @@ type PostService interface {
 	CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error)
 	SearchForPostsByHashTagByGuest(ctx context.Context,  hashTagValue string) ([]*model.HashTageSearchResponseDTO , error)
 	GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse , error)
+	GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string,bearer string) ([]*model.PostResponse , error)
 }

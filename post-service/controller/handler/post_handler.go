@@ -24,6 +24,7 @@ type PostHandler interface {
 	EditPost(c echo.Context) error
 	SearchPostsByHashTagByGuest(c echo.Context) error
 	GetPostForGuestLineByHashTag(c echo.Context) error
+	GetPostForUserTimelineByHashTag(c echo.Context) error
 }
 
 type postHandler struct {
@@ -258,4 +259,26 @@ func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
 
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, hashTagsInfo)
+}
+
+func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag,bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	if hashTagsPosts == nil{
+		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsPosts)
 }

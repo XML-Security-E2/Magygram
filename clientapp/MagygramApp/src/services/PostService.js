@@ -16,6 +16,7 @@ export const postService = {
 	undislikePost,
 	commentPost,
 	findPostsForGuestByHashtag,
+	findPostsForUserByHashtag,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -392,5 +393,35 @@ function findPostsForGuestByHashtag(hashtag,dispatch){
 	}
 	function failure() {
 		return { type: postConstants.GUEST_TIMELINE_POSTS_FAILURE };
+	}
+}
+
+
+function findPostsForUserByHashtag(hashtag,dispatch){
+	dispatch(request());
+	Axios.get(`/api/posts/hashtag/${hashtag}/user`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	
+	function request() {
+		return { type: postConstants.TIMELINE_POSTS_REQUEST };
+	}
+	
+	function success(data) {
+		return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
+	}
+	
+	function failure() {
+		return { type: postConstants.TIMELINE_POSTS_FAILURE };
 	}
 }

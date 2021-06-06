@@ -94,10 +94,14 @@ const Post = ({ post }) => {
 							deleteFromCollections={deleteFromCollections}
 						/>
 						<div className="pl-3 pr-3 pb-2">
-							<strong className="d-block">
-            				</strong>
-            				<strong className="d-block">{post.UserInfo.Username}</strong>
-            				<p className="d-block mb-1">{post.Description}</p>
+							<PostInformation
+								username={post.UserInfo.Username}
+								likes={post.LikedBy.length}
+								dislikes={post.DislikedBy.length}
+								description={post.Description}
+								showLikedByModal={showLikedByModal}
+								showDislikesModal={showDislikesModal}
+							/>
 						</div>
 						<PostComments comments={post.Comments} postComment={postComment} viewAllComments={viewAllComments} />
 						<PostLikesModal />

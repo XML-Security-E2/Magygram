@@ -148,7 +148,7 @@ func (r *postRepository) GetPostsThatContainHashTag(ctx context.Context, hashTag
 	return posts, nil
 }
 
-func (r *postRepository) GetPostsByHashTagForGuest(ctx context.Context, hashTag string) ([]*model.Post, error) {
+func (r *postRepository) GetPostsByHashTag(ctx context.Context, hashTag string) ([]*model.Post, error) {
 	var posts []*model.Post
 
 	var arr []string

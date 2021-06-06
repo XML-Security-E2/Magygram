@@ -18,9 +18,9 @@ const HomePage = () => {
 		<React.Fragment>
 			<div hidden={role==="guest"}>
 				<UserContextProvider>
-				<Header/>
 				<StoryContextProvider>
 					<PostContextProvider>
+						<Header/>
 						<CreateStoryModal />
 						<AddPostToFavouritesModal />
 						<div>
