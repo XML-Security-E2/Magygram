@@ -22,6 +22,7 @@ type UserHandler interface {
 	GetUserById(c echo.Context) error
 	GetLoggedUserInfo(c echo.Context) error
 	SearchForUsersByUsername(c echo.Context) error
+	SearchForUsersByUsernameByGuest(c echo.Context) error
 }
 
 var (
@@ -207,7 +208,26 @@ func (h *userHandler) SearchForUsersByUsername(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	users, err := h.UserService.SearchForUsersByUsername(ctx, username)
+	bearer := c.Request().Header.Get("Authorization")
+	users, err := h.UserService.SearchForUsersByUsername(ctx, username, bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, users)
+}
+
+func (h *userHandler) SearchForUsersByUsernameByGuest(c echo.Context) error {
+	username := c.Param("username")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	users, err := h.UserService.SearchForUsersByUsernameByGuest(ctx, username)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")

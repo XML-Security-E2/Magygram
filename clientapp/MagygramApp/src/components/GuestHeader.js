@@ -1,34 +1,26 @@
 import React, { useState } from "react";
 import Axios from "axios";
-import { useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
 import AsyncSelect from "react-select/async";
+import { searchService } from "../services/SearchService"
 
 const GuestHeader = () => {
-	const history = useHistory();
-	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
+    const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
-	const imgStyle = { width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
 
-	const [name, setName] = useState("");
-	const [img, setImg] = useState("");
 	const [currentId, setCurrentId] = useState();
 	const [search, setSearch] = useState("");
 
 	const loadOptions = (value, callback) => {
-		setTimeout(() => {
-			var options;
-			Axios.get(`/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res.data);
-				if (res.status === 200) {
-					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
-					callback(options);
-				}})
-			.catch((err) => {
-				console.log(err)
-			});
-		}, 1000);
+        if(value.startsWith('#')){
+            setTimeout(() => {
+                searchService.guestSearchHashtagPosts(value,callback)
+            }, 1000);
+        }else{
+            setTimeout(() => {
+                searchService.guestSearchUsers(value,callback)
+            }, 1000);
+        }
 	  };
 
 	const onInputChange = (inputValue, { action }) => {

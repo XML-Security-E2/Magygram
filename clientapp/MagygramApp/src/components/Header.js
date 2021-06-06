@@ -34,7 +34,7 @@ const Header = () => {
 	const loadOptions = (value, callback) => {
 		setTimeout(() => {
 			var options;
-			Axios.get(`/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
+			Axios.get(`/api/users/search/${value}/user`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
 				if (res.status === 200) {
