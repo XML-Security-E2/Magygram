@@ -20,23 +20,7 @@ function login(loginRequest, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				setAuthInLocalStorage(res.data);
-
-				Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
-					.then((res) => {
-						if (res.status === 200) {
-							localStorage.setItem("userId", res.data.id);
-							localStorage.setItem("username", res.data.username);
-							localStorage.setItem("imageURL", res.data.imageUrl);
-
-							dispatch(success())
-							window.location = "#/";
-
-						} else {
-							dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
-
-						} 
-					})
-					.catch((err) => console.error(err));
+				getLoggedData(dispatch)
 			} else if (res.status === 401) {
 				dispatch(failure("Sorry, your email or password was incorrect. Please double-check your password."));
 			} else if (res.status === 403) {
@@ -52,31 +36,37 @@ function login(loginRequest, dispatch) {
 	function request() {
 		return { type: userConstants.LOGIN_REQUEST };
 	}
+	function failure(error) {
+		return { type: userConstants.LOGIN_FAILURE, error };
+	}
+}
+
+function getLoggedData(dispatch){
+	dispatch(request());
+
+	Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				localStorage.setItem("userId", res.data.id);
+				localStorage.setItem("username", res.data.username);
+				localStorage.setItem("imageURL", res.data.imageUrl);
+
+				dispatch(success())
+				window.location = "#/";
+				} else {
+					dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+				} 
+				}).catch((err) => console.error(err));
+					
+	function request() {
+		return { type: userConstants.LOGIN_REQUEST };
+	}
 	function success() {
 		return { type: userConstants.LOGIN_SUCCESS  };
 	}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
 	}
-}
-
-function getLoggedData(){
-	Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
-		.then((res) => {
-			if (res.status === 200) {
-				let userInfo = {
-					id: res.data.id,
-					username: res.data.username,
-					imageURL: res.data.imageUrl,
-				}
-				localStorage.setItem("userInfo", userInfo);
-				alert('t')
-				return res.data
-			} else {
-				return null
-			} 
-		})
-		.catch((err) => console.error(err));
 }
 
 function resendActivationLink(resendActivationLink, dispatch) {

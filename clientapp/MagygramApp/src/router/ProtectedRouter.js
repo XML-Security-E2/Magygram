@@ -7,6 +7,9 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
 		<Route
 			{...rest}
 			render={(props) => {
+				if(rest.roles==="*"){
+					return <Component {...props} />;
+				}
 				if (hasRoles(rest.roles) === true) {
 					return <Component {...props} />;
 				} else {

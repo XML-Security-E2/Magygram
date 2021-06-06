@@ -18,8 +18,8 @@ type User struct {
 	Gender Gender `bson:"gender"`
 	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
 	HighlightsStory map[string]HighlightImageWithMedia `bson:"highlightsStory"`
+	IsPrivate bool `bson:"private_profile"`
 }
-
 
 type Gender string
 
@@ -133,6 +133,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Email:          html.EscapeString(userRequest.Email),
 		FavouritePosts: map[string][]IdWithMedia{},
 		HighlightsStory: map[string]HighlightImageWithMedia{},
+		IsPrivate: true,
 	}, nil
 }
 
