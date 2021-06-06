@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
+import { authHeader } from "../helpers/auth-header";
 
 export const userService = {
 	login,
@@ -19,10 +20,25 @@ function login(loginRequest, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				setAuthInLocalStorage(res.data);
-				dispatch(success());
-				window.location = "#/";
+
+				Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+					.then((res) => {
+						if (res.status === 200) {
+							localStorage.setItem("userId", res.data.id);
+							localStorage.setItem("username", res.data.username);
+							localStorage.setItem("imageURL", res.data.imageUrl);
+
+							dispatch(success())
+							window.location = "#/";
+
+						} else {
+							dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+
+						} 
+					})
+					.catch((err) => console.error(err));
 			} else if (res.status === 401) {
-				dispatch(failure(res.data.message));
+				dispatch(failure("Sorry, your email or password was incorrect. Please double-check your password."));
 			} else if (res.status === 403) {
 				window.location = "#/blocked-user/" + res.data.userId;
 			} else {
@@ -31,15 +47,36 @@ function login(loginRequest, dispatch) {
 		})
 		.catch((err) => console.error(err));
 
+	
+	
 	function request() {
 		return { type: userConstants.LOGIN_REQUEST };
 	}
 	function success() {
-		return { type: userConstants.LOGIN_SUCCESS };
+		return { type: userConstants.LOGIN_SUCCESS  };
 	}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
 	}
+}
+
+function getLoggedData(){
+	Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				let userInfo = {
+					id: res.data.id,
+					username: res.data.username,
+					imageURL: res.data.imageUrl,
+				}
+				localStorage.setItem("userInfo", userInfo);
+				alert('t')
+				return res.data
+			} else {
+				return null
+			} 
+		})
+		.catch((err) => console.error(err));
 }
 
 function resendActivationLink(resendActivationLink, dispatch) {

@@ -43,11 +43,6 @@ const PostContextProvider = (props) => {
 			successMessage: "",
 			collections: [],
 		},
-		loggedUserInfo: {
-			Id: "063d2368-9035-4184-8b0f-bdb255e6a492",
-			ImageURL: "assets/images/profiles/profile-1.jpg",
-			Username: "nikolakolovic",
-		},
 		postLikedBy: {
 			showModal: false,
 			likedBy: [],

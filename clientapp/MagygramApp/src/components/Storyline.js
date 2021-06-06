@@ -16,8 +16,8 @@ const Storyline = () => {
 		getStoriesHandler();
 	}, [dispatch]);
 
-	const openStorySlider = (userId) => {
-		storyService.GetStoriesForUser(userId, dispatch);
+	const openStorySlider = (userId,visited) => {
+		storyService.GetStoriesForUser(userId, visited, dispatch);
 	};
 
 	return (

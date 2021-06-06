@@ -21,10 +21,11 @@ type postService struct {
 	repository.PostRepository
 	intercomm.MediaClient
 	intercomm.UserClient
+	intercomm.RelationshipClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient) service_contracts.PostService {
-	return &postService{r , ic, uc}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient) service_contracts.PostService {
+	return &postService{r , ic, uc, ir}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -55,15 +56,26 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 }
 
 func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]*model.PostResponse, error) {
-	result, err := p.PostRepository.GetAll(ctx)
 
+	var posts []*model.Post
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
 		return nil, err
 	}
 
-	retVal := p.mapPostsToResponsePostDTO(bearer, result, userInfo.Id)
+	var followedUsers model.FollowedUsersResponse
+	followedUsers, err = p.RelationshipClient.GetFollowedUsers(userInfo.Id)
+	if err != nil {
+		return nil, err
+	}
 
+	for _, userId := range followedUsers.Users {
+		var newPosts []*model.Post
+		newPosts, _ = p.PostRepository.GetPostsForUser(ctx,userId)
+		posts= append(posts, newPosts...)
+	}
+
+	retVal := p.mapPostsToResponsePostDTO(bearer, posts, userInfo.Id)
 
 	return retVal, nil
 }

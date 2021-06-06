@@ -18,6 +18,8 @@ type postRepository struct {
 	tagCol *mongo.Collection
 }
 
+
+
 func NewPostRepository(Col *mongo.Collection, locationCol *mongo.Collection, tagCol *mongo.Collection) repository.PostRepository {
 	return &postRepository{Col, locationCol, tagCol}
 }
@@ -102,5 +104,26 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.U
 		{"liked_by" , post.LikedBy},
 		{"disliked_by" , post.DislikedBy},
 		{"comments" , post.Comments}}}})
+}
+
+func (r *postRepository) GetPostsForUser(ctx context.Context, userId string) ([]*model.Post, error) {
+	cursor, err := r.Col.Find(context.TODO(), bson.M{"user_info.id": userId})
+	var results []*model.Post
+
+	if err != nil {
+		defer cursor.Close(ctx)
+	} else {
+		for cursor.Next(ctx) {
+			var result model.Post
+
+			err := cursor.Decode(&result)
+			results = append(results, &result)
+
+			if err != nil {
+				os.Exit(1)
+			}
+		}
+	}
+	return results, nil
 }
 

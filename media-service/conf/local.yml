@@ -1,4 +1,4 @@
 server :
-  port : "463"
+  port : "465"
   host : "localhost"
   secret : "MagyGram"

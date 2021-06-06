@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/go-playground/validator"
 	"mime/multipart"
 	"story-service/domain/model"
@@ -16,10 +17,11 @@ type storyService struct {
 	intercomm.MediaClient
 	intercomm.UserClient
 	intercomm.AuthClient
+	intercomm.RelationshipClient
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient) service_contracts.StoryService {
-	return &storyService{r , ic, uc,ac}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient) service_contracts.StoryService {
+	return &storyService{r , ic, uc,ac,rc}
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
@@ -50,18 +52,47 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {
 	//TODO 1: napraviti getStory za usera koji eliminise njegove storije a onda izbrisati iz mapStories proveru
-	stories, err := p.StoryRepository.GetAll(ctx)
 
+	var stories []*model.Story
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
 		return nil, err
+	}
+
+	var followedUsers model.FollowedUsersResponse
+	followedUsers, err = p.RelationshipClient.GetFollowedUsers(userInfo.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, userId := range followedUsers.Users {
+		var userStories []*model.Story
+		userStories, _ = p.StoryRepository.GetStoriesForUser(ctx,userId)
+		stories= append(stories, userStories...)
 	}
 
     storiesMap := makeStoriesMapFromArray(stories, userInfo)
 
     retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
 
+	retVal = sortFirstUnvisited(retVal)
+
 	return retVal, nil
+}
+
+func sortFirstUnvisited(stories []*model.StoryInfoResponse) []*model.StoryInfoResponse {
+	var visited []*model.StoryInfoResponse
+	var unvisited []*model.StoryInfoResponse
+
+	for _, story := range stories {
+		if story.Visited==true{
+			visited= append(visited, story)
+		}else{
+			unvisited= append(unvisited,story)
+		}
+	}
+
+	return append(unvisited, visited...)
 }
 
 func mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap map[string][]*model.Story, userId string) []*model.StoryInfoResponse {
@@ -109,14 +140,16 @@ func makeStoriesMapFromArray(stories []*model.Story, userInfo *model.UserInfo) m
 
 func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bearer string) (*model.StoryResponse, error) {
 	result, err := p.StoryRepository.GetStoriesForUser(ctx, userId)
-
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(len(result))
+
 	var media []model.MediaContent
 	media = mapStoriesToMediaArray(result)
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+
 	if err != nil {
 		return nil, err
 	}

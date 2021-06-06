@@ -19,7 +19,7 @@ mail :
 mediaservice:
   protocol: "https://"
   domain: "localhost"
-  port: "463"
+  port: "465"
 
 authservice:
   protocol: "https://"
@@ -31,3 +31,7 @@ userservice:
   domain: "localhost"
   port: "460"
 
+relationshipservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "463"

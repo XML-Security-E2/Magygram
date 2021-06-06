@@ -101,8 +101,8 @@ export const postReducer = (state, action) => {
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 			postCopy.Liked = true;
-			if (postCopy.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === state.loggedUserInfo.Id) === undefined) {
-				postCopy.LikedBy.push(state.loggedUserInfo);
+			if (postCopy.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+				postCopy.LikedBy.push(action.loggedUser);
 			}
 			return strcpy;
 		case postConstants.LIKE_POST_FAILURE:
@@ -119,7 +119,8 @@ export const postReducer = (state, action) => {
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 			postCopy.Liked = false;
-			var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== state.loggedUserInfo.Id);
+			
+			var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
 			postCopy.LikedBy = newLikedByList;
 			return strcpy;
 		case postConstants.UNLIKE_POST_FAILURE:
@@ -136,8 +137,8 @@ export const postReducer = (state, action) => {
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 			postCopy.Disliked = true;
-			if (postCopy.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === state.loggedUserInfo.Id) === undefined) {
-				postCopy.DislikedBy.push(state.loggedUserInfo);
+			if (postCopy.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+				postCopy.DislikedBy.push(action.loggedUser);
 			}
 			return strcpy;
 		case postConstants.DISLIKE_POST_FAILURE:
@@ -154,7 +155,7 @@ export const postReducer = (state, action) => {
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 			postCopy.Disliked = false;
-			var newDisikedByList = postCopy.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== state.loggedUserInfo.Id);
+			var newDisikedByList = postCopy.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== action.loggedUser.Id);
 			postCopy.DislikedBy = newDisikedByList;
 			return strcpy;
 		case postConstants.UNDISLIKE_POST_FAILURE:

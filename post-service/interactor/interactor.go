@@ -47,12 +47,16 @@ func (i *interactor) NewUserClient() intercomm.UserClient {
 	return intercomm.NewUserClient()
 }
 
+func (i *interactor) NewRelationshipClient() intercomm.RelationshipClient {
+	return intercomm.NewRelationshipClient()
+}
+
 func (i *interactor) NewPostRepository() repository.PostRepository {
 	return mongodb.NewPostRepository(i.PostCol, i.locationCol, i.tagCol)
 }
 
 func (i *interactor) NewPostService() service_contracts.PostService {
-	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient(), i.NewUserClient())
+	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewRelationshipClient())
 }
 
 func (i *interactor) NewPostHandler() handler.PostHandler {

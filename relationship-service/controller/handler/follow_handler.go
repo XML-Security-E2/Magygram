@@ -64,10 +64,8 @@ func (f *followHandler) CreateUser(c echo.Context) error {
 }
 
 func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
-	user := &model.User{}
-	if err := ctx.Bind(user); err != nil {
-		return err
-	}
+	user := &model.User{Id: ctx.Param("userId")}
+
 
 	result, err := f.FollowService.ReturnFollowedUsers(user)
 	if err != nil {

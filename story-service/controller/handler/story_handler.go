@@ -59,6 +59,10 @@ func (p storyHandler) GetStoriesForStoryline(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	if stories==nil{
+		return c.JSON(http.StatusOK, []model.StoryResponse{})
+	}
+
 	return c.JSON(http.StatusOK, stories)
 }
 
@@ -107,6 +111,11 @@ func (p storyHandler) GetAllUserStories(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+
+	if stories==nil{
+		return c.JSON(http.StatusOK, []model.StoryResponse{})
+	}
+	fmt.Println("test3")
 
 	return c.JSON(http.StatusOK, stories)
 }
