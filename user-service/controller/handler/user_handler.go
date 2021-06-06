@@ -12,6 +12,7 @@ import (
 
 type UserHandler interface {
 	RegisterUser(c echo.Context) error
+	EditUser(c echo.Context) error
 	ActivateUser(c echo.Context) error
 	ResetPasswordRequest(c echo.Context) error
 	ResetPasswordActivation(c echo.Context) error
@@ -34,6 +35,27 @@ func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
 }
 
+func (h *userHandler) EditUser(c echo.Context) error {
+	userRequest := &model.EditUserRequest{}
+	if err := c.Bind(userRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	userId, err := h.UserService.EditUser(ctx, userRequest)
+	fmt.Println(userId)
+	if err != nil {
+		fmt.Println(err)
+
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, userId)
+}
 func (h *userHandler) RegisterUser(c echo.Context) error {
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {

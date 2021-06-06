@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 import { authHeader } from "../helpers/auth-header";
 import { colorConstants } from "../constants/ColorConstants";
 import Header from "../components/Header";
@@ -22,29 +23,34 @@ const ProfilePage = () => {
 	const [name, setName] = useState("");
 	const [username, setUsername] = useState("");
 	const [bio, setBio] = useState("");
+	const [website, setWebsite] = useState("");
 	const [img, setImg] = useState("");
 
 	const handleLogout = () => {
 		userService.logout();
 	};
 
-	useEffect(() => {
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+    useEffect(() => {
+        Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
-				setUsername(res.data.username);
-				if (res.data.imageUrl == "") setImg("assets/img/profile.jpg");
-				else setImg(res.data.imageUrl);
+                setUsername(res.data.username);
+                if(res.data.imageUrl == "")
+                    setImg("assets/img/profile.jpg");
+                else
+                setImg(res.data.imageUrl);
+                
+                Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+                    .then((res) => {
+                        
+				        console.log(res.data);
+                        setName(res.data.Name);
+                        setBio(res.data.Bio);
+                        setWebsite(res.data.Website);
 
-				Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
-					.then((res) => {
-						console.log(res.data);
-						setName(res.data.Name);
-						setBio(res.data.Bio);
-					})
-					.catch((err) => {
-						console.log(err);
-					});
+                    })
+                    .catch((err) => {console.log(err);});
+
 			})
 			.catch((err) => {
 				console.log(err);
@@ -54,29 +60,24 @@ const ProfilePage = () => {
 	const handleProfile = () => {
 		window.location = `#/profile`;
 
-		Axios.get(`https://localhost:460/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
-				console.log(res.data);
-				setUsername(res.data.username);
+                setUsername(res.data.username);
+                
+                Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
+                    .then((res) => {
+                        setName(res.data.Name);
+                        setBio(res.data.Bio);
 
-				Axios.get(`https://localhost:460/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
-					.then((res) => {
-						console.log(res.data);
-						setName(res.data.Name);
-						setBio(res.data.Bio);
-					})
-					.catch((err) => {
-						console.log(err);
-					});
+                    })
+                    .catch((err) => {console.log(err);});
+
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
 
-	const handleSettings = () => {
-		alert("TOD1O");
-	};
 
 	return (
 		<React.Fragment>
@@ -114,6 +115,7 @@ const ProfilePage = () => {
 														<h4>{name}</h4>
 													</div>
 													<div>{bio}</div>
+													<div><a href={website}>{website}</a></div>
 												</section>
 											</div>
 										</nav>

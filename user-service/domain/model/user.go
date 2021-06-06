@@ -64,6 +64,18 @@ type UserRequest struct {
 	RepeatedPassword string `json:"repeatedPassword"`
 }
 
+type EditUserRequest struct {
+	Id string `json:"id"`
+	Name  string `json:"nameInput"`
+	Surname  string `json:"surnameInput"`
+	Username  string `json:"usernameInput"`
+	Email string `json:"emailInput"`
+	Website string `json:"websiteInput" `
+	Bio string `json:"bioInput" `
+	Number string `json:"numberInput" `
+	Gender Gender `json:"gender" `
+}
+
 type ResetPasswordRequest struct {
 	Email string `json:"email"`
 }
@@ -121,6 +133,19 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Email:          html.EscapeString(userRequest.Email),
 		FavouritePosts: map[string][]IdWithMedia{},
 		HighlightsStory: map[string]HighlightImageWithMedia{},
+	}, nil
+}
+
+func NewEditUser(userRequest *EditUserRequest) (*User, error) {
+	return &User{Id: userRequest.Id,
+		Name:           html.EscapeString(userRequest.Name),
+		Surname:           html.EscapeString(userRequest.Surname),
+		Username:       html.EscapeString(userRequest.Username),
+		Email:          html.EscapeString(userRequest.Email),
+		Website:          html.EscapeString(userRequest.Website),
+		Bio:          html.EscapeString(userRequest.Bio),
+		Number:          html.EscapeString(userRequest.Number),
+		Gender: 		userRequest.Gender,
 	}, nil
 }
 
