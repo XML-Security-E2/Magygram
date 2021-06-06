@@ -234,6 +234,10 @@ func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
+	if hashTagsPosts == nil{
+		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
+	}
+
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, hashTagsPosts)
 }
