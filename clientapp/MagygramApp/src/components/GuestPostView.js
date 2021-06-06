@@ -12,6 +12,10 @@ const GuestPostView = ({ post }) => {
 					<div className="card-body p-0">
 						<PostImageSlider media={post.Media} />
 					</div>
+					<div className="pl-3 pr-3 pb-2 pt-3">
+            			<strong className="d-block">{post.UserInfo.Username}</strong>
+            			<p className="d-block mb-1">{post.Description}</p>
+					</div>
 				</div>
 			</div>
 		</React.Fragment>
