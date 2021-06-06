@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"github.com/beevik/guid"
 	"github.com/go-playground/validator"
+	"log"
 	_ "net/http"
 	"post-service/domain/model"
 	"post-service/domain/repository"
 	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/service/intercomm"
+	"strings"
 	"time"
 )
 
@@ -339,4 +341,115 @@ func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId strin
 		return false, nil
 	}
 	return true, nil
+}
+
+func (p postService) SearchForPostsByHashTagByGuest(ctx context.Context, hashTagValue string) ([]*model.HashTageSearchResponseDTO, error) {
+	posts, err := p.PostRepository.GetPostsThatContainHashTag(ctx, hashTagValue)
+	if err != nil {
+		return nil, errors.New("Couldn't find any users")
+	}
+
+	elementMap := makeHashTagMap(posts, hashTagValue)
+
+	retVal := mapHashTagMapToHashTagResponseDTO(elementMap)
+	
+	return retVal, err
+}
+
+func mapHashTagMapToHashTagResponseDTO(hashTagMap map[string]int) []*model.HashTageSearchResponseDTO {
+	var retVal []*model.HashTageSearchResponseDTO
+
+	for key, element := range hashTagMap {
+		res := model.HashTageSearchResponseDTO{Hashtag: key, NumberOfPosts: element}
+		retVal = append(retVal, &res)
+	}
+
+	return retVal
+}
+
+func makeHashTagMap(posts []*model.Post, hashTagValue string) map[string]int {
+	elementMap := make(map[string]int)
+
+	for _, post := range posts{
+		for _, hashTag := range post.HashTags {
+			if strings.Contains(hashTag,hashTagValue){
+				if _, ok := elementMap[hashTag]; ok {
+					elementMap[hashTag] = elementMap[hashTag]+1
+				}else{
+					elementMap[hashTag] = 1
+				}
+			}
+		}
+	}
+
+	return elementMap
+}
+
+func (p postService) GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse, error) {
+	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
+
+	if err!=nil{
+		return nil,err
+	}
+
+	var publicPosts []*model.Post
+
+	for _,post := range posts{
+		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+
+		if err!=nil{
+			log.Println(err)
+			return nil,err
+		}
+
+		if !value {
+			publicPosts=append(publicPosts, post)
+		}
+	}
+
+	retVal := p.mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(publicPosts)
+
+	return retVal, nil
+}
+
+func (p postService) mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(posts []*model.Post) []*model.GuestTimelinePostResponse {
+	var retVal []*model.GuestTimelinePostResponse
+
+	for _, post := range posts {
+		res, err := model.NewGuestTimelinePostResponse(post)
+
+		if err != nil { return nil}
+
+		retVal = append(retVal, res)
+	}
+
+	return retVal
+}
+
+func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string, bearer string) ([]*model.PostResponse, error) {
+	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
+	if err!=nil{
+		return nil,err
+	}
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var publicPosts []*model.Post
+	for _,post := range posts{
+		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+		if err!=nil{
+			return nil,err
+		}
+
+		if !value {
+			publicPosts=append(publicPosts, post)
+		}
+	}
+
+	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+
+	return retVal, nil
 }

@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
 import { useHistory } from "react-router-dom";
 import { config } from "../config/config";
 import { authHeader } from "../helpers/auth-header";
 import AsyncSelect from "react-select/async";
+import { searchService } from "../services/SearchService";
+import { postService } from "../services/PostService";
+import { PostContext } from "../contexts/PostContext";
 
 const Header = () => {
+	const { postState, dispatch } = useContext(PostContext);
+
 	const history = useHistory();
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
@@ -32,19 +37,16 @@ const Header = () => {
 	});
 
 	const loadOptions = (value, callback) => {
-		setTimeout(() => {
-			var options;
-			Axios.get(`/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res.data);
-				if (res.status === 200) {
-					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
-					callback(options);
-				}})
-			.catch((err) => {
-				console.log(err)
-			});
-		}, 1000);
+		if(value.startsWith('#')){
+            setTimeout(() => {
+                searchService.guestSearchHashtagPosts(value,callback)
+            }, 1000);
+        }else{
+            setTimeout(() => {
+                searchService.userSearchUsers(value,callback)
+            }, 1000);
+        }
+
 	  };
 
 	const onInputChange = (inputValue, { action }) => {
@@ -63,8 +65,8 @@ const Header = () => {
 	};
 
 	const onChange = (option) => {
-		if (currentId === option.id) {
-			window.location = "#/profile";
+		if (option.searchType === "hashtag") {
+			postService.findPostsForUserByHashtag(option.value,dispatch);
 		} else {
 			window.location = "#/user/" + option.id;
 		}

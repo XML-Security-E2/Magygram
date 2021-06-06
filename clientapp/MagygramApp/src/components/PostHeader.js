@@ -18,11 +18,6 @@ const PostHeader = ({ username, image, openOptionsModal }) => {
 						</li>
 					</ul>
 
-					<div className="d-flex justify-content-end">
-						<button className="btn p-0" onClick={openOptionsModal}>
-							<i className="fa fa-ellipsis-h" aria-hidden="true"></i>
-						</button>
-					</div>
 				</div>
 			</div>
 		</React.Fragment>

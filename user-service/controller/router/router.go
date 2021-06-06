@@ -17,7 +17,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/resend-activation-link", h.ResendActivationLink)
 	e.GET("/api/users/check-existence/:userId", h.GetUserEmailIfUserExist)
 	e.GET("/api/users/:userId", h.GetUserById)
-	e.GET("/api/users/search/:username", h.SearchForUsersByUsername)
+	e.GET("/api/users/search/:username/user", h.SearchForUsersByUsername)
+	e.GET("/api/users/search/:username/guest", h.SearchForUsersByUsernameByGuest)
 
 	e.POST("/api/users/highlights", h.CreateHighlights)
 	e.GET("/api/users/highlights", h.GetProfileHighlights)
@@ -30,4 +31,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/collections", h.GetUsersCollections)
 	e.GET("/api/users/collections/except-default", h.GetUsersCollectionsExceptDefault)
 	e.POST("/api/users/collections/check-favourites", h.CheckIfPostInFavourites)
+	e.GET("/api/users/:userId/isprivate", h.IsUserPrivate)
 }
