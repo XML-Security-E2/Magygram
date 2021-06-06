@@ -8,6 +8,7 @@ import Header from "../components/Header";
 import Storyline from "../components/Storyline"
 import UserContextProvider from "../contexts/UserContext";
 import { hasRoles } from "../helpers/auth-header";
+import GuestHeader from "../components/GuestHeader";
 
 const HomePage = () => {
 	var role = hasRoles(["user"]) ? "user":"guest";
@@ -41,7 +42,7 @@ const HomePage = () => {
 				</UserContextProvider>
 			</div>
 			<div hidden={role==="user"}>
-
+				<GuestHeader/>
 			</div>
 		</React.Fragment>
 	);
