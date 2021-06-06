@@ -18,16 +18,16 @@ function App() {
 	return (
 		<Router>
 			<Switch>
-				<ProtectedRoute roles={["user"]} exact path="/" redirectTo="/unauthorized" component={HomePage} />
+				<ProtectedRoute roles={"*"} exact path="/" redirectTo="/unauthorized" component={HomePage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/login" component={LoginPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/forgot-password" component={ForgotPasswordPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/registration" component={RegistrationPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/reset-password/:id" component={ResetPasswordPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/blocked-user/:id" component={UserActivateRequestPage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/" path="/user/:id" component={UserPage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/" path="/profile" component={ProfilePage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/" path="/edit-profile" component={EditProfilePage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/" path="/add-posts" component={CreatePostPage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/user/:id" component={UserPage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/profile" component={ProfilePage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/edit-profile" component={EditProfilePage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/add-posts" component={CreatePostPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 
