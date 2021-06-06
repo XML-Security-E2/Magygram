@@ -2,7 +2,7 @@ import { modalConstants } from "../constants/ModalConstants";
 import { storyConstants } from "../constants/StoryConstants";
 
 let storyCopy = {};
-
+let newStoryline= {};
 export const storyReducer = (state, action) => {
 	switch (action.type) {
 		case storyConstants.CREATE_STORY_REQUEST:
@@ -78,6 +78,7 @@ export const storyReducer = (state, action) => {
 					showModal: true,
 					stories: createStories(action.stories),
 					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
+					visited: action.visited
 				},
 			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
@@ -213,7 +214,9 @@ export const storyReducer = (state, action) => {
 			storyCopy = { ...state };
 			storyCopy.highlightsSliderModal.showModal = false;
 			return storyCopy;
-
+		case storyConstants.VISITED_STORY_SUCCESS:{
+	
+		}
 		default:
 			return state;
 	}

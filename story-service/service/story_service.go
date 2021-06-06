@@ -92,7 +92,7 @@ func sortFirstUnvisited(stories []*model.StoryInfoResponse) []*model.StoryInfoRe
 		}
 	}
 
-	return append(visited, unvisited...)
+	return append(unvisited, visited...)
 }
 
 func mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap map[string][]*model.Story, userId string) []*model.StoryInfoResponse {

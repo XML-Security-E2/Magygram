@@ -18,7 +18,15 @@ const StorySliderModal = () => {
 	}
 
 	const onStoryStart =(index,story)=>{
-		storyService.visitedByUser(story.header.storyId,dispatch)
+		if(!storyState.storySliderModal.visited){
+			if((index+1)===storyState.storySliderModal.stories.length){
+				storyService.visitedByUser(story.header.storyId,dispatch)
+				storyService.findStoriesForStoryline(dispatch)
+
+			}else {
+				storyService.visitedByUser(story.header.storyId,dispatch)
+			}
+		}
 	}
 
 

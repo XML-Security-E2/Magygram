@@ -8,7 +8,7 @@ const Story = ({story,openStorySlider}) => {
 	return (
         <React.Fragment>
             <li class="list-inline-item">
-				<button onClick={() => openStorySlider(story.UserInfo.Id)} className="btn p-0 m-0">
+				<button onClick={() => openStorySlider(story.UserInfo.Id,story.Visited)} className="btn p-0 m-0">
 					<div className="d-flex flex-column align-items-center">
 						<div className={story.Visited ? visitedStoryClassName : notVisitedStoryClassName}>
 							<img src={story.UserInfo.ImageURL} alt="..." style={imgStyle}/>
