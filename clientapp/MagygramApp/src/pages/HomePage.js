@@ -30,7 +30,7 @@ const HomePage = () => {
 											<div class="row">
 												<div class="col-8">
 													<Storyline />
-													<Timeline />
+													<Timeline search={false} />
 												</div>
 											</div>
 										</div>

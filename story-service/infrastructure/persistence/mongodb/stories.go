@@ -4,10 +4,13 @@ import (
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"os"
 	"story-service/domain/model"
 	"story-service/domain/repository"
+	"time"
 )
 
 type storyRepository struct {
@@ -23,7 +26,7 @@ func (s storyRepository) Create(ctx context.Context, story *model.Story) (*mongo
 }
 
 func (s storyRepository) GetAll(ctx context.Context) ([]*model.Story, error) {
-	cursor, err := s.Col.Find(context.TODO(), bson.D{})
+	cursor, err := s.Col.Find(context.TODO(), bson.M{"created_time": bson.M{"$gte": primitive.NewObjectIDFromTimestamp(time.Now().AddDate(0,0,-1))}})
 
 	var results []*model.Story
 
@@ -47,6 +50,29 @@ func (s storyRepository) GetAll(ctx context.Context) ([]*model.Story, error) {
 
 func (s storyRepository) GetStoriesForUser(ctx context.Context, userId string) ([]*model.Story, error) {
 	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId})
+	var results []*model.Story
+
+	if err != nil {
+		defer cursor.Close(ctx)
+	} else {
+		for cursor.Next(ctx) {
+			var result model.Story
+
+			err := cursor.Decode(&result)
+			results = append(results, &result)
+
+			if err != nil {
+				os.Exit(1)
+			}
+		}
+	}
+	return results, nil
+}
+
+
+func (s storyRepository) GetActiveStoriesForUser(ctx context.Context, userId string) ([]*model.Story, error) {
+	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId , "created_time" : bson.M{"$gte" : primitive.NewDateTimeFromTime(time.Now().AddDate(0,0,-1))}})
+	log.Println(primitive.NewObjectIDFromTimestamp(time.Now().AddDate(0,0,-1)))
 	var results []*model.Story
 
 	if err != nil {

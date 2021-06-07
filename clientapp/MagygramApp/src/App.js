@@ -12,6 +12,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
+import SearchPostPage from "./pages/SearchedPostPage";
 
 function App() {
 	return (
@@ -26,6 +27,11 @@ function App() {
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/edit-profile" component={EditProfilePage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/add-posts" component={CreatePostPage} />
 				<Route path="/profile" component={UserProfilePage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/user/:id" component={UserPage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/edit-profile" component={EditProfilePage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/add-posts" component={CreatePostPage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/search" component={SearchPostPage} />
+				<Route path="/test" component={LoginPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 

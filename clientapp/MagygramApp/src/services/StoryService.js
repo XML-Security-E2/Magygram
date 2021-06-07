@@ -12,6 +12,7 @@ export const storyService = {
 	findAllUserStories,
 	GetStoriesForUser,
 	visitedByUser,
+	HaveActiveStoriesLoggedUser,
 };
 
 function createStory(storyDTO, dispatch) {
@@ -244,4 +245,31 @@ function visitedByUser(storyId, dispatch) {
 	//function failure() {
 	//	return { type: storyConstants.STORYLINE_STORY_FAILURE };
 	//}
+}
+
+function HaveActiveStoriesLoggedUser(dispatch){
+	dispatch(request());
+	Axios.get(`/api/story/activestories`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure())
+			}
+		})
+		.catch((err) => {
+			dispatch(failure())
+		});
+
+	function request() {
+		return { type: storyConstants.HAVE_LOGGED_USER_STORY_REQUEST };
+	}
+	
+	function success(data) {
+		return { type: storyConstants.HAVE_LOGGED_USER_STORY_SUCCESS, haveStories: data };
+	}
+
+	function failure() {
+		return { type: storyConstants.HAVE_LOGGED_USER_STORY_FAILURE };
+	}
 }

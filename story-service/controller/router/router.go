@@ -12,4 +12,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/story/:userId", h.GetStoriesForUser)
 	e.GET("/api/story/user", h.GetAllUserStories)
 	e.PUT("/api/story/:storyId/visited", h.VisitedStoryByUser)
+	e.GET("/api/story/activestories", h.HaveActiveStoriesLoggedUser)
+
 }
