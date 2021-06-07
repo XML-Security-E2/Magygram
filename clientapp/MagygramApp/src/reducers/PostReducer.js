@@ -604,7 +604,14 @@ export const postReducer = (state, action) => {
 					post: action.post,
 				},
 			};
-
+		case modalConstants.HIDE_VIEW_POST_FOR_GUEST_MODAL:
+			return {
+				...state,
+				viewPostModalForGuest: {
+					showModal: false,
+					post: action.post,
+				},
+			};
 		case modalConstants.SHOW_POST_OPTIONS_MODAL:
 			console.log(action.post);
 			return {
