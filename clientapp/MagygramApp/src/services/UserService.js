@@ -7,11 +7,70 @@ export const userService = {
 	login,
 	logout,
 	register,
+	getUserProfileByUserId,
 	resetPasswordLinkRequest,
 	resetPasswordRequest,
+	findAllFollowingUsers,
+	findAllFollowedUsers,
 	resendActivationLink,
 	checkIfUserIdExist,
+	followUser,
+	unfollowUser,
 };
+
+async function findAllFollowedUsers(userId, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/users/${userId}/followed`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure());
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: userConstants.SET_USER_FOLLOWING_REQUEST };
+	}
+
+	function success(data) {
+		return { type: userConstants.SET_USER_FOLLOWING_SUCCESS, userInfos: data, header: "Followers" };
+	}
+	function failure() {
+		return { type: userConstants.SET_USER_FOLLOWING_FAILURE };
+	}
+}
+
+async function findAllFollowingUsers(userId, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/users/${userId}/following`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure());
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: userConstants.SET_USER_FOLLOWING_REQUEST };
+	}
+
+	function success(data) {
+		return { type: userConstants.SET_USER_FOLLOWING_SUCCESS, userInfos: data, header: "Following" };
+	}
+	function failure() {
+		return { type: userConstants.SET_USER_FOLLOWING_FAILURE };
+	}
+}
 
 function login(loginRequest, dispatch) {
 	dispatch(request());
@@ -20,7 +79,7 @@ function login(loginRequest, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				setAuthInLocalStorage(res.data);
-				getLoggedData(dispatch)
+				getLoggedData(dispatch);
 			} else if (res.status === 401) {
 				dispatch(failure("Sorry, your email or password was incorrect. Please double-check your password."));
 			} else if (res.status === 403) {
@@ -31,8 +90,6 @@ function login(loginRequest, dispatch) {
 		})
 		.catch((err) => console.error(err));
 
-	
-	
 	function request() {
 		return { type: userConstants.LOGIN_REQUEST };
 	}
@@ -41,7 +98,7 @@ function login(loginRequest, dispatch) {
 	}
 }
 
-function getLoggedData(dispatch){
+function getLoggedData(dispatch) {
 	dispatch(request());
 
 	Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
@@ -51,18 +108,19 @@ function getLoggedData(dispatch){
 				localStorage.setItem("username", res.data.username);
 				localStorage.setItem("imageURL", res.data.imageUrl);
 
-				dispatch(success())
+				dispatch(success());
 				window.location = "#/";
-				} else {
-					dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
-				} 
-				}).catch((err) => console.error(err));
-					
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
 	function request() {
 		return { type: userConstants.LOGIN_REQUEST };
 	}
 	function success() {
-		return { type: userConstants.LOGIN_SUCCESS  };
+		return { type: userConstants.LOGIN_SUCCESS };
 	}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
@@ -151,6 +209,87 @@ function resetPasswordRequest(resetPasswordRequest, dispatch) {
 	}
 	function failure(error) {
 		return { type: userConstants.RESET_PASSWORD_FAILURE, errorMessage: error };
+	}
+}
+
+function followUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request());
+
+	Axios.post(`/api/users/follow`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(userId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: userConstants.FOLLOW_USER_REQUEST };
+	}
+	function success(userId) {
+		return { type: userConstants.FOLLOW_USER_SUCCESS, userId };
+	}
+	function failure() {
+		return { type: userConstants.FOLLOW_USER_FAILURE };
+	}
+}
+
+function unfollowUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request());
+
+	Axios.post(`/api/users/unfollow`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(userId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: userConstants.UNFOLLOW_USER_REQUEST };
+	}
+	function success(userId) {
+		return { type: userConstants.UNFOLLOW_USER_SUCCESS, userId };
+	}
+	function failure() {
+		return { type: userConstants.UNFOLLOW_USER_FAILURE };
+	}
+}
+
+async function getUserProfileByUserId(userId, dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/users/${userId}/profile`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data, userId));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.GET_USER_PROFILE_REQUEST };
+	}
+	function success(user, userId) {
+		return { type: userConstants.GET_USER_PROFILE_SUCCESS, user, userId };
+	}
+	function failure(error) {
+		return { type: userConstants.GET_USER_PROFILE_FAILURE, error };
 	}
 }
 

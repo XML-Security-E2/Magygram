@@ -11,4 +11,5 @@ type CollectionsService interface {
 	DeletePostFromCollections(ctx context.Context, bearer string, postId string) error
 	GetUsersCollections(ctx context.Context, bearer string, except string) (map[string][]model.IdWithMedia,error)
 	CheckIfPostsInFavourites(ctx context.Context, bearer string,postIds *[]string) ([]*model.PostIdFavouritesFlag,error)
+	GetCollectionPosts(ctx context.Context, bearer string, collectionName string) ([]*model.PostProfileResponse, error)
 }

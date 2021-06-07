@@ -6,7 +6,7 @@ import CreateStoryHighlightsButton from "./CreateStoryHighlightsButton";
 import Highlight from "./Highlight";
 import StorySliderHighlightsModal from "./modals/StorySliderHighlightsModal";
 
-const StoryHighlights = () => {
+const StoryHighlights = ({ userId }) => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
 	useEffect(() => {
@@ -21,7 +21,7 @@ const StoryHighlights = () => {
 	};
 
 	return (
-		<React.Fragment>
+		<nav>
 			<div className="card border-0" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 				<div className="card-body d-flex justify-content-start">
 					<ul className="list-unstyled mb-0">
@@ -30,11 +30,11 @@ const StoryHighlights = () => {
 								return <Highlight highlight={highlight} openHighlightSlider={openHighlightSlider} />;
 							})}
 						<StorySliderHighlightsModal />
-						<CreateStoryHighlightsButton />
+						<CreateStoryHighlightsButton userId={userId} />
 					</ul>
 				</div>
 			</div>
-		</React.Fragment>
+		</nav>
 	);
 };
 

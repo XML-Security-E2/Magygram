@@ -26,6 +26,11 @@ userservice:
   domain: "localhost"
   port: "460"
 
+authservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "461"
+
 relationshipservice:
   protocol: "https://"
   domain: "localhost"
