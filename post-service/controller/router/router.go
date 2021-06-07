@@ -18,5 +18,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/posts/hashtag-search/:value/guest", h.SearchPostsByHashTagByGuest)
 	e.GET("/api/posts/hashtag/:value/guest", h.GetPostForGuestLineByHashTag)
 	e.GET("/api/posts/hashtag/:value/user", h.GetPostForUserTimelineByHashTag)
+	e.GET("/api/posts/location-search/:value/guest", h.SearchPostsByLocation)
+	e.GET("/api/posts/location/:value/guest", h.GetPostForGuestTimelineByLocation)
 
 }

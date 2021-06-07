@@ -346,7 +346,7 @@ func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId strin
 func (p postService) SearchForPostsByHashTagByGuest(ctx context.Context, hashTagValue string) ([]*model.HashTageSearchResponseDTO, error) {
 	posts, err := p.PostRepository.GetPostsThatContainHashTag(ctx, hashTagValue)
 	if err != nil {
-		return nil, errors.New("Couldn't find any users")
+		return nil, errors.New("Couldn't find any posts")
 	}
 
 	elementMap := makeHashTagMap(posts, hashTagValue)
@@ -450,6 +450,73 @@ func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashta
 	}
 
 	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+
+	return retVal, nil
+}
+
+func (p postService) SearchPostsByLocation(ctx context.Context, locationValue string) ([]*model.LocationSearchResponseDTO, error) {
+	posts, err := p.PostRepository.GetPostsThatContainLocation(ctx, locationValue)
+	if err != nil {
+		return nil, errors.New("Couldn't find any posts")
+	}
+
+	elementMap := makeLocationMap(posts, locationValue)
+
+	retVal := mapLocationMapToLocationResponseDTO(elementMap)
+
+	return retVal, err
+}
+
+func makeLocationMap(posts []*model.Post, locationValue string) map[string]int {
+	elementMap := make(map[string]int)
+
+	for _, post := range posts{
+		if strings.Contains(post.Location,locationValue){
+			if _, ok := elementMap[post.Location]; ok {
+				elementMap[post.Location] = elementMap[post.Location]+1
+			}else {
+				elementMap[post.Location] = 1
+			}
+		}
+	}
+
+	return elementMap
+}
+
+func mapLocationMapToLocationResponseDTO(hashTagMap map[string]int) []*model.LocationSearchResponseDTO {
+	var retVal []*model.LocationSearchResponseDTO
+
+	for key, element := range hashTagMap {
+		res := model.LocationSearchResponseDTO{Hashtag: key, NumberOfPosts: element}
+		retVal = append(retVal, &res)
+	}
+
+	return retVal
+}
+
+func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, location string) ([]*model.GuestTimelinePostResponse, error) {
+	posts, err := p.PostRepository.GetPostsByLocation(ctx, location)
+
+	if err!=nil{
+		return nil,err
+	}
+
+	var publicPosts []*model.Post
+
+	for _,post := range posts{
+		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+
+		if err!=nil{
+			log.Println(err)
+			return nil,err
+		}
+
+		if !value {
+			publicPosts=append(publicPosts, post)
+		}
+	}
+
+	retVal := p.mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(publicPosts)
 
 	return retVal, nil
 }

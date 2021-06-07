@@ -25,6 +25,8 @@ type PostHandler interface {
 	SearchPostsByHashTagByGuest(c echo.Context) error
 	GetPostForGuestLineByHashTag(c echo.Context) error
 	GetPostForUserTimelineByHashTag(c echo.Context) error
+	SearchPostsByLocation(c echo.Context) error
+	GetPostForGuestTimelineByLocation(c echo.Context) error
 }
 
 type postHandler struct {
@@ -281,4 +283,44 @@ func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
 
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, hashTagsPosts)
+}
+
+func (p postHandler) SearchPostsByLocation(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	hashTagsInfo, err := p.PostService.SearchPostsByLocation(ctx, hashTag)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsInfo)
+}
+
+func (p postHandler) GetPostForGuestTimelineByLocation(c echo.Context) error {
+	location := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	locationPosts, err := p.PostService.GetPostForGuestTimelineByLocation(ctx, location)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	if locationPosts == nil{
+		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, locationPosts)
 }

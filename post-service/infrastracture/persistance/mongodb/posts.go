@@ -18,6 +18,7 @@ type postRepository struct {
 	tagCol *mongo.Collection
 }
 
+
 func NewPostRepository(Col *mongo.Collection, locationCol *mongo.Collection, tagCol *mongo.Collection) repository.PostRepository {
 	return &postRepository{Col, locationCol, tagCol}
 }
@@ -173,3 +174,46 @@ func (r *postRepository) GetPostsByHashTag(ctx context.Context, hashTag string) 
 
 	return posts, nil
 }
+
+func (r *postRepository) GetPostsThatContainLocation(ctx context.Context, location string) ([]*model.Post, error) {
+	var posts []*model.Post
+
+	cursor, err := r.Col.Find(ctx, bson.M{"location": bson.M{"$regex": location, "$options": "i"}})
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.Post
+			err := cursor.Decode(&record)
+			posts = append(posts, &record)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return posts, nil
+}
+
+func (r *postRepository) GetPostsByLocation(ctx context.Context, location string) ([]*model.Post, error) {
+	var posts []*model.Post
+
+	cursor, err := r.Col.Find(ctx, bson.M{"location": location})
+
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.Post
+			err := cursor.Decode(&record)
+			posts = append(posts,&record)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return posts, nil}

@@ -57,7 +57,7 @@ function guestSearchLocation(value,callback){
         .then((res) => {
             console.log(res.data);
             if (res.status === 200) {
-                options = res.data.map(option => ({ value: option.Hashtag, label: '#'+option.Hashtag + " ("+ option.NumberOfPosts+")", id: option.Hashtag, searchType:"location"}))
+                options = res.data.map(option => ({ value: option.Hashtag, label: '%'+option.Hashtag + " ("+ option.NumberOfPosts+")", id: option.Hashtag, searchType:"location"}))
                 callback(options);
         }}).catch((err) => {
             console.log(err)
