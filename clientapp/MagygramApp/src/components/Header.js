@@ -34,16 +34,20 @@ const Header = () => {
 	});
 
 	const loadOptions = (value, callback) => {
-		if (value.startsWith("#")) {
+		if(value.startsWith('#')){
+            setTimeout(() => {
+                searchService.guestSearchHashtagPosts(value,callback)
+            }, 1000);
+        }else if(value.startsWith('%')){
 			setTimeout(() => {
-				searchService.guestSearchHashtagPosts(value, callback);
-			}, 1000);
-		} else {
-			setTimeout(() => {
-				searchService.userSearchUsers(value, callback);
-			}, 1000);
-		}
-	};
+                searchService.guestSearchLocation(value,callback)
+            }, 1000);
+		}else{
+            setTimeout(() => {
+                searchService.userSearchUsers(value,callback)
+            }, 1000);
+        }
+	  };
 
 	const onInputChange = (inputValue, { action }) => {
 		switch (action) {
@@ -62,10 +66,13 @@ const Header = () => {
 
 	const onChange = (option) => {
 		if (option.searchType === "hashtag") {
-			postService.findPostsForUserByHashtag(option.value, dispatch);
+			postService.findPostsForUserByHashtag(option.value,dispatch);
+		}else if(option.searchType === "location"){
+			postService.findPostsForUserByLocation(option.value,dispatch);
 		} else {
 			window.location = "#/user/" + option.id;
 		}
+
 		return false;
 	};
 

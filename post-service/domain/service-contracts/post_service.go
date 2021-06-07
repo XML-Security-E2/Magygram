@@ -22,4 +22,7 @@ type PostService interface {
 	SearchForPostsByHashTagByGuest(ctx context.Context,  hashTagValue string) ([]*model.HashTageSearchResponseDTO , error)
 	GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse , error)
 	GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string,bearer string) ([]*model.PostResponse , error)
+	SearchPostsByLocation(ctx context.Context,  locationValue string) ([]*model.LocationSearchResponseDTO , error)
+	GetPostForGuestTimelineByLocation(ctx context.Context, location string) ([]*model.GuestTimelinePostResponse , error)
+	GetPostForUserTimelineByLocation(ctx context.Context, location string, bearer string) ([]*model.PostResponse , error)
 }

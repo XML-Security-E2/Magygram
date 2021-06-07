@@ -216,6 +216,11 @@ type HashTageSearchResponseDTO struct {
 	NumberOfPosts int
 }
 
+type LocationSearchResponseDTO struct {
+	Hashtag string
+	NumberOfPosts int
+}
+
 type GuestTimelinePostResponse struct {
 	Id string
 	Description string

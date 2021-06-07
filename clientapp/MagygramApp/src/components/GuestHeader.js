@@ -17,6 +17,10 @@ const GuestHeader = () => {
             setTimeout(() => {
                 searchService.guestSearchHashtagPosts(value,callback)
             }, 1000);
+        }else if(value.startsWith('%')){
+            setTimeout(() => {
+                searchService.guestSearchLocation(value,callback)
+            }, 1000);
         }else{
             setTimeout(() => {
                 searchService.guestSearchUsers(value,callback)
@@ -42,8 +46,11 @@ const GuestHeader = () => {
 	const onChange = (option) => {
 		if (option.searchType === "hashtag") {
 			postService.findPostsForGuestByHashtag(option.value,dispatch);
-		} else {
+		} else if(option.searchType === "location"){
+			postService.findPostsForGuestByLocation(option.value,dispatch);
+		}else{
 			window.location = "#/user/" + option.id;
+
 		}
 		return false;
 	};
