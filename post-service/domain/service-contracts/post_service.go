@@ -21,4 +21,5 @@ type PostService interface {
 	GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string,bearer string) ([]*model.PostResponse , error)
 	SearchPostsByLocation(ctx context.Context,  locationValue string) ([]*model.LocationSearchResponseDTO , error)
 	GetPostForGuestTimelineByLocation(ctx context.Context, location string) ([]*model.GuestTimelinePostResponse , error)
+	GetPostForUserTimelineByLocation(ctx context.Context, location string, bearer string) ([]*model.PostResponse , error)
 }

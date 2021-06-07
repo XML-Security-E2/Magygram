@@ -27,6 +27,7 @@ type PostHandler interface {
 	GetPostForUserTimelineByHashTag(c echo.Context) error
 	SearchPostsByLocation(c echo.Context) error
 	GetPostForGuestTimelineByLocation(c echo.Context) error
+	GetPostForUserTimelineByLocation(c echo.Context) error
 }
 
 type postHandler struct {
@@ -324,3 +325,24 @@ func (p postHandler) GetPostForGuestTimelineByLocation(c echo.Context) error {
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, locationPosts)
 }
+
+func (p postHandler) GetPostForUserTimelineByLocation(c echo.Context) error {
+	location := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	locationPosts, err := p.PostService.GetPostForUserTimelineByLocation(ctx, location,bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	if locationPosts == nil{
+		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, locationPosts)}

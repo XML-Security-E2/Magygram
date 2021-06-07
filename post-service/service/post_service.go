@@ -520,3 +520,30 @@ func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, loca
 
 	return retVal, nil
 }
+
+func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, location string, bearer string) ([]*model.PostResponse, error) {
+	posts, err := p.PostRepository.GetPostsByLocation(ctx, location)
+	if err!=nil{
+		return nil,err
+	}
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var publicPosts []*model.Post
+	for _,post := range posts{
+		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+		if err!=nil{
+			return nil,err
+		}
+
+		if !value {
+			publicPosts=append(publicPosts, post)
+		}
+	}
+
+	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+
+	return retVal, nil}
