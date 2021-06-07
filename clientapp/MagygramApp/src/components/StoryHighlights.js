@@ -11,10 +11,10 @@ const StoryHighlights = ({ userId }) => {
 
 	useEffect(() => {
 		const getHighlightsHandler = async () => {
-			await storyService.findAllProfileHighlights(dispatch);
+			await storyService.findAllProfileHighlights(userId, dispatch);
 		};
 		getHighlightsHandler();
-	}, [dispatch]);
+	}, [dispatch, userId]);
 
 	const openHighlightSlider = (name) => {
 		storyService.findAllStoriesByHighlightName(name, dispatch);

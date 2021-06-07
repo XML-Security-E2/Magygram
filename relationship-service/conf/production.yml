@@ -1,6 +1,6 @@
 server :
   port : "463"
-  host : "localhost"
+  host : "relationship-service"
   secret : "MagyGram"
 
 database :
@@ -17,11 +17,11 @@ mail :
   port : "587"
 
 userservice:
-  protocol: "https://"
-  domain: "localhost"
+  protocol: "http://"
+  domain: "user-service"
   port: "460"
 
 authservice:
-  protocol: "https://"
-  domain: "localhost"
+  protocol: "http://"
+  domain: "auth-service"
   port: "461"
