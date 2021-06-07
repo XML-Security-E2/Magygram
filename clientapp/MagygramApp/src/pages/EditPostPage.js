@@ -1,6 +1,6 @@
 import React from "react";
 import EditPostForm from "../components/EditPostForm";
-import Header from "../components/Header";
+import HeaderWrapper from "../components/HeaderWrapper";
 import PostContextProvider from "../contexts/PostContext";
 
 const EditPostPage = () => {
@@ -8,7 +8,7 @@ const EditPostPage = () => {
 		<React.Fragment>
 			<div className="container-scroller">
 				<div className="container-fluid ">
-					<Header />
+					<HeaderWrapper />
 					<div className="main-panel">
 						<div className="container">
 							<PostContextProvider>

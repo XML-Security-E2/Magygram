@@ -32,6 +32,8 @@ type UserHandler interface {
 	UnollowUser(c echo.Context) error
 	SearchForUsersByUsernameByGuest(c echo.Context) error
 	IsUserPrivate(c echo.Context) error
+	GetFollowRequests(c echo.Context) error
+	AcceptFollowRequest(c echo.Context) error
 }
 
 var (
@@ -413,6 +415,50 @@ func (h *userHandler) UnollowUser(c echo.Context) error {
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) GetFollowRequests(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	reqs, err := h.UserService.GetFollowRequests(ctx, bearer)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, reqs)
+}
+
+func (h *userHandler) AcceptFollowRequest(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	err := h.UserService.AcceptFollowRequest(ctx, bearer, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, "")

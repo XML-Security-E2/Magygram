@@ -57,18 +57,16 @@ func (f *followHandler) Unfollow(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")
 }
 
-func (f *followHandler) AcceptFollowRequest(ctx echo.Context) error {
-	followRequest := &model.FollowRequest{}
-	if err := ctx.Bind(followRequest); err != nil {
-		return err
-	}
-
-	err := f.FollowService.AcceptFollowRequest(followRequest)
+func (f *followHandler) AcceptFollowRequest(c echo.Context) error {
+	userId := c.Param("userId")
+	fmt.Println(userId)
+	bearer := c.Request().Header.Get("Authorization")
+	err := f.FollowService.AcceptFollowRequest(bearer, userId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusCreated, true)
+	return c.JSON(http.StatusOK, true)
 }
 
 func (f *followHandler) CreateUser(c echo.Context) error {
@@ -104,18 +102,18 @@ func (f *followHandler) ReturnFollowingUsers(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, result)}
 
-func (f *followHandler) ReturnFollowRequests(ctx echo.Context) error {
-	user := &model.User{}
-	if err := ctx.Bind(user); err != nil {
-		return err
+func (f *followHandler) ReturnFollowRequests(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
 	}
-
-	result, err := f.FollowService.ReturnFollowRequests(user)
+	bearer := c.Request().Header.Get("Authorization")
+	result, err := f.FollowService.ReturnFollowRequests(bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return ctx.JSON(http.StatusCreated, result)
+	return c.JSON(http.StatusOK, result)
 }
 
 func (f *followHandler) IsUserFollowed(ctx echo.Context) error {

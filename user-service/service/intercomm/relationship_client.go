@@ -18,6 +18,8 @@ type RelationshipClient interface {
 	FollowRequest(request *model.FollowRequest) (bool,error)
 	Unfollow(request *model.FollowRequest) error
 	ReturnFollowRequestsForUser(bearer string, objectId string) (bool, error)
+	ReturnFollowRequests(bearer string) (model.FollowedUsersResponse, error)
+	AcceptFollowRequest(bearer string, userId string) error
 }
 
 type relationshipClient struct { }
@@ -158,4 +160,36 @@ func (r relationshipClient) ReturnFollowRequestsForUser(bearer string, objectId 
 	fmt.Println(isSentRequest)
 
 	return isSentRequest, nil
+}
+
+func (r relationshipClient) ReturnFollowRequests(bearer string) (model.FollowedUsersResponse, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/follow-requests", baseRelationshipUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return model.FollowedUsersResponse{}, errors.New("user not found")
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return model.FollowedUsersResponse{}, err
+	}
+
+	var users model.FollowedUsersResponse
+	_ = json.Unmarshal(bodyBytes, &users)
+
+	fmt.Println(users)
+
+	return users, nil
+}
+
+func (r relationshipClient) AcceptFollowRequest(bearer string, userId string) error {
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/accept-follow-request/%s", baseRelationshipUrl, userId), nil)
+	req.Header.Add("Authorization", bearer)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return errors.New("user not found")
+	}
+	return nil
 }

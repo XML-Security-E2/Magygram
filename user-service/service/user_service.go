@@ -22,6 +22,7 @@ type userService struct {
 	intercomm.PostClient
 	intercomm.MediaClient
 }
+
 var (
 	MaxUnsuccessfulLogins = 3
 )
@@ -469,4 +470,42 @@ func (u *userService) UnfollowUser(ctx context.Context, bearer string, userId st
 		ObjectId:  userId,
 	})
 	return err
+}
+
+func (u *userService) GetFollowRequests(ctx context.Context, bearer string) ([]*model.UserFollowingResponse, error) {
+	requestsFrom, err := u.RelationshipClient.ReturnFollowRequests(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var userInfos []*model.UserFollowingResponse
+
+	fmt.Println(len(requestsFrom.Users))
+	for _, followedId := range requestsFrom.Users {
+		folUsr, err := u.UserRepository.GetByID(ctx, followedId)
+		if err != nil {
+			return nil, errors.New("invalid user id")
+		}
+
+		userInfos = append(userInfos, &model.UserFollowingResponse{
+			Following: false,
+			UserInfo:  &model.UserInfo{
+				Id:       followedId,
+				Username: folUsr.Username,
+				ImageURL: folUsr.ImageUrl,
+			},
+		})
+	}
+
+	return userInfos, nil
+}
+
+func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, userId string) error {
+
+	err := u.RelationshipClient.AcceptFollowRequest(bearer, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

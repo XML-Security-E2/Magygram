@@ -83,6 +83,7 @@ type UserInfo struct {
 	ImageURL string `json:"imageUrl"`
 }
 
+
 type FollowRequest struct {
 	SubjectId string `json:"subjectId"`
 	ObjectId string `json:"objectId"`

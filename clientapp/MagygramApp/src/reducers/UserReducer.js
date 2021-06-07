@@ -287,6 +287,42 @@ export const userReducer = (state, action) => {
 				},
 			};
 
+		case userConstants.FOLLOW_REQUESTS_REQUEST:
+			return {
+				...state,
+				userFollowRequests: {
+					userInfos: [],
+				},
+			};
+
+		case userConstants.FOLLOW_REQUESTS_SUCCESS:
+			return {
+				...state,
+				userFollowRequests: {
+					userInfos: action.userInfos,
+				},
+			};
+		case userConstants.FOLLOW_REQUESTS_FAILURE:
+			return {
+				...state,
+				userFollowRequests: {
+					userInfos: [],
+				},
+			};
+
+		case userConstants.ACCEPT_FOLLOW_REQUESTS_REQUEST:
+			return state;
+
+		case userConstants.ACCEPT_FOLLOW_REQUESTS_SUCCESS:
+			a = { ...state };
+
+			let usrCpy = a.userFollowRequests.userInfos.find((uinfo) => uinfo.userInfo.id === action.userId);
+			usrCpy.following = true;
+			console.log(action.userInfos);
+			return a;
+		case userConstants.ACCEPT_FOLLOW_REQUESTS_FAILURE:
+			return state;
+
 		default:
 			return state;
 	}

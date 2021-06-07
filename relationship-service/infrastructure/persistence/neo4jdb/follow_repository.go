@@ -137,7 +137,6 @@ func (f *followRepository) AcceptFollowRequest(followRequest *model.FollowReques
 	return nil
 }
 
-
 func (f *followRepository) CreateUser(user *model.User) (err error) {
 	session := f.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeWrite,
