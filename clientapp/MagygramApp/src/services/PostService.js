@@ -17,6 +17,7 @@ export const postService = {
 	commentPost,
 	findPostsForGuestByHashtag,
 	findPostsForUserByHashtag,
+	findPostsForGuestByLocation,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -423,5 +424,32 @@ function findPostsForUserByHashtag(hashtag,dispatch){
 	
 	function failure() {
 		return { type: postConstants.TIMELINE_POSTS_FAILURE };
+	}
+}
+
+function findPostsForGuestByLocation(location,dispatch){
+	dispatch(request());
+	Axios.get(`/api/posts/location/${location}/guest`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: postConstants.GUEST_TIMELINE_POSTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.GUEST_TIMELINE_POSTS_SUCCESS, posts: data };
+	}
+	function failure() {
+		return { type: postConstants.GUEST_TIMELINE_POSTS_FAILURE };
 	}
 }

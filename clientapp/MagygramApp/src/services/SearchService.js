@@ -5,6 +5,7 @@ export const searchService = {
 	guestSearchUsers,
     guestSearchHashtagPosts,
     userSearchUsers,
+    guestSearchLocation,
 };
 
 function guestSearchUsers(value,callback){
@@ -43,6 +44,20 @@ function guestSearchHashtagPosts(value,callback){
             console.log(res.data);
             if (res.status === 200) {
                 options = res.data.map(option => ({ value: option.Hashtag, label: '#'+option.Hashtag + " ("+ option.NumberOfPosts+")", id: option.Hashtag, searchType:"hashtag"}))
+                callback(options);
+        }}).catch((err) => {
+            console.log(err)
+    });
+}
+
+function guestSearchLocation(value,callback){
+    var options;
+    value = value.substring(1);
+    Axios.get(`/api/posts/location-search/${value}/guest`, { validateStatus: () => true, headers: authHeader() })
+        .then((res) => {
+            console.log(res.data);
+            if (res.status === 200) {
+                options = res.data.map(option => ({ value: option.Hashtag, label: '#'+option.Hashtag + " ("+ option.NumberOfPosts+")", id: option.Hashtag, searchType:"location"}))
                 callback(options);
         }}).catch((err) => {
             console.log(err)
