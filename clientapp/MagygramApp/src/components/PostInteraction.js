@@ -11,7 +11,6 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 	};
 
 	const handleDeleteFromToCollection = (postId) => {
-		console.log("DDD");
 		deleteFromCollections(postId);
 	};
 

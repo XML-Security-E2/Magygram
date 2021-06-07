@@ -11,7 +11,7 @@ import { ProtectedRoute } from "./router/ProtectedRouter";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import UserPage from "./pages/UserPage";
-import EditProfilePage from "./pages/EditProfile";
+import EditProfilePage from "./pages/EditProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 
 function App() {

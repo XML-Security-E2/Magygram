@@ -15,7 +15,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 			await userService.getUserProfileByUserId(userId, dispatch);
 		};
 		getProfileHandler();
-	}, [userId]);
+	}, [userId, dispatch]);
 
 	const getFollowersHandler = async () => {
 		await userService.findAllFollowedUsers(userId, dispatch);
@@ -37,7 +37,12 @@ const UserProfileHeaderInfo = ({ userId }) => {
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 			<div className="flexbox-container">
 				<div className="mr-5">
-					<img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src={userState.userProfile.user.imageUrl} alt="" />
+					<img
+						className="rounded-circle dropdown-toggle"
+						style={imgProfileStyle}
+						src={userState.userProfile.user.imageUrl === "" ? "assets/img/profile.jpg" : userState.userProfile.user.imageUrl}
+						alt=""
+					/>
 				</div>
 				<section className="ml-5">
 					<div className="flexbox-container d-flex align-items-center">

@@ -37,6 +37,11 @@ storyservice:
   domain: "localhost"
   port: "464"
 
+mediaservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "465"
+
 gateway:
   port: "8085"
   protocol: "https://"

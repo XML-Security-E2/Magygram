@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"mime/multipart"
 	"net/http"
 	"user-service/domain/model"
 	"user-service/domain/service-contracts"
@@ -14,6 +15,7 @@ import (
 type UserHandler interface {
 	RegisterUser(c echo.Context) error
 	EditUser(c echo.Context) error
+	EditUserImage(c echo.Context) error
 	ActivateUser(c echo.Context) error
 	ResetPasswordRequest(c echo.Context) error
 	ResetPasswordActivation(c echo.Context) error
@@ -39,12 +41,12 @@ type userHandler struct {
 	UserService service_contracts.UserService
 }
 
-
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
 }
 
 func (h *userHandler) EditUser(c echo.Context) error {
+	userId := c.Param("userId")
 	userRequest := &model.EditUserRequest{}
 	if err := c.Bind(userRequest); err != nil {
 		return err
@@ -55,16 +57,46 @@ func (h *userHandler) EditUser(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	userId, err := h.UserService.EditUser(ctx, userRequest)
-	fmt.Println(userId)
-	if err != nil {
-		fmt.Println(err)
+	bearer := c.Request().Header.Get("Authorization")
+	updatedId, err := h.UserService.EditUser(ctx, bearer, userId, userRequest)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+	return c.JSON(http.StatusOK, updatedId)
+}
 
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+func (h *userHandler) EditUserImage(c echo.Context) error {
+	userId := c.Param("userId")
+
+	mpf, _ := c.MultipartForm()
+	var headers []*multipart.FileHeader
+	for _, v := range mpf.File {
+		headers = append(headers, v[0])
 	}
 
-	return c.JSON(http.StatusCreated, userId)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	url, err := h.UserService.EditUserImage(ctx, bearer, userId, headers)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+	return c.JSON(http.StatusOK, url)
 }
+
 func (h *userHandler) RegisterUser(c echo.Context) error {
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {

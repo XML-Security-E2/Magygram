@@ -2,12 +2,14 @@ package service_contracts
 
 import (
 	"context"
+	"mime/multipart"
 	"user-service/domain/model"
 )
 
 type UserService interface {
 	RegisterUser(ctx context.Context, user *model.UserRequest) (string, error)
-	EditUser(ctx context.Context, user *model.EditUserRequest) (string, error)
+	EditUser(ctx context.Context, bearer string, userId string, user *model.EditUserRequest) (string, error)
+	EditUserImage(ctx context.Context, bearer string, userId string, userImage []*multipart.FileHeader) (string, error)
 	ActivateUser(ctx context.Context, activationId string) (bool, error)
 	ResetPassword(ctx context.Context, userEmail string) (bool, error)
 	ResetPasswordActivation(ctx context.Context, resetPasswordId string) (bool, error)

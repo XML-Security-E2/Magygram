@@ -8,7 +8,9 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	//users
 	e.POST("/api/users", h.RegisterUser)
-	e.POST("/api/users/edit", h.EditUser)
+	e.PUT("/api/users/:userId", h.EditUser)
+	e.PUT("/api/users/:userId/image", h.EditUserImage)
+
 	e.GET("/api/users/logged", h.GetLoggedUserInfo)
 	e.GET("/api/users/activate/:activationId", h.ActivateUser)
 	e.POST("/api/users/reset-password-link-request", h.ResetPasswordRequest)

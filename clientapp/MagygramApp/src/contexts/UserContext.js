@@ -37,6 +37,12 @@ const UserContextProvider = (props) => {
 			modalHeader: "",
 			userInfos: [],
 		},
+		editProfile: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
 		userProfile: {
 			showedUserId: "",
 			user: {
@@ -46,6 +52,7 @@ const UserContextProvider = (props) => {
 				surname: "",
 				website: "",
 				bio: "",
+				email: "",
 				gender: "",
 				imageUrl: "",
 				postNumber: "",

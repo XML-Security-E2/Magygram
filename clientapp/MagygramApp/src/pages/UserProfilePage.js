@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Header from "../components/Header";
 import StoryContextProvider from "../contexts/StoryContext";
 import UserStoriesModal from "../components/modals/UserStoriesModal";

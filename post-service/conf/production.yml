@@ -19,7 +19,7 @@ mail:
 mediaservice:
     protocol: "http://"
     domain: "media-service"
-    port: "463"
+    port: "465"
 
 authservice:
     protocol: "http://"

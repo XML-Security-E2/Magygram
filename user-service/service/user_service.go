@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/go-playground/validator"
+	"mime/multipart"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
@@ -18,32 +19,81 @@ type userService struct {
 	intercomm.AuthClient
 	intercomm.RelationshipClient
 	intercomm.PostClient
+	intercomm.MediaClient
 }
-
 var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient) service_contracts.UserService {
-	return &userService{r, a,  rp , ic, rC, pc}
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient) service_contracts.UserService {
+	return &userService{r, a,  rp , ic, rC, pc, mc}
 }
 
-func (u *userService) EditUser(ctx context.Context, userRequest *model.EditUserRequest) (string, error) {
-	user, _ := model.NewEditUser(userRequest)
-	if err := validator.New().Struct(user); err!= nil {
+func (u *userService) EditUser(ctx context.Context, bearer string, userId string, userRequest *model.EditUserRequest) (string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
 		return "", err
 	}
 
+	if loggedId != userId {
+		return "", &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
 
-	result, err := u.UserRepository.UpdateUserDetails(ctx, user)
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return "", errors.New("invalid user id")
+	}
 
+	user.Username = userRequest.Username
+	user.Name = userRequest.Name
+	user.Surname = userRequest.Surname
+	user.Number = userRequest.Number
+	user.Website = userRequest.Website
+	user.Bio = userRequest.Bio
+	user.Gender = userRequest.Gender
+	if err = validator.New().Struct(user); err!= nil {
+		return "", err
+	}
+
+	result, err := u.UserRepository.Update(ctx, user)
 	if err != nil { return "", err}
 
-	if userId, ok := result.UpsertedID.(string); ok {
-		return userId, nil
+	if usrId, ok := result.UpsertedID.(string); ok {
+		return usrId, nil
 	}
 	return "", err
 }
+
+func (u *userService) EditUserImage(ctx context.Context, bearer string, userId string, userImage []*multipart.FileHeader) (string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return "", err
+	}
+
+	if loggedId != userId {
+		return "", &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return "", errors.New("invalid user id")
+	}
+
+	media, err := u.MediaClient.SaveMedia(userImage)
+	if err != nil { return "", err}
+
+	if len(media) == 0 {
+		return "", errors.New("error while saving image")
+	}
+	user.ImageUrl = media[0].Url
+
+	_, err = u.UserRepository.Update(ctx, user)
+	if err != nil { return "", err}
+
+
+	return media[0].Url ,err
+}
+
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user, _ := model.NewUser(userRequest)
@@ -208,7 +258,7 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 	return &model.UserInfo{
 		Id:       userId,
 		Username: user.Username,
-		ImageURL: "",
+		ImageURL: user.ImageUrl,
 	}, nil
 }
 
@@ -252,6 +302,7 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		ImageUrl:        user.ImageUrl,
 		PostNumber:      postsCount,
 		Following: 		 following,
+		Email:			 user.Email,
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),
 	}

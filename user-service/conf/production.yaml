@@ -26,6 +26,11 @@ postservice:
     domain: "post-service"
     port: "462"
 
+mediaservice:
+    protocol: "http://"
+    domain: "media-service"
+    port: "465"
+
 storyservice:
     protocol: "http://"
     domain: "story-service"

@@ -28,6 +28,7 @@ type UserProfileResponse struct {
 	Surname string `json:"surname"`
 	Website string `json:"website" `
 	Bio string `json:"bio"`
+	Email string `json:"email"`
 	Number string `json:"number"`
 	Gender Gender `json:"gender"`
 	ImageUrl string `json:"imageUrl"`
@@ -100,15 +101,13 @@ type UserRequest struct {
 }
 
 type EditUserRequest struct {
-	Id string `json:"id"`
-	Name  string `json:"nameInput"`
-	Surname  string `json:"surnameInput"`
-	Username  string `json:"usernameInput"`
-	Email string `json:"emailInput"`
-	Website string `json:"websiteInput" `
-	Bio string `json:"bioInput" `
-	Number string `json:"numberInput" `
-	Gender Gender `json:"gender" `
+	Name  string `json:"name"`
+	Surname  string `json:"surname"`
+	Username  string `json:"username"`
+	Website string `json:"website"`
+	Bio string `json:"bio"`
+	Number string `json:"number"`
+	Gender Gender `json:"gender"`
 }
 
 type ResetPasswordRequest struct {
@@ -172,18 +171,6 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 	}, nil
 }
 
-func NewEditUser(userRequest *EditUserRequest) (*User, error) {
-	return &User{Id: userRequest.Id,
-		Name:           html.EscapeString(userRequest.Name),
-		Surname:           html.EscapeString(userRequest.Surname),
-		Username:       html.EscapeString(userRequest.Username),
-		Email:          html.EscapeString(userRequest.Email),
-		Website:          html.EscapeString(userRequest.Website),
-		Bio:          html.EscapeString(userRequest.Bio),
-		Number:          html.EscapeString(userRequest.Number),
-		Gender: 		userRequest.Gender,
-	}, nil
-}
 
 func validateGenderEnums(pt Gender) error {
 	switch pt {

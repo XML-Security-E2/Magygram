@@ -248,6 +248,38 @@ export const userReducer = (state, action) => {
 		case userConstants.UNFOLLOW_USER_FAILURE:
 			return state;
 
+		case userConstants.UPDATE_USER_REQUEST:
+			return {
+				...state,
+				editProfile: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case userConstants.UPDATE_USER_SUCCESS:
+			return {
+				...state,
+				editProfile: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
+			};
+		case userConstants.UPDATE_USER_FAILURE:
+			return {
+				...state,
+				editProfile: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
 		default:
 			return state;
 	}
