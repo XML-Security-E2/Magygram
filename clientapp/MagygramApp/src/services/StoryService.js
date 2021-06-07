@@ -113,9 +113,9 @@ async function findStoriesForStoryline(dispatch) {
 	}
 }
 
-async function findAllProfileHighlights(dispatch) {
+async function findAllProfileHighlights(userId, dispatch) {
 	dispatch(request());
-	await Axios.get(`/api/users/highlights`, { validateStatus: () => true, headers: authHeader() })
+	await Axios.get(`/api/users/${userId}/highlights`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(res.data));

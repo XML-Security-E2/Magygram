@@ -80,7 +80,7 @@ const Post = ({ post }) => {
 		<React.Fragment>
 			<div className="d-flex flex-column mt-4 mb-4">
 				<div className="card">
-					<PostHeader username={post.UserInfo.Username} image={post.UserInfo.ImageURL} openOptionsModal={handleOpenOptionsModal} />
+					<PostHeader id={post.UserInfo.Id} username={post.UserInfo.Username} image={post.UserInfo.imageURL} openOptionsModal={handleOpenOptionsModal} />
 					<div className="card-body p-0">
 						<PostImageSlider media={post.Media} />
 						<PostInteraction

@@ -1,6 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const PostHeader = ({ username, image, openOptionsModal }) => {
+const PostHeader = ({ username, image, id, openOptionsModal }) => {
 	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 
 	return (
@@ -10,14 +11,15 @@ const PostHeader = ({ username, image, openOptionsModal }) => {
 					<ul className="list-inline d-flex flex-row align-items-center m-0">
 						<li className="list-inline-item">
 							<div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger post-profile-photo ">
-								<img src={image} alt="..." style={imgStyle} />
+								<img src={image} alt="" style={imgStyle} />
 							</div>
 						</li>
 						<li className="list-inline-item">
-							<span className="font-weight-bold">{username}</span>
+							<Link className="font-weight-bold" style={{ cursor: "pointer", color: "black" }} to={"/profile?userId=" + id}>
+								{username}
+							</Link>
 						</li>
 					</ul>
-
 				</div>
 			</div>
 		</React.Fragment>

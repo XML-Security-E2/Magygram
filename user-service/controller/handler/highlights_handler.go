@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"user-service/domain/model"
 	"user-service/domain/service-contracts"
+	"user-service/domain/service-contracts/exceptions"
 )
 
 type HighlightsHandler interface {
@@ -45,15 +46,22 @@ func (h highlightsHandler) CreateHighlights(c echo.Context) error {
 
 
 func (h highlightsHandler) GetProfileHighlights(c echo.Context) error {
+	userId := c.Param("userId")
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	bearer := c.Request().Header.Get("Authorization")
 
-	response, err := h.HighlightService.GetProfileHighlights(ctx, bearer)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	response, err := h.HighlightService.GetProfileHighlights(ctx, bearer, userId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
 	}
 
 	return c.JSON(http.StatusOK, response)

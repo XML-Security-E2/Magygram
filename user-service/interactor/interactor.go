@@ -80,7 +80,7 @@ func (i *interactor) NewHighlightsHandler() handler.HighlightsHandler {
 }
 
 func (i *interactor) NewHighlightsService() service_contracts.HighlightsService {
-	return service.NewHighlightsService(i.NewUserRepository(), i.NewAuthClient(), i.NewStoryClient())
+	return service.NewHighlightsService(i.NewUserRepository(), i.NewAuthClient(), i.NewStoryClient(), i.NewRelationshipClient())
 }
 
 func (i *interactor) NewCollectionsService() service_contracts.CollectionsService {
