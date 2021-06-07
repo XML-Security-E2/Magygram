@@ -216,6 +216,21 @@ export const storyReducer = (state, action) => {
 		case storyConstants.VISITED_STORY_SUCCESS: {
 			return state;
 		}
+		case storyConstants.HAVE_LOGGED_USER_STORY_REQUEST:
+			return {
+				...state,
+			}
+		case storyConstants.HAVE_LOGGED_USER_STORY_SUCCESS:
+			return {
+				...state,
+				iHaveAStory:action.haveStories
+			}
+		case storyConstants.HAVE_LOGGED_USER_STORY_FAILURE: {
+			return {
+				...state,
+				iHaveAStory: false
+			}
+		}
 		default:
 			return state;
 	}

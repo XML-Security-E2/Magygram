@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator"
+	"log"
 	"mime/multipart"
 	"story-service/domain/model"
 	"story-service/domain/repository"
@@ -52,7 +53,7 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {
 	//TODO 1: napraviti getStory za usera koji eliminise njegove storije a onda izbrisati iz mapStories proveru
-
+	log.Println("test")
 	var stories []*model.Story
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
@@ -67,11 +68,11 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 
 	for _, userId := range followedUsers.Users {
 		var userStories []*model.Story
-		userStories, _ = p.StoryRepository.GetStoriesForUser(ctx,userId)
+		userStories, _ = p.StoryRepository.GetActiveStoriesForUser(ctx,userId)
 		stories= append(stories, userStories...)
 	}
 
-    storiesMap := makeStoriesMapFromArray(stories, userInfo)
+	storiesMap := makeStoriesMapFromArray(stories, userInfo)
 
     retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
 
@@ -139,7 +140,7 @@ func makeStoriesMapFromArray(stories []*model.Story, userInfo *model.UserInfo) m
 
 
 func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bearer string) (*model.StoryResponse, error) {
-	result, err := p.StoryRepository.GetStoriesForUser(ctx, userId)
+	result, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -260,12 +261,20 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 	return retVal
 }
 
-func hasUserVisitedStories1(stories []*model.Story, id string) bool {
-	for _, story := range stories{
-		if !hasUserVisitStory(story, id){
-			return false
-		}
+func (p storyService) HaveActiveStoriesLoggedUser(ctx context.Context, bearer string) (bool, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return false,err
 	}
 
-	return true
+	result, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userInfo.Id)
+	if err != nil {
+		return false, err
+	}
+
+	if len(result)==0{
+		return false,nil
+	}
+
+	return true, nil
 }

@@ -14,6 +14,7 @@ const Storyline = () => {
 			await storyService.findStoriesForStoryline(dispatch);
 		};
 		getStoriesHandler();
+		storyService.HaveActiveStoriesLoggedUser(dispatch)
 	}, [dispatch]);
 
 	const openStorySlider = (userId,visited) => {
