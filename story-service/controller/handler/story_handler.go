@@ -16,11 +16,14 @@ type StoryHandler interface {
 	GetAllUserStories(c echo.Context) error
 	VisitedStoryByUser(c echo.Context) error
 	GetStoryHighlight(c echo.Context) error
+	HaveActiveStoriesLoggedUser(c echo.Context) error
 }
 
 type storyHandler struct {
 	StoryService service_contracts.StoryService
 }
+
+
 
 func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 	return &storyHandler{p}
@@ -137,4 +140,20 @@ func (p storyHandler) GetStoryHighlight(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, highlight)
+}
+
+
+func (p storyHandler) HaveActiveStoriesLoggedUser(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	retVal, err := p.StoryService.HaveActiveStoriesLoggedUser(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, retVal)
 }

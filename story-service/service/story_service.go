@@ -261,12 +261,20 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 	return retVal
 }
 
-func hasUserVisitedStories1(stories []*model.Story, id string) bool {
-	for _, story := range stories{
-		if !hasUserVisitStory(story, id){
-			return false
-		}
+func (p storyService) HaveActiveStoriesLoggedUser(ctx context.Context, bearer string) (bool, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil {
+		return false,err
 	}
 
-	return true
+	result, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userInfo.Id)
+	if err != nil {
+		return false, err
+	}
+
+	if len(result)==0{
+		return false,nil
+	}
+
+	return true, nil
 }

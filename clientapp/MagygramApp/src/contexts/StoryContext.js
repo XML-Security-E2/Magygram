@@ -35,7 +35,7 @@ const StoryContextProvider = (props) => {
 			firstUnvisitedStory: 0,
 			visited: false
 		},
-		iHaveAStory: true,
+		iHaveAStory: false,
 	});
 
 	return <StoryContext.Provider value={{ storyState, dispatch }}>{props.children}</StoryContext.Provider>;
