@@ -8,9 +8,7 @@ import FollowingUsersModal from "./modals/FollowingUsersModal";
 const UserProfileHeaderInfo = ({ userId }) => {
 	const { userState, dispatch } = useContext(UserContext);
 
-	const sectionStyle = { left: "20", marginLeft: "100px" };
 	const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
-	const editStyle = { color: "black", left: "20", marginLeft: "13px", marginRight: "13px", borderWidth: "1px", borderStyle: "solid" };
 
 	useEffect(() => {
 		const getProfileHandler = async () => {
@@ -27,19 +25,44 @@ const UserProfileHeaderInfo = ({ userId }) => {
 		await userService.findAllFollowingUsers(userId, dispatch);
 	};
 
+	const handleUserFollow = () => {
+		userService.followUser(userId, dispatch);
+	};
+
+	const handleUserUnfollow = () => {
+		userService.unfollowUser(userId, dispatch);
+	};
+
 	return (
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 			<div className="flexbox-container">
-				<div>
+				<div className="mr-5">
 					<img className="rounded-circle dropdown-toggle" style={imgProfileStyle} src={userState.userProfile.user.imageUrl} alt="" />
 				</div>
-				<section style={sectionStyle}>
-					<div className="flexbox-container">
+				<section className="ml-5">
+					<div className="flexbox-container d-flex align-items-center">
 						<div>
 							<h2>{userState.userProfile.user.username}</h2>
 						</div>
 						<div>
-							<Link hidden={userId !== localStorage.getItem("userId")} style={editStyle} to="/edit-profile" tabindex="0">
+							{userId !== localStorage.getItem("userId") &&
+								(localStorage.getItem("userId") !== null && userState.userProfile.user.following ? (
+									<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnfollow}>
+										Unfollow
+									</button>
+								) : (
+									<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserFollow}>
+										Follow
+									</button>
+								))}
+							<Link
+								type="button"
+								hidden={userId !== localStorage.getItem("userId")}
+								className="btn btn-outline-secondary ml-2"
+								style={{ color: "black" }}
+								to="/edit-profile"
+								tabindex="0"
+							>
 								Edit Profile
 							</Link>
 						</div>
@@ -63,9 +86,9 @@ const UserProfileHeaderInfo = ({ userId }) => {
 					</div>
 					<br />
 					<div>
-						<h4>
+						<h5>
 							{userState.userProfile.user.name} {userState.userProfile.user.surname}
-						</h4>
+						</h5>
 					</div>
 					<div>{userState.userProfile.user.bio}</div>
 					<div>

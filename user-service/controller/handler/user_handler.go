@@ -247,7 +247,8 @@ func (h *userHandler) GetUserProfileById(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	user, err := h.UserService.GetUserProfileById(ctx, userId)
+	bearer := c.Request().Header.Get("Authorization")
+	user, err := h.UserService.GetUserProfileById(ctx,bearer, userId)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")

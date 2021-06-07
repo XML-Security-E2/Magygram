@@ -160,6 +160,7 @@ export const userReducer = (state, action) => {
 						surname: "",
 						website: "",
 						bio: "",
+						following: "",
 						gender: "",
 						imageUrl: "",
 						postNumber: "",
@@ -211,15 +212,17 @@ export const userReducer = (state, action) => {
 
 		case userConstants.FOLLOW_USER_SUCCESS:
 			a = { ...state };
-			console.log(a);
 			let cp = a.userProfileFollowingModal.userInfos.find((info) => info.userInfo.id === action.userId);
-			cp.following = true;
-			console.log(a.userProfile.showedUserId);
+			if (cp !== undefined) {
+				cp.following = true;
+			}
 
 			if (a.userProfile.showedUserId === localStorage.getItem("userId")) {
-				console.log(a);
 				a.userProfile.user.followingNumber = a.userProfile.user.followingNumber + 1;
+			} else {
+				a.userProfile.user.followersNumber = a.userProfile.user.followersNumber + 1;
 			}
+			a.userProfile.user.following = true;
 
 			return a;
 		case userConstants.FOLLOW_USER_FAILURE:
@@ -231,11 +234,16 @@ export const userReducer = (state, action) => {
 		case userConstants.UNFOLLOW_USER_SUCCESS:
 			a = { ...state };
 			let cccp = a.userProfileFollowingModal.userInfos.find((info) => info.userInfo.id === action.userId);
-			cccp.following = false;
-
+			if (cccp !== undefined) {
+				cccp.following = false;
+			}
 			if (a.userProfile.showedUserId === localStorage.getItem("userId")) {
 				a.userProfile.user.followingNumber = a.userProfile.user.followingNumber - 1;
+			} else {
+				a.userProfile.user.followersNumber = a.userProfile.user.followersNumber - 1;
 			}
+			a.userProfile.user.following = false;
+
 			return a;
 		case userConstants.UNFOLLOW_USER_FAILURE:
 			return state;

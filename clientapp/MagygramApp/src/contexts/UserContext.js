@@ -42,6 +42,7 @@ const UserContextProvider = (props) => {
 			user: {
 				username: "",
 				name: "",
+				following: "",
 				surname: "",
 				website: "",
 				bio: "",

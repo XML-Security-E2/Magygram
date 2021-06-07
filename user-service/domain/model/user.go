@@ -31,6 +31,7 @@ type UserProfileResponse struct {
 	Number string `json:"number"`
 	Gender Gender `json:"gender"`
 	ImageUrl string `json:"imageUrl"`
+	Following bool `json:"following"`
 	PostNumber int `json:"postNumber"`
 	FollowersNumber int `json:"followersNumber"`
 	FollowingNumber int `json:"followingNumber"`

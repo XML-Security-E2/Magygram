@@ -197,7 +197,7 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 	}, nil
 }
 
-func (u *userService) GetUserProfileById(ctx context.Context, userId string) (*model.UserProfileResponse, error) {
+func (u *userService) GetUserProfileById(ctx context.Context,bearer string, userId string) (*model.UserProfileResponse, error) {
 
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
@@ -220,6 +220,12 @@ func (u *userService) GetUserProfileById(ctx context.Context, userId string) (*m
 		return nil, err
 	}
 
+	loggedId, _ := u.AuthClient.GetLoggedUserId(bearer)
+	following := false
+	if loggedId != "" {
+		following = doesUserFollow(followedUsers, loggedId)
+	}
+
 	retVal := &model.UserProfileResponse{
 		Username:        user.Username,
 		Name:            user.Name,
@@ -230,6 +236,7 @@ func (u *userService) GetUserProfileById(ctx context.Context, userId string) (*m
 		Gender:          user.Gender,
 		ImageUrl:        user.ImageUrl,
 		PostNumber:      postsCount,
+		Following: 		 following,
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),
 	}
