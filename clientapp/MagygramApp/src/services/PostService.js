@@ -523,6 +523,7 @@ function findPostsForUserByHashtag(hashtag,dispatch){
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
+				window.location = "#/search";
 			} else {
 				failure();
 			}
@@ -579,6 +580,7 @@ function findPostsForUserByLocation(location,dispatch){
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
+				window.location = "#/search";
 			} else {
 				failure();
 			}
