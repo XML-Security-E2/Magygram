@@ -32,6 +32,7 @@ const UserStoriesModal = () => {
 
 		console.log(highlight);
 		storyService.createHighlight(highlight, dispatch);
+		setSelectedStoryIds([]);
 	};
 
 	useEffect(() => {

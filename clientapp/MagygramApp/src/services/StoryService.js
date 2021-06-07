@@ -52,6 +52,7 @@ function createHighlight(highlightDTO, dispatch) {
 			.then((res) => {
 				console.log(res);
 				if (res.status === 201) {
+					findAllProfileHighlights(dispatch);
 					dispatch(success(res.data));
 				} else {
 					dispatch(failure(res.data.message));
@@ -204,11 +205,10 @@ function fetchFormData(storyDTO) {
 }
 
 function GetStoriesForUser(userId, visited, dispatch) {
-	
 	Axios.get(`/api/story/` + userId, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
-				dispatch(success(res.data,visited));
+				dispatch(success(res.data, visited));
 			} else {
 				//failure()
 			}
@@ -217,7 +217,7 @@ function GetStoriesForUser(userId, visited, dispatch) {
 			//failure()
 		});
 
-	function success(data,visited) {
+	function success(data, visited) {
 		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data, visited };
 	}
 	//function failure() {
@@ -238,8 +238,8 @@ function visitedByUser(storyId, dispatch) {
 			//failure()
 		});
 
-    function success(storyId, lastStory) {
-	 	return { type: storyConstants.VISITED_STORY_SUCCESS, storyId };
+	function success(storyId, lastStory) {
+		return { type: storyConstants.VISITED_STORY_SUCCESS, storyId };
 	}
 	//function failure() {
 	//	return { type: storyConstants.STORYLINE_STORY_FAILURE };

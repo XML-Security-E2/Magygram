@@ -30,19 +30,17 @@ type privateFlag struct {
 }
 
 func (u userClient) IsPrivate(id string) (bool, error) {
-	return false, nil
-	resp, err := http.Get(fmt.Sprintf("%s/is-private/%s", baseUrl, id))
+	resp, err := http.Get(fmt.Sprintf("%s/%s/is-private", baseUrl, id))
 	if err != nil || resp.StatusCode != 200 {
 		return false, errors.New("could not get user profile private flag")
 	}
+
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return false, err
 	}
-	result := &privateFlag{}
-	err = json.Unmarshal(bodyBytes, &result)
-	if err != nil {
-		return false, err
-	}
-	return result.isPrivate, nil
+	var isPrivate bool
+	json.Unmarshal(bodyBytes, &isPrivate)
+
+	return isPrivate, nil
 }

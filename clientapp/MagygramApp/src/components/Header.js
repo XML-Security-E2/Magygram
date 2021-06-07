@@ -51,7 +51,7 @@ const Header = () => {
 		} else if (option.searchType === "location") {
 			postService.findPostsForUserByLocation(option.value, dispatch);
 		} else {
-			window.location = "#/user/" + option.id;
+			window.location = "#/profile?userId=" + option.id;
 		}
 
 		return false;

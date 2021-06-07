@@ -34,7 +34,7 @@ const EditProfileInfoForm = () => {
 
 	const handleImageDeselect = () => {
 		setImage("");
-		setShowedImage("");
+		setShowedImage(userState.userProfile.user.imageUrl);
 		setSelectedImage(false);
 	};
 
