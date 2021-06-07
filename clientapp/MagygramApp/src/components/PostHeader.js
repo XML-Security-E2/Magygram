@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const PostHeader = ({ username, image, id, openOptionsModal }) => {
+const PostHeader = ({ username, image, id }) => {
 	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 
 	return (

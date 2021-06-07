@@ -24,11 +24,11 @@ const Post = ({ post }) => {
 	};
 
 	const DislikePost = (postId) => {
-		postService.dislikePost(postId, dispatch);
+		postService.dislikePost(postId, getUserInfo(), dispatch);
 	};
 
 	const UndislikePost = (postId) => {
-		postService.undislikePost(postId, dispatch);
+		postService.undislikePost(postId, getUserInfo(), dispatch);
 	};
 
 	const showAddToCollectionModal = (postId) => {

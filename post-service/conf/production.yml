@@ -30,3 +30,8 @@ userservice:
     protocol: "http://"
     domain: "user-service"
     port: "460"
+
+relationshipservice:
+    protocol: "http://"
+    domain: "relationship-service"
+    port: "463"

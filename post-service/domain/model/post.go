@@ -94,6 +94,9 @@ func GetHashTagsFromDescription(description string) []string {
 			hashTags = append(hashTags, strings.TrimPrefix(w, "#"))
 		}
 	}
+	if hashTags == nil {
+		return []string{}
+	}
 	return hashTags
 }
 

@@ -5,8 +5,8 @@ import UserProfileHeaderInfo from "../components/UserProfileHeaderInfo";
 import UserContextProvider from "../contexts/UserContext";
 import UserProfileContent from "../components/UserProfileContent";
 import PostContextProvider from "../contexts/PostContext";
-import GuestHeader from "../components/GuestHeader";
 import HeaderWrapper from "../components/HeaderWrapper";
+import EditPostModal from "../components/modals/EditPostModal";
 
 const UserProfilePage = (props) => {
 	const search = props.location.search;
@@ -33,6 +33,8 @@ const UserProfilePage = (props) => {
 							</div>
 						</div>
 					</div>
+					<EditPostModal />
+
 					<UserStoriesModal />
 				</StoryContextProvider>
 			</PostContextProvider>

@@ -9,25 +9,27 @@ import PostInteractionModalView from "../PostInteractionModalView";
 import { postService } from "../../services/PostService";
 import PostCommentInputModalView from "../PostCommentInputModalView";
 import PostLikesAndDislikesModalView from "../PostLikesAndDislikesModalView";
+import OptionsModal from "./OptionsModal";
+import { getUserInfo } from "../../helpers/auth-header";
 
 const ViewPostModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
 	const style = { width: "450px" };
 
 	const LikePost = (postId) => {
-		postService.likePost(postId, dispatch);
+		postService.likePost(postId, getUserInfo(), dispatch);
 	};
 
 	const UnlikePost = (postId) => {
-		postService.unlikePost(postId, dispatch);
+		postService.unlikePost(postId, getUserInfo(), dispatch);
 	};
 
 	const DislikePost = (postId) => {
-		postService.dislikePost(postId, dispatch);
+		postService.dislikePost(postId, getUserInfo(), dispatch);
 	};
 
 	const UndislikePost = (postId) => {
-		postService.undislikePost(postId, dispatch);
+		postService.undislikePost(postId, getUserInfo(), dispatch);
 	};
 
 	const handleModalClose = () => {
@@ -65,6 +67,10 @@ const ViewPostModal = () => {
 		dispatch({ type: modalConstants.SHOW_POST_DISLIKES_MODAL, Dislikes: postState.viewPostModal.post.DislikedBy });
 	};
 
+	const handleOpenOptionsModal = () => {
+		dispatch({ type: modalConstants.SHOW_POST_OPTIONS_MODAL, post: postState.viewPostModal.post });
+	};
+
 	return (
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body>
@@ -72,7 +78,13 @@ const ViewPostModal = () => {
 					<PostImageSliderModalView media={postState.viewPostModal.post.Media} />
 					<div className="p-2" style={style}>
 						<div className="align-top" style={style}>
-							<PostHeaderModalView username={postState.viewPostModal.post.UserInfo.Username} image={postState.viewPostModal.post.UserInfo.ImageURL} />
+							<PostHeaderModalView
+								username={postState.viewPostModal.post.UserInfo.Username}
+								image={postState.viewPostModal.post.UserInfo.ImageURL}
+								id={postState.viewPostModal.post.UserInfo.Id}
+								openOptionsModal={handleOpenOptionsModal}
+								location={postState.viewPostModal.post.Location}
+							/>
 							<hr></hr>
 							<PostCommentsModalView
 								imageUrl={postState.viewPostModal.post.UserInfo.ImageURL}
@@ -82,27 +94,27 @@ const ViewPostModal = () => {
 							/>
 							<hr></hr>
 							<div id="viewPostModalInteraction">
-							<PostInteractionModalView
-								post={postState.viewPostModal.post}
-								LikePost={LikePost}
-								DislikePost={DislikePost}
-								UnlikePost={UnlikePost}
-								UndislikePost={UndislikePost}
-								addToDefaultCollection={addToDefaultCollection}
-								deleteFromCollections={deleteFromCollections}
-							/>
-							<PostLikesAndDislikesModalView
-								likes={postState.viewPostModal.post.LikedBy.length}
-								dislikes={postState.viewPostModal.post.DislikedBy.length}
-								showLikedByModal={showLikedByModal}
-								showDislikesModal={showDislikesModal}
-							/>
-							<PostCommentInputModalView postComment={postComment} />
+								<PostInteractionModalView
+									post={postState.viewPostModal.post}
+									LikePost={LikePost}
+									DislikePost={DislikePost}
+									UnlikePost={UnlikePost}
+									UndislikePost={UndislikePost}
+									addToDefaultCollection={addToDefaultCollection}
+									deleteFromCollections={deleteFromCollections}
+								/>
+								<PostLikesAndDislikesModalView
+									likes={postState.viewPostModal.post.LikedBy.length}
+									dislikes={postState.viewPostModal.post.DislikedBy.length}
+									showLikedByModal={showLikedByModal}
+									showDislikesModal={showDislikesModal}
+								/>
+								<PostCommentInputModalView postComment={postComment} />
 							</div>
-							
 						</div>
 					</div>
 				</div>
+				<OptionsModal />
 			</Modal.Body>
 		</Modal>
 	);

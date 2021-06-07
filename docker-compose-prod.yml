@@ -11,6 +11,14 @@ services:
             - ./gateway/certificate.pem:/etc/nginx/ssl/certificate.pem
             - ./gateway/certificate-key.pem:/etc/nginx/ssl/certificate-key.pem
 
+    magygram-app:
+        image: magygram-app
+        build:
+            context: ./clientapp/MagygramApp
+            dockerfile: Dockerfile
+        ports:
+            - 3000:3000
+
     user-service:
         image: user-service
         build:
@@ -61,6 +69,16 @@ services:
         environment:
             IS_PRODUCTION: "true"
 
+    relationship-service:
+        image: relationship-service
+        build:
+            context: ./relationship-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
     mongo-db:
         image: mongo
         restart: always
@@ -69,6 +87,13 @@ services:
         volumes:
             # if you wish to setup additional user accounts specific per DB or with different roles you can use following entry point
             - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
+
+    neo4j-db:
+        image: neo4j:latest
+        networks:
+            - backend
+        environment:
+            NEO4J_AUTH: neo4j/neo4jdb
 
 volumes:
     mongodbdata:
