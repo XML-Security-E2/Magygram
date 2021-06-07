@@ -28,19 +28,37 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 	return &userService{r, a,  rp , ic, rC, pc}
 }
 
-func (u *userService) EditUser(ctx context.Context, userRequest *model.EditUserRequest) (string, error) {
-	user, _ := model.NewEditUser(userRequest)
-	if err := validator.New().Struct(user); err!= nil {
+func (u *userService) EditUser(ctx context.Context, bearer string, userId string, userRequest *model.EditUserRequest) (string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
 		return "", err
 	}
 
+	if loggedId != userId {
+		return "", &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return "", errors.New("invalid user id")
+	}
+
+	user.Username = userRequest.Username
+	user.Name = userRequest.Name
+	user.Surname = userRequest.Surname
+	user.Number = userRequest.Number
+	user.Website = userRequest.Website
+	user.Bio = userRequest.Bio
+	user.Gender = userRequest.Gender
+	if err = validator.New().Struct(user); err!= nil {
+		return "", err
+	}
 
 	result, err := u.UserRepository.UpdateUserDetails(ctx, user)
-
 	if err != nil { return "", err}
 
-	if userId, ok := result.UpsertedID.(string); ok {
-		return userId, nil
+	if usrId, ok := result.UpsertedID.(string); ok {
+		return usrId, nil
 	}
 	return "", err
 }
@@ -252,6 +270,7 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		ImageUrl:        user.ImageUrl,
 		PostNumber:      postsCount,
 		Following: 		 following,
+		Email:			 user.Email,
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),
 	}

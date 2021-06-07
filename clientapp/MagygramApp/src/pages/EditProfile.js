@@ -5,6 +5,7 @@ import { authHeader } from "../helpers/auth-header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Header from "../components/Header";
+import PostContextProvider from "../contexts/PostContext";
 
 const EditProfile = () => {
 	// history = useHistory();
@@ -40,29 +41,27 @@ const EditProfile = () => {
 	const [genderInput, setGenderInput] = useState("");
 
 	useEffect(() => {
-
-        Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				setId(res.data.id);
 				if (res.data.imageUrl == "") setImg("assets/img/profile.jpg");
 				else setImg(res.data.imageUrl);
 
 				Axios.get(`/api/users/` + res.data.id, { validateStatus: () => true, headers: authHeader() })
-				.then((res) => {
-					console.log(res.data)
-					setName(res.data.Name);
-					setSurname(res.data.Surname);
-					setUsername(res.data.Username);
-					setBio(res.data.Bio);
-					setEmail(res.data.Email);
-					setWebsite(res.data.Website);
-					setNumber(res.data.Number);
-					setGenderInput(res.data.Gender);
-
-				})
-				.catch((err) => {console.log(err);});
-
-
+					.then((res) => {
+						console.log(res.data);
+						setName(res.data.Name);
+						setSurname(res.data.Surname);
+						setUsername(res.data.Username);
+						setBio(res.data.Bio);
+						setEmail(res.data.Email);
+						setWebsite(res.data.Website);
+						setNumber(res.data.Number);
+						setGenderInput(res.data.Gender);
+					})
+					.catch((err) => {
+						console.log(err);
+					});
 			})
 			.catch((err) => {
 				console.log(err);
@@ -84,74 +83,71 @@ const EditProfile = () => {
 		var b = bio;
 		var g = genderInput;
 
-		if(gender == ""){
+		if (gender == "") {
 			g = "MALE";
-		}else{
+		} else {
 			g = gender;
 		}
 
-		if(nameInput == ""){
+		if (nameInput == "") {
 			n = name;
-		}else{
+		} else {
 			n = nameInput;
 		}
-		if(numberInput == ""){
+		if (numberInput == "") {
 			num = number;
-		}else{
+		} else {
 			num = numberInput;
 		}
-		if(bioInput == ""){
+		if (bioInput == "") {
 			b = bio;
-		}else{
+		} else {
 			b = bioInput;
 		}
-		if(surnameInput == ""){
+		if (surnameInput == "") {
 			sur = surname;
-		}else{
+		} else {
 			sur = surnameInput;
 		}
 
-		if(usernameInput == ""){
+		if (usernameInput == "") {
 			un = username;
-		}else{
+		} else {
 			un = usernameInput;
 		}
 
-		if(emailInput == ""){
+		if (emailInput == "") {
 			e = email;
-		}else{
+		} else {
 			e = emailInput;
 		}
 
-		if(websiteInput == ""){
+		if (websiteInput == "") {
 			w = website;
-		}else{
+		} else {
 			w = websiteInput;
 		}
-			let user = {
-				id,
-				nameInput: n,
-				surnameInput: sur,
-				usernameInput: un,
-				emailInput: e,
-				websiteInput: w,
-				numberInput: num,
-				bioInput: b,
-				gender: g
-			};
-			console.log(user)
-			
-			Axios.post(`/api/users/edit`, user, { validateStatus: () => true })
+		let user = {
+			id,
+			nameInput: n,
+			surnameInput: sur,
+			usernameInput: un,
+			emailInput: e,
+			websiteInput: w,
+			numberInput: num,
+			bioInput: b,
+			gender: g,
+		};
+		console.log(user);
+
+		Axios.post(`/api/users/edit`, user, { validateStatus: () => true })
 			.then((res) => {
 				window.location = "#/profile";
 			})
 			.catch((err) => {
 				console.log(err);
 			});
-
-
 	};
-
 
 	const handleLogout = () => {
 		userService.logout();
@@ -167,9 +163,10 @@ const EditProfile = () => {
 
 	return (
 		<React.Fragment>
-		<Header />
+			<PostContextProvider>
+				<Header />
+			</PostContextProvider>
 			<div>
-				
 				<br />
 				<br />
 				<div className="container">
@@ -181,43 +178,35 @@ const EditProfile = () => {
 							<br />
 							<div className="form-group">
 								<text>Name</text>
-								<input className="form-control"  type="text" name="name" placeholder={name} value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
+								<input className="form-control" type="text" name="name" placeholder={name} value={nameInput} onChange={(e) => setNameInput(e.target.value)} />
 							</div>
 							<div className="form-group">
 								<text>Surname</text>
-								<input className="form-control"  type="text" name="surname" placeholder={surname} value={surnameInput} onChange={(e) => setSurnameInput(e.target.value)} />
+								<input className="form-control" type="text" name="surname" placeholder={surname} value={surnameInput} onChange={(e) => setSurnameInput(e.target.value)} />
 							</div>
 							<div className="form-group">
 								<text>Email</text>
-								<input className="form-control"  type="email" name="email" placeholder={email} value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
+								<input className="form-control" type="email" name="email" placeholder={email} value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Username</text>
-								<input
-									className="form-control"
-									
-									type="username"
-									name="username"
-									placeholder={username}
-									value={usernameInput}
-									onChange={(e) => setUsernameInput(e.target.value)}
-								/>
+								<input className="form-control" type="username" name="username" placeholder={username} value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Website</text>
-								<input className="form-control"  type="text" name="websiteInput" placeholder={website} value={websiteInput} onChange={(e) => setWebsiteInput(e.target.value)} />
+								<input className="form-control" type="text" name="websiteInput" placeholder={website} value={websiteInput} onChange={(e) => setWebsiteInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Bio</text>
-								<input className="form-control"  type="text" name="bioInput" placeholder={bio} value={bioInput} onChange={(e) => setBioInput(e.target.value)} />
+								<input className="form-control" type="text" name="bioInput" placeholder={bio} value={bioInput} onChange={(e) => setBioInput(e.target.value)} />
 							</div>
 
 							<div className="form-group">
 								<text>Number</text>
-								<input className="form-control"  type="text" name="numberInput" placeholder={number} value={numberInput} onChange={(e) => setNumberInput(e.target.value)} />
+								<input className="form-control" type="text" name="numberInput" placeholder={number} value={numberInput} onChange={(e) => setNumberInput(e.target.value)} />
 							</div>
 							<br />
 							<div class="flexbox-container">

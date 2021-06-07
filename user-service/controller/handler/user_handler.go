@@ -45,6 +45,7 @@ func NewUserHandler(u service_contracts.UserService) UserHandler {
 }
 
 func (h *userHandler) EditUser(c echo.Context) error {
+	userId := c.Param("userId")
 	userRequest := &model.EditUserRequest{}
 	if err := c.Bind(userRequest); err != nil {
 		return err
@@ -55,15 +56,17 @@ func (h *userHandler) EditUser(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	userId, err := h.UserService.EditUser(ctx, userRequest)
-	fmt.Println(userId)
-	if err != nil {
-		fmt.Println(err)
-
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	bearer := c.Request().Header.Get("Authorization")
+	updatedId, err := h.UserService.EditUser(ctx, bearer, userId, userRequest)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
 	}
-
-	return c.JSON(http.StatusCreated, userId)
+	return c.JSON(http.StatusOK, updatedId)
 }
 func (h *userHandler) RegisterUser(c echo.Context) error {
 	userRequest := &model.UserRequest{}

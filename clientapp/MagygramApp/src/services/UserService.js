@@ -8,6 +8,7 @@ export const userService = {
 	logout,
 	register,
 	getUserProfileByUserId,
+	editUser,
 	resetPasswordLinkRequest,
 	resetPasswordRequest,
 	findAllFollowingUsers,
@@ -95,6 +96,32 @@ function login(loginRequest, dispatch) {
 	}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
+	}
+}
+
+function editUser(userId, userRequestDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/users/${userId}`, userRequestDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("User info successfully changed"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.UPDATE_USER_REQUEST };
+	}
+
+	function success(successMessage) {
+		return { type: userConstants.UPDATE_USER_SUCCESS, successMessage };
+	}
+
+	function failure(error) {
+		return { type: userConstants.UPDATE_USER_FAILURE, errorMessage: error };
 	}
 }
 

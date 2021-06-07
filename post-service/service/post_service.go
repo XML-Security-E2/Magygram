@@ -598,7 +598,7 @@ func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, loca
 	var publicPosts []*model.Post
 
 	for _,post := range posts{
-		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+		value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
 
 		if err!=nil{
 			log.Println(err)
@@ -628,7 +628,7 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 
 	var publicPosts []*model.Post
 	for _,post := range posts{
-		value, err := p.UserClient.IsProfilePrivate(post.UserInfo.Id)
+		value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
 		if err!=nil{
 			return nil,err
 		}
