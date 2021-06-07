@@ -640,4 +640,16 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 
 	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
 
-	return retVal, nil}
+	return retVal, nil
+}
+
+func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*model.GuestTimelinePostResponse, error) {
+	post, err := p.PostRepository.GetByID(ctx, postId)
+	if err != nil {
+		return nil, errors.New("invalid post id")
+	}
+
+	var retVal,_ = model.NewGuestTimelinePostResponse(post)
+
+	return retVal, nil
+}

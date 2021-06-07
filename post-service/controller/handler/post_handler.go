@@ -32,6 +32,7 @@ type PostHandler interface {
 	SearchPostsByLocation(c echo.Context) error
 	GetPostForGuestTimelineByLocation(c echo.Context) error
 	GetPostForUserTimelineByLocation(c echo.Context) error
+	GetPostByIdForGuest(c echo.Context) error
 }
 
 type postHandler struct {
@@ -400,4 +401,20 @@ func (p postHandler) GetPostForUserTimelineByLocation(c echo.Context) error {
 	}
 
 	c.Response().Header().Set("Content-Type" , "text/javascript")
-	return c.JSON(http.StatusOK, locationPosts)}
+	return c.JSON(http.StatusOK, locationPosts)
+}
+
+func (p postHandler) GetPostByIdForGuest(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	post, err := p.PostService.GetPostByIdForGuest(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, post)
+}

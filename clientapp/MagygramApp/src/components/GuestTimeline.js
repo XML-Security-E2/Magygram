@@ -1,9 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { PostContext } from "../contexts/PostContext";
 import GuestPostView from "./GuestPostView";
 
 const GuestTimeline = () => {
-	const { postState, dispatch } = useContext(PostContext);
+	const { postState } = useContext(PostContext);
 
 	return (
 		<React.Fragment>

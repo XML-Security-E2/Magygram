@@ -5,6 +5,7 @@ import UserProfileHeaderInfo from "../components/UserProfileHeaderInfo";
 import UserContextProvider from "../contexts/UserContext";
 import UserProfileContent from "../components/UserProfileContent";
 import PostContextProvider from "../contexts/PostContext";
+import GuestHeader from "../components/GuestHeader";
 import HeaderWrapper from "../components/HeaderWrapper";
 
 const UserProfilePage = (props) => {

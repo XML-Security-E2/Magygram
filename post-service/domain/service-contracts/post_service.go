@@ -25,4 +25,5 @@ type PostService interface {
 	SearchPostsByLocation(ctx context.Context,  locationValue string) ([]*model.LocationSearchResponseDTO , error)
 	GetPostForGuestTimelineByLocation(ctx context.Context, location string) ([]*model.GuestTimelinePostResponse , error)
 	GetPostForUserTimelineByLocation(ctx context.Context, location string, bearer string) ([]*model.PostResponse , error)
+	GetPostByIdForGuest(ctx context.Context, postId string) (*model.GuestTimelinePostResponse , error)
 }

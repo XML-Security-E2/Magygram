@@ -12,36 +12,38 @@ import GuestHeader from "../components/GuestHeader";
 import GuestTimeline from "../components/GuestTimeline";
 
 const HomePage = () => {
-	var role = hasRoles(["user"]) ? "user" : "guest";
 
 	return (
 		<React.Fragment>
-			<div hidden={role === "guest"}>
-				<UserContextProvider>
-					<StoryContextProvider>
-						<PostContextProvider>
-							<Header />
-							<CreateStoryModal />
-							<AddPostToFavouritesModal />
-							<div>
-								<div class="mt-4">
-									<div class="container d-flex justify-content-center">
-										<div class="col-9">
-											<div class="row">
-												<div class="col-8">
-													<Storyline />
-													<Timeline search={false} />
-												</div>
+			{hasRoles(["user"]) ? 
+			<div>
+			<UserContextProvider>
+				<StoryContextProvider>
+					<PostContextProvider>
+						<Header />
+						<CreateStoryModal />
+						<AddPostToFavouritesModal />
+						<div>
+							<div class="mt-4">
+								<div class="container d-flex justify-content-center">
+									<div class="col-9">
+										<div class="row">
+											<div class="col-8">
+												<Storyline />
+												<Timeline search={false} />
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</PostContextProvider>
-					</StoryContextProvider>
-				</UserContextProvider>
-			</div>
-			<div hidden={role === "user"}>
+						</div>
+					</PostContextProvider>
+				</StoryContextProvider>
+			</UserContextProvider>
+		</div> : 
+			
+	
+			<div>
 				<PostContextProvider>
 					<GuestHeader />
 					<div>
@@ -59,6 +61,9 @@ const HomePage = () => {
 					</div>
 				</PostContextProvider>
 			</div>
+
+		}
+			
 		</React.Fragment>
 	);
 };

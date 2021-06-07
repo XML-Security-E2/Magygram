@@ -27,11 +27,9 @@ function App() {
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/edit-profile" component={EditProfilePage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/add-posts" component={CreatePostPage} />
 				<Route path="/profile" component={UserProfilePage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/user/:id" component={UserPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/edit-profile" component={EditProfilePage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/add-posts" component={CreatePostPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/search" component={SearchPostPage} />
-				<Route path="/test" component={LoginPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 

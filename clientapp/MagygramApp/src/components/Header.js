@@ -68,6 +68,10 @@ const Header = () => {
 		alert("TOD1O");
 	};
 
+	const backToHome = () => {
+        window.location = "#/"
+    }
+	
 	const handleLoadFollowRequests = async () => {
 		await userService.findAllFollowRequests(userCtx.dispatch);
 	};
@@ -76,7 +80,7 @@ const Header = () => {
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
 			<div className="container">
 				<div>
-					<img src="assets/img/logotest.png" alt="NistagramLogo" />
+					<img onClick={() =>backToHome()} src="assets/img/logotest.png" alt="NistagramLogo" />
 				</div>
 				<button className="navbar-toggler" data-toggle="collapse">
 					<span className="sr-only">Toggle navigation</span>
