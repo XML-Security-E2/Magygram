@@ -10,7 +10,7 @@ const Highlight = ({ highlight, openHighlightSlider }) => {
 				<button onClick={() => openHighlightSlider(highlight.name)} className="btn p-0 m-0">
 					<div className="d-flex flex-column align-items-center">
 						<div className={visitedStoryClassName}>
-							<img src={highlight.url} alt="..." style={imgStyle} />
+							<img src={highlight.url !== "" ? highlight.url : "assets/img/star.jpg"} alt="" style={imgStyle} />
 						</div>
 						<small>{highlight.name}</small>
 					</div>

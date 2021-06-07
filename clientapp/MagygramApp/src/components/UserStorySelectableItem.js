@@ -15,7 +15,13 @@ const UserStorySelectableItem = ({ time, media, deselectStoryItem, selectStoryIt
 	return (
 		<React.Fragment>
 			<div className="container-select-img" onClick={handleStoryItemClick} style={{ cursor: "pointer" }}>
-				<img src={media.Url} className="img-fluid rounded-lg w-100" alt="" />
+				{media.MediaType === "IMAGE" ? (
+					<img src={media.Url} className="img-fluid rounded-lg w-100" alt="" />
+				) : (
+					<video className="img-fluid box-coll rounded-lg w-100" style={{ objectFit: "cover" }}>
+						<source src={media.Url} type="video/mp4" />
+					</video>
+				)}
 
 				<div className="story-time">{time}</div>
 				<div hidden={!selectedStory} className="overlay-select-img rounded" style={{ backgroundColor: "rgba(83, 83, 83, 0.6)" }}>

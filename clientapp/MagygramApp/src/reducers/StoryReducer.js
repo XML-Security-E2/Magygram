@@ -77,7 +77,7 @@ export const storyReducer = (state, action) => {
 					showModal: true,
 					stories: createStories(action.stories),
 					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
-					visited: action.visited
+					visited: action.visited,
 				},
 			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
@@ -213,7 +213,7 @@ export const storyReducer = (state, action) => {
 			storyCopy = { ...state };
 			storyCopy.highlightsSliderModal.showModal = false;
 			return storyCopy;
-		case storyConstants.VISITED_STORY_SUCCESS:{
+		case storyConstants.VISITED_STORY_SUCCESS: {
 			return state;
 		}
 		default:
@@ -248,7 +248,7 @@ function createHighlights(highlights, name) {
 			url: media.media.url,
 			header: {
 				heading: name,
-				profileImage: highlights.url,
+				profileImage: localStorage.getItem("imageURL") !== "" ? localStorage.getItem("imageURL") : "assets/img/profile.jpg",
 				storyId: media.id,
 			},
 			type: media.media.mediaType === "VIDEO" ? "video" : "image",

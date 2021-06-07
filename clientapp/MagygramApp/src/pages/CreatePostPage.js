@@ -8,14 +8,14 @@ const CreatePostPage = () => {
 		<React.Fragment>
 			<div className="container-scroller">
 				<div className="container-fluid ">
-					<Header />
-					<div className="main-panel">
-						<div className="container">
-							<PostContextProvider>
+					<PostContextProvider>
+						<Header />
+						<div className="main-panel">
+							<div className="container">
 								<CreatePostForm />
-							</PostContextProvider>
+							</div>
 						</div>
-					</div>
+					</PostContextProvider>
 				</div>
 			</div>
 		</React.Fragment>
