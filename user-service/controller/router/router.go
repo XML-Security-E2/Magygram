@@ -23,6 +23,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/:userId/is-private", h.IsUserPrivate)
 	e.GET("/api/users/:userId/followed", h.GetFollowedUsers)
 	e.GET("/api/users/:userId/following", h.GetFollowingUsers)
+	e.GET("/api/users/follow-requests", h.GetFollowRequests)
+	e.POST("/api/users/follow-requests/:userId/accept", h.AcceptFollowRequest)
 	e.POST("/api/users/follow", h.FollowUser)
 	e.POST("/api/users/unfollow", h.UnollowUser)
 
@@ -33,7 +35,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/search/:username/guest", h.SearchForUsersByUsernameByGuest)
 
 	e.POST("/api/users/highlights", h.CreateHighlights)
-	e.GET("/api/users/highlights", h.GetProfileHighlights)
+	e.GET("/api/users/:userId/highlights", h.GetProfileHighlights)
 	e.GET("/api/users/highlights/:name", h.GetProfileHighlightsByHighlightName)
 
 

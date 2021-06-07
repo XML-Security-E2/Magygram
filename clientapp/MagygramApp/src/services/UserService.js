@@ -2,6 +2,7 @@ import Axios from "axios";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 import { authHeader } from "../helpers/auth-header";
+import { postService } from "./PostService";
 
 export const userService = {
 	login,
@@ -14,6 +15,8 @@ export const userService = {
 	resetPasswordRequest,
 	findAllFollowingUsers,
 	findAllFollowedUsers,
+	findAllFollowRequests,
+	acceptFollowRequest,
 	resendActivationLink,
 	checkIfUserIdExist,
 	followUser,
@@ -44,6 +47,33 @@ async function findAllFollowedUsers(userId, dispatch) {
 	}
 	function failure() {
 		return { type: userConstants.SET_USER_FOLLOWING_FAILURE };
+	}
+}
+
+async function findAllFollowRequests(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/users/follow-requests`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure());
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: userConstants.FOLLOW_REQUESTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: userConstants.FOLLOW_REQUESTS_SUCCESS, userInfos: data };
+	}
+	function failure() {
+		return { type: userConstants.FOLLOW_REQUESTS_FAILURE };
 	}
 }
 
@@ -97,6 +127,32 @@ function login(loginRequest, dispatch) {
 	}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
+	}
+}
+
+function acceptFollowRequest(userId, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/users/follow-requests/${userId}/accept`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(userId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.ACCEPT_FOLLOW_REQUESTS_REQUEST };
+	}
+
+	function success(userId) {
+		return { type: userConstants.ACCEPT_FOLLOW_REQUESTS_SUCCESS, userId };
+	}
+
+	function failure(error) {
+		return { type: userConstants.ACCEPT_FOLLOW_REQUESTS_FAILURE, errorMessage: error };
 	}
 }
 
@@ -280,6 +336,8 @@ function followUser(userId, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(userId));
+			} else if (res.status === 201) {
+				dispatch(followRequestSuccess());
 			} else {
 				dispatch(failure(res.data.message));
 			}
@@ -293,6 +351,9 @@ function followUser(userId, dispatch) {
 	}
 	function success(userId) {
 		return { type: userConstants.FOLLOW_USER_SUCCESS, userId };
+	}
+	function followRequestSuccess() {
+		return { type: userConstants.FOLLOW_USER_SEND_REQUEST_SUCCESS };
 	}
 	function failure() {
 		return { type: userConstants.FOLLOW_USER_FAILURE };

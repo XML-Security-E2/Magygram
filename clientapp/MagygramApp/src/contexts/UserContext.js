@@ -37,6 +37,9 @@ const UserContextProvider = (props) => {
 			modalHeader: "",
 			userInfos: [],
 		},
+		userFollowRequests: {
+			userInfos: [],
+		},
 		editProfile: {
 			showError: false,
 			errorMessage: "",
@@ -58,6 +61,7 @@ const UserContextProvider = (props) => {
 				postNumber: "",
 				followersNumber: "",
 				followingNumber: "",
+				sentFollowRequest: false,
 			},
 		},
 	});

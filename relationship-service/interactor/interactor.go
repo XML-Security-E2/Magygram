@@ -32,5 +32,5 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 }
 
 func (i *interactor) NewFollowHandler() handler.FollowHandler {
-	return handler.NewFollowHandler(service.NewFollowService(neo4jdb.NewFollowRepository(i.Driver), intercomm.NewUserClient()))
+	return handler.NewFollowHandler(service.NewFollowService(neo4jdb.NewFollowRepository(i.Driver), intercomm.NewUserClient(), intercomm.NewAuthClient()))
 }

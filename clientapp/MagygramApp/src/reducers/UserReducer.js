@@ -166,6 +166,7 @@ export const userReducer = (state, action) => {
 						postNumber: "",
 						followersNumber: "",
 						followingNumber: "",
+						sentFollowRequest: false,
 					},
 				},
 			};
@@ -223,7 +224,13 @@ export const userReducer = (state, action) => {
 				a.userProfile.user.followersNumber = a.userProfile.user.followersNumber + 1;
 			}
 			a.userProfile.user.following = true;
+			a.userProfile.user.sentFollowRequest = false;
 
+			return a;
+
+		case userConstants.FOLLOW_USER_SEND_REQUEST_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.sentFollowRequest = true;
 			return a;
 		case userConstants.FOLLOW_USER_FAILURE:
 			return state;
@@ -279,6 +286,42 @@ export const userReducer = (state, action) => {
 					successMessage: "",
 				},
 			};
+
+		case userConstants.FOLLOW_REQUESTS_REQUEST:
+			return {
+				...state,
+				userFollowRequests: {
+					userInfos: [],
+				},
+			};
+
+		case userConstants.FOLLOW_REQUESTS_SUCCESS:
+			return {
+				...state,
+				userFollowRequests: {
+					userInfos: action.userInfos,
+				},
+			};
+		case userConstants.FOLLOW_REQUESTS_FAILURE:
+			return {
+				...state,
+				userFollowRequests: {
+					userInfos: [],
+				},
+			};
+
+		case userConstants.ACCEPT_FOLLOW_REQUESTS_REQUEST:
+			return state;
+
+		case userConstants.ACCEPT_FOLLOW_REQUESTS_SUCCESS:
+			a = { ...state };
+
+			let usrCpy = a.userFollowRequests.userInfos.find((uinfo) => uinfo.userInfo.id === action.userId);
+			usrCpy.following = true;
+			console.log(action.userInfos);
+			return a;
+		case userConstants.ACCEPT_FOLLOW_REQUESTS_FAILURE:
+			return state;
 
 		default:
 			return state;
