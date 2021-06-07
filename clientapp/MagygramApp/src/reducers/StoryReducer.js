@@ -219,17 +219,17 @@ export const storyReducer = (state, action) => {
 		case storyConstants.HAVE_LOGGED_USER_STORY_REQUEST:
 			return {
 				...state,
-			}
+			};
 		case storyConstants.HAVE_LOGGED_USER_STORY_SUCCESS:
 			return {
 				...state,
-				iHaveAStory:action.haveStories
-			}
+				iHaveAStory: action.haveStories,
+			};
 		case storyConstants.HAVE_LOGGED_USER_STORY_FAILURE: {
 			return {
 				...state,
-				iHaveAStory: false
-			}
+				iHaveAStory: false,
+			};
 		}
 		default:
 			return state;
@@ -263,7 +263,7 @@ function createHighlights(highlights, name) {
 			url: media.media.url,
 			header: {
 				heading: name,
-				profileImage: localStorage.getItem("imageURL") !== "" ? localStorage.getItem("imageURL") : "assets/img/profile.jpg",
+				profileImage: highlights.url !== "" ? highlights.url : "assets/img/profile.jpg",
 				storyId: media.id,
 			},
 			type: media.media.mediaType === "VIDEO" ? "video" : "image",

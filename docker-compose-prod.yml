@@ -11,6 +11,14 @@ services:
             - ./gateway/certificate.pem:/etc/nginx/ssl/certificate.pem
             - ./gateway/certificate-key.pem:/etc/nginx/ssl/certificate-key.pem
 
+    magygram-app:
+        image: magygram-app
+        build:
+            context: ./clientapp/MagygramApp
+            dockerfile: Dockerfile
+        ports:
+            - 3000:3000
+
     user-service:
         image: user-service
         build:

@@ -36,7 +36,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.POST("/api/users/highlights", h.CreateHighlights)
 	e.GET("/api/users/:userId/highlights", h.GetProfileHighlights)
-	e.GET("/api/users/highlights/:name", h.GetProfileHighlightsByHighlightName)
+	e.GET("/api/users/:userId/highlights/:name", h.GetProfileHighlightsByHighlightName)
 
 
 	e.POST("/api/users/collections", h.CreateCollection)

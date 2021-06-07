@@ -111,23 +111,23 @@ func (h highlightsService) checkIfUserContentIsAccessible(bearer string, owner *
 	return true
 }
 
-func (h highlightsService) GetProfileHighlightsByHighlightName(ctx context.Context, bearer string, name string) (*model.HighlightImageWithMedia, error) {
-	userId, err := h.AuthClient.GetLoggedUserId(bearer)
-	if err != nil {
-		return nil, err
-	}
+func (h highlightsService) GetProfileHighlightsByHighlightName(ctx context.Context, bearer string, name string, userId string) (*model.HighlightImageWithMedia, error) {
 
-	user, err := h.UserRepository.GetByID(ctx, userId)
+	owner, err := h.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
 
-	if _, ok := user.HighlightsStory[name]; !ok {
+	if !h.checkIfUserContentIsAccessible(bearer, owner) {
+		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	if _, ok := owner.HighlightsStory[name]; !ok {
 		return nil, errors.New(fmt.Sprintf("highlights with name %s already not exist", name))
 	}
 	retVal := &model.HighlightImageWithMedia{
-		Url:   user.HighlightsStory[name].Url,
-		Media: user.HighlightsStory[name].Media,
+		Url:   owner.HighlightsStory[name].Url,
+		Media: owner.HighlightsStory[name].Media,
 	}
 	return retVal, nil
 }

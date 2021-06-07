@@ -405,14 +405,14 @@ function unlikePost(postId, loggedUser, dispatch) {
 	}
 }
 
-function dislikePost(postId, dispatch) {
+function dislikePost(postId, loggedUser, dispatch) {
 	dispatch(request());
 
 	Axios.put(`/api/posts/${postId}/dislike`, {}, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(postId));
+				dispatch(success(postId, loggedUser));
 			} else {
 				dispatch(failure("Error"));
 			}
@@ -425,22 +425,22 @@ function dislikePost(postId, dispatch) {
 	function request() {
 		return { type: postConstants.DISLIKE_POST_REQUEST };
 	}
-	function success(postId) {
-		return { type: postConstants.DISLIKE_POST_SUCCESS, postId };
+	function success(postId, loggedUser) {
+		return { type: postConstants.DISLIKE_POST_SUCCESS, postId, loggedUser };
 	}
 	function failure(message) {
 		return { type: postConstants.DISLIKE_POST_FAILURE, errorMessage: message };
 	}
 }
 
-function undislikePost(postId, dispatch) {
+function undislikePost(postId, loggedUser, dispatch) {
 	dispatch(request());
 
 	Axios.put(`/api/posts/${postId}/undislike`, {}, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(postId));
+				dispatch(success(postId, loggedUser));
 			} else {
 				dispatch(failure("Error"));
 			}
@@ -453,8 +453,8 @@ function undislikePost(postId, dispatch) {
 	function request() {
 		return { type: postConstants.UNDISLIKE_POST_REQUEST };
 	}
-	function success(postId) {
-		return { type: postConstants.UNDISLIKE_POST_SUCCESS, postId };
+	function success(postId, loggedUser) {
+		return { type: postConstants.UNDISLIKE_POST_SUCCESS, postId, loggedUser };
 	}
 	function failure(message) {
 		return { type: postConstants.UNDISLIKE_POST_FAILURE, errorMessage: message };
@@ -489,7 +489,7 @@ function commentPost(commentDTO, dispatch) {
 	}
 }
 
-function findPostsForGuestByHashtag(hashtag,dispatch){
+function findPostsForGuestByHashtag(hashtag, dispatch) {
 	dispatch(request());
 	Axios.get(`/api/posts/hashtag/${hashtag}/guest`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
@@ -517,8 +517,7 @@ function findPostsForGuestByHashtag(hashtag,dispatch){
 	}
 }
 
-
-function findPostsForUserByHashtag(hashtag,dispatch){
+function findPostsForUserByHashtag(hashtag, dispatch) {
 	dispatch(request());
 	Axios.get(`/api/posts/hashtag/${hashtag}/user`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
@@ -534,28 +533,26 @@ function findPostsForUserByHashtag(hashtag,dispatch){
 			failure();
 		});
 
-	
 	function request() {
 		return { type: postConstants.TIMELINE_POSTS_REQUEST };
 	}
-	
+
 	function success(data) {
 		return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
 	}
-	
+
 	function failure() {
 		return { type: postConstants.TIMELINE_POSTS_FAILURE };
 	}
 }
 
-function findPostsForGuestByLocation(location,dispatch){
+function findPostsForGuestByLocation(location, dispatch) {
 	dispatch(request());
 	Axios.get(`/api/posts/location/${location}/guest`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
-				alert('t')
 			} else {
 				failure();
 			}
@@ -576,7 +573,7 @@ function findPostsForGuestByLocation(location,dispatch){
 	}
 }
 
-function findPostsForUserByLocation(location,dispatch){
+function findPostsForUserByLocation(location, dispatch) {
 	dispatch(request());
 	Axios.get(`/api/posts/location/${location}/user`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
@@ -595,11 +592,11 @@ function findPostsForUserByLocation(location,dispatch){
 	function request() {
 		return { type: postConstants.TIMELINE_POSTS_REQUEST };
 	}
-	
+
 	function success(data) {
 		return { type: postConstants.TIMELINE_POSTS_SUCCESS, posts: data };
 	}
-		
+
 	function failure() {
 		return { type: postConstants.TIMELINE_POSTS_FAILURE };
 	}

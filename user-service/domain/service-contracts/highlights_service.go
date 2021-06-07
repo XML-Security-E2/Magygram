@@ -8,5 +8,5 @@ import (
 type HighlightsService interface {
 	CreateHighlights(ctx context.Context, bearer string, highlights *model.HighlightRequest) (*model.HighlightProfileResponse,error)
 	GetProfileHighlights(ctx context.Context, bearer string, userId string) ([]*model.HighlightProfileResponse, error)
-	GetProfileHighlightsByHighlightName(ctx context.Context, bearer string, name string) (*model.HighlightImageWithMedia, error)
+	GetProfileHighlightsByHighlightName(ctx context.Context, bearer string, name string, userId string) (*model.HighlightImageWithMedia, error)
 }

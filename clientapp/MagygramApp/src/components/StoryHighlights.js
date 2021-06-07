@@ -17,7 +17,7 @@ const StoryHighlights = ({ userId }) => {
 	}, [dispatch, userId]);
 
 	const openHighlightSlider = (name) => {
-		storyService.findAllStoriesByHighlightName(name, dispatch);
+		storyService.findAllStoriesByHighlightName(userId, name, dispatch);
 	};
 
 	return (

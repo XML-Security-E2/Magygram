@@ -140,10 +140,10 @@ async function findAllProfileHighlights(userId, dispatch) {
 	}
 }
 
-function findAllStoriesByHighlightName(name, dispatch) {
+function findAllStoriesByHighlightName(userId, name, dispatch) {
 	dispatch(request());
 
-	Axios.get(`/api/users/highlights/${name}`, { validateStatus: () => true, headers: authHeader() })
+	Axios.get(`/api/users/${userId}/highlights/${name}`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
