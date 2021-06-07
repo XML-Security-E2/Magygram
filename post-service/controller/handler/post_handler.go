@@ -26,6 +26,9 @@ type PostHandler interface {
 	GetUsersPosts(c echo.Context) error
 	GetUsersPostsCount(c echo.Context) error
 	GetPostById(c echo.Context) error
+	SearchPostsByHashTagByGuest(c echo.Context) error
+	GetPostForGuestLineByHashTag(c echo.Context) error
+	GetPostForUserTimelineByHashTag(c echo.Context) error
 }
 
 type postHandler struct {
@@ -257,6 +260,28 @@ func (p postHandler) GetUsersPostsCount(c echo.Context) error {
 	return c.JSON(http.StatusOK, postsCount)
 }
 
+
+func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+	ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag,bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	if hashTagsPosts == nil{
+		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
+	}
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+		return c.JSON(http.StatusOK, hashTagsPosts)
+}
+
 func (p postHandler) GetPostById(c echo.Context) error {
 	postId := c.Param("postId")
 	fmt.Println(postId)
@@ -271,4 +296,44 @@ func (p postHandler) GetPostById(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, post)
+}
+
+func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	hashTagsInfo, err := p.PostService.SearchForPostsByHashTagByGuest(ctx, hashTag)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsInfo)
+}
+
+func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	hashTagsPosts, err := p.PostService.GetPostsByHashTagForGuest(ctx, hashTag)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	if hashTagsPosts == nil{
+		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsPosts)
 }

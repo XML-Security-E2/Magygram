@@ -451,7 +451,11 @@ export const postReducer = (state, action) => {
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.collectionDTO.postId);
 
 			if (action.defaultCollection) {
-				postCopy.Favourites = true;
+				if (postCopy !== undefined) {
+					postCopy.Favourites = true;
+				} else {
+					strcpy.viewPostModal.post.Favourites = true;
+				}
 			} else {
 				if (strcpy.userCollections.collections[action.collectionDTO.collectionName].find((col) => col.id === action.collectionDTO.postId) === undefined) {
 					strcpy.userCollections.collections[action.collectionDTO.collectionName].push({
@@ -485,7 +489,11 @@ export const postReducer = (state, action) => {
 			};
 
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
-			postCopy.Favourites = false;
+			if (postCopy !== undefined) {
+				postCopy.Favourites = false;
+			} else {
+				strcpy.viewPostModal.post.Favourites = false;
+			}
 
 			for (const [key] of Object.entries(strcpy.userCollections.collections)) {
 				strcpy.userCollections.collections[key] = strcpy.userCollections.collections[key].filter((collection) => collection.id !== action.postId);
@@ -640,7 +648,6 @@ export const postReducer = (state, action) => {
 					showModal: false,
 				},
 			};
-
 		case modalConstants.SHOW_POST_EDIT_MODAL:
 			strcpy = {
 				...state,
@@ -667,6 +674,27 @@ export const postReducer = (state, action) => {
 				},
 				postOptions: {
 					showModal: false,
+				},
+			};
+		case postConstants.GUEST_TIMELINE_POSTS_REQUEST:
+			return {
+				...state,
+				guestTimeline: {
+					posts: [],
+				},
+			};
+		case postConstants.GUEST_TIMELINE_POSTS_SUCCESS:
+			return {
+				...state,
+				guestTimeline: {
+					posts: action.posts,
+				},
+			};
+		case postConstants.GUEST_TIMELINE_POSTS_FAILURE:
+			return {
+				...state,
+				guestTimeline: {
+					posts: [],
 				},
 			};
 		default:

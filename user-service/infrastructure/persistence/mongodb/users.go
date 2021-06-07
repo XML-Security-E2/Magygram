@@ -56,10 +56,30 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 	return &user, nil
 }
 
-func (r *userRepository) SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error) {
+func (r *userRepository) SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error) {
 	var users []model.User
 	log.Println("param: " + username)
-	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}})
+	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}, "_id" : bson.M{ "$ne": loggedUserId}})
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.User
+			err := cursor.Decode(&record)
+			users = append(users, record)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return users, nil
+}
+
+func (r *userRepository) SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error) {
+	var users []model.User
+	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}, "private_profile" : false})
 	if err != nil {
 		return nil, err
 	} else {

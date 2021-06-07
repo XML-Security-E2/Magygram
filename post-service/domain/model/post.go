@@ -210,3 +210,25 @@ type Tag struct {
 type FollowedUsersResponse struct {
 	Users []string
 }
+
+type HashTageSearchResponseDTO struct {
+	Hashtag string
+	NumberOfPosts int
+}
+
+type GuestTimelinePostResponse struct {
+	Id string
+	Description string
+	Location string
+	Media []Media
+	UserInfo UserInfo
+}
+
+func NewGuestTimelinePostResponse(post *Post) (*GuestTimelinePostResponse, error) {
+	return &GuestTimelinePostResponse{Id: post.Id,
+		Description:   post.Description,
+		Location:    post.Location,
+		Media: post.Media,
+		UserInfo: post.UserInfo,
+	}, nil
+}

@@ -13,28 +13,28 @@ const UserProfilePage = (props) => {
 
 	return (
 		<React.Fragment>
-			<Header />
-			<StoryContextProvider>
-				<div>
-					<div className="mt-4">
-						<div className="container d-flex justify-content-center">
-							<div className="col-12">
-								<div className="row">
-									<div className="col-12">
-										<UserContextProvider>
-											<UserProfileHeaderInfo userId={userId} />
-										</UserContextProvider>
-										<PostContextProvider>
+			<PostContextProvider>
+				<Header />
+				<StoryContextProvider>
+					<div>
+						<div className="mt-4">
+							<div className="container d-flex justify-content-center">
+								<div className="col-12">
+									<div className="row">
+										<div className="col-12">
+											<UserContextProvider>
+												<UserProfileHeaderInfo userId={userId} />
+											</UserContextProvider>
 											<UserProfileContent userId={userId} />
-										</PostContextProvider>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<UserStoriesModal />
-			</StoryContextProvider>
+					<UserStoriesModal />
+				</StoryContextProvider>
+			</PostContextProvider>
 		</React.Fragment>
 	);
 };

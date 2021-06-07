@@ -24,11 +24,12 @@ type UserHandler interface {
 	GetLoggedUserInfo(c echo.Context) error
 	SearchForUsersByUsername(c echo.Context) error
 	GetUserProfileById(c echo.Context) error
-	IsUserPrivate(c echo.Context) error
 	GetFollowedUsers(c echo.Context) error
 	GetFollowingUsers(c echo.Context) error
 	FollowUser(c echo.Context) error
 	UnollowUser(c echo.Context) error
+	SearchForUsersByUsernameByGuest(c echo.Context) error
+	IsUserPrivate(c echo.Context) error
 }
 
 var (
@@ -37,6 +38,7 @@ var (
 type userHandler struct {
 	UserService service_contracts.UserService
 }
+
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
@@ -214,7 +216,26 @@ func (h *userHandler) SearchForUsersByUsername(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	users, err := h.UserService.SearchForUsersByUsername(ctx, username)
+	bearer := c.Request().Header.Get("Authorization")
+	users, err := h.UserService.SearchForUsersByUsername(ctx, username, bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
+	}
+
+	c.Response().Header().Set("Content-Type" , "text/javascript")
+	return c.JSON(http.StatusOK, users)
+}
+
+func (h *userHandler) SearchForUsersByUsernameByGuest(c echo.Context) error {
+	username := c.Param("username")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	users, err := h.UserService.SearchForUsersByUsernameByGuest(ctx, username)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")

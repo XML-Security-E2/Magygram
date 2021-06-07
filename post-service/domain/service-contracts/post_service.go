@@ -19,5 +19,7 @@ type PostService interface {
 	CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error)
 	GetUsersPosts(ctx context.Context, bearer string, postOwnerId string) ([]*model.PostProfileResponse, error)
 	GetUsersPostsCount(ctx context.Context, postOwnerId string) (int, error)
-
+	SearchForPostsByHashTagByGuest(ctx context.Context,  hashTagValue string) ([]*model.HashTageSearchResponseDTO , error)
+	GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse , error)
+	GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string,bearer string) ([]*model.PostResponse , error)
 }

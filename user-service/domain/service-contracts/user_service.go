@@ -16,10 +16,11 @@ type UserService interface {
 	GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error)
-	SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error)
 	GetUserProfileById(ctx context.Context,bearer string, userId string) (*model.UserProfileResponse, error)
 	GetFollowedUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error)
 	GetFollowingUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error)
 	FollowUser(ctx context.Context, bearer string, userId string) error
 	UnfollowUser(ctx context.Context, bearer string, userId string) error
+	SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error)
+	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
 }

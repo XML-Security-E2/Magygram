@@ -168,8 +168,23 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 	return user, err
 }
 
-func (u *userService) SearchForUsersByUsername(ctx context.Context, username string) ([]model.User, error) {
-	users, err := u.UserRepository.SearchForUsersByUsername(ctx, username)
+func (u *userService) SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error) {
+	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := u.UserRepository.SearchForUsersByUsername(ctx, username,userId)
+
+	if err != nil {
+		return nil, errors.New("Couldn't find any users")
+	}
+
+	return users, err
+}
+
+func (u *userService) SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error) {
+	users, err := u.UserRepository.SearchForUsersByUsernameByGuest(ctx, username)
 
 	if err != nil {
 		return nil, errors.New("Couldn't find any users")

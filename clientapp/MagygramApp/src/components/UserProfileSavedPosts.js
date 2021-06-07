@@ -18,7 +18,7 @@ const UserProfileSavedPosts = () => {
 	return (
 		<React.Fragment>
 			<div className="row" hidden={!postState.userProfileContent.showCollections}>
-				{postState.userProfileContent.collections.length > 0 ? (
+				{Object.keys(postState.userProfileContent.collections).length > 0 ? (
 					Object.keys(postState.userProfileContent.collections).map((collection) => {
 						return (
 							<div className="col-4" align="center" onClick={() => handleShowCollectionPosts(collection)}>

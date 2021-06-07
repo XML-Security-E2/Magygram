@@ -17,6 +17,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/resend-activation-link", h.ResendActivationLink)
 	e.GET("/api/users/check-existence/:userId", h.GetUserEmailIfUserExist)
 	e.GET("/api/users/:userId", h.GetUserById)
+
 	e.GET("/api/users/:userId/is-private", h.IsUserPrivate)
 	e.GET("/api/users/:userId/followed", h.GetFollowedUsers)
 	e.GET("/api/users/:userId/following", h.GetFollowingUsers)
@@ -26,6 +27,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/:userId/profile", h.GetUserProfileById)
 
 	e.GET("/api/users/search/:username", h.SearchForUsersByUsername)
+	e.GET("/api/users/search/:username/user", h.SearchForUsersByUsername)
+	e.GET("/api/users/search/:username/guest", h.SearchForUsersByUsernameByGuest)
 
 	e.POST("/api/users/highlights", h.CreateHighlights)
 	e.GET("/api/users/highlights", h.GetProfileHighlights)
@@ -36,7 +39,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/collections/posts", h.AddPostToCollection)
 	e.GET("/api/users/collections/:collectionName/posts", h.GetCollectionPosts)
 	e.DELETE("/api/users/collections/posts/:postId", h.DeleteFromCollection)
-	e.GET("/api/users/collections", h.GetUsersCollections)
 	e.GET("/api/users/collections/except-default", h.GetUsersCollectionsExceptDefault)
 	e.GET("/api/users/collections", h.GetUserCollections)
 	e.POST("/api/users/collections/check-favourites", h.CheckIfPostInFavourites)
