@@ -16,6 +16,7 @@ type FollowRepository interface {
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
+	ReturnFollowRequestsForUser(user *model.User, loggedId string) (interface{}, error)
 	AcceptFollowRequest(followRequest *model.FollowRequest) error
 	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
 }
@@ -241,6 +242,30 @@ func (f *followRepository) ReturnFollowRequests(user *model.User) (interface{}, 
 	}
 	log.Println(result)
 	return result, nil
+}
+
+func (f *followRepository) ReturnFollowRequestsForUser(user *model.User, loggedId string) (interface{}, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (o:User)<-[f:FOLLOWREQUEST]-(s:User) WHERE o.id = $oId AND s.id = $loggedId RETURN f"
+		parameters := map[string]interface{}{
+			"oId": user.Id,
+			"loggedId": loggedId,
+		}
+		records, err := tx.Run(query, parameters)
+		for records.Next() {
+			return true, err
+		}
+		return false, err
+	})
+	if err != nil {
+		log.Println("error querying graph:", err)
+		return false, err
+	}
+	return result.(bool), nil
 }
 
 func unsafeClose(closeable io.Closer) {

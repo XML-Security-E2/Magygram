@@ -280,6 +280,8 @@ function followUser(userId, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(userId));
+			} else if (res.status === 201) {
+				dispatch(followRequestSuccess());
 			} else {
 				dispatch(failure(res.data.message));
 			}
@@ -293,6 +295,9 @@ function followUser(userId, dispatch) {
 	}
 	function success(userId) {
 		return { type: userConstants.FOLLOW_USER_SUCCESS, userId };
+	}
+	function followRequestSuccess() {
+		return { type: userConstants.FOLLOW_USER_SEND_REQUEST_SUCCESS };
 	}
 	function failure() {
 		return { type: userConstants.FOLLOW_USER_FAILURE };

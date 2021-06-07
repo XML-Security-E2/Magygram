@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/go-playground/validator"
 	"mime/multipart"
 	"user-service/domain/model"
@@ -290,7 +291,12 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 	if loggedId != "" {
 		following = doesUserFollow(followedUsers, loggedId)
 	}
+	sentReq := false
+	if userId != loggedId {
+		sentReq, _ = u.RelationshipClient.ReturnFollowRequestsForUser(bearer, userId)
+	}
 
+	fmt.Println(sentReq)
 	retVal := &model.UserProfileResponse{
 		Username:        user.Username,
 		Name:            user.Name,
@@ -305,6 +311,7 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		Email:			 user.Email,
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),
+		SentFollowRequest: sentReq,
 	}
 	return retVal, nil
 }
@@ -438,17 +445,17 @@ func (u *userService) GetFollowingUsers(ctx context.Context, bearer string, user
 	return userInfos, nil
 }
 
-func (u *userService) FollowUser(ctx context.Context, bearer string, userId string) error {
+func (u *userService) FollowUser(ctx context.Context, bearer string, userId string) (bool, error) {
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	err = u.RelationshipClient.FollowRequest(&model.FollowRequest{
+	followRequest, err := u.RelationshipClient.FollowRequest(&model.FollowRequest{
 		SubjectId: loggedId,
 		ObjectId:  userId,
 	})
-	return err
+	return followRequest, err
 }
 
 func (u *userService) UnfollowUser(ctx context.Context, bearer string, userId string) error {

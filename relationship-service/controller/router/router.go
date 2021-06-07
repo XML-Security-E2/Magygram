@@ -14,4 +14,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/relationship/following-users/:userId", h.ReturnFollowingUsers)
 	e.POST("/api/relationship/is-user-followed", h.IsUserFollowed)
 	e.GET("/api/relationship/follow-requests", h.ReturnFollowRequests)
+	e.GET("/api/relationship/follow-requests/:objectId", h.ReturnFollowRequestsForUser)
+
 }

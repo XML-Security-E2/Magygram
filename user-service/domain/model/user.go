@@ -36,6 +36,7 @@ type UserProfileResponse struct {
 	PostNumber int `json:"postNumber"`
 	FollowersNumber int `json:"followersNumber"`
 	FollowingNumber int `json:"followingNumber"`
+	SentFollowRequest bool `json:"sentFollowRequest"`
 }
 
 type PostProfileResponse struct {

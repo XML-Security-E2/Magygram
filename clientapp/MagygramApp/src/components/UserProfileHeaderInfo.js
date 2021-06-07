@@ -50,7 +50,10 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							<h2>{userState.userProfile.user.username}</h2>
 						</div>
 						<div>
-							{userId !== localStorage.getItem("userId") &&
+							{userState.userProfile.user.sentFollowRequest ? (
+								<h5 className="text-secondary ml-2">Following request sent</h5>
+							) : (
+								userId !== localStorage.getItem("userId") &&
 								(localStorage.getItem("userId") !== null && userState.userProfile.user.following ? (
 									<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnfollow}>
 										Unfollow
@@ -59,7 +62,8 @@ const UserProfileHeaderInfo = ({ userId }) => {
 									<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserFollow}>
 										Follow
 									</button>
-								))}
+								))
+							)}
 							<Link
 								type="button"
 								hidden={userId !== localStorage.getItem("userId")}

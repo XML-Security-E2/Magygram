@@ -386,12 +386,15 @@ func (h *userHandler) FollowUser(c echo.Context) error {
 	if bearer == "" {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
-	err := h.UserService.FollowUser(ctx, bearer, userId)
+	followRequest, err := h.UserService.FollowUser(ctx, bearer, userId)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
+	if followRequest {
+		return c.JSON(http.StatusCreated, "")
+	}
 	return c.JSON(http.StatusOK, "")
 }
 

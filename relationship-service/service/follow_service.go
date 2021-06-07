@@ -16,15 +16,17 @@ type FollowService interface {
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
+	ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error)
 }
 
 type followService struct {
 	neo4jdb.FollowRepository
 	intercomm.UserClient
+	intercomm.AuthClient
 }
 
-func NewFollowService(r neo4jdb.FollowRepository, userClient intercomm.UserClient) FollowService {
-	return &followService{r, userClient}
+func NewFollowService(r neo4jdb.FollowRepository, userClient intercomm.UserClient, ac intercomm.AuthClient) FollowService {
+	return &followService{r, userClient, ac}
 }
 
 func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool, error) {
@@ -39,12 +41,13 @@ func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool,
 		if err:= f.FollowRepository.CreateFollowRequest(followRequest); err != nil {
 			return false, err
 		}
+		return true, nil
 	} else {
 		if err:= f.FollowRepository.CreateFollow(followRequest); err != nil {
 			return false, err
 		}
 	}
-	return true, nil
+	return false, nil
 }
 
 func (f *followService) Unfollow(followRequest *model.FollowRequest) error {
@@ -88,4 +91,13 @@ func (f *followService) ReturnFollowingUsers(user *model.User) (interface{}, err
 
 func (f *followService) ReturnFollowRequests(user *model.User) (interface{}, error) {
 	return f.FollowRepository.ReturnFollowRequests(user)
+}
+
+func (f *followService) ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error) {
+	loggedId, err := f.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return false, err
+	}
+
+	return f.FollowRepository.ReturnFollowRequestsForUser(&model.User{Id: objectId}, loggedId)
 }

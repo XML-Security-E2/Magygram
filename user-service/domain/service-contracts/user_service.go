@@ -21,7 +21,7 @@ type UserService interface {
 	GetUserProfileById(ctx context.Context,bearer string, userId string) (*model.UserProfileResponse, error)
 	GetFollowedUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error)
 	GetFollowingUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error)
-	FollowUser(ctx context.Context, bearer string, userId string) error
+	FollowUser(ctx context.Context, bearer string, userId string) (bool, error)
 	UnfollowUser(ctx context.Context, bearer string, userId string) error
 	SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)

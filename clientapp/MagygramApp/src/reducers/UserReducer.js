@@ -166,6 +166,7 @@ export const userReducer = (state, action) => {
 						postNumber: "",
 						followersNumber: "",
 						followingNumber: "",
+						sentFollowRequest: false,
 					},
 				},
 			};
@@ -223,7 +224,13 @@ export const userReducer = (state, action) => {
 				a.userProfile.user.followersNumber = a.userProfile.user.followersNumber + 1;
 			}
 			a.userProfile.user.following = true;
+			a.userProfile.user.sentFollowRequest = false;
 
+			return a;
+
+		case userConstants.FOLLOW_USER_SEND_REQUEST_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.sentFollowRequest = true;
 			return a;
 		case userConstants.FOLLOW_USER_FAILURE:
 			return state;
