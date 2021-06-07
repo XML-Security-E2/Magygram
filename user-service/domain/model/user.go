@@ -16,9 +16,29 @@ type User struct {
 	Bio string `bson:"bio" `
 	Number string `bson:"number" `
 	Gender Gender `bson:"gender"`
+	ImageUrl string `bson:"imageUrl"`
 	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
 	HighlightsStory map[string]HighlightImageWithMedia `bson:"highlightsStory"`
 	IsPrivate bool `bson:"private_profile"`
+}
+
+type UserProfileResponse struct {
+	Username  string `json:"username"`
+	Name  string `json:"name"`
+	Surname string `json:"surname"`
+	Website string `json:"website" `
+	Bio string `json:"bio"`
+	Number string `json:"number"`
+	Gender Gender `json:"gender"`
+	ImageUrl string `json:"imageUrl"`
+	PostNumber int `json:"postNumber"`
+	FollowersNumber int `json:"followersNumber"`
+	FollowingNumber int `json:"followingNumber"`
+}
+
+type PostProfileResponse struct {
+	Id string `json:"id"`
+	Media Media `json:"media"`
 }
 
 type Gender string
@@ -49,10 +69,24 @@ type StoryHighlight struct {
 	ImageURL  string `json:"imageUrl"`
 }
 
+type UserFollowingResponse struct {
+	Following bool `json:"following"`
+	UserInfo *UserInfo `json:"userInfo"`
+}
+
 type UserInfo struct {
-	Id string `json:"id"`
-	Username  string `json:"username"`
-	ImageURL  string `json:"imageUrl"`
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	ImageURL string `json:"imageUrl"`
+}
+
+type FollowRequest struct {
+	SubjectId string `json:"subjectId"`
+	ObjectId string `json:"objectId"`
+}
+
+type FollowedUsersResponse struct {
+	Users []string
 }
 
 type UserRequest struct {

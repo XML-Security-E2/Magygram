@@ -14,6 +14,7 @@ import (
 type UserClient interface {
 	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
 	MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
+	IsUserPrivate(userId string) (bool, error)
 }
 
 type userClient struct {}
@@ -71,4 +72,24 @@ func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*mo
 	_ = json.Unmarshal(bodyBytes, &postIdFav)
 
 	return postIdFav, nil
+}
+
+
+func (u userClient) IsUserPrivate(userId string) (bool, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Println(resp.StatusCode)
+		return false, errors.New("user not found")
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+	var isPrivate bool
+	json.Unmarshal(bodyBytes, &isPrivate)
+
+	return isPrivate, nil
 }

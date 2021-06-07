@@ -32,6 +32,26 @@ const UserContextProvider = (props) => {
 			showSuccessMessage: false,
 			emailAddress: "",
 		},
+		userProfileFollowingModal: {
+			showModal: false,
+			modalHeader: "",
+			userInfos: [],
+		},
+		userProfile: {
+			showedUserId: "",
+			user: {
+				username: "",
+				name: "",
+				surname: "",
+				website: "",
+				bio: "",
+				gender: "",
+				imageUrl: "",
+				postNumber: "",
+				followersNumber: "",
+				followingNumber: "",
+			},
+		},
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

@@ -51,6 +51,18 @@ const PostContextProvider = (props) => {
 			showModal: false,
 			dislikes: [],
 		},
+		userProfileContent: {
+			showError: false,
+			errorMessage: "",
+			showPosts: false,
+			showCollections: false,
+			showUnauthorizedErrorMessage: false,
+			showCollectionPosts: false,
+			selectedCollectionName: "",
+			posts: [],
+			collections: [],
+			collectionPosts: [],
+		},
 		viewPostModal: {
 			showModal: false,
 			post: {

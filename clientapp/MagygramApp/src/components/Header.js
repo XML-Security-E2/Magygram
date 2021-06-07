@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { config } from "../config/config";
-import { authHeader } from "../helpers/auth-header";
+import { authHeader, getUserInfo } from "../helpers/auth-header";
 import AsyncSelect from "react-select/async";
 
 const Header = () => {
@@ -21,10 +21,8 @@ const Header = () => {
 		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				setCurrentId(res.data.id);
-                if(res.data.imageUrl == "")
-                    setImg("assets/img/profile.jpg");
-                else
-                	setImg(res.data.imageUrl);
+				if (res.data.imageUrl == "") setImg("assets/img/profile.jpg");
+				else setImg(res.data.imageUrl);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -35,17 +33,18 @@ const Header = () => {
 		setTimeout(() => {
 			var options;
 			Axios.get(`/api/users/search/` + value, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res.data);
-				if (res.status === 200) {
-					options = res.data.map(option => ({ value: option.Username, label: option.Username, id: option.Id}))
-					callback(options);
-				}})
-			.catch((err) => {
-				console.log(err)
-			});
+				.then((res) => {
+					console.log(res.data);
+					if (res.status === 200) {
+						options = res.data.map((option) => ({ value: option.Username, label: option.Username, id: option.Id }));
+						callback(options);
+					}
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		}, 1000);
-	  };
+	};
 
 	const onInputChange = (inputValue, { action }) => {
 		switch (action) {
@@ -78,18 +77,6 @@ const Header = () => {
 	const handleProfile = () => {
 		let path = `/profile`;
 		history.push(path);
-
-		Axios.get(`api/users/logged`, {
-			validateStatus: () => true,
-			headers: { Authorization: authHeader() },
-		})
-			.then((res) => {
-				console.log(res.data);
-				setName(res.data.Name);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	};
 
 	const handleSettings = () => {
@@ -117,9 +104,9 @@ const Header = () => {
 					<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src={img} alt="ProfileImage" />
 					<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
 						<li>
-							<button className="la la-user btn shadow-none" onClick={handleProfile}>
+							<Link className="la la-user btn shadow-none" to={"/profile?userId=" + localStorage.getItem("userId")}>
 								Profile
-							</button>
+							</Link>
 						</li>
 						<li>
 							<button className="la la-cog btn shadow-none" onClick={handleSettings}>

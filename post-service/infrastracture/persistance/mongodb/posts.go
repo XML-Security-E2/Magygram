@@ -107,7 +107,7 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.U
 }
 
 func (r *postRepository) GetPostsForUser(ctx context.Context, userId string) ([]*model.Post, error) {
-	cursor, err := r.Col.Find(context.TODO(), bson.M{"user_info.id": userId})
+	cursor, err := r.Col.Find(ctx, bson.M{"user_info.id": userId})
 	var results []*model.Post
 
 	if err != nil {

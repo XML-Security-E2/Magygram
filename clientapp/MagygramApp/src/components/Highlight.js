@@ -6,7 +6,7 @@ const Highlight = ({ highlight, openHighlightSlider }) => {
 
 	return (
 		<React.Fragment>
-			<li class="list-inline-item">
+			<li className="list-inline-item">
 				<button onClick={() => openHighlightSlider(highlight.name)} className="btn p-0 m-0">
 					<div className="d-flex flex-column align-items-center">
 						<div className={visitedStoryClassName}>

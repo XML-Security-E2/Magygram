@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/labstack/echo"
 	"mime/multipart"
 	"net/http"
@@ -22,6 +23,9 @@ type PostHandler interface {
 	GetPostsFirstImage(c echo.Context) error
 	AddComment(c echo.Context) error
 	EditPost(c echo.Context) error
+	GetUsersPosts(c echo.Context) error
+	GetUsersPostsCount(c echo.Context) error
+	GetPostById(c echo.Context) error
 }
 
 type postHandler struct {
@@ -213,7 +217,58 @@ func (p postHandler) EditPost(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
 		}
 	}
-
-
 	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) GetUsersPosts(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetUsersPosts(ctx, bearer, userId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, posts)
+}
+
+func (p postHandler) GetUsersPostsCount(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	postsCount, err := p.PostService.GetUsersPostsCount(ctx, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, postsCount)
+}
+
+func (p postHandler) GetPostById(c echo.Context) error {
+	postId := c.Param("postId")
+	fmt.Println(postId)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	post, err := p.PostService.GetPostById(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, post)
 }

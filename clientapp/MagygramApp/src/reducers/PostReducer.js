@@ -119,7 +119,7 @@ export const postReducer = (state, action) => {
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 			postCopy.Liked = false;
-			
+
 			var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
 			postCopy.LikedBy = newLikedByList;
 			return strcpy;
@@ -194,6 +194,226 @@ export const postReducer = (state, action) => {
 					showSuccessMessage: false,
 					successMessage: "",
 					collections: [],
+				},
+			};
+
+		case postConstants.PROFILE_POST_DETAILS_REQUEST:
+			strcpy = {
+				...state,
+			};
+			strcpy.userProfileContent.showError = false;
+			strcpy.userProfileContent.errorMessage = "";
+			strcpy.viewPostModal.showModal = false;
+			strcpy.viewPostModal.post = {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [{}],
+				UserInfo: {},
+				LikedBy: [{}],
+				DislikedBy: [{}],
+				Comments: [{}],
+				Liked: false,
+				Disliked: false,
+			};
+			return strcpy;
+
+		case postConstants.PROFILE_POST_DETAILS_SUCCESS:
+			strcpy = {
+				...state,
+			};
+			strcpy.userProfileContent.showError = false;
+			strcpy.userProfileContent.errorMessage = "";
+			strcpy.viewPostModal.showModal = true;
+			strcpy.viewPostModal.post = action.post;
+			return strcpy;
+		case postConstants.PROFILE_POST_DETAILS_FAILURE:
+			strcpy = {
+				...state,
+			};
+			strcpy.userProfileContent.showError = true;
+			strcpy.userProfileContent.errorMessage = action.errorMessage;
+			strcpy.viewPostModal.showModal = false;
+			strcpy.viewPostModal.post = {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [{}],
+				UserInfo: {},
+				LikedBy: [{}],
+				DislikedBy: [{}],
+				Comments: [{}],
+				Liked: false,
+				Disliked: false,
+			};
+			return strcpy;
+
+		case postConstants.SET_USER_PROFILE_COLLECTIONS_POSTS_REQUEST:
+			return {
+				...state,
+				userProfileContent: {
+					showError: false,
+					errorMessage: "",
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+		case postConstants.SET_USER_PROFILE_COLLECTIONS_POSTS_SUCCESS:
+			return {
+				...state,
+				userProfileContent: {
+					showError: false,
+					errorMessage: "",
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: true,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: action.collectionName,
+					posts: [],
+					collections: [],
+					collectionPosts: action.collectionPosts,
+				},
+			};
+		case postConstants.SET_USER_PROFILE_COLLECTIONS_POSTS_FAILURE:
+			return {
+				...state,
+				userProfileContent: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+
+		case postConstants.SET_USER_PROFILE_COLLECTIONS_REQUEST:
+			return {
+				...state,
+				userProfileContent: {
+					showError: false,
+					errorMessage: "",
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+		case postConstants.SET_USER_PROFILE_COLLECTIONS_SUCCESS:
+			return {
+				...state,
+				userProfileContent: {
+					showError: false,
+					errorMessage: "",
+					showPosts: false,
+					showCollections: true,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: action.collections,
+					collectionPosts: [],
+				},
+			};
+		case postConstants.SET_USER_PROFILE_COLLECTIONS_FAILURE:
+			return {
+				...state,
+				userProfileContent: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+
+		case postConstants.SET_USER_POSTS_REQUEST:
+			return {
+				...state,
+				userProfileContent: {
+					showError: false,
+					errorMessage: "",
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+		case postConstants.SET_USER_POSTS_SUCCESS:
+			return {
+				...state,
+				userProfileContent: {
+					showError: false,
+					errorMessage: "",
+					showPosts: true,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: action.posts,
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+		case postConstants.SET_USER_POSTS_FAILURE:
+			return {
+				...state,
+				userProfileContent: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: false,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
+				},
+			};
+		case postConstants.SET_USER_POSTS_UNAUTHORIZED_FAILURE:
+			return {
+				...state,
+				userProfileContent: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showPosts: false,
+					showCollections: false,
+					showCollectionPosts: false,
+					showUnauthorizedErrorMessage: true,
+					selectedCollectionName: "",
+					posts: [],
+					collections: [],
+					collectionPosts: [],
 				},
 			};
 		case modalConstants.OPEN_ADD_TO_COLLECTION_MODAL:

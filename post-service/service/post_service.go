@@ -22,10 +22,11 @@ type postService struct {
 	intercomm.MediaClient
 	intercomm.UserClient
 	intercomm.RelationshipClient
+	intercomm.AuthClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient) service_contracts.PostService {
-	return &postService{r , ic, uc, ir}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient) service_contracts.PostService {
+	return &postService{r , ic, uc, ir, ac}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -339,4 +340,93 @@ func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId strin
 		return false, nil
 	}
 	return true, nil
+}
+
+func (p postService) GetUsersPosts(ctx context.Context, bearer string, postOwnerId string) ([]*model.PostProfileResponse, error) {
+
+	if !p.checkIfUserContentIsAccessible(bearer, postOwnerId) {
+		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	userPosts, err := p.PostRepository.GetPostsForUser(ctx, postOwnerId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	var userPostsResponse []*model.PostProfileResponse
+	for _, post := range userPosts {
+		userPostsResponse = append(userPostsResponse, &model.PostProfileResponse{
+			Id:    post.Id,
+			Media: post.Media[0],
+		})
+	}
+
+	return userPostsResponse, nil
+}
+
+func (p postService) checkIfUserContentIsAccessible(bearer string, postOwnerId string) bool {
+	isPrivate, err := p.UserClient.IsUserPrivate(postOwnerId)
+	if err != nil {
+		return false
+	}
+
+	if isPrivate {
+		if bearer == "" {
+			return false
+		}
+		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		if err != nil {
+			return false
+		}
+
+		if userId != postOwnerId {
+			followedUsers, err := p.RelationshipClient.GetFollowedUsers(userId)
+			if err != nil {
+				return false
+			}
+
+			for _, usrId := range followedUsers.Users {
+				if postOwnerId == usrId {
+					return true
+				}
+			}
+			return false
+		}
+	}
+
+	return true
+}
+
+func (p postService) GetUsersPostsCount(ctx context.Context, postOwnerId string) (int, error) {
+	userPosts, err := p.PostRepository.GetPostsForUser(ctx, postOwnerId)
+	if err != nil {
+		return 0, errors.New("invalid user id")
+	}
+
+	return len(userPosts), nil
+}
+
+func (p postService) GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse, error) {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(userId)
+	post, err := p.PostRepository.GetByID(ctx, postId)
+	if err != nil {
+		return nil, errors.New("invalid post id")
+	}
+
+	if !p.checkIfUserContentIsAccessible(bearer, post.UserInfo.Id) {
+		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	postIdFavourite, err := p.UserClient.MapPostsToFavourites(bearer, []string{post.Id})
+	if err != nil { return nil, err}
+
+	res, err := model.NewPostResponse(post,hasUserLikedPost(post,userId), hasUserDislikedPost(post,userId), isInFavourites(post, postIdFavourite))
+	if err != nil { return nil, err}
+
+	return res, nil
 }
