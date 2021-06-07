@@ -21,6 +21,7 @@ type Interactor interface {
 	NewHighlightsHandler() handler.HighlightsHandler
 	NewHighlightsService() service_contracts.HighlightsService
 	NewPostClient() intercomm.PostClient
+	NewMediaClient() intercomm.MediaClient
 	NewUserHandler() handler.UserHandler
 	NewCollectionsHandler() handler.CollectionsHandler
 	NewAppHandler() handler.AppHandler
@@ -31,7 +32,6 @@ type interactor struct {
 	AccCol *mongo.Collection
 	ResPwdCol *mongo.Collection
 }
-
 
 func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection) Interactor {
 	return &interactor{UserCol, AccCol,  ResPwdCol}
@@ -46,6 +46,10 @@ type appHandler struct {
 
 func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
+}
+
+func (i *interactor) NewMediaClient() intercomm.MediaClient {
+	return intercomm.NewMediaClient()
 }
 
 func (i *interactor) NewRelationshipClient() intercomm.RelationshipClient {
@@ -96,7 +100,7 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient())
+	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient())
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {

@@ -1,9 +1,9 @@
 const EditProfileSidebar = () => {
 	return (
 		<nav className="nav flex-column mt-3">
-			<a className="nav-link active" href="#">
+			<button type="button" className="btn btn-link btn-fw nav-link active">
 				Edit profile
-			</a>
+			</button>
 		</nav>
 	);
 };

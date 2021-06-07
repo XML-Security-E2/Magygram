@@ -39,9 +39,7 @@ const EditProfileInfoForm = () => {
 	};
 
 	const handleImageChange = () => {
-		const formData = new FormData();
-		formData.append("image", image, "img");
-		//productService.updateProductImage(props.product.Id, formData, showedImage, dispatch);
+		userService.editUserImage(localStorage.getItem("userId"), image, dispatch);
 	};
 
 	useEffect(() => {
@@ -61,7 +59,7 @@ const EditProfileInfoForm = () => {
 			await userService.getUserProfileByUserId(localStorage.getItem("userId"), dispatch);
 		};
 		getProfileHandler();
-	}, []);
+	}, [dispatch]);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();

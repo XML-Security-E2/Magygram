@@ -15,7 +15,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 			await userService.getUserProfileByUserId(userId, dispatch);
 		};
 		getProfileHandler();
-	}, [userId]);
+	}, [userId, dispatch]);
 
 	const getFollowersHandler = async () => {
 		await userService.findAllFollowedUsers(userId, dispatch);

@@ -31,6 +31,12 @@ type Config struct {
 		Port 	 string
 	}
 
+	Mediaservice struct {
+		Protocol   string
+		Domain 	 string
+		Port 	 string
+	}
+
 	Relationshipservice struct {
 		Protocol   string
 		Domain string

@@ -28,6 +28,14 @@
 	position: relative;
 }
 
+.header-image-photo {
+	width: 35px;
+	height: 35px;
+	position: relative;
+	border-width: 2px !important;
+	border-color: rgb(153, 151, 151) !important;
+}
+
 .story-profile-photo {
 	width: 56px;
 	height: 56px;
@@ -51,7 +59,6 @@
 	border-width: 3px !important;
 	border-color: gray !important;
 }
-
 
 .story-profile-photo-my-story {
 	width: 56px;
@@ -120,7 +127,6 @@
 
 .carousel-item > img {
 	width: 100%;
-
 }
 
 video {
@@ -132,39 +138,37 @@ hr {
 	margin-bottom: 1rem;
 	border: 0;
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
-  }
+}
 
-  .comments-profile-photo {
+.comments-profile-photo {
 	width: 36px;
 	height: 36px;
 	position: relative;
 	border-width: 2px !important;
 }
 
-.description_label{
-    width: 300px;    
-    float: left;    
-    overflow: hidden;  
+.description_label {
+	width: 300px;
+	float: left;
+	overflow: hidden;
 	font-size: 14px;
 }
 
-.messagessss{
+.messagessss {
 	overflow-y: scroll;
 	max-height: 250px;
 }
 
-.modal-stories { 
-	background-color: rgb(43, 42, 42) !important; 
-
- }
- .modal-body-remove-margins {
-    position: relative;
-    overflow-y: auto;
-    margin: 0 ;
-    padding: 0;
+.modal-stories {
+	background-color: rgb(43, 42, 42) !important;
 }
-.modal-content-remove-margins{
-    padding: 0;
-    margin: 0;
+.modal-body-remove-margins {
+	position: relative;
+	overflow-y: auto;
+	margin: 0;
+	padding: 0;
 }
- 
+.modal-content-remove-margins {
+	padding: 0;
+	margin: 0;
+}
