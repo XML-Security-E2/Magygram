@@ -49,7 +49,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 						<div>
 							<h2>{userState.userProfile.user.username}</h2>
 						</div>
-						<div>
+						<div hidden={localStorage.getItem("userId") === null}>
 							{userId !== localStorage.getItem("userId") &&
 								(localStorage.getItem("userId") !== null && userState.userProfile.user.following ? (
 									<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnfollow}>

@@ -81,6 +81,7 @@ const ViewPostModal = () => {
 								comments={postState.viewPostModal.post.Comments}
 							/>
 							<hr></hr>
+							<div id="viewPostModalInteraction">
 							<PostInteractionModalView
 								post={postState.viewPostModal.post}
 								LikePost={LikePost}
@@ -97,6 +98,8 @@ const ViewPostModal = () => {
 								showDislikesModal={showDislikesModal}
 							/>
 							<PostCommentInputModalView postComment={postComment} />
+							</div>
+							
 						</div>
 					</div>
 				</div>
