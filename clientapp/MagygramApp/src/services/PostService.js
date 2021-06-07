@@ -23,6 +23,7 @@ export const postService = {
 	findPostsForUserByHashtag,
 	findPostsForGuestByLocation,
 	findPostsForUserByLocation,
+	findPostByIdForGuest,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -599,5 +600,32 @@ function findPostsForUserByLocation(location,dispatch){
 		
 	function failure() {
 		return { type: postConstants.TIMELINE_POSTS_FAILURE };
+	}
+}
+
+async function findPostByIdForGuest(postId, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/id/${postId}/guest`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Error while loading collections"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: postConstants.PROFILE_POST_DETAILS_FOR_GUEST_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.PROFILE_POST_DETAILS_FOR_GUEST_SUCCESS, post: data };
+	}
+	function failure(message) {
+		return { type: postConstants.PROFILE_POST_DETAILS_FOR_GUEST_FAILURE, errorMessage: message };
 	}
 }

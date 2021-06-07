@@ -13,7 +13,6 @@ import CreatePostPage from "./pages/CreatePostPage";
 import UserPage from "./pages/UserPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
-import { searchService } from "./services/SearchService";
 import SearchPostPage from "./pages/SearchedPostPage";
 
 function App() {

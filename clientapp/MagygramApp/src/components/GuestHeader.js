@@ -5,7 +5,7 @@ import { searchService } from "../services/SearchService"
 import { postService } from "../services/PostService";
 
 const GuestHeader = () => {
-	const { postState, dispatch } = useContext(PostContext);
+	const { dispatch } = useContext(PostContext);
 
     const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };

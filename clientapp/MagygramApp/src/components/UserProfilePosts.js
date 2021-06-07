@@ -6,7 +6,11 @@ const UserProfilePosts = () => {
 	const { postState, dispatch } = useContext(PostContext);
 
 	const getPostDetailsHandler = async (postId) => {
-		await postService.findPostById(postId, dispatch);
+		if(localStorage.getItem("userId")===null){
+			await postService.findPostByIdForGuest(postId, dispatch);
+		}else{
+			await postService.findPostById(postId, dispatch);
+		}
 	};
 
 	return (
