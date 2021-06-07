@@ -16,6 +16,8 @@ type CollectionsHandler interface {
 	GetUsersCollectionsExceptDefault(c echo.Context) error
 	CheckIfPostInFavourites(c echo.Context) error
 	DeleteFromCollection(c echo.Context) error
+	GetUserCollections(c echo.Context) error
+	GetCollectionPosts(c echo.Context) error
 }
 
 type collectionsHandler struct {
@@ -129,4 +131,36 @@ func (ch collectionsHandler) DeleteFromCollection(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (ch collectionsHandler) GetUserCollections(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	collection, err := ch.CollectionsService.GetUsersCollections(ctx,bearer, "")
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, collection)
+}
+
+func (ch collectionsHandler) GetCollectionPosts(c echo.Context) error {
+	collectionName := c.Param("collectionName")
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	posts, err := ch.CollectionsService.GetCollectionPosts(ctx, bearer, collectionName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, posts)
 }

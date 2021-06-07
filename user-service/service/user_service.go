@@ -7,6 +7,7 @@ import (
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
+	"user-service/domain/service-contracts/exceptions"
 	"user-service/service/intercomm"
 )
 
@@ -16,15 +17,15 @@ type userService struct {
 	service_contracts.ResetPasswordService
 	intercomm.AuthClient
 	intercomm.RelationshipClient
+	intercomm.PostClient
 }
-
 
 var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient) service_contracts.UserService {
-	return &userService{r, a,  rp , ic, rC}
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient) service_contracts.UserService {
+	return &userService{r, a,  rp , ic, rC, pc}
 }
 
 func (u *userService) EditUser(ctx context.Context, userRequest *model.EditUserRequest) (string, error) {
@@ -211,11 +212,203 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 	}, nil
 }
 
-func (u *userService) IsUserPrivate(ctx context.Context, userId string) (bool, error) {
+func (u *userService) GetUserProfileById(ctx context.Context,bearer string, userId string) (*model.UserProfileResponse, error) {
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
-		return false, errors.New("invalid user id")
+		return nil, errors.New("invalid user id")
 	}
 
-	return user.IsPrivate, nil
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	postsCount, err := u.PostClient.GetUsersPostsCount(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	loggedId, _ := u.AuthClient.GetLoggedUserId(bearer)
+	following := false
+	if loggedId != "" {
+		following = doesUserFollow(followedUsers, loggedId)
+	}
+
+	retVal := &model.UserProfileResponse{
+		Username:        user.Username,
+		Name:            user.Name,
+		Surname:         user.Surname,
+		Website:         user.Website,
+		Bio:             user.Bio,
+		Number:          user.Number,
+		Gender:          user.Gender,
+		ImageUrl:        user.ImageUrl,
+		PostNumber:      postsCount,
+		Following: 		 following,
+		FollowersNumber: len(followedUsers.Users),
+		FollowingNumber: len(followingUsers.Users),
+	}
+	return retVal, nil
+}
+
+func (p userService) checkIfUserInfoIsAccessible(bearer string, owner *model.User, loggedUserId string, followedUsers model.FollowedUsersResponse) bool {
+
+	if owner.IsPrivate {
+		if bearer == "" {
+			return false
+		}
+
+		if loggedUserId != owner.Id {
+			for _, usrId := range followedUsers.Users {
+				if owner.Id == usrId {
+					return true
+				}
+			}
+			return false
+		}
+	}
+
+	return true
+}
+
+func (u *userService) GetFollowedUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	owner, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(loggedId)
+	if err != nil {
+		return nil, err
+	}
+
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !u.checkIfUserInfoIsAccessible(bearer, owner, loggedId, followingUsers) {
+		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	var userInfos []*model.UserFollowingResponse
+
+	for _, followedId := range followedUsers.Users {
+		folUsr, err := u.UserRepository.GetByID(ctx, followedId)
+		if err != nil {
+			return nil, errors.New("invalid user id")
+		}
+
+		following := false
+		if bearer != "" {
+			following = doesUserFollow(followingUsers, followedId)
+		}
+		userInfos = append(userInfos, &model.UserFollowingResponse{
+			Following: following,
+			UserInfo:  &model.UserInfo{
+				Id:       followedId,
+				Username: folUsr.Username,
+				ImageURL: folUsr.ImageUrl,
+			},
+		})
+	}
+
+	return userInfos, nil
+}
+
+func doesUserFollow(followingUsers model.FollowedUsersResponse, followedId string) bool {
+	for _, folId := range followingUsers.Users {
+		if folId == followedId {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *userService) GetFollowingUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	owner, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(loggedId)
+	if err != nil {
+		return nil, err
+	}
+
+	followingUsersRet, err := u.RelationshipClient.GetFollowedUsers(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !u.checkIfUserInfoIsAccessible(bearer, owner, loggedId, followingUsers) {
+		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	var userInfos []*model.UserFollowingResponse
+
+	for _, followedId := range followingUsersRet.Users {
+		folUsr, err := u.UserRepository.GetByID(ctx, followedId)
+		if err != nil {
+			return nil, errors.New("invalid user id")
+		}
+
+		following := false
+		if bearer != "" {
+			following = doesUserFollow(followingUsers, followedId)
+		}
+		userInfos = append(userInfos, &model.UserFollowingResponse{
+			Following: following,
+			UserInfo:  &model.UserInfo{
+				Id:       followedId,
+				Username: folUsr.Username,
+				ImageURL: folUsr.ImageUrl,
+			},
+		})
+	}
+
+	return userInfos, nil
+}
+
+func (u *userService) FollowUser(ctx context.Context, bearer string, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	err = u.RelationshipClient.FollowRequest(&model.FollowRequest{
+		SubjectId: loggedId,
+		ObjectId:  userId,
+	})
+	return err
+}
+
+func (u *userService) UnfollowUser(ctx context.Context, bearer string, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	err = u.RelationshipClient.Unfollow(&model.FollowRequest{
+		SubjectId: loggedId,
+		ObjectId:  userId,
+	})
+	return err
 }

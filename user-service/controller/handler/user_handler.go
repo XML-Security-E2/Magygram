@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"user-service/domain/model"
 	"user-service/domain/service-contracts"
+	"user-service/domain/service-contracts/exceptions"
 )
 
 
@@ -22,6 +23,11 @@ type UserHandler interface {
 	GetUserById(c echo.Context) error
 	GetLoggedUserInfo(c echo.Context) error
 	SearchForUsersByUsername(c echo.Context) error
+	GetUserProfileById(c echo.Context) error
+	GetFollowedUsers(c echo.Context) error
+	GetFollowingUsers(c echo.Context) error
+	FollowUser(c echo.Context) error
+	UnollowUser(c echo.Context) error
 	SearchForUsersByUsernameByGuest(c echo.Context) error
 	IsUserPrivate(c echo.Context) error
 }
@@ -254,6 +260,24 @@ func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, userInfo)
 }
 
+func (h *userHandler) GetUserProfileById(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	user, err := h.UserService.GetUserProfileById(ctx,bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK,user)
+}
+
 func (h *userHandler) IsUserPrivate(c echo.Context) error {
 	userId := c.Param("userId")
 
@@ -262,11 +286,99 @@ func (h *userHandler) IsUserPrivate(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	retVal, err := h.UserService.IsUserPrivate(ctx, userId)
+	user, err := h.UserService.GetUserById(ctx, userId)
+
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
-	return c.JSON(http.StatusOK, retVal)
+	return c.JSON(http.StatusOK, user.IsPrivate)
+}
 
+func (h *userHandler) GetFollowedUsers(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	users, err := h.UserService.GetFollowedUsers(ctx, bearer, userId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, users)
+}
+
+func (h *userHandler) GetFollowingUsers(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	users, err := h.UserService.GetFollowingUsers(ctx, bearer, userId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, users)
+}
+
+func (h *userHandler) FollowUser(c echo.Context) error {
+	userId := c.FormValue("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	err := h.UserService.FollowUser(ctx, bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) UnollowUser(c echo.Context) error {
+	userId := c.FormValue("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	err := h.UserService.UnfollowUser(ctx, bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, "")
 }

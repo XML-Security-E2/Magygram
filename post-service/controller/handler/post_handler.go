@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/labstack/echo"
 	"mime/multipart"
 	"net/http"
@@ -22,6 +23,9 @@ type PostHandler interface {
 	GetPostsFirstImage(c echo.Context) error
 	AddComment(c echo.Context) error
 	EditPost(c echo.Context) error
+	GetUsersPosts(c echo.Context) error
+	GetUsersPostsCount(c echo.Context) error
+	GetPostById(c echo.Context) error
 	SearchPostsByHashTagByGuest(c echo.Context) error
 	GetPostForGuestLineByHashTag(c echo.Context) error
 	GetPostForUserTimelineByHashTag(c echo.Context) error
@@ -216,20 +220,56 @@ func (p postHandler) EditPost(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
 		}
 	}
-
-
 	return c.JSON(http.StatusOK, "")
 }
 
-func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
-	hashTag := c.Param("value")
+func (p postHandler) GetUsersPosts(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetUsersPosts(ctx, bearer, userId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, posts)
+}
+
+func (p postHandler) GetUsersPostsCount(c echo.Context) error {
+	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	hashTagsPosts, err := p.PostService.GetPostsByHashTagForGuest(ctx, hashTag)
+	postsCount, err := p.PostService.GetUsersPostsCount(ctx, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, postsCount)
+}
+
+
+func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
+	hashTag := c.Param("value")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+	ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag,bearer)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
@@ -238,9 +278,24 @@ func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
 	if hashTagsPosts == nil{
 		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
 	}
-
 	c.Response().Header().Set("Content-Type" , "text/javascript")
-	return c.JSON(http.StatusOK, hashTagsPosts)
+		return c.JSON(http.StatusOK, hashTagsPosts)
+}
+
+func (p postHandler) GetPostById(c echo.Context) error {
+	postId := c.Param("postId")
+	fmt.Println(postId)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	post, err := p.PostService.GetPostById(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, post)
 }
 
 func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
@@ -261,15 +316,15 @@ func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
 	return c.JSON(http.StatusOK, hashTagsInfo)
 }
 
-func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
+func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
 	hashTag := c.Param("value")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	bearer := c.Request().Header.Get("Authorization")
-	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag,bearer)
+
+	hashTagsPosts, err := p.PostService.GetPostsByHashTagForGuest(ctx, hashTag)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")

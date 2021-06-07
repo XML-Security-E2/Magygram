@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { userService } from "../services/UserService";
 import Axios from "axios";
-import { useHistory } from "react-router-dom";
-import { config } from "../config/config";
+import { Link, useHistory } from "react-router-dom";
 import { authHeader } from "../helpers/auth-header";
 import AsyncSelect from "react-select/async";
 import { searchService } from "../services/SearchService";
@@ -10,7 +9,7 @@ import { postService } from "../services/PostService";
 import { PostContext } from "../contexts/PostContext";
 
 const Header = () => {
-	const { postState, dispatch } = useContext(PostContext);
+	const { dispatch } = useContext(PostContext);
 
 	const history = useHistory();
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
@@ -26,10 +25,8 @@ const Header = () => {
 		Axios.get(`/api/users/logged`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				setCurrentId(res.data.id);
-                if(res.data.imageUrl == "")
-                    setImg("assets/img/profile.jpg");
-                else
-                	setImg(res.data.imageUrl);
+				if (res.data.imageUrl == "") setImg("assets/img/profile.jpg");
+				else setImg(res.data.imageUrl);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -37,17 +34,16 @@ const Header = () => {
 	});
 
 	const loadOptions = (value, callback) => {
-		if(value.startsWith('#')){
-            setTimeout(() => {
-                searchService.guestSearchHashtagPosts(value,callback)
-            }, 1000);
-        }else{
-            setTimeout(() => {
-                searchService.userSearchUsers(value,callback)
-            }, 1000);
-        }
-
-	  };
+		if (value.startsWith("#")) {
+			setTimeout(() => {
+				searchService.guestSearchHashtagPosts(value, callback);
+			}, 1000);
+		} else {
+			setTimeout(() => {
+				searchService.userSearchUsers(value, callback);
+			}, 1000);
+		}
+	};
 
 	const onInputChange = (inputValue, { action }) => {
 		switch (action) {
@@ -66,7 +62,7 @@ const Header = () => {
 
 	const onChange = (option) => {
 		if (option.searchType === "hashtag") {
-			postService.findPostsForUserByHashtag(option.value,dispatch);
+			postService.findPostsForUserByHashtag(option.value, dispatch);
 		} else {
 			window.location = "#/user/" + option.id;
 		}
@@ -80,18 +76,6 @@ const Header = () => {
 	const handleProfile = () => {
 		let path = `/profile`;
 		history.push(path);
-
-		Axios.get(`api/users/logged`, {
-			validateStatus: () => true,
-			headers: { Authorization: authHeader() },
-		})
-			.then((res) => {
-				console.log(res.data);
-				setName(res.data.Name);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	};
 
 	const handleSettings = () => {
@@ -119,9 +103,9 @@ const Header = () => {
 					<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src={img} alt="ProfileImage" />
 					<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
 						<li>
-							<button className="la la-user btn shadow-none" onClick={handleProfile}>
+							<Link className="la la-user btn shadow-none" to={"/profile?userId=" + localStorage.getItem("userId")}>
 								Profile
-							</button>
+							</Link>
 						</li>
 						<li>
 							<button className="la la-cog btn shadow-none" onClick={handleSettings}>

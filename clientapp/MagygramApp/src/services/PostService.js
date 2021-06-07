@@ -4,7 +4,11 @@ import { authHeader } from "../helpers/auth-header";
 
 export const postService = {
 	findPostsForTimeline,
+	findPostById,
+	findAllUserPosts,
 	findAllUsersCollections,
+	findAllUsersProfileCollections,
+	findAllPostsFromCollection,
 	addPostToCollection,
 	createCollection,
 	deletePostFromCollection,
@@ -46,9 +50,122 @@ async function findPostsForTimeline(dispatch) {
 	}
 }
 
+async function findAllUserPosts(userId, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/${userId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else if (res.status === 401) {
+				dispatch(unauthorizedFailure());
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("error"));
+		});
+
+	function request() {
+		return { type: postConstants.SET_USER_POSTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.SET_USER_POSTS_SUCCESS, posts: data };
+	}
+	function failure(error) {
+		return { type: postConstants.SET_USER_POSTS_FAILURE, errorMessage: error };
+	}
+	function unauthorizedFailure() {
+		return { type: postConstants.SET_USER_POSTS_UNAUTHORIZED_FAILURE };
+	}
+}
+
 async function findAllUsersCollections(dispatch) {
 	dispatch(request());
 	await Axios.get(`/api/users/collections/except-default`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Error while loading collections"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: postConstants.SET_USER_COLLECTIONS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.SET_USER_COLLECTIONS_SUCCESS, collections: data };
+	}
+	function failure(message) {
+		return { type: postConstants.SET_USER_COLLECTIONS_FAILURE, errorMessage: message };
+	}
+}
+
+async function findPostById(postId, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/id/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Error while loading collections"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: postConstants.PROFILE_POST_DETAILS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.PROFILE_POST_DETAILS_SUCCESS, post: data };
+	}
+	function failure(message) {
+		return { type: postConstants.PROFILE_POST_DETAILS_FAILURE, errorMessage: message };
+	}
+}
+
+async function findAllPostsFromCollection(collectionName, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/users/collections/${collectionName}/posts`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data, collectionName));
+			} else {
+				dispatch(failure("Error while loading collections"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("error"));
+		});
+
+	function request() {
+		return { type: postConstants.SET_USER_PROFILE_COLLECTIONS_POSTS_REQUEST };
+	}
+
+	function success(data, collectionName) {
+		return { type: postConstants.SET_USER_PROFILE_COLLECTIONS_POSTS_SUCCESS, collectionPosts: data, collectionName };
+	}
+	function failure(message) {
+		return { type: postConstants.SET_USER_PROFILE_COLLECTIONS_POSTS_FAILURE, errorMessage: message };
+	}
+}
+
+async function findAllUsersProfileCollections(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/users/collections`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
@@ -62,14 +179,14 @@ async function findAllUsersCollections(dispatch) {
 		});
 
 	function request() {
-		return { type: postConstants.SET_USER_COLLECTIONS_REQUEST };
+		return { type: postConstants.SET_USER_PROFILE_COLLECTIONS_REQUEST };
 	}
 
 	function success(data) {
-		return { type: postConstants.SET_USER_COLLECTIONS_SUCCESS, collections: data };
+		return { type: postConstants.SET_USER_PROFILE_COLLECTIONS_SUCCESS, collections: data };
 	}
 	function failure(message) {
-		return { type: postConstants.SET_USER_COLLECTIONS_FAILURE, errorMessage: message };
+		return { type: postConstants.SET_USER_PROFILE_COLLECTIONS_FAILURE, errorMessage: message };
 	}
 }
 
@@ -237,7 +354,7 @@ function likePost(postId, loggedUser, dispatch) {
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(postId,loggedUser));
+				dispatch(success(postId, loggedUser));
 			} else {
 				dispatch(failure("Error"));
 			}
@@ -251,7 +368,7 @@ function likePost(postId, loggedUser, dispatch) {
 		return { type: postConstants.LIKE_POST_REQUEST };
 	}
 	function success(postId, loggedUser) {
-		return { type: postConstants.LIKE_POST_SUCCESS, postId , loggedUser };
+		return { type: postConstants.LIKE_POST_SUCCESS, postId, loggedUser };
 	}
 	function failure(message) {
 		return { type: postConstants.LIKE_POST_FAILURE, errorMessage: message };
@@ -264,7 +381,7 @@ function unlikePost(postId, loggedUser, dispatch) {
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(postId,loggedUser));
+				dispatch(success(postId, loggedUser));
 			} else {
 				dispatch(failure("Error"));
 			}
@@ -277,8 +394,8 @@ function unlikePost(postId, loggedUser, dispatch) {
 	function request() {
 		return { type: postConstants.UNLIKE_POST_REQUEST };
 	}
-	function success(postId,loggedUser) {
-		return { type: postConstants.UNLIKE_POST_SUCCESS, postId,loggedUser };
+	function success(postId, loggedUser) {
+		return { type: postConstants.UNLIKE_POST_SUCCESS, postId, loggedUser };
 	}
 	function failure(message) {
 		return { type: postConstants.UNLIKE_POST_FAILURE, errorMessage: message };

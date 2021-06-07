@@ -9,9 +9,11 @@ import (
 
 type FollowHandler interface {
 	FollowRequest(ctx echo.Context) error
+	Unfollow(ctx echo.Context) error
 	CreateUser(ctx echo.Context) error
 	IsUserFollowed(ctx echo.Context) error
 	ReturnFollowedUsers(ctx echo.Context) error
+	ReturnFollowingUsers(ctx echo.Context) error
 	ReturnFollowRequests(ctx echo.Context) error
 	AcceptFollowRequest(ctx echo.Context) error
 }
@@ -36,6 +38,20 @@ func (f *followHandler) FollowRequest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, followId)
+}
+
+func (f *followHandler) Unfollow(c echo.Context) error {
+	followRequest := &model.FollowRequest{}
+	if err := c.Bind(followRequest); err != nil {
+		return err
+	}
+
+	err := f.FollowService.Unfollow(followRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
 
 func (f *followHandler) AcceptFollowRequest(ctx echo.Context) error {
@@ -66,7 +82,6 @@ func (f *followHandler) CreateUser(c echo.Context) error {
 func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
 	user := &model.User{Id: ctx.Param("userId")}
 
-
 	result, err := f.FollowService.ReturnFollowedUsers(user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -74,6 +89,17 @@ func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusCreated, result)
 }
+
+
+func (f *followHandler) ReturnFollowingUsers(ctx echo.Context) error {
+	user := &model.User{Id: ctx.Param("userId")}
+
+	result, err := f.FollowService.ReturnFollowingUsers(user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, result)}
 
 func (f *followHandler) ReturnFollowRequests(ctx echo.Context) error {
 	user := &model.User{}

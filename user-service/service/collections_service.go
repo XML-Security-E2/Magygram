@@ -204,3 +204,30 @@ func deletePostFromCollection(collection []model.IdWithMedia, postId string) []m
 	}
 	return colCpy
 }
+
+
+func (c collectionsService) GetCollectionPosts(ctx context.Context, bearer string, collectionName string) ([]*model.PostProfileResponse, error) {
+	userId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := c.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	if _, ok := user.FavouritePosts[collectionName]; !ok {
+		return nil, errors.New(fmt.Sprintf("collection with name %s not exist", collectionName))
+	}
+
+	var postsFavFlags []*model.PostProfileResponse
+	for _, fav := range user.FavouritePosts[collectionName] {
+		postsFavFlags = append(postsFavFlags, &model.PostProfileResponse{
+			Id:    fav.Id,
+			Media: fav.Media,
+		})
+	}
+	fmt.Println(len(postsFavFlags))
+	return postsFavFlags, nil
+}

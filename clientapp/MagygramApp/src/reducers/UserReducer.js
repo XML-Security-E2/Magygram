@@ -1,4 +1,7 @@
+import { modalConstants } from "../constants/ModalConstants";
 import { userConstants } from "../constants/UserConstants";
+
+var a = {};
 
 export const userReducer = (state, action) => {
 	switch (action.type) {
@@ -145,6 +148,106 @@ export const userReducer = (state, action) => {
 					emailAddress: action.emailAddress,
 				},
 			};
+
+		case userConstants.GET_USER_PROFILE_REQUEST:
+			return {
+				...state,
+				userProfile: {
+					showedUserId: "",
+					user: {
+						username: "",
+						name: "",
+						surname: "",
+						website: "",
+						bio: "",
+						following: "",
+						gender: "",
+						imageUrl: "",
+						postNumber: "",
+						followersNumber: "",
+						followingNumber: "",
+					},
+				},
+			};
+		case userConstants.GET_USER_PROFILE_SUCCESS:
+			return {
+				...state,
+				userProfile: {
+					showedUserId: action.userId,
+					user: action.user,
+				},
+			};
+
+		case userConstants.GET_USER_PROFILE_FAILURE:
+			return state;
+
+		case modalConstants.HIDE_FOLLOWING_MODAL:
+			return {
+				...state,
+				userProfileFollowingModal: {
+					showModal: false,
+					userInfos: [],
+					modalHeader: "",
+				},
+			};
+
+		case userConstants.SET_USER_FOLLOWING_REQUEST:
+			a = { ...state };
+			a.userProfileFollowingModal.userInfos = [];
+			return a;
+
+		case userConstants.SET_USER_FOLLOWING_SUCCESS:
+			a = { ...state };
+			a.userProfileFollowingModal.userInfos = action.userInfos;
+			a.userProfileFollowingModal.showModal = true;
+			a.userProfileFollowingModal.modalHeader = action.header;
+			return a;
+		case userConstants.SET_USER_FOLLOWING_FAILURE:
+			a = { ...state };
+			a.userProfileFollowingModal.userInfos = [];
+			return a;
+
+		case userConstants.FOLLOW_USER_REQUEST:
+			return state;
+
+		case userConstants.FOLLOW_USER_SUCCESS:
+			a = { ...state };
+			let cp = a.userProfileFollowingModal.userInfos.find((info) => info.userInfo.id === action.userId);
+			if (cp !== undefined) {
+				cp.following = true;
+			}
+
+			if (a.userProfile.showedUserId === localStorage.getItem("userId")) {
+				a.userProfile.user.followingNumber = a.userProfile.user.followingNumber + 1;
+			} else {
+				a.userProfile.user.followersNumber = a.userProfile.user.followersNumber + 1;
+			}
+			a.userProfile.user.following = true;
+
+			return a;
+		case userConstants.FOLLOW_USER_FAILURE:
+			return state;
+
+		case userConstants.UNFOLLOW_USER_REQUEST:
+			return state;
+
+		case userConstants.UNFOLLOW_USER_SUCCESS:
+			a = { ...state };
+			let cccp = a.userProfileFollowingModal.userInfos.find((info) => info.userInfo.id === action.userId);
+			if (cccp !== undefined) {
+				cccp.following = false;
+			}
+			if (a.userProfile.showedUserId === localStorage.getItem("userId")) {
+				a.userProfile.user.followingNumber = a.userProfile.user.followingNumber - 1;
+			} else {
+				a.userProfile.user.followersNumber = a.userProfile.user.followersNumber - 1;
+			}
+			a.userProfile.user.following = false;
+
+			return a;
+		case userConstants.UNFOLLOW_USER_FAILURE:
+			return state;
+
 		default:
 			return state;
 	}

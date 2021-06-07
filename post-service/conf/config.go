@@ -38,6 +38,12 @@ type Config struct {
 		Port 	 string
 	}
 
+	Authservice struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
+
 	Relationshipservice struct {
 		Protocol   string
 		Domain 	 string

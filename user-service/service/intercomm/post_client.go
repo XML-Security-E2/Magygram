@@ -12,6 +12,7 @@ import (
 
 type PostClient interface {
 	GetPostsFirstImage(postId string) (*model.Media, error)
+	GetUsersPostsCount(userId string) (int, error)
 }
 
 type postClient struct {}
@@ -24,7 +25,6 @@ func NewPostClient() PostClient {
 var (
 	basePostUrl = ""
 )
-
 func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/image", basePostUrl, postId), nil)
@@ -43,4 +43,23 @@ func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 	json.Unmarshal(bodyBytes, &postImage)
 
 	return &postImage, nil
+}
+
+func (a postClient) GetUsersPostsCount(userId string) (int, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/count", basePostUrl, userId), nil)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Println(resp.StatusCode)
+		return 0, errors.New("posts not found")
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+	var postsCount int
+	json.Unmarshal(bodyBytes, &postsCount)
+
+	return postsCount, nil
 }

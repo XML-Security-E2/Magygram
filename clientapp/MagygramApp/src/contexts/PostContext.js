@@ -31,7 +31,7 @@ const PostContextProvider = (props) => {
 		timeline: {
 			posts: [],
 		},
-		guestTimeline:{
+		guestTimeline: {
 			posts: [],
 		},
 		addToFavouritesModal: {
@@ -54,6 +54,18 @@ const PostContextProvider = (props) => {
 			showModal: false,
 			dislikes: [],
 		},
+		userProfileContent: {
+			showError: false,
+			errorMessage: "",
+			showPosts: false,
+			showCollections: false,
+			showUnauthorizedErrorMessage: false,
+			showCollectionPosts: false,
+			selectedCollectionName: "",
+			posts: [],
+			collections: [],
+			collectionPosts: [],
+		},
 		viewPostModal: {
 			showModal: false,
 			post: {
@@ -70,6 +82,7 @@ const PostContextProvider = (props) => {
 				Comments: [{}],
 				Liked: false,
 				Disliked: false,
+				Favourites: false,
 			},
 		},
 	});

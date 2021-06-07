@@ -161,6 +161,11 @@ type PostResponse struct {
 	Disliked bool
 }
 
+type PostProfileResponse struct {
+	Id string `json:"id"`
+	Media Media `json:"media"`
+}
+
 type PostIdFavouritesFlag struct {
 	Id string `json:"id"`
 	Favourites bool `json:"favourites"`
