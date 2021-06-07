@@ -13,19 +13,22 @@ const GuestHeader = () => {
 	const [search, setSearch] = useState("");
 
 	const loadOptions = (value, callback) => {
-        if(value.startsWith('#')){
-            setTimeout(() => {
-                searchService.guestSearchHashtagPosts(value,callback)
-            }, 1000);
-        }else if(value.startsWith('%')){
-            setTimeout(() => {
-                searchService.guestSearchLocation(value,callback)
-            }, 1000);
-        }else{
-            setTimeout(() => {
-                searchService.guestSearchUsers(value,callback)
-            }, 1000);
-        }
+		if(value!==""){
+			if(value.startsWith('#')){
+				setTimeout(() => {
+					searchService.guestSearchHashtagPosts(value,callback)
+				}, 1000);
+			}else if(value.startsWith('%')){
+				setTimeout(() => {
+					searchService.guestSearchLocation(value,callback)
+				}, 1000);
+			}else{
+				setTimeout(() => {
+					searchService.guestSearchUsers(value,callback)
+				}, 1000);
+			}
+		}
+        
 	  };
 
 	const onInputChange = (inputValue, { action }) => {
@@ -71,7 +74,7 @@ const GuestHeader = () => {
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
 			<div className="container">
 				<div>
-					<img src="assets/img/logotest.png" alt="NistagramLogo" />
+					<img onClick={() =>backToHome()} src="assets/img/logotest.png" alt="NistagramLogo" />
 				</div>
 				<button className="navbar-toggler" data-toggle="collapse">
 					<span className="sr-only">Toggle navigation</span>

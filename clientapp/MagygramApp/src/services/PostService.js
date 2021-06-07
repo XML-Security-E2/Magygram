@@ -496,6 +496,7 @@ function findPostsForGuestByHashtag(hashtag,dispatch){
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
+				window.location = "#/";
 			} else {
 				failure();
 			}
@@ -554,6 +555,7 @@ function findPostsForGuestByLocation(location,dispatch){
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
+				alert('t')
 			} else {
 				failure();
 			}
