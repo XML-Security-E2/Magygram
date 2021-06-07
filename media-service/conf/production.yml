@@ -1,4 +1,4 @@
 server:
-    port: "463"
+    port: "465"
     host: "media-service"
     secret: "MagyGram"

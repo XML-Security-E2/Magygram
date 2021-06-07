@@ -53,7 +53,7 @@ function createHighlight(highlightDTO, dispatch) {
 			.then((res) => {
 				console.log(res);
 				if (res.status === 201) {
-					findAllProfileHighlights(dispatch);
+					findAllProfileHighlights(localStorage.getItem("userId"), dispatch);
 					dispatch(success(res.data));
 				} else {
 					dispatch(failure(res.data.message));
@@ -247,24 +247,24 @@ function visitedByUser(storyId, dispatch) {
 	//}
 }
 
-function HaveActiveStoriesLoggedUser(dispatch){
+function HaveActiveStoriesLoggedUser(dispatch) {
 	dispatch(request());
 	Axios.get(`/api/story/activestories`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(res.data));
 			} else {
-				dispatch(failure())
+				dispatch(failure());
 			}
 		})
 		.catch((err) => {
-			dispatch(failure())
+			dispatch(failure());
 		});
 
 	function request() {
 		return { type: storyConstants.HAVE_LOGGED_USER_STORY_REQUEST };
 	}
-	
+
 	function success(data) {
 		return { type: storyConstants.HAVE_LOGGED_USER_STORY_SUCCESS, haveStories: data };
 	}

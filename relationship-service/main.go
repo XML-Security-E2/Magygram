@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"flag"
 	"github.com/labstack/echo"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
@@ -10,7 +11,7 @@ import (
 	"relationship-service/interactor"
 )
 
-var runServer = flag.Bool("server", false, "production is -server option require")
+var runServer = flag.Bool("relationship-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
 func main(){
 	conf.NewConfig(*runServer)
@@ -25,5 +26,8 @@ func main(){
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 
-	e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
-}
+	if os.Getenv("IS_PRODUCTION") == "true" {
+		e.Start(":"+ conf.Current.Server.Port)
+	} else {
+		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+	}}

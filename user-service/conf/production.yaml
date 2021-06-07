@@ -36,6 +36,11 @@ storyservice:
     domain: "story-service"
     port: "464"
 
+relationshipservice:
+    protocol: "http://"
+    domain: "relationship-service"
+    port: "463"
+
 gateway:
     port: "8085"
     protocol: "http://"
