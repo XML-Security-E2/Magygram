@@ -5,7 +5,7 @@ import { searchService } from "../services/SearchService"
 import { postService } from "../services/PostService";
 
 const GuestHeader = () => {
-	const { postState, dispatch } = useContext(PostContext);
+	const { dispatch } = useContext(PostContext);
 
     const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
@@ -13,19 +13,22 @@ const GuestHeader = () => {
 	const [search, setSearch] = useState("");
 
 	const loadOptions = (value, callback) => {
-        if(value.startsWith('#')){
-            setTimeout(() => {
-                searchService.guestSearchHashtagPosts(value,callback)
-            }, 1000);
-        }else if(value.startsWith('%')){
-            setTimeout(() => {
-                searchService.guestSearchLocation(value,callback)
-            }, 1000);
-        }else{
-            setTimeout(() => {
-                searchService.guestSearchUsers(value,callback)
-            }, 1000);
-        }
+		if(value!==""){
+			if(value.startsWith('#')){
+				setTimeout(() => {
+					searchService.guestSearchHashtagPosts(value,callback)
+				}, 1000);
+			}else if(value.startsWith('%')){
+				setTimeout(() => {
+					searchService.guestSearchLocation(value,callback)
+				}, 1000);
+			}else{
+				setTimeout(() => {
+					searchService.guestSearchUsers(value,callback)
+				}, 1000);
+			}
+		}
+        
 	  };
 
 	const onInputChange = (inputValue, { action }) => {
@@ -71,7 +74,7 @@ const GuestHeader = () => {
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
 			<div className="container">
 				<div>
-					<img src="assets/img/logotest.png" alt="NistagramLogo" />
+					<img onClick={() =>backToHome()} src="assets/img/logotest.png" alt="NistagramLogo" />
 				</div>
 				<button className="navbar-toggler" data-toggle="collapse">
 					<span className="sr-only">Toggle navigation</span>

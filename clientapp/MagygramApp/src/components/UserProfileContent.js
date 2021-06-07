@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { PostContext } from "../contexts/PostContext";
 import { postService } from "../services/PostService";
 import ViewPostModal from "./modals/ViewPostModal";
+import ViewPostModalForGuest from "./modals/ViewPostModalForGuest";
 import StoryHighlights from "./StoryHighlights";
 import UserProfilePosts from "./UserProfilePosts";
 import UserProfileSavedPosts from "./UserProfileSavedPosts";
@@ -49,6 +50,7 @@ const UserProfileContent = ({ userId }) => {
 					<UserProfilePosts />
 					<UserProfileSavedPosts />
 					<ViewPostModal />
+					<ViewPostModalForGuest/>
 				</div>
 			) : (
 				<div className="mt-5 d-flex justify-content-center border" style={{ backgroundColor: "white" }}>

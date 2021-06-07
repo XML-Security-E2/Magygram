@@ -172,3 +172,10 @@ hr {
 	padding: 0;
 	margin: 0;
 }
+
+#viewPostModalInteraction {
+	position:absolute;
+	bottom:0;
+	width: 450px;
+	margin-bottom: 3px;
+}

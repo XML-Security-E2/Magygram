@@ -604,7 +604,14 @@ export const postReducer = (state, action) => {
 					post: action.post,
 				},
 			};
-
+		case modalConstants.HIDE_VIEW_POST_FOR_GUEST_MODAL:
+			return {
+				...state,
+				viewPostModalForGuest: {
+					showModal: false,
+					post: action.post,
+				},
+			};
 		case modalConstants.SHOW_POST_OPTIONS_MODAL:
 			console.log(action.post);
 			return {
@@ -697,6 +704,46 @@ export const postReducer = (state, action) => {
 					posts: [],
 				},
 			};
+		case postConstants.PROFILE_POST_DETAILS_FOR_GUEST_REQUEST:
+			strcpy = {
+				...state,
+			};
+			strcpy.userProfileContent.showError = false;
+			strcpy.userProfileContent.errorMessage = "";
+			strcpy.viewPostModalForGuest.showModal = false;
+			strcpy.viewPostModalForGuest.post = {
+				Id: "",
+				Description: "",
+				Location: "",
+				Media: [{}],
+				UserInfo: {},
+			};
+			return strcpy;
+	
+		case postConstants.PROFILE_POST_DETAILS_FOR_GUEST_SUCCESS:
+			strcpy = {
+				...state,
+			};
+			strcpy.userProfileContent.showError = false;
+			strcpy.userProfileContent.errorMessage = "";
+			strcpy.viewPostModalForGuest.showModal = true;
+			strcpy.viewPostModalForGuest.post = action.post;
+			return strcpy;
+		case postConstants.PROFILE_POST_DETAILS_FOR_GUEST_FAILURE:
+			strcpy = {
+				...state,
+			};
+			strcpy.userProfileContent.showError = true;
+			strcpy.userProfileContent.errorMessage = action.errorMessage;
+			strcpy.viewPostModalForGuest.showModal = false;
+			strcpy.viewPostModalForGuest.post = {
+				Id: "",
+				Description: "",
+				Location: "",
+				Media: [{}],
+				UserInfo: {},
+			};
+			return strcpy;
 		default:
 			return state;
 	}

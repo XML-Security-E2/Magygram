@@ -85,6 +85,16 @@ const PostContextProvider = (props) => {
 				Favourites: false,
 			},
 		},
+		viewPostModalForGuest: {
+			showModal: false,
+			post: {
+				Id: "",
+				Description: "",
+				Location: "",
+				Media: [{}],
+				UserInfo: {},
+			},
+		},
 	});
 
 	return <PostContext.Provider value={{ postState, dispatch }}>{props.children}</PostContext.Provider>;
