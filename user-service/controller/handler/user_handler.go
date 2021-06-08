@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"os"
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
@@ -134,7 +135,12 @@ func (h *userHandler) ActivateUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "User can not be activated.")
 	}
 
-	return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
+	if os.Getenv("IS_PRODUCTION") == "true" {
+		return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
+	} else {
+		return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
+	}
+	//return c.Redirect(http.StatusMovedPermanently, "https://localhost:3000/#/login")//c.JSON(http.StatusNoContent, activationId)
 }
 
 func (h *userHandler) ResendActivationLink(c echo.Context) error {

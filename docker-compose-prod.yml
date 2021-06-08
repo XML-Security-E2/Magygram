@@ -13,6 +13,8 @@ services:
 
     magygram-app:
         image: magygram-app
+        networks:
+            - backend
         build:
             context: ./clientapp/MagygramApp
             dockerfile: Dockerfile
