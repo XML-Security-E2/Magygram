@@ -8,7 +8,7 @@ const PostHeaderModalView = ({ username, image, location, openOptionsModal }) =>
 			<div className="d-flex flex-row align-items-center justify-content-between">
 				<div className="list-inline d-flex flex-row align-items-center m-0">
 					<div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger post-profile-photo mr-3 ml-2">
-						<img src={image} alt="..." style={imgStyle} />
+						<img src={image === "" ? "assets/img/profile.jpg" : image} alt="" style={imgStyle} />
 					</div>
 					<div className="align-items-top">
 						<div className="font-weight-bold">{username}</div>
