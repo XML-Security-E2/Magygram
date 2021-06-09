@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"relationship-service/conf"
+	"relationship-service/logger"
 )
 
 type UserClient interface {
@@ -32,6 +34,12 @@ type privateFlag struct {
 func (u userClient) IsPrivate(id string) (bool, error) {
 	resp, err := http.Get(fmt.Sprintf("%s/%s/is-private", baseUrl, id))
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : id}).Error("User-service not available")
+			return false, err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : id}).Error("User-service check user privacy")
 		return false, errors.New("could not get user profile private flag")
 	}
 

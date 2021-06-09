@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
 	"user-service/domain/service-contracts/exceptions"
+	"user-service/logger"
 	"user-service/service/intercomm"
 )
 
@@ -35,6 +37,7 @@ func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, 
 	}
 
 	if _, ok := user.HighlightsStory[highlights.Name]; ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id, "highlight_name" : highlights.Name}).Warn("Highlight name already exist")
 		return nil, errors.New(fmt.Sprintf("highlights with name %s already exist", highlights.Name))
 	}
 
@@ -49,8 +52,14 @@ func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, 
 
 	_, err = h.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+													 "highlights_name" : highlights.Name,
+													 "story_ids": highlights.StoryIds}).Error("User create highlights failure")
+
 		return nil, err
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,	"highlights_name" : highlights.Name}).Info("Highlights created")
 
 	return &model.HighlightProfileResponse{
 		Name: highlights.Name,
@@ -61,13 +70,13 @@ func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, 
 
 func (h highlightsService) GetProfileHighlights(ctx context.Context, bearer string, usrId string) ([]*model.HighlightProfileResponse, error) {
 
-
 	owner, err := h.UserRepository.GetByID(ctx, usrId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
 
 	if !h.checkIfUserContentIsAccessible(bearer, owner) {
+		logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id" : owner.Id}).Warn("Unauthorized access")
 		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 	}
 
@@ -119,12 +128,15 @@ func (h highlightsService) GetProfileHighlightsByHighlightName(ctx context.Conte
 	}
 
 	if !h.checkIfUserContentIsAccessible(bearer, owner) {
+		logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id" : owner.Id}).Warn("Unauthorized access")
 		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 	}
 
 	if _, ok := owner.HighlightsStory[name]; !ok {
-		return nil, errors.New(fmt.Sprintf("highlights with name %s already not exist", name))
+		logger.LoggingEntry.WithFields(logrus.Fields{"highlights_name" : name, "content_owner_id" : owner.Id}).Warn("Invalid highlights name")
+		return nil, errors.New(fmt.Sprintf("highlights with name %s not exist", name))
 	}
+
 	retVal := &model.HighlightImageWithMedia{
 		Url:   owner.HighlightsStory[name].Url,
 		Media: owner.HighlightsStory[name].Media,

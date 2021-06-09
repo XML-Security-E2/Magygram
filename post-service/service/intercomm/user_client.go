@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"post-service/conf"
 	"post-service/domain/model"
+	"post-service/logger"
 )
 
 type UserClient interface {
@@ -36,6 +38,13 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.Error("User-service not available")
+			return &model.UserInfo{}, err
+		}
+
+		logger.LoggingEntry.Error("User-service get logged user info")
+
 		return &model.UserInfo{}, errors.New("unauthorized")
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -62,6 +71,12 @@ func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*mo
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_ids" : postIds}).Error("User-service not available")
+			return nil, err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_ids" : postIds}).Error("User-service map posts to favourites")
 		return nil, errors.New("unauthorized")
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -80,7 +95,12 @@ func (u userClient) IsUserPrivate(userId string) (bool, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Println(resp.StatusCode)
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("User-service not available")
+			return false, err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("User-service check user privacy")
 		return false, errors.New("user not found")
 	}
 

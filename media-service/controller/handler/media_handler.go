@@ -2,6 +2,8 @@ package handler
 
 import (
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
+	"media-service/logger"
 	"media-service/service"
 	"mime/multipart"
 	"net/http"
@@ -20,6 +22,8 @@ func NewMediaHandler(m service.MediaService) MediaHandler {
 }
 
 func (m mediaHandler) SaveMedia(c echo.Context) error {
+	logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+
 	mpf, _ := c.MultipartForm()
 
 	var headers []*multipart.FileHeader

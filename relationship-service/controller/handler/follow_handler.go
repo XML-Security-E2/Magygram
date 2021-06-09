@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"relationship-service/domain/model"
+	"relationship-service/logger"
 	"relationship-service/service"
 )
 
@@ -19,6 +21,7 @@ type FollowHandler interface {
 	ReturnFollowRequests(ctx echo.Context) error
 	AcceptFollowRequest(ctx echo.Context) error
 	ReturnFollowRequestsForUser(ctx echo.Context) error
+	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type followHandler struct {
@@ -27,6 +30,13 @@ type followHandler struct {
 
 func NewFollowHandler(f service.FollowService) FollowHandler {
 	return &followHandler{f}
+}
+
+func (f followHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (f *followHandler) FollowRequest(c echo.Context) error {

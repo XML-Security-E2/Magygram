@@ -3,16 +3,19 @@ package handler
 import (
 	"context"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"user-service/domain/model"
 	"user-service/domain/service-contracts"
 	"user-service/domain/service-contracts/exceptions"
+	"user-service/logger"
 )
 
 type HighlightsHandler interface {
 	CreateHighlights(c echo.Context) error
 	GetProfileHighlights(c echo.Context) error
 	GetProfileHighlightsByHighlightName(c echo.Context) error
+	HighlightsLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type highlightsHandler struct {
@@ -21,6 +24,13 @@ type highlightsHandler struct {
 
 func NewHighlightsHandler(u service_contracts.HighlightsService) HighlightsHandler {
 	return &highlightsHandler{u}
+}
+
+func (h *highlightsHandler) HighlightsLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (h highlightsHandler) CreateHighlights(c echo.Context) error {

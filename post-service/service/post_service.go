@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"github.com/beevik/guid"
 	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 	"log"
 	_ "net/http"
 	"post-service/domain/model"
 	"post-service/domain/repository"
 	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
+	"post-service/logger"
 	"post-service/service/intercomm"
 	"strings"
 	"time"
@@ -40,18 +42,29 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	if err != nil { return "", err}
 
 	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
+													 "description" : postRequest.Description,
+													 "location" : postRequest.Location}).Warn("Post creating validation failure")
 
-	if err != nil { return "", err}
+		return "", err}
 
-	if err := validator.New().Struct(post); err!= nil {
+	if err = validator.New().Struct(post); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
+			"description" : postRequest.Description,
+			"location" : postRequest.Location}).Warn("Post creating validation failure")
 		return "", err
 	}
 
 	result, err := p.PostRepository.Create(ctx, post)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
+													 "description" : postRequest.Description,
+													 "location" : postRequest.Location}).Error("Post database create failure")
+		return "", err}
 
-	if err != nil { return "", err}
 	if postId, ok := result.InsertedID.(string); ok {
-		if err != nil { return "", err}
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id" : userInfo.Id}).Info("Post created")
 		return postId, nil
 	}
 
@@ -89,7 +102,7 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 		return err
 	}
 
-	result, err := p.PostRepository.GetOne(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx,postId)
 	if err != nil {
 		return err
 	}
@@ -103,6 +116,8 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+													"post_id" : postId}).Error("Post like, database update failure")
 		return err
 	}
 
@@ -115,7 +130,7 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 		return err
 	}
 
-	result, err := p.PostRepository.GetOne(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx,postId)
 	if err != nil {
 		return err
 	}
@@ -124,6 +139,8 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+					 							     "post_id" : postId}).Error("Post dislike, database update failure")
 		return err
 	}
 
@@ -136,7 +153,7 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 		return err
 	}
 
-	result, err := p.PostRepository.GetOne(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx,postId)
 	if err != nil {
 		return err
 	}
@@ -150,6 +167,8 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+													 "post_id" : postId}).Error("Post dislike, database update failure")
 		return err
 	}
 
@@ -164,7 +183,7 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 	}
 	fmt.Println(postId)
 
-	result, err := p.PostRepository.GetOne(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx,postId)
 	if err != nil {
 		return err
 	}
@@ -173,6 +192,8 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+			 										 "post_id" : postId}).Error("Post un-dislike, database update failure")
 		return err
 	}
 
@@ -185,7 +206,7 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 		return nil, err
 	}
 
-	result, err := p.PostRepository.GetOne(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx,postId)
 	if err != nil {
 		return nil,err
 	}
@@ -201,6 +222,8 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+												     "post_id" : postId}).Error("Post comment, database update failure")
 		return nil, err
 	}
 
@@ -326,6 +349,11 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 
 	_, err = p.PostRepository.Update(ctx, post)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": post.UserInfo.Id,
+													 "post_id" : post.Id,
+													 "tags": postRequest.Tags,
+													 "description": postRequest.Description,
+													 "location": postRequest.Location}).Error("Post edit, database update failure")
 		return err
 	}
 
@@ -335,10 +363,12 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
 		return false, err
 	}
 
 	if postOwnerId != userInfo.Id {
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userInfo.Id}).Warn("Unauthorized access")
 		return false, nil
 	}
 	return true, nil
@@ -352,6 +382,7 @@ func (p postService) GetUsersPosts(ctx context.Context, bearer string, postOwner
 
 	userPosts, err := p.PostRepository.GetPostsForUser(ctx, postOwnerId)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Error while getting user posts")
 		return nil, errors.New("invalid user id")
 	}
 
@@ -374,16 +405,19 @@ func (p postService) checkIfUserContentIsAccessible(bearer string, postOwnerId s
 
 	if isPrivate {
 		if bearer == "" {
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
 			return false
 		}
 		userId, err := p.AuthClient.GetLoggedUserId(bearer)
 		if err != nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
 			return false
 		}
 
 		if userId != postOwnerId {
 			followedUsers, err := p.RelationshipClient.GetFollowedUsers(userId)
 			if err != nil {
+				logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userId}).Warn("Unauthorized access")
 				return false
 			}
 
@@ -392,6 +426,8 @@ func (p postService) checkIfUserContentIsAccessible(bearer string, postOwnerId s
 					return true
 				}
 			}
+
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userId}).Warn("Unauthorized access")
 			return false
 		}
 	}
@@ -414,7 +450,6 @@ func (p postService) GetPostById(ctx context.Context, bearer string, postId stri
 		return nil, err
 	}
 
-	fmt.Println(userId)
 	post, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
 		return nil, errors.New("invalid post id")

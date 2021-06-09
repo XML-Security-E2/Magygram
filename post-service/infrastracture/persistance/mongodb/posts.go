@@ -3,13 +3,14 @@ package mongodb
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/beevik/guid"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
 	"post-service/domain/model"
 	"post-service/domain/repository"
+	"post-service/logger"
 )
 
 type postRepository struct {
@@ -70,6 +71,7 @@ func (r *postRepository) GetByID(ctx context.Context, id string) (*model.Post, e
 	var post = model.Post{}
 	err := r.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&post)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_id" : id}).Warn("Invalid post id")
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("ErrNoDocuments")
 		}
@@ -78,18 +80,6 @@ func (r *postRepository) GetByID(ctx context.Context, id string) (*model.Post, e
 	return &post, nil
 }
 
-func (r *postRepository) GetOne(ctx context.Context, postId string) (*model.Post, error) {
-	var post = model.Post{}
-	fmt.Println(postId)
-	err := r.Col.FindOne(ctx, bson.M{"_id": postId}).Decode(&post)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, errors.New("ErrNoDocuments")
-		}
-		return nil, err
-	}
-	return &post, nil
-}
 
 func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.UpdateResult, error) {
 	return r.Col.UpdateOne(ctx, bson.M{"_id":  post.Id},bson.D{{"$set", bson.D{
@@ -111,16 +101,14 @@ func (r *postRepository) GetPostsForUser(ctx context.Context, userId string) ([]
 
 	if err != nil {
 		defer cursor.Close(ctx)
+		return nil, err
 	} else {
 		for cursor.Next(ctx) {
 			var result model.Post
 
-			err := cursor.Decode(&result)
+			_ = cursor.Decode(&result)
 			results = append(results, &result)
 
-			if err != nil {
-				os.Exit(1)
-			}
 		}
 	}
 	return results, nil

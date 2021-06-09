@@ -1,10 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 	"relationship-service/domain/model"
 	"relationship-service/infrastructure/persistence/neo4jdb"
+	"relationship-service/logger"
 	"relationship-service/service/intercomm"
 )
 
@@ -40,11 +41,15 @@ func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool,
 	}
 	if isPrivate {
 		if err:= f.FollowRepository.CreateFollowRequest(followRequest); err != nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+														 "object_id" : followRequest.ObjectId}).Error("Follow request create, database failure")
 			return false, err
 		}
 		return true, nil
 	} else {
 		if err:= f.FollowRepository.CreateFollow(followRequest); err != nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+														 "object_id" : followRequest.ObjectId}).Error("Follow user, database failure")
 			return false, err
 		}
 	}
@@ -52,7 +57,12 @@ func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool,
 }
 
 func (f *followService) Unfollow(followRequest *model.FollowRequest) error {
-	return f.FollowRepository.Unfollow(followRequest)
+	err := f.FollowRepository.Unfollow(followRequest)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+													 "object_id" : followRequest.ObjectId}).Error("Unfollow user, database failure")
+	}
+	return err
 }
 
 func (f *followService) IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error) {
@@ -60,9 +70,11 @@ func (f *followService) IsUserFollowed(followRequest *model.FollowRequest) (inte
 		return false, err
 	}
 
-	exists, err := f.FollowRepository.IsUserFollowed(followRequest);
+	exists, err := f.FollowRepository.IsUserFollowed(followRequest)
 	if err != nil {
-			return false, err
+		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+													 "object_id" : followRequest.ObjectId}).Error("Check if follows, database failure")
+		return false, err
 	}
 
 	return exists, nil
@@ -72,9 +84,12 @@ func (f *followService) CreateUser(user *model.User) error {
 	if err := validator.New().Struct(user); err != nil {
 		return err
 	}
-	if err:= f.FollowRepository.CreateUser(user); err != nil {
+	if err := f.FollowRepository.CreateUser(user); err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Create user node, database failure")
 		return err
 	}
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : user.Id}).Info("User node created")
+
 	return nil
 }
 
@@ -84,7 +99,6 @@ func (f *followService) AcceptFollowRequest(bearer string, userId string) error 
 		return  err
 	}
 
-	fmt.Println(loggedId)
 	return f.FollowRepository.AcceptFollowRequest(&model.FollowRequest{
 		SubjectId: userId,
 		ObjectId:  loggedId,
@@ -92,11 +106,21 @@ func (f *followService) AcceptFollowRequest(bearer string, userId string) error 
 }
 
 func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, error) {
-	return f.FollowRepository.ReturnFollowedUsers(user)
+	retVal, err := f.FollowRepository.ReturnFollowedUsers(user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
 }
 
 func (f *followService) ReturnFollowingUsers(user *model.User) (interface{}, error) {
-	return f.FollowRepository.ReturnFollowingUsers(user)
+	retVal, err := f.FollowRepository.ReturnFollowingUsers(user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get following users, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
 }
 
 func (f *followService) ReturnFollowRequests(bearer string) (interface{}, error) {
@@ -105,7 +129,12 @@ func (f *followService) ReturnFollowRequests(bearer string) (interface{}, error)
 		return false, err
 	}
 
-	return f.FollowRepository.ReturnFollowRequests(&model.User{Id: loggedId})
+	retVal, err := f.FollowRepository.ReturnFollowRequests(&model.User{Id: loggedId})
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"logged_user_id": loggedId}).Error("Get follow requests for user, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
 }
 
 func (f *followService) ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error) {
@@ -114,5 +143,10 @@ func (f *followService) ReturnFollowRequestsForUser(bearer string, objectId stri
 		return false, err
 	}
 
-	return f.FollowRepository.ReturnFollowRequestsForUser(&model.User{Id: objectId}, loggedId)
+	retVal, err := f.FollowRepository.ReturnFollowRequestsForUser(&model.User{Id: objectId}, loggedId)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"logged_user_id": loggedId, "object_id" : objectId}).Error("Get follow requests for user, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
 }

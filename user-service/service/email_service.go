@@ -2,10 +2,11 @@ package service
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/sirupsen/logrus"
 	"html/template"
 	"net/smtp"
 	"user-service/conf"
+	"user-service/logger"
 )
 
 type Request struct {
@@ -36,8 +37,11 @@ func SendActivationMail(receiver string, name string, activationId string) {
 	}
 	r := NewRequest([]string{receiver}, "Hello "+ name + "!", "Hello "+ name + "!")
 	if err := r.parseTemplate("mailActivation.html", templateData); err == nil {
-		ok, _ := r.sendEmail()
-		fmt.Println(ok)
+		if ok, _ := r.sendEmail(); ok {
+			logger.Logger.WithFields(logrus.Fields{"activation_id" : activationId}).Info("Activation e-mail sent")
+		} else {
+			logger.Logger.WithFields(logrus.Fields{"activation_id" : activationId}).Error("Sending activation e-mail")
+		}
 	}
 }
 
@@ -52,8 +56,11 @@ func SendResetPasswordMail(receiver string, name string, activationId string) {
 	}
 	r := NewRequest([]string{receiver}, "Hello "+ name + "!", "Hello "+ name + "!")
 	if err := r.parseTemplate("mailResetPassword.html", templateData); err == nil {
-		ok, _ := r.sendEmail()
-		fmt.Println(ok)
+		if ok, _ := r.sendEmail(); ok {
+			logger.Logger.WithFields(logrus.Fields{"reset_password_id" : activationId}).Info("Reset password e-mail sent")
+		} else {
+			logger.Logger.WithFields(logrus.Fields{"reset_password_id" : activationId}).Error("Sending reset password e-mail")
+		}
 	}
 }
 

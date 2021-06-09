@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"github.com/beevik/guid"
+	"github.com/sirupsen/logrus"
 	"io"
 	"media-service/domain/model"
+	"media-service/logger"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -12,7 +14,6 @@ import (
 
 type MediaService interface {
 	SaveMedia(ctx context.Context, files []*multipart.FileHeader) ([]model.Media, error)
-	GetMedia(ctx context.Context, mediaId string) (*os.File, error)
 }
 
 type mediaService struct {
@@ -32,13 +33,19 @@ func NewMediaService() MediaService {
 
 func (m mediaService) SaveMedia(ctx context.Context, files []*multipart.FileHeader) ([]model.Media, error) {
 	var mediaIds []model.Media
+	var mediaIdLog []string
 	for _, file := range files {
 		media , err := saveFile(file)
 		if err != nil {
+			logger.LoggingEntry.Error("Error while saving file")
 			return nil, err
 		}
 		mediaIds = append(mediaIds, *media)
+		mediaIdLog = append(mediaIdLog, media.Url)
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"file_paths" : mediaIds}).Info("Files saved")
+
 	return mediaIds, nil
 }
 
@@ -80,8 +87,4 @@ func checkIfImage(extension string) bool {
 		}
 	}
 	return false
-}
-
-func (m mediaService) GetMedia(ctx context.Context, mediaId string) (*os.File, error) {
-	panic("implement me")
 }

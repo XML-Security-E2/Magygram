@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 	"log"
 	"mime/multipart"
 	"story-service/domain/model"
 	"story-service/domain/repository"
 	"story-service/domain/service-contracts"
+	"story-service/logger"
 	"story-service/service/intercomm"
 )
 
@@ -33,18 +35,22 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	if err != nil { return "", err}
 
 	post, err := model.NewStory(*userInfo, "REGULAR", media)
-
-	if err != nil { return "", err}
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
+		return "", err}
 
 	if err := validator.New().Struct(post); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
 		return "", err
 	}
 
 	result, err := p.StoryRepository.Create(ctx, post)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userInfo.Id}).Error("Story database create failure")
+		return "", err}
 
-	if err != nil { return "", err}
 	if postId, ok := result.InsertedID.(string); ok {
-		if err != nil { return "", err}
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_id": post.Id, "user_id" : userInfo.Id}).Info("Story created")
 		return postId, nil
 	}
 
@@ -142,6 +148,7 @@ func makeStoriesMapFromArray(stories []*model.Story, userInfo *model.UserInfo) m
 func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bearer string) (*model.StoryResponse, error) {
 	result, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userId)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_owner_id" : userId}).Warn("Error while getting user stories")
 		return nil, err
 	}
 	fmt.Println(len(result))
@@ -174,6 +181,7 @@ func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*
 	var userStories []*model.UsersStoryResponse
 	result, err := p.StoryRepository.GetStoriesForUser(ctx, userInfo.Id)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_owner_id" : userInfo.Id}).Warn("Error while getting user stories")
 		return nil, err
 	}
 

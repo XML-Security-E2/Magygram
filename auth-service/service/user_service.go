@@ -4,10 +4,11 @@ import (
 	"auth-service/domain/model"
 	"auth-service/domain/repository"
 	"auth-service/domain/service-contracts"
+	"auth-service/logger"
 	"context"
 	"errors"
 	"github.com/go-playground/validator"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/sirupsen/logrus"
 )
 
 type userService struct {
@@ -21,17 +22,25 @@ func NewUserService(r repository.UserRepository,a repository.LoginEventRepositor
 
 func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user, err := model.NewUser(userRequest)
-	if err != nil { return "", err}
-	if err := validator.New().Struct(user); err!= nil {
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return "", err
 	}
-	result, err := u.UserRepository.Create(ctx, user)
 
-	if err != nil { 	
+	if err := validator.New().Struct(user); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return "", err
 	}
-	if userId, ok := result.InsertedID.(primitive.ObjectID); ok {
-		return userId.String(), nil
+
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Error("User database create failure")
+		return "", err
+	}
+
+	if userId, ok := result.InsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
+		return userId, nil
 	}
 	return "", err
 }
@@ -45,6 +54,7 @@ func (u userService) ActivateUser(ctx context.Context, userId string) (bool, err
 	user.Active = true
 	_, err = u.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("User database update failure")
 		return false, err
 	}
 
@@ -55,38 +65,36 @@ func (u userService) ActivateUser(ctx context.Context, userId string) (bool, err
 
 func (u userService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
 	if successful {
-		_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
+		_, err := u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
+		if err != nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_email" : userEmail}).Warn("Create success login event, database failure")
+		}
 		return
-	}
-	loginEvent, err := u.LoginEventRepository.GetLastByUserEmail(ctx, userEmail)
-
-	if err != nil || loginEvent == nil {
-		_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 1))
-		return
-	}
-
-	_, _ = u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, loginEvent.RepetitionNumber+1))
-	if loginEvent.RepetitionNumber + 1 > MaxUnsuccessfulLogins {
-		_, _ = u.DeactivateUser(ctx, userEmail)
 	}
 }
 
 func (u userService) DeactivateUser(ctx context.Context, userEmail string) (bool, error) {
 	user, err := u.UserRepository.GetByEmail(ctx, userEmail)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email": userEmail}).Warn("Invalid email address")
 		return false, err
 	}
 	user.Active = false
 	_, err = u.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("User database update failure")
 		return false, err
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Info("User deactivated")
+
 	return true, err
 }
 
 func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *model.PasswordChangeRequest) (bool, error) {
 	hashAndSalt, err := model.HashAndSaltPasswordIfStrongAndMatching(changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : changePasswordRequest.UserId}).Warn("Passwords not valid")
 		return false, err
 	}
 
@@ -98,6 +106,7 @@ func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *m
 	user.Active = true
 	_, err = u.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("User database update failure")
 		return false, err
 	}
 
@@ -108,6 +117,7 @@ func (u userService) GetByEmail(ctx context.Context, email string) (*model.User,
 	user, err := u.UserRepository.GetByEmail(ctx, email)
 
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email": email}).Warn("Invalid email address")
 		return nil, errors.New("invalid user id")
 	}
 

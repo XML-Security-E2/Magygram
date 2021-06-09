@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"user-service/conf"
 	"user-service/domain/model"
+	"user-service/logger"
 )
 
 type PostClient interface {
@@ -31,7 +33,12 @@ func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Println(resp.StatusCode)
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_id": postId}).Error("Post-service not available")
+			return nil, err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": postId}).Error("Post-service get posts first image")
 		return nil, errors.New("post not found")
 	}
 
@@ -50,6 +57,12 @@ func (a postClient) GetUsersPostsCount(userId string) (int, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Post-service not available")
+			return 0, err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Post-service get post count")
 		fmt.Println(resp.StatusCode)
 		return 0, errors.New("posts not found")
 	}

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"relationship-service/conf"
+	"relationship-service/logger"
 )
 
 type AuthClient interface {
@@ -34,7 +35,12 @@ func (a authClient) GetLoggedUserId(bearer string) (string,error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Println(resp.StatusCode)
+		if resp == nil {
+			logger.LoggingEntry.Error("Auth-service not available")
+			return "", err
+		}
+
+		logger.LoggingEntry.Error("Auth-service get logged user")
 		return "", errors.New("unauthorized")
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)

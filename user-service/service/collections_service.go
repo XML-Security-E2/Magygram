@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
+	"user-service/logger"
 	"user-service/service/intercomm"
 )
 
@@ -33,15 +35,18 @@ func (c collectionsService) CreateCollection(ctx context.Context, bearer string,
 	}
 
 	if _, ok := user.FavouritePosts[collectionName]; ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id, "collection_name" : collectionName}).Warn("Collection name already exist")
 		return errors.New(fmt.Sprintf("collection with name %s already exist", collectionName))
 	}
 
 	user.FavouritePosts[collectionName] = []model.IdWithMedia{}
 	_, err = c.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId, "collection_name" : collectionName}).Error("User create collection failure")
 		return err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId, "collection_name" : collectionName}).Info("Collection created")
 	return nil
 }
 
@@ -58,6 +63,7 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 	}
 	if favouritePostRequest.CollectionName != ""{
 		if _, ok := user.FavouritePosts[favouritePostRequest.CollectionName]; !ok {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id, "collection_name" : favouritePostRequest.CollectionName}).Warn("Invalid collection name")
 			return errors.New(fmt.Sprintf("invalid %s collection", favouritePostRequest.CollectionName))
 		}
 	}
@@ -67,6 +73,7 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 		if colName != model.DefaultCollection {
 			for _, favMedia := range user.FavouritePosts[colName] {
 				if favMedia.Id == favouritePostRequest.PostId {
+					logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id, "post_id" : favouritePostRequest.PostId}).Warn("Post already in favourite")
 					return errors.New(fmt.Sprintf("post with %s id already in favourites", favouritePostRequest.PostId))
 				}
 			}
@@ -94,6 +101,9 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 
 	_, err = c.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+													 "post_id" : favouritePostRequest.PostId,
+													 "collection_name" : favouritePostRequest.CollectionName}).Error("Save post to collection failure")
 		return err
 	}
 
@@ -188,6 +198,9 @@ func (c collectionsService) DeletePostFromCollections(ctx context.Context, beare
 	}
 	_, err = c.UserRepository.Update(ctx, user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+													 "post_id" : postId}).Error("Delete post from collection failure")
+
 		return err
 	}
 
@@ -218,6 +231,8 @@ func (c collectionsService) GetCollectionPosts(ctx context.Context, bearer strin
 	}
 
 	if _, ok := user.FavouritePosts[collectionName]; !ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+													 "collection_name" : collectionName}).Warn("Invalid collection name")
 		return nil, errors.New(fmt.Sprintf("collection with name %s not exist", collectionName))
 	}
 

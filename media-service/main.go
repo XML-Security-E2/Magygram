@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"github.com/sirupsen/logrus"
+	"media-service/logger"
 	"os"
 	"github.com/labstack/echo"
 	"media-service/conf"
@@ -13,6 +15,8 @@ var runServer = flag.Bool("media-service", os.Getenv("IS_PRODUCTION") == "true",
 
 func main() {
 
+	logger.InitLogger()
+
 	conf.NewConfig(*runServer)
 
 	e := echo.New()
@@ -21,6 +25,11 @@ func main() {
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
+
+	logger.Logger.WithFields(logrus.Fields{
+		"host": conf.Current.Server.Host,
+		"port":   conf.Current.Server.Port,
+	}).Info("Server started")
 
 	if os.Getenv("IS_PRODUCTION") == "true" {
 		e.Start(":"+ conf.Current.Server.Port)
