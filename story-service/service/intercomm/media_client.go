@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"story-service/conf"
 	"story-service/domain/model"
+	"story-service/logger"
 )
 
 type MediaClient interface {
@@ -45,7 +46,13 @@ func handleSaveMediaRequest(body *bytes.Buffer, writer *multipart.Writer) (model
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	resp, err := client.Do(req)
-	if err != nil {
+	if err != nil || resp.StatusCode != 201 {
+		if resp == nil {
+			logger.LoggingEntry.Error("Media-service not available")
+			return model.Media{}, 0, err
+		}
+
+		logger.LoggingEntry.Error("Media-service save media")
 		return model.Media{}, 0, err
 	}
 

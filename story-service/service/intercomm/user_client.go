@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"story-service/conf"
 	"story-service/domain/model"
+	"story-service/logger"
 )
 
 type UserClient interface {
@@ -33,6 +34,12 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.Error("User-service not available")
+			return &model.UserInfo{}, err
+		}
+
+		logger.LoggingEntry.Error("User-service get logged user info")
 		return &model.UserInfo{}, errors.New("unauthorized")
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)

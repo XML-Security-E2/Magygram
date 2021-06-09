@@ -64,7 +64,7 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 		return "", err}
 
 	if postId, ok := result.InsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id}).Info("Post created")
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id" : userInfo.Id}).Info("Post created")
 		return postId, nil
 	}
 

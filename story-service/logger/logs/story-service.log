@@ -1,0 +1,1 @@
+time="2021-06-09T22:02:38+02:00" level=info msg="Server started" func="github.com/sirupsen/logrus.(*Entry).Info" file="C:/Users/Dusan/go/pkg/mod/github.com/sirupsen/logrus@v1.4.2/entry.go:285" host=localhost port=464

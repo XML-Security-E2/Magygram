@@ -5,18 +5,22 @@ import (
 	"flag"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"story-service/conf"
 	"story-service/controller/router"
 	"story-service/interactor"
+	"story-service/logger"
 	"time"
 )
 
 var runServer = flag.Bool("story-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
 func main() {
+
+	logger.InitLogger()
 
 	conf.NewConfig(*runServer)
 	mongoDbInfo := fmt.Sprintf("%s:%s",
@@ -60,6 +64,11 @@ func main() {
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
+
+	logger.Logger.WithFields(logrus.Fields{
+		"host": conf.Current.Server.Host,
+		"port":   conf.Current.Server.Port,
+	}).Info("Server started")
 
 	if os.Getenv("IS_PRODUCTION") == "true" {
 		e.Start(":"+ conf.Current.Server.Port)

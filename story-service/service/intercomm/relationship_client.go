@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"story-service/conf"
 	"story-service/domain/model"
+	"story-service/logger"
 )
 
 type RelationshipClient interface {
@@ -34,7 +36,11 @@ func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsers
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 201 {
-		fmt.Println(resp.StatusCode)
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service not available")
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service get followed users")
 		return model.FollowedUsersResponse{}, errors.New("post not found")
 	}
 

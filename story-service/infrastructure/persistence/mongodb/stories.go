@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"errors"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"story-service/domain/model"
 	"story-service/domain/repository"
+	"story-service/logger"
 	"time"
 )
 
@@ -54,16 +56,14 @@ func (s storyRepository) GetStoriesForUser(ctx context.Context, userId string) (
 
 	if err != nil {
 		defer cursor.Close(ctx)
+		return nil, err
 	} else {
 		for cursor.Next(ctx) {
 			var result model.Story
 
-			err := cursor.Decode(&result)
+			_ = cursor.Decode(&result)
 			results = append(results, &result)
 
-			if err != nil {
-				os.Exit(1)
-			}
 		}
 	}
 	return results, nil
@@ -77,16 +77,13 @@ func (s storyRepository) GetActiveStoriesForUser(ctx context.Context, userId str
 
 	if err != nil {
 		defer cursor.Close(ctx)
+		return nil, err
 	} else {
 		for cursor.Next(ctx) {
 			var result model.Story
 
-			err := cursor.Decode(&result)
+			_ = cursor.Decode(&result)
 			results = append(results, &result)
-
-			if err != nil {
-				os.Exit(1)
-			}
 		}
 	}
 	return results, nil
@@ -97,6 +94,7 @@ func (s storyRepository) GetByID(ctx context.Context, storyId string) (*model.St
 
 	err := s.Col.FindOne(ctx, bson.M{"_id": storyId}).Decode(&story)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_id" : storyId}).Warn("Invalid story id")
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("ErrNoDocuments")
 		}

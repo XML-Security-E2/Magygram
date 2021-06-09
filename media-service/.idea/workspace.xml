@@ -3,20 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/handler/post_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/domain/repository/posts.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/infrastracture/persistance/mongodb/posts.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/auth_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/auth_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/media_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/relationship_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/post_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/media_client.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +16,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$USER_HOME$/go/go1.16.3" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>

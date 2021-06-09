@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"story-service/domain/model"
 	"story-service/domain/service-contracts"
+	"story-service/logger"
 )
 
 type StoryHandler interface {
@@ -17,13 +19,19 @@ type StoryHandler interface {
 	VisitedStoryByUser(c echo.Context) error
 	GetStoryHighlight(c echo.Context) error
 	HaveActiveStoriesLoggedUser(c echo.Context) error
+	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type storyHandler struct {
 	StoryService service_contracts.StoryService
 }
 
-
+func (p storyHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
+}
 
 func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 	return &storyHandler{p}
