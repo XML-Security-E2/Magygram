@@ -84,10 +84,12 @@ func (f *followService) CreateUser(user *model.User) error {
 	if err := validator.New().Struct(user); err != nil {
 		return err
 	}
-	if err:= f.FollowRepository.CreateUser(user); err != nil {
+	if err := f.FollowRepository.CreateUser(user); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Create user node, database failure")
 		return err
 	}
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : user.Id}).Info("User node created")
+
 	return nil
 }
 

@@ -2,11 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../auth-service/controller/handler/auth_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/handler/auth_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/handler/user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/service/user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/media_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/media_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/handler/media_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/handler/media_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/handler/follow_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/handler/follow_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/service/follow_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/service/follow_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

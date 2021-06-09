@@ -9,7 +9,6 @@ import (
 	"errors"
 	"github.com/go-playground/validator"
 	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type userService struct {
@@ -39,9 +38,9 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 		return "", err
 	}
 
-	if userId, ok := result.InsertedID.(primitive.ObjectID); ok {
+	if userId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
-		return userId.String(), nil
+		return userId, nil
 	}
 	return "", err
 }

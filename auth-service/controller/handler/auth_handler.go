@@ -4,10 +4,12 @@ import (
 	"auth-service/conf"
 	"auth-service/domain/model"
 	"auth-service/domain/service-contracts"
+	"auth-service/logger"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,6 +22,7 @@ type AuthHandler interface {
 	AuthorizationSuccess(c echo.Context) error
 	AuthorizationMiddleware() echo.MiddlewareFunc
 	GetLoggedUserId(c echo.Context) error
+	AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type authHandler struct {
@@ -28,6 +31,13 @@ type authHandler struct {
 
 func NewAuthHandler(a service_contracts.AuthService) AuthHandler {
 	return &authHandler{a}
+}
+
+func (a authHandler) AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (a authHandler) LoginUser(c echo.Context) error {
@@ -80,7 +90,6 @@ func (a authHandler) AdminCheck(c echo.Context) error {
 }
 
 func (a authHandler) AuthorizationSuccess(c echo.Context) error {
-	fmt.Println("OKEEEJ")
 	return c.JSON(http.StatusOK, "")
 }
 

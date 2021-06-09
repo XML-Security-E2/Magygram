@@ -3,8 +3,10 @@ package handler
 import (
 	"auth-service/domain/model"
 	"auth-service/domain/service-contracts"
+	"auth-service/logger"
 	"context"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -13,6 +15,7 @@ type UserHandler interface {
 	RegisterUser(c echo.Context) error
 	ActivateUser(c echo.Context) error
 	ResetPassword(c echo.Context) error
+	UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 var (
@@ -27,6 +30,13 @@ type userHandler struct {
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
+}
+
+func (u userHandler) UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (u userHandler) RegisterUser(c echo.Context) error {
