@@ -106,6 +106,16 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 													 "collection_name" : favouritePostRequest.CollectionName}).Error("Save post to collection failure")
 		return err
 	}
+	if favouritePostRequest.CollectionName == "" {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+			"post_id" : favouritePostRequest.PostId,
+			"collection_name" : model.DefaultCollection}).Info("Post saved to collection")
+	} else {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+			"post_id" : favouritePostRequest.PostId,
+			"collection_name" : favouritePostRequest.CollectionName}).Info("Post saved to collection")
+	}
+
 
 	return nil
 }
@@ -203,6 +213,9 @@ func (c collectionsService) DeletePostFromCollections(ctx context.Context, beare
 
 		return err
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId,
+		"post_id" : postId}).Info("Post deleted from collection")
 
 	return nil
 }
