@@ -214,6 +214,9 @@ func (p storyService) GetStoryHighlight(ctx context.Context, bearer string, requ
 			return nil, err
 		}
 		if story.UserInfo.Id != userId {
+			logger.LoggingEntry.WithFields(logrus.Fields{"logged_user_id" : userId,
+														 "story_owner_id" : story.UserInfo.Id,
+														 "story_id" : storyId}).Warn("Unauthorized to use story as highlights")
 			return nil, errors.New("desired stories cannot be in users highlights")
 		}
 		highlights.Media = append(highlights.Media, model.IdWithMedia{

@@ -45,6 +45,8 @@ func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool,
 														 "object_id" : followRequest.ObjectId}).Error("Follow request create, database failure")
 			return false, err
 		}
+		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+													 "object_id" : followRequest.ObjectId}).Info("Follow request created")
 		return true, nil
 	} else {
 		if err:= f.FollowRepository.CreateFollow(followRequest); err != nil {
@@ -52,6 +54,9 @@ func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool,
 														 "object_id" : followRequest.ObjectId}).Error("Follow user, database failure")
 			return false, err
 		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+												     "object_id" : followRequest.ObjectId}).Info("User followed")
 	}
 	return false, nil
 }
@@ -61,7 +66,13 @@ func (f *followService) Unfollow(followRequest *model.FollowRequest) error {
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
 													 "object_id" : followRequest.ObjectId}).Error("Unfollow user, database failure")
+
+		return err
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
+												 "object_id" : followRequest.ObjectId}).Info("User unfollowed")
+
 	return err
 }
 
@@ -99,10 +110,18 @@ func (f *followService) AcceptFollowRequest(bearer string, userId string) error 
 		return  err
 	}
 
-	return f.FollowRepository.AcceptFollowRequest(&model.FollowRequest{
+	err = f.FollowRepository.AcceptFollowRequest(&model.FollowRequest{
 		SubjectId: userId,
 		ObjectId:  loggedId,
 	})
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": userId,
+													 "object_id" : loggedId}).Error("Accept follow request, database failure")
+		return  err
+	}
+	logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": userId,
+													"object_id" : loggedId}).Info("Follow request accepted")
+	return err
 }
 
 func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, error) {
