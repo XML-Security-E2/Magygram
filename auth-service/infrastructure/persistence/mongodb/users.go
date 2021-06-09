@@ -3,8 +3,10 @@ package mongodb
 import (
 	"auth-service/domain/model"
 	"auth-service/domain/repository"
+	"auth-service/logger"
 	"context"
 	"errors"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -32,6 +34,7 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 	var user = model.User{}
 	err := r.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : id}).Warn("Invalid user id")
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("ErrNoDocuments")
 		}
