@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"mime/multipart"
 	"net/http"
 	"post-service/domain/model"
 	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
+	"post-service/logger"
 )
 
 
@@ -33,6 +35,7 @@ type PostHandler interface {
 	GetPostForGuestTimelineByLocation(c echo.Context) error
 	GetPostForUserTimelineByLocation(c echo.Context) error
 	GetPostByIdForGuest(c echo.Context) error
+	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type postHandler struct {
@@ -41,6 +44,13 @@ type postHandler struct {
 
 func NewPostHandler(p service_contracts.PostService) PostHandler {
 	return &postHandler{p}
+}
+
+func (p postHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (p postHandler) CreatePost(c echo.Context) error {

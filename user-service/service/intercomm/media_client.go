@@ -49,7 +49,7 @@ func handleSaveMediaRequest(body *bytes.Buffer, writer *multipart.Writer) ([]mod
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	resp, err := client.Do(req)
-	if err != nil {
+	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
 			logger.LoggingEntry.Error("Media-service not available")
 			return []model.Media{}, 0, err
