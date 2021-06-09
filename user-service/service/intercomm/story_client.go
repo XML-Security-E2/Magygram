@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"user-service/conf"
 	"user-service/domain/model"
+	"user-service/logger"
 )
 
 type StoryClient interface {
@@ -36,6 +38,11 @@ func (s storyClient) GetStoryHighlightIfValid(bearer string, request *model.High
 	resp, err := client.Do(req)
 
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"highlights_name": request.Name, "story_ids" : request.StoryIds}).Fatal("Story-service get stories for highlights")
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"highlights_name": request.Name, "story_ids" : request.StoryIds}).Error("Story-service get stories for highlights")
 		message, err := getErrorMessageFromRequestBody(resp.Body)
 		if err != nil {
 			return nil, err

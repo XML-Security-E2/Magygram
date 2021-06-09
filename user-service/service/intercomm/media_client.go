@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"user-service/conf"
 	"user-service/domain/model"
+	"user-service/logger"
 )
 
 type MediaClient interface {
@@ -49,6 +50,12 @@ func handleSaveMediaRequest(body *bytes.Buffer, writer *multipart.Writer) ([]mod
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	resp, err := client.Do(req)
 	if err != nil {
+		if resp == nil {
+			logger.LoggingEntry.Fatal("Media-service save media")
+			return []model.Media{}, 0, err
+		}
+
+		logger.LoggingEntry.Error("Media-service save media")
 		return []model.Media{}, 0, err
 	}
 

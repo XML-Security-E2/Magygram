@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,12 +15,15 @@ import (
 	"user-service/controller/middleware"
 	"user-service/controller/router"
 	"user-service/interactor"
+	"user-service/logger"
 )
 
 
 var runServer = flag.Bool("user-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
 func main() {
+
+	logger.InitLogger()
 
 	conf.NewConfig(*runServer)
 	mongoDbInfo := fmt.Sprintf("%s:%s",
@@ -81,9 +85,22 @@ func main() {
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 
+	//Log rotation test
+	//for i := 0; i < 32000; i++ {
+	//	logger.Logger.WithFields(logrus.Fields{
+	//		"test": "123",
+	//	}).Info("Test rotation")
+	//}
+	logger.Logger.WithFields(logrus.Fields{
+		"host": conf.Current.Server.Host,
+		"port":   conf.Current.Server.Port,
+	}).Info("Server started")
+
 	if os.Getenv("IS_PRODUCTION") == "true" {
 		e.Start(":"+ conf.Current.Server.Port)
 	} else {
 		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 	}
+
+
 }

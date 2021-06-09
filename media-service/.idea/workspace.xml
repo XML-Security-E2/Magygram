@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="" />
+    <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/app_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/app_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/collections_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/collections_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/user_service.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,15 +52,15 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../auth-service" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
+      <directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
     <recent_temporary>

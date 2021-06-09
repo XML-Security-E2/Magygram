@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"user-service/conf"
 	"user-service/domain/model"
+	"user-service/logger"
 )
 
 type AuthClient interface {
@@ -55,6 +57,12 @@ func (a authClient) GetLoggedUserId(bearer string) (string,error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.Fatal("Auth-service get logged user")
+			return "", err
+		}
+
+		logger.LoggingEntry.Error("Auth-service get logged user")
 		fmt.Println(resp.StatusCode)
 		return "", errors.New("unauthorized")
 	}
@@ -89,6 +97,12 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
 		"application/json", bytes.NewBuffer(jsonUserRequest))
 	if err != nil || resp.StatusCode != 201 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name, "surname" : user.Surname, "email" : user.Email, "username" : user.Username}).Fatal("Auth-service user registration")
+			return err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name, "surname" : user.Surname, "email" : user.Email, "username" : user.Username}).Error("Auth-service user registration")
 		message, err := getErrorMessageFromRequestBody(resp.Body)
 		if err != nil {
 			return err
@@ -102,7 +116,12 @@ func (a authClient) ActivateUser(userId string) error {
 
 	resp, err := http.Get(fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId))
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Println(resp.StatusCode)
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Fatal("Auth-service user activation")
+			return err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("Auth-service user activation")
 		return errors.New("failed updating user")
 	}
 	return nil
@@ -115,6 +134,12 @@ func (a authClient) ChangePassword(userId string, password string, passwordRepea
 
 	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port), "application/json", bytes.NewBuffer(jsonPasswordRequest))
 	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Fatal("Auth-service reset password")
+			return err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Auth-service reset password")
 		message, err := getErrorMessageFromRequestBody(resp.Body)
 		if err != nil {
 			return err

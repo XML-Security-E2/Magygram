@@ -5,3 +5,4 @@ type AppHandler interface {
 	CollectionsHandler
 	HighlightsHandler
 }
+

@@ -1,15 +1,17 @@
 package handler
 
 import (
-	"os"
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"user-service/domain/model"
 	"user-service/domain/service-contracts"
 	"user-service/domain/service-contracts/exceptions"
+	"user-service/logger"
 )
 
 
@@ -35,6 +37,7 @@ type UserHandler interface {
 	IsUserPrivate(c echo.Context) error
 	GetFollowRequests(c echo.Context) error
 	AcceptFollowRequest(c echo.Context) error
+	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 var (
@@ -46,6 +49,13 @@ type userHandler struct {
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
+}
+
+func (h *userHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (h *userHandler) EditUser(c echo.Context) error {

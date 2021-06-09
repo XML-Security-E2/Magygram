@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 	"mime/multipart"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
 	"user-service/domain/service-contracts/exceptions"
+	"user-service/logger"
 	"user-service/service/intercomm"
 )
 
@@ -38,6 +40,7 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 	}
 
 	if loggedId != userId {
+		logger.LoggingEntry.WithFields(logrus.Fields{"requested_user_id" : userId, "logged_user_id" : loggedId}).Warn("Unauthorized access")
 		return "", &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 	}
 
@@ -54,13 +57,29 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 	user.Bio = userRequest.Bio
 	user.Gender = userRequest.Gender
 	if err = validator.New().Struct(user); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name,
+													 "surname" : userRequest.Surname,
+													 "number" : userRequest.Number,
+													 "gender" : userRequest.Gender,
+													 "username" : userRequest.Username,
+													 "website" : userRequest.Website,
+													 "bio": userRequest.Bio}).Warn("User registration validation failure")
 		return "", err
 	}
 
 	result, err := u.UserRepository.Update(ctx, user)
-	if err != nil { return "", err}
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name,
+													 "surname" : userRequest.Surname,
+													 "number" : userRequest.Number,
+													 "gender" : userRequest.Gender,
+													 "username" : userRequest.Username,
+													 "website" : userRequest.Website,
+													 "bio": userRequest.Bio}).Error("User database update failure")
+		return "", err}
 
 	if usrId, ok := result.UpsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User information updated")
 		return usrId, nil
 	}
 	return "", err
@@ -73,6 +92,7 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 	}
 
 	if loggedId != userId {
+		logger.LoggingEntry.WithFields(logrus.Fields{"requested_user_id" : userId, "logged_user_id" : loggedId}).Warn("Unauthorized access")
 		return "", &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 	}
 
@@ -90,8 +110,11 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 	user.ImageUrl = media[0].Url
 
 	_, err = u.UserRepository.Update(ctx, user)
-	if err != nil { return "", err}
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("User profile picture update failure")
+		return "", err}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User profile picture updated")
 
 	return media[0].Url ,err
 }
@@ -100,23 +123,32 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname" : userRequest.Surname, "email" : userRequest.Email, "username" : userRequest.Username}).Warn("User registration validation failure")
 		return "", err
 	}
 
 	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
-	if err != nil { return "", err}
+	if err != nil {
+		return "", err
+	}
 
 	err = u.RelationshipClient.CreateUser(user)
-	if err != nil { return "", err}
+	if err != nil {
+		return "", err
+	}
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
 
 	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname" : userRequest.Surname, "email" : userRequest.Email, "username" : userRequest.Username}).Error("User database create failure")
+		return "", err
+	}
 
-	if err != nil { return "", err}
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 
 	if userId, ok := result.InsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
 		return userId, nil
 	}
 	return "", err
@@ -139,18 +171,22 @@ func (u *userService) ActivateUser(ctx context.Context, activationId string) (bo
 		return false, err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"activation_id" : activationId, "user_id" : accActivation.UserId}).Info("User activated")
+
 	return true, err
 }
 
 func (u *userService) ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error) {
 	user, err := u.UserRepository.GetByEmail(ctx, activateLinkRequest.Email)
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : activateLinkRequest.Email}).Warn("Invalid email address")
 		return false, err
 	}
 
 	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
 	go SendActivationMail(user.Email, user.Name, accActivationId)
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"activation_id" : accActivationId, "user_id" : user.Id}).Info("Account activation link created")
 	return true, nil
 }
 
@@ -158,12 +194,14 @@ func (u *userService) ResetPassword(ctx context.Context, userEmail string) (bool
 	user, err := u.GetByEmail(ctx,userEmail)
 	//pokrivena invalid email
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userEmail}).Warn("Invalid email address")
 		return false, errors.New("invalid email address")
 	}
 
 	accResetPasswordId, _ := u.ResetPasswordService.Create(ctx, user.Id)
 	go SendResetPasswordMail(user.Email, user.Name, accResetPasswordId)
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"reset_password_id" : accResetPasswordId, "user_id" : user.Id}).Info("Reset password link created")
 	return true, nil
 }
 
@@ -188,7 +226,7 @@ func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordReque
 		return false, err
 	}
 
-	err = 	u.AuthClient.ChangePassword(user.Id, changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
+	err = u.AuthClient.ChangePassword(user.Id, changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
 		return false, err
 	}
@@ -198,6 +236,7 @@ func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordReque
 		return false, err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"reset_password_id" : changePasswordRequest.ResetPasswordId, "user_id" : user.Id}).Info("Users password changed")
 	return true, err
 }
 
@@ -214,6 +253,7 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Warn("Invalid user id")
 		return nil, errors.New("invalid user id")
 	}
 
@@ -277,7 +317,6 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 	}
 
 	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-
 	if err != nil {
 		return nil, err
 	}
