@@ -34,7 +34,7 @@ func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"post_id": postId}).Fatal("Post-service get posts first image")
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_id": postId}).Error("Post-service not available")
 			return nil, err
 		}
 
@@ -58,7 +58,7 @@ func (a postClient) GetUsersPostsCount(userId string) (int, error) {
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Fatal("Post-service get post count")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Post-service not available")
 			return 0, err
 		}
 

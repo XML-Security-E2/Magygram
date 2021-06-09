@@ -39,7 +39,7 @@ func (s storyClient) GetStoryHighlightIfValid(bearer string, request *model.High
 
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"highlights_name": request.Name, "story_ids" : request.StoryIds}).Fatal("Story-service get stories for highlights")
+			logger.LoggingEntry.WithFields(logrus.Fields{"highlights_name": request.Name, "story_ids" : request.StoryIds}).Error("Story-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"highlights_name": request.Name, "story_ids" : request.StoryIds}).Error("Story-service get stories for highlights")

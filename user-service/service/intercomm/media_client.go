@@ -51,7 +51,7 @@ func handleSaveMediaRequest(body *bytes.Buffer, writer *multipart.Writer) ([]mod
 	resp, err := client.Do(req)
 	if err != nil {
 		if resp == nil {
-			logger.LoggingEntry.Fatal("Media-service save media")
+			logger.LoggingEntry.Error("Media-service not available")
 			return []model.Media{}, 0, err
 		}
 

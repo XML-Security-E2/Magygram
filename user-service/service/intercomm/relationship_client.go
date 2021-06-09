@@ -47,7 +47,10 @@ func (r relationshipClient) CreateUser(user *model.User) error {
 		"application/json", bytes.NewBuffer(jsonUserRequest))
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name, "surname" : user.Surname, "email" : user.Email, "username" : user.Username}).Fatal("Relationship-service user registration")
+			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name,
+														 "surname" : user.Surname,
+														 "email" : user.Email,
+														 "username" : user.Username}).Error("Relationship-service not available")
 			return err
 		}
 
@@ -69,7 +72,7 @@ func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsers
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Fatal("Relationship-service get followed users")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service get followed users")
@@ -97,7 +100,7 @@ func (r relationshipClient) GetFollowingUsers(userId string) (model.FollowedUser
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Fatal("Relationship-service get following users")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service get following users")
@@ -128,7 +131,7 @@ func (r relationshipClient) FollowRequest(request *model.FollowRequest) (bool,er
 
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": request.SubjectId, "object_id" : request.ObjectId}).Fatal("Relationship-service follow user")
+			logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": request.SubjectId, "object_id" : request.ObjectId}).Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": request.SubjectId, "object_id" : request.ObjectId}).Error("Relationship-service follow user")
@@ -154,7 +157,7 @@ func (r relationshipClient) Unfollow(request *model.FollowRequest) error {
 
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": request.SubjectId, "object_id" : request.ObjectId}).Fatal("Relationship-service unfollow user")
+			logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": request.SubjectId, "object_id" : request.ObjectId}).Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": request.SubjectId, "object_id" : request.ObjectId}).Error("Relationship-service unfollow user")
@@ -174,7 +177,7 @@ func (r relationshipClient) ReturnFollowRequestsForUser(bearer string, objectId 
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": objectId}).Fatal("Relationship-service get follow requests")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": objectId}).Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": objectId}).Error("Relationship-service get follow requests")
@@ -200,7 +203,7 @@ func (r relationshipClient) ReturnFollowRequests(bearer string) (model.FollowedU
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.Fatal("Relationship-service get follow requests")
+			logger.LoggingEntry.Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.Error("Relationship-service get follow requests")
@@ -227,7 +230,7 @@ func (r relationshipClient) AcceptFollowRequest(bearer string, userId string) er
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Fatal("Relationship-service accept follow request")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service not available")
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service accept follow request")

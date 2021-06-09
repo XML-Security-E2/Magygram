@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"user-service/domain/model"
 	"user-service/domain/service-contracts"
+	"user-service/logger"
 )
 
 type CollectionsHandler interface {
@@ -18,6 +20,7 @@ type CollectionsHandler interface {
 	DeleteFromCollection(c echo.Context) error
 	GetUserCollections(c echo.Context) error
 	GetCollectionPosts(c echo.Context) error
+	CollectionsLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type collectionsHandler struct {
@@ -26,6 +29,14 @@ type collectionsHandler struct {
 
 func NewCollectionsHandler(u service_contracts.CollectionsService) CollectionsHandler {
 	return &collectionsHandler{u}
+}
+
+
+func (h *collectionsHandler) CollectionsLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
+		return next(c)
+	}
 }
 
 func (ch collectionsHandler) CreateCollection(c echo.Context) error {

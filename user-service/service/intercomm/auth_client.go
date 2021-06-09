@@ -58,7 +58,7 @@ func (a authClient) GetLoggedUserId(bearer string) (string,error) {
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.Fatal("Auth-service get logged user")
+			logger.LoggingEntry.Error("Auth-service not available")
 			return "", err
 		}
 
@@ -98,7 +98,10 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 		"application/json", bytes.NewBuffer(jsonUserRequest))
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name, "surname" : user.Surname, "email" : user.Email, "username" : user.Username}).Fatal("Auth-service user registration")
+			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name,
+														 "surname" : user.Surname,
+														 "email" : user.Email,
+														 "username" : user.Username}).Error("Auth-service not available")
 			return err
 		}
 
@@ -117,7 +120,7 @@ func (a authClient) ActivateUser(userId string) error {
 	resp, err := http.Get(fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId))
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Fatal("Auth-service user activation")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("Auth-service not available")
 			return err
 		}
 
@@ -135,7 +138,7 @@ func (a authClient) ChangePassword(userId string, password string, passwordRepea
 	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port), "application/json", bytes.NewBuffer(jsonPasswordRequest))
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Fatal("Auth-service reset password")
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Auth-service not available")
 			return err
 		}
 

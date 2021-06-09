@@ -37,7 +37,7 @@ type UserHandler interface {
 	IsUserPrivate(c echo.Context) error
 	GetFollowRequests(c echo.Context) error
 	AcceptFollowRequest(c echo.Context) error
-	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 var (
@@ -51,7 +51,7 @@ func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
 }
 
-func (h *userHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (h *userHandler) UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
 		return next(c)
