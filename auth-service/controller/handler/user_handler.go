@@ -4,6 +4,7 @@ import (
 	"auth-service/domain/model"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"bytes"
 	"context"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
@@ -50,12 +51,14 @@ func (u userHandler) RegisterUser(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	userId, err := u.UserService.RegisterUser(ctx, userRequest)
+	_, bufer, err := u.UserService.RegisterUser(ctx, userRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, userId)
+	yter := bytes.NewReader(bufer)
+
+	return c.Stream(http.StatusCreated,"image/png",yter)
 }
 
 func (u userHandler) ActivateUser(c echo.Context) error {

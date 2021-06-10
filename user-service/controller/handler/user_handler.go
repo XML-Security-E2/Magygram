@@ -121,15 +121,15 @@ func (h *userHandler) RegisterUser(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	userId, err := h.UserService.RegisterUser(ctx, userRequest)
-	fmt.Println(userId)
+	resp, err := h.UserService.RegisterUser(ctx, userRequest)
+
 	if err != nil {
 		fmt.Println(err)
 
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, userId)
+	return c.Stream(http.StatusCreated,"image/png",resp.Body)
 }
 
 func (h *userHandler) ActivateUser(c echo.Context) error {

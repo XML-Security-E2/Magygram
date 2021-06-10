@@ -21,6 +21,7 @@ export const userReducer = (state, action) => {
 					errorMessage: "",
 					showSuccessMessage: true,
 					emailAddress: action.emailAddress,
+					imageData:action.imageData
 				},
 			};
 		case userConstants.REGISTER_FAILURE:
@@ -32,6 +33,11 @@ export const userReducer = (state, action) => {
 					emailAddress: "",
 				},
 			};
+		case userConstants.REGISTRATION_SHOW_QR_CODE:
+			return {
+				...state,
+				registrationShowQr:true
+			}
 		case userConstants.REGISTER_VALIDATION_FAILURE:
 			return {
 				registrationError: {
@@ -43,25 +49,86 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.LOGIN_REQUEST:
 			return {
-				loginError: {
+				loginFirstError: {
 					showError: false,
 					errorMessage: "",
 				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				loginPhase: {
+					twoFactorAuthInputShow:false,
+				}
 			};
 		case userConstants.LOGIN_FAILURE:
 			return {
-				loginError: {
+				loginFirstError: {
 					showError: true,
 					errorMessage: action.error,
 				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				loginPhase: {
+					twoFactorAuthInputShow:false,
+				}
 			};
 		case userConstants.LOGIN_SUCCESS:
 			return {
 				...state,
-				loginError: {
+				loginFirstError: {
 					showError: false,
 					errorMessage: "",
 				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				loginPhase: {
+					twoFactorAuthInputShow:true,
+				}
+			};
+		case userConstants.LOGIN_TWO_REQUEST:
+			return {
+				loginFirstError: {
+					showError: false,
+					errorMessage: "",
+				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				loginPhase: {
+					twoFactorAuthInputShow:true,
+				}
+			};
+		case userConstants.LOGIN_TWO_FAILURE:
+			return {
+				...state,
+				loginSecondError:{
+					showError: true,
+					errorMessage: action.error,
+				},
+				loginPhase: {
+					twoFactorAuthInputShow:true,
+				}
+			};
+		case userConstants.LOGIN_SUCCESS:
+			return {
+				...state,
+				loginFirstError: {
+					showError: false,
+					errorMessage: "",
+				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				loginPhase: {
+					twoFactorAuthInputShow:false,
+				}
 			};
 		case userConstants.RESET_PASSWORD_LINK_REQUEST:
 			return {

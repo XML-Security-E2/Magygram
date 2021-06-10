@@ -185,3 +185,8 @@ func validateGenderEnums(pt Gender) error {
 var (
 	DefaultCollection = "all posts"
 )
+
+type RegisteredUserResponseDTO struct {
+	userId string
+	qrCode string
+}

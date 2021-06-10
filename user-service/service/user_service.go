@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/sirupsen/logrus"
 	"mime/multipart"
+	"net/http"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
@@ -118,21 +119,21 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 }
 
 
-func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
+func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*http.Response, error) {
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err!= nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname" : userRequest.Surname, "email" : userRequest.Email, "username" : userRequest.Username}).Warn("User registration validation failure")
-		return "", err
+		return nil, err
 	}
 
-	err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
+	resp, err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	err = u.RelationshipClient.CreateUser(user)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
@@ -140,16 +141,16 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	result, err := u.UserRepository.Create(ctx, user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname" : userRequest.Surname, "email" : userRequest.Email, "username" : userRequest.Username}).Error("User database create failure")
-		return "", err
+		return nil, err
 	}
 
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 
 	if userId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
-		return userId, nil
+		return resp, nil
 	}
-	return "", err
+	return resp, err
 }
 
 func (u *userService) ActivateUser(ctx context.Context, activationId string) (bool, error) {

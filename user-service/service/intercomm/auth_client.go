@@ -15,7 +15,7 @@ import (
 )
 
 type AuthClient interface {
-	RegisterUser(user *model.User, password string, passwordRepeat string) error
+	RegisterUser(user *model.User, password string, passwordRepeat string) (*http.Response, error )
 	ActivateUser(userId string) error
 	GetLoggedUserId(bearer string) (string,error)
 	ChangePassword(userId string, password string, passwordRepeat string) error
@@ -89,11 +89,10 @@ func getErrorMessageFromRequestBody(body io.ReadCloser) (string ,error){
 	return result.Message, nil
 }
 
-func (a authClient) RegisterUser(user *model.User, password string, passwordRepeat string) error {
+func (a authClient) RegisterUser(user *model.User, password string, passwordRepeat string) (*http.Response, error ){
 	userRequest := &userAuthRequest{Id: user.Id, Email: user.Email, Password: password, RepeatedPassword: passwordRepeat}
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
-	fmt.Println(fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port))
 	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
 		"application/json", bytes.NewBuffer(jsonUserRequest))
 	if err != nil || resp.StatusCode != 201 {
@@ -102,17 +101,18 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 														 "surname" : user.Surname,
 														 "email" : user.Email,
 														 "username" : user.Username}).Error("Auth-service not available")
-			return err
+			return nil,err
 		}
 
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name, "surname" : user.Surname, "email" : user.Email, "username" : user.Username}).Error("Auth-service user registration")
 		message, err := getErrorMessageFromRequestBody(resp.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		return errors.New(message)
+		return nil, errors.New(message)
 	}
-	return nil
+
+	return resp,nil
 }
 
 func (a authClient) ActivateUser(userId string) error {

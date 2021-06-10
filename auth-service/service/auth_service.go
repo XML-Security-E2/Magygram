@@ -3,10 +3,11 @@ package service
 import (
 	"auth-service/domain/model"
 	"auth-service/domain/repository"
-	service_contracts "auth-service/domain/service-contracts"
+	"auth-service/domain/service-contracts"
 	"auth-service/logger"
 	"context"
 	"errors"
+	"github.com/pquerna/otp/totp"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -43,6 +44,21 @@ func (a authService) AuthenticateUser(ctx context.Context, loginRequest *model.L
 	a.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.SuccessfulLogin)
 	return user, err
 }
+
+func (a authService) AuthenticateTwoFactoryUser(ctx context.Context, loginRequest *model.LoginTwoFactoryRequest) (*model.User, error) {
+	user, err := a.UserService.GetByEmail(ctx, loginRequest.Email)
+
+	valid := totp.Validate(loginRequest.Token, user.TotpToken)
+
+	a.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.SuccessfulLogin)
+
+	if valid{
+		return user, err
+	}
+
+	return nil, err
+}
+
 
 func equalPasswords(hashedPwd string, passwordRequest string) bool {
 
