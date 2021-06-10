@@ -121,6 +121,8 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 		return err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+												 "post_id" : postId}).Info("Post liked")
 	return nil
 }
 
@@ -144,6 +146,8 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 		return err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+												 "post_id" : postId}).Info("Post unliked")
 	return nil
 }
 
@@ -172,6 +176,8 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 		return err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+												 "post_id" : postId}).Info("Post disliked")
 	return nil
 }
 
@@ -197,6 +203,8 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 		return err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+											 	 "post_id" : postId}).Info("Post un-disliked")
 	return nil
 }
 
@@ -226,6 +234,9 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 												     "post_id" : postId}).Error("Post comment, database update failure")
 		return nil, err
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
+												 "post_id" : postId}).Info("Post commented")
 
 	return &res, nil
 }
@@ -356,6 +367,10 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 													 "location": postRequest.Location}).Error("Post edit, database update failure")
 		return err
 	}
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": post.UserInfo.Id,
+												 "post_id" : post.Id,
+												 }).Info("Post edited")
 
 	return nil
 }

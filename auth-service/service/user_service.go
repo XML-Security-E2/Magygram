@@ -80,6 +80,7 @@ func (u userService) ActivateUser(ctx context.Context, userId string) (bool, err
 	}
 
 	u.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.ActivatedAccount)
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User activated")
 
 	return true, err
 }
@@ -131,6 +132,7 @@ func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *m
 		return false, err
 	}
 
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : user.Id}).Info("Users password changed")
 	return true, err
 }
 

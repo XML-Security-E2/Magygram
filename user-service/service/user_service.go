@@ -68,7 +68,7 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 		return "", err
 	}
 
-	result, err := u.UserRepository.Update(ctx, user)
+	_, err = u.UserRepository.Update(ctx, user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name,
 													 "surname" : userRequest.Surname,
@@ -79,11 +79,9 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 													 "bio": userRequest.Bio}).Error("User database update failure")
 		return "", err}
 
-	if usrId, ok := result.UpsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User information updated")
-		return usrId, nil
-	}
-	return "", err
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User information updated")
+
+	return user.Id, err
 }
 
 func (u *userService) EditUserImage(ctx context.Context, bearer string, userId string, userImage []*multipart.FileHeader) (string, error) {
