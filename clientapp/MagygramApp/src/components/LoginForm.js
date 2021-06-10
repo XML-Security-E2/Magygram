@@ -39,7 +39,7 @@ const LoginForm = () => {
 				<i className="icon ion-ios-navigate"></i>
 			</div>
 			
-			<div hidden={userState.loginPhase.twoFactorAuthInputShow}>
+			<div hidden={userState.showTwoFactorAuth}>
 				<div className="form-group">
 					<input className="form-control" required type="email" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
 				</div>
@@ -64,12 +64,12 @@ const LoginForm = () => {
 				</div>
 			</div>
 			
-			<div hidden={!userState.loginPhase.twoFactorAuthInputShow}>
+			<div hidden={!userState.showTwoFactorAuth}>
 				<h4 className="form-group text-center">Enter code</h4>
 				<div className="form-group text-center" style={{ color: "red", fontSize: "0.8em" }} hidden={!userState.loginSecondError.showError}>
 					{userState.loginSecondError.errorMessage}
 				</div>
-				<div hidden={!userState.loginPhase.twoFactorAuthInputShow} className="form-group">
+				<div hidden={!userState.showTwoFactorAuth} className="form-group">
 					<input className="form-control" required type="number" name="uniqueCode" placeholder="Code" value={uniqueCode} onChange={(e) => setUniqueCode(e.target.value)}></input>
 				</div>
 				<div className="form-group">

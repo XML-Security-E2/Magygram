@@ -49,6 +49,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.LOGIN_REQUEST:
 			return {
+				...state,
 				loginFirstError: {
 					showError: false,
 					errorMessage: "",
@@ -57,12 +58,11 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginPhase: {
-					twoFactorAuthInputShow:false,
-				}
+				showTwoFactorAuth:false,
 			};
 		case userConstants.LOGIN_FAILURE:
 			return {
+				...state,
 				loginFirstError: {
 					showError: true,
 					errorMessage: action.error,
@@ -71,9 +71,7 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginPhase: {
-					twoFactorAuthInputShow:false,
-				}
+				showTwoFactorAuth:false,
 			};
 		case userConstants.LOGIN_SUCCESS:
 			return {
@@ -86,12 +84,11 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginPhase: {
-					twoFactorAuthInputShow:true,
-				}
+				showTwoFactorAuth:true,
 			};
 		case userConstants.LOGIN_TWO_REQUEST:
 			return {
+				...state,
 				loginFirstError: {
 					showError: false,
 					errorMessage: "",
@@ -100,9 +97,7 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginPhase: {
-					twoFactorAuthInputShow:true,
-				}
+				showTwoFactorAuth:true,
 			};
 		case userConstants.LOGIN_TWO_FAILURE:
 			return {
@@ -111,11 +106,9 @@ export const userReducer = (state, action) => {
 					showError: true,
 					errorMessage: action.error,
 				},
-				loginPhase: {
-					twoFactorAuthInputShow:true,
-				}
+				showTwoFactorAuth:true,
 			};
-		case userConstants.LOGIN_SUCCESS:
+		case userConstants.LOGIN_TWO_SUCCESS:
 			return {
 				...state,
 				loginFirstError: {
@@ -126,9 +119,42 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginPhase: {
-					twoFactorAuthInputShow:false,
-				}
+				showTwoFactorAuth:true,
+			};
+		case userConstants.LOGIN_DATA_REQUEST:
+			return {
+				...state,
+				loginFirstError: {
+					showError: false,
+					errorMessage: "",
+				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				showTwoFactorAuth:true,
+			};
+		case userConstants.LOGIN_DATA_FAILURE:
+			return {
+				...state,
+				loginSecondError:{
+					showError: true,
+					errorMessage: action.error,
+				},
+				showTwoFactorAuth:true,
+			};
+		case userConstants.LOGIN_DATA_SUCCESS:
+			return {
+				...state,
+				loginFirstError: {
+					showError: false,
+					errorMessage: "",
+				},
+				loginSecondError:{
+					showError: false,
+					errorMessage: "",
+				},
+				showTwoFactorAuth:true,
 			};
 		case userConstants.RESET_PASSWORD_LINK_REQUEST:
 			return {
