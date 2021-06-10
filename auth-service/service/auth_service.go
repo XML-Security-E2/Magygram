@@ -41,7 +41,9 @@ func (a authService) AuthenticateUser(ctx context.Context, loginRequest *model.L
 		a.HandleLoginEventAndAccountActivation(ctx, user.Email, false, model.UnsuccessfulLogin)
 		return nil, errors.New("invalid password")
 	}
-	a.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.SuccessfulLogin)
+	logger.LoggingEntry.WithFields(logrus.Fields{"user_email" : loginRequest.Email}).Info("Successful first stage of login")
+
+	//a.HandleLoginEventAndAccountActivation(ctx, user.Email, true, model.SuccessfulLogin)
 	return user, err
 }
 
