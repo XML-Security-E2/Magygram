@@ -17,13 +17,13 @@ import (
 )
 
 type AuthHandler interface {
-	LoginUser(c echo.Context) error
+	LoginFirstStage(c echo.Context) error
 	AdminCheck(c echo.Context) error
 	AuthorizationSuccess(c echo.Context) error
 	AuthorizationMiddleware() echo.MiddlewareFunc
 	GetLoggedUserId(c echo.Context) error
 	AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
-	LoginTwoFactory(c echo.Context) error
+	LoginSecondStage(c echo.Context) error
 }
 
 type authHandler struct {
@@ -41,7 +41,7 @@ func (a authHandler) AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFu
 	}
 }
 
-func (a authHandler) LoginUser(c echo.Context) error {
+func (a authHandler) LoginFirstStage(c echo.Context) error {
 	loginRequest := &model.LoginRequest{}
 	if err := c.Bind(loginRequest); err != nil {
 		return err
@@ -63,7 +63,7 @@ func (a authHandler) LoginUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user.Id)
 }
 
-func (a authHandler) LoginTwoFactory(c echo.Context) error {
+func (a authHandler) LoginSecondStage(c echo.Context) error {
 	loginRequest := &model.LoginTwoFactoryRequest{}
 	if err := c.Bind(loginRequest); err != nil {
 		return err
@@ -72,15 +72,14 @@ func (a authHandler) LoginTwoFactory(c echo.Context) error {
 	ctx := c.Request().Context()
 	user, err := a.AuthService.AuthenticateTwoFactoryUser(ctx, loginRequest)
 
-	if err != nil && user==nil {
-		return ErrWrongCredentials
+	if err != nil {
+		return err
 	}
 
-	if err != nil && user != nil {
-		return c.JSON(http.StatusForbidden, map[string]string{
-			"userId" : user.Id,
-		})
+	if user==nil{
+		return c.JSON(http.StatusForbidden,"")
 	}
+
 	expireTime := time.Now().Add(time.Hour).Unix() * 1000
 	token, err := generateToken(user, expireTime)
 	if err != nil {

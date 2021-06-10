@@ -107,7 +107,7 @@ async function findAllFollowingUsers(userId, dispatch) {
 function loginFirstAuthorization(loginRequest, dispatch) {
 	dispatch(request());
 
-	Axios.post(`/api/auth/login`, loginRequest, { validateStatus: () => true })
+	Axios.post(`/api/auth/login/firststage`, loginRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success())
@@ -135,7 +135,7 @@ function loginFirstAuthorization(loginRequest, dispatch) {
 function loginSecondAuthorization(loginRequest, dispatch) {
 	dispatch(request());
 
-	Axios.post(`/api/auth/login/two`, loginRequest, { validateStatus: () => true })
+	Axios.post(`/api/auth/login/secondstage`, loginRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
 				setAuthInLocalStorage(res.data);
