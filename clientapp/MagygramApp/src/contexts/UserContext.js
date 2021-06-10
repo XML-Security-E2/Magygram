@@ -13,9 +13,7 @@ const UserContextProvider = (props) => {
 			showError: false,
 			errorMessage: "",
 		},
-		loginPhase: {
-			twoFactorAuthInputShow:false,
-		},
+		showTwoFactorAuth:false,
 		registrationError: {
 			showError: false,
 			errorMessage: "",

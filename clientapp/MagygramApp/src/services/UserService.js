@@ -2,7 +2,6 @@ import Axios from "axios";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 import { authHeader } from "../helpers/auth-header";
-import { postService } from "./PostService";
 
 export const userService = {
 	loginFirstAuthorization,
@@ -117,7 +116,7 @@ function loginFirstAuthorization(loginRequest, dispatch) {
 			} else if (res.status === 403) {
 				window.location = "#/blocked-user/" + res.data.userId;
 			} else {
-				dispatch({ type: userConstants.LOGIN_FAILURE });
+				dispatch(failure("Internal server error"));
 			}
 		})
 		.catch((err) => console.error(err));
@@ -150,9 +149,7 @@ function loginSecondAuthorization(loginRequest, dispatch) {
 	function request() {
 		return { type: userConstants.LOGIN_TWO_REQUEST };
 	}
-	function success() {
-		return { type: userConstants.LOGIN_TWO_SUCCESS };
-	}
+
 	function failure(error) {
 		return { type: userConstants.LOGIN_TWO_FAILURE, error };
 	}
@@ -260,13 +257,13 @@ function getLoggedData(dispatch) {
 		.catch((err) => console.error(err));
 
 	function request() {
-		return { type: userConstants.LOGIN_REQUEST };
+		return { type: userConstants.LOGIN_DATA_REQUEST };
 	}
 	function success() {
-		return { type: userConstants.LOGIN_SUCCESS };
+		return { type: userConstants.LOGIN_DATA_SUCCESS };
 	}
 	function failure(error) {
-		return { type: userConstants.LOGIN_FAILURE, error };
+		return { type: userConstants.LOGIN_DATA_FAILURE, error };
 	}
 }
 
