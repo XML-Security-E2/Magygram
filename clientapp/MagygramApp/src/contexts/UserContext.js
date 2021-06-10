@@ -5,16 +5,25 @@ export const UserContext = createContext();
 
 const UserContextProvider = (props) => {
 	const [userState, dispatch] = useReducer(userReducer, {
-		loginError: {
+		loginFirstError: {
 			showError: false,
 			errorMessage: "",
+		},
+		loginSecondError: {
+			showError: false,
+			errorMessage: "",
+		},
+		loginPhase: {
+			twoFactorAuthInputShow:false,
 		},
 		registrationError: {
 			showError: false,
 			errorMessage: "",
 			showSuccessMessage: false,
 			emailAddress: "",
+			imageData:"",
 		},
+		registrationShowQr:false,
 		forgotPasswordLinkError: {
 			showError: false,
 			errorMessage: "",

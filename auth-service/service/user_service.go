@@ -5,10 +5,13 @@ import (
 	"auth-service/domain/repository"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"bytes"
 	"context"
 	"errors"
 	"github.com/go-playground/validator"
+	"github.com/pquerna/otp/totp"
 	"github.com/sirupsen/logrus"
+	"image/jpeg"
 )
 
 type userService struct {
@@ -20,29 +23,47 @@ func NewUserService(r repository.UserRepository,a repository.LoginEventRepositor
 	return &userService{r,a}
 }
 
-func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string, error) {
-	user, err := model.NewUser(userRequest)
+func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string,[]byte, error) {
+	key, err := totp.Generate(totp.GenerateOpts{
+		Issuer:      "Magygram",
+		AccountName: userRequest.Email,
+	})
+
+	img, err := key.Image(200, 200)
+	if err != nil {
+		panic(err)
+	}
+
+	buffer := new(bytes.Buffer)
+	err = jpeg.Encode(buffer, img, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	imageInBytes := buffer.Bytes()
+
+	user, err := model.NewUser(userRequest,key.Secret())
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return "", err
+		return "",[]byte{}, err
 	}
 
 	if err := validator.New().Struct(user); err!= nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
-		return "", err
+		return "",[]byte{}, err
 	}
 
 	result, err := u.UserRepository.Create(ctx, user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Error("User database create failure")
-		return "", err
+		return "",[]byte{}, err
 	}
 
 	if userId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
-		return userId, nil
+		return userId,imageInBytes, nil
 	}
-	return "", err
+	return "",imageInBytes, err
 }
 
 func (u userService) ActivateUser(ctx context.Context, userId string) (bool, error) {

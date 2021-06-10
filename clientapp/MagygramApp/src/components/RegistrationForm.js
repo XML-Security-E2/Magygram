@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { userConstants } from "../constants/UserConstants";
 import { UserContext } from "../contexts/UserContext";
 import { userService } from "../services/UserService";
 
@@ -27,6 +28,10 @@ const RegistrationForm = () => {
 
 		userService.register(user, dispatch);
 	};
+
+	const handleShowQRCode= ()=>{
+		dispatch({type: userConstants.REGISTRATION_SHOW_QR_CODE})
+	}
 
 	return (
 		<form method="post" onSubmit={handleSubmit}>
@@ -84,10 +89,20 @@ const RegistrationForm = () => {
 			</div>
 
 			<section hidden={!userState.registrationError.showSuccessMessage} className="login-clean">
-				<div className="form-group text-center" style={{ fontSize: "1.3em" }}>
-					We sent an email to <b>{userState.registrationError.emailAddress}</b> with a activation link to activate your account.
+				<div hidden={userState.registrationShowQr}>
+					<div className="form-group text-center" style={{ fontSize: "1.3em" }}>
+						We sent an email to <b>{userState.registrationError.emailAddress}</b> with a activation link to activate your account.
+					</div>
+					<div className="form-group text-center" style={{ fontSize: "1.3em" }}>
+						We provide QR code for two factor authorization
+					</div>
+					<Link className="btn btn-primary btn-block" onClick={handleShowQRCode}>
+						Show QR code
+					</Link>
 				</div>
-				<div className="form-group">
+				
+				<div hidden={!userState.registrationShowQr} className="form-group text-center">
+					<img src={userState.registrationError.imageData} alt=""></img>
 					<Link className="btn btn-primary btn-block" to="/login">
 						Back to login
 					</Link>

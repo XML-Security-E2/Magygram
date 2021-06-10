@@ -14,6 +14,7 @@ type User struct {
 	Email string `bson:"email" validate:"required,email"`
 	Password string `bson:"password"`
 	Roles []Role `bson:"roles"`
+	TotpToken string `bson:"totp_token"`
 }
 
 type UserRequest struct {
@@ -28,6 +29,12 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+type LoginTwoFactoryRequest struct{
+	Email string
+	Password string
+	Token string
+}
+
 type ActivatedRequest struct {
 	Email string `json:"email"`
 }
@@ -38,7 +45,7 @@ type PasswordChangeRequest struct {
 	PasswordRepeat string `json:"passwordRepeat"`
 }
 
-func NewUser(userRequest *UserRequest) (*User, error) {
+func NewUser(userRequest *UserRequest, token string) (*User, error) {
 	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching(userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil {
 		return nil, err
@@ -47,7 +54,8 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		Active:   false,
 		Email:    html.EscapeString(userRequest.Email),
 		Password: hashAndSalt,
-		Roles: []Role{{ Name: "user", Permissions: []Permission{{"create_post"}}}}}, err
+		Roles: []Role{{ Name: "user", Permissions: []Permission{{"create_post"}}}},
+		TotpToken: token}, err
 }
 
 func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {

@@ -23,6 +23,7 @@ type AuthHandler interface {
 	AuthorizationMiddleware() echo.MiddlewareFunc
 	GetLoggedUserId(c echo.Context) error
 	AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	LoginTwoFactory(c echo.Context) error
 }
 
 type authHandler struct {
@@ -58,6 +59,28 @@ func (a authHandler) LoginUser(c echo.Context) error {
 			"userId" : user.Id,
 		})
 	}
+
+	return c.JSON(http.StatusOK, user.Id)
+}
+
+func (a authHandler) LoginTwoFactory(c echo.Context) error {
+	loginRequest := &model.LoginTwoFactoryRequest{}
+	if err := c.Bind(loginRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	user, err := a.AuthService.AuthenticateTwoFactoryUser(ctx, loginRequest)
+
+	if err != nil && user==nil {
+		return ErrWrongCredentials
+	}
+
+	if err != nil && user != nil {
+		return c.JSON(http.StatusForbidden, map[string]string{
+			"userId" : user.Id,
+		})
+	}
 	expireTime := time.Now().Add(time.Hour).Unix() * 1000
 	token, err := generateToken(user, expireTime)
 	if err != nil {
@@ -71,6 +94,7 @@ func (a authHandler) LoginUser(c echo.Context) error {
 		"expireTime" : strconv.FormatInt(expireTime, 10) ,
 	})
 }
+
 
 func generateToken(user *model.User, expireTime int64) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)

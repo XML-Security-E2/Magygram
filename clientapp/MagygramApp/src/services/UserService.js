@@ -5,7 +5,7 @@ import { authHeader } from "../helpers/auth-header";
 import { postService } from "./PostService";
 
 export const userService = {
-	login,
+	loginFirstAuthorization,
 	logout,
 	register,
 	getUserProfileByUserId,
@@ -21,6 +21,7 @@ export const userService = {
 	checkIfUserIdExist,
 	followUser,
 	unfollowUser,
+	loginSecondAuthorization
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -104,14 +105,13 @@ async function findAllFollowingUsers(userId, dispatch) {
 	}
 }
 
-function login(loginRequest, dispatch) {
+function loginFirstAuthorization(loginRequest, dispatch) {
 	dispatch(request());
 
 	Axios.post(`/api/auth/login`, loginRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
-				setAuthInLocalStorage(res.data);
-				getLoggedData(dispatch);
+				dispatch(success())
 			} else if (res.status === 401) {
 				dispatch(failure("Sorry, your email or password was incorrect. Please double-check your password."));
 			} else if (res.status === 403) {
@@ -125,8 +125,36 @@ function login(loginRequest, dispatch) {
 	function request() {
 		return { type: userConstants.LOGIN_REQUEST };
 	}
+	function success() {
+		return { type: userConstants.LOGIN_SUCCESS };
+	}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
+	}
+}
+
+function loginSecondAuthorization(loginRequest, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/auth/login/two`, loginRequest, { validateStatus: () => true })
+		.then((res) => {
+			if (res.status === 200) {
+				setAuthInLocalStorage(res.data);
+				getLoggedData(dispatch);
+			} else {
+				dispatch(failure("Uneti kod je neispravan"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.LOGIN_TWO_REQUEST };
+	}
+	function success() {
+		return { type: userConstants.LOGIN_TWO_SUCCESS };
+	}
+	function failure(error) {
+		return { type: userConstants.LOGIN_TWO_FAILURE, error };
 	}
 }
 
@@ -421,10 +449,15 @@ function logout() {
 function register(user, dispatch) {
 	if (validateUser(user, dispatch)) {
 		dispatch(request());
-		Axios.post(`/api/users`, user, { validateStatus: () => true })
+		Axios.post(`/api/users`, user, { responseType: 'arraybuffer' ,validateStatus: () => true })
 			.then((res) => {
 				if (res.status === 201) {
-					dispatch(success(user.email));
+					let blob = new Blob(
+						[res.data], 
+						{ type: res.headers['image/png'] }
+					)
+					let image = URL.createObjectURL(blob)
+					dispatch(success(user.email,image));
 				} else {
 					dispatch(failure(res.data.message));
 				}
@@ -437,8 +470,8 @@ function register(user, dispatch) {
 	function request() {
 		return { type: userConstants.REGISTER_REQUEST };
 	}
-	function success(emailAddress) {
-		return { type: userConstants.REGISTER_SUCCESS, emailAddress };
+	function success(emailAddress,imageData) {
+		return { type: userConstants.REGISTER_SUCCESS, emailAddress ,imageData};
 	}
 	function failure(error) {
 		return { type: userConstants.REGISTER_FAILURE, errorMessage: error };
