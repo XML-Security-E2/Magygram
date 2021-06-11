@@ -3,3 +3,9 @@ time="2021-06-10T01:22:07+02:00" level=info msg="Server started" func="github.co
 time="2021-06-10T01:28:26+02:00" level=info msg="Story created" func="github.com/sirupsen/logrus.(*Entry).Info" file="C:/Users/Dusan/go/pkg/mod/github.com/sirupsen/logrus@v1.4.2/entry.go:285" request_ip=127.0.0.1 story_id=d8fd071d-d2ed-4b78-8bd5-d1da4195469b user_id=f53bb8ed-e9ac-4c50-94b4-ee32ca85a52d
 time="2021-06-10T01:28:59+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:71" host=localhost port=464
 time="2021-06-10T01:32:38+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:71" host=localhost port=464
+time="2021-06-11T22:02:32+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-11T22:07:35+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:53" request_ip=127.0.0.1 story_id=b8e6243e-be22-4566-9809-1cac7c73b921 user_id=55489ec6-3eb3-45af-b714-3df1b3a95d05
+time="2021-06-11T22:20:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-11T22:22:31+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-11T22:29:28+02:00" level=error msg="User-service get logged user info" func=story-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/Dusan/Desktop/Magygram/story-service/service/intercomm/user_client.go:45" request_ip=127.0.0.1
+time="2021-06-11T22:39:57+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464

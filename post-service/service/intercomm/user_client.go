@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"post-service/conf"
@@ -34,6 +35,8 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -67,6 +70,8 @@ func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*mo
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/collections/check-favourites", baseUsersUrl), bytes.NewReader(jsonStr))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -92,6 +97,9 @@ func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*mo
 
 func (u userClient) IsUserPrivate(userId string) (bool, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {

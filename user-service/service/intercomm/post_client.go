@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"user-service/conf"
@@ -30,6 +31,9 @@ var (
 func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/image", basePostUrl, postId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
@@ -54,6 +58,10 @@ func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 
 func (a postClient) GetUsersPostsCount(userId string) (int, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/count", basePostUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {

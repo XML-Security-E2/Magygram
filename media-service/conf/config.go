@@ -10,6 +10,8 @@ type Config struct {
 		Port string
 		Host string
 		Secret string
+		Name string
+		Handshake string
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"user-service/conf"
@@ -34,6 +35,9 @@ func (s storyClient) GetStoryHighlightIfValid(bearer string, request *model.High
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/highlights", baseStorytUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 

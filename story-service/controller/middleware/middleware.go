@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	"user-service/conf"
+	"story-service/conf"
 )
 
 var (

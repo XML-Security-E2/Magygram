@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"user-service/conf"
@@ -43,8 +44,15 @@ func (r relationshipClient) CreateUser(user *model.User) error {
 	userRequest := &userRequest{Id: user.Id}
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
-	resp, err := http.Post(baseRelationshipUrl + "/user",
-		"application/json", bytes.NewBuffer(jsonUserRequest))
+	req, err := http.NewRequest("POST", baseRelationshipUrl + "/user", bytes.NewBuffer(jsonUserRequest))
+	req.Header.Add("Content-Type","application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	//resp, err := http.Post(baseRelationshipUrl + "/user","application/json", bytes.NewBuffer(jsonUserRequest))
+
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
 			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name,
@@ -68,6 +76,9 @@ func (r relationshipClient) CreateUser(user *model.User) error {
 func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsersResponse, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/followed-users/%s", baseRelationshipUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 201 {
@@ -96,6 +107,9 @@ func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsers
 func (r relationshipClient) GetFollowingUsers(userId string) (model.FollowedUsersResponse, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/following-users/%s", baseRelationshipUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
@@ -126,6 +140,9 @@ func (r relationshipClient) FollowRequest(request *model.FollowRequest) (bool,er
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/follow", baseRelationshipUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
@@ -152,6 +169,9 @@ func (r relationshipClient) Unfollow(request *model.FollowRequest) error {
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/unfollow", baseRelationshipUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
@@ -173,6 +193,9 @@ func (r relationshipClient) Unfollow(request *model.FollowRequest) error {
 func (r relationshipClient) ReturnFollowRequestsForUser(bearer string, objectId string) (bool, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/follow-requests/%s", baseRelationshipUrl, objectId), nil)
 	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
@@ -199,6 +222,9 @@ func (r relationshipClient) ReturnFollowRequestsForUser(bearer string, objectId 
 func (r relationshipClient) ReturnFollowRequests(bearer string) (model.FollowedUsersResponse, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/follow-requests", baseRelationshipUrl), nil)
 	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {
@@ -226,6 +252,9 @@ func (r relationshipClient) ReturnFollowRequests(bearer string) (model.FollowedU
 func (r relationshipClient) AcceptFollowRequest(bearer string, userId string) error {
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/accept-follow-request/%s", baseRelationshipUrl, userId), nil)
 	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 200 {

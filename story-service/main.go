@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"story-service/conf"
+	"story-service/controller/middleware"
 	"story-service/controller/router"
 	"story-service/interactor"
 	"story-service/logger"
@@ -64,6 +65,7 @@ func main() {
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
+	middleware.NewMiddleware(e)
 
 	logger.Logger.WithFields(logrus.Fields{
 		"host": conf.Current.Server.Host,
