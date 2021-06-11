@@ -2,6 +2,7 @@ package main
 
 import (
 	"auth-service/conf"
+	"auth-service/controller/middleware"
 	"auth-service/controller/router"
 	"auth-service/interactor"
 	"auth-service/logger"
@@ -65,6 +66,7 @@ func main() {
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
+	middleware.NewMiddleware(e)
 
 	logger.Logger.WithFields(logrus.Fields{
 		"host": conf.Current.Server.Host,

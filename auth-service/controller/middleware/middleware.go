@@ -1,11 +1,11 @@
 package middleware
 
 import (
+	"auth-service/conf"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	"user-service/conf"
 )
 
 var (

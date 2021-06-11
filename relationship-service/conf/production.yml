@@ -2,6 +2,8 @@ server:
     port: "463"
     host: "relationship-service"
     secret: "MagyGram"
+    name: "relationship-service"
+    handshake : "ms-handshake"
 
 database:
     host: "bolt://neo4j-db"

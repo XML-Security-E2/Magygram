@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -70,10 +71,12 @@ func (h highlightsHandler) GetProfileHighlights(c echo.Context) error {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
 		case *exceptions.UnauthorizedAccessError:
+			fmt.Println("nije ovde")
+
 			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
 		}
 	}
-
+	fmt.Println("Ovde")
 	return c.JSON(http.StatusOK, response)
 }
 

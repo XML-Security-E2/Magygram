@@ -2,3 +2,5 @@ server :
   port : "465"
   host : "localhost"
   secret : "MagyGram"
+  name: "media-service"
+  handshake : "ms-handshake"
