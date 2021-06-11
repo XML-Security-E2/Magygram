@@ -318,6 +318,7 @@ func (h *userHandler) GetUserProfileById(c echo.Context) error {
 		ctx = context.Background()
 	}
 
+	fmt.Println("Profile 1")
 	bearer := c.Request().Header.Get("Authorization")
 	user, err := h.UserService.GetUserProfileById(ctx,bearer, userId)
 
