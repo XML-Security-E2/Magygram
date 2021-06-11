@@ -2,63 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../auth-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/conf/production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/conf/production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/handler/user_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/StoryService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/src/services/StoryService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/conf/production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/logger/logs/media-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/conf/production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/conf/production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/auth_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/auth_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/media_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/relationship_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/service/intercomm/user_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/conf/production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/conf/production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/middleware/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/middleware/middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/service/intercomm/auth_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/service/intercomm/auth_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/service/intercomm/user_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/conf/production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/conf/production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/service/intercomm/auth_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/intercomm/auth_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/intercomm/media_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/intercomm/relationship_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/service/intercomm/user_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/conf/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/conf/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/conf/local.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/conf/local.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/conf/production.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/conf/production.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/highlights_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/highlights_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/handler/user_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/controller/middleware/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/controller/middleware/middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/auth_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/auth_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/media_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/media_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/post_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/post_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logger/logs/media-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/story_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/story_client.go" afterDir="false" />
     </list>
@@ -102,9 +58,18 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../post-service" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../user-service" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Go Build.go build main.go">
+    <configuration name="go build logger.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="media-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/logger/logger.go" />
+      <package value="media-service" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
@@ -116,6 +81,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build main.go" />
+        <item itemvalue="Go Build.go build logger.go" />
       </list>
     </recent_temporary>
   </component>
