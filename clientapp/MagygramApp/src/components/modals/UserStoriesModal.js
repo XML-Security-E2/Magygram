@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { storyConstants } from "../../constants/StoryConstants";
@@ -34,13 +34,6 @@ const UserStoriesModal = () => {
 		storyService.createHighlight(highlight, dispatch);
 		setSelectedStoryIds([]);
 	};
-
-	useEffect(() => {
-		const getUserStoriesHandler = async () => {
-			await storyService.findAllUserStories(dispatch);
-		};
-		getUserStoriesHandler();
-	}, [dispatch]);
 
 	return (
 		<Modal show={storyState.highlights.showModal} size="lg" aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
