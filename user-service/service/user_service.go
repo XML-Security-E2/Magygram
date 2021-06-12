@@ -126,6 +126,12 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 		return nil, err
 	}
 
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname" : userRequest.Surname, "email" : userRequest.Email, "username" : userRequest.Username}).Error("User database create failure")
+		return nil, err
+	}
+
 	resp, err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
 	if err != nil {
 		return nil, err
@@ -138,11 +144,6 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 
 	accActivationId, _ :=u.AccountActivationService.Create(ctx, user.Id)
 
-	result, err := u.UserRepository.Create(ctx, user)
-	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname" : userRequest.Surname, "email" : userRequest.Email, "username" : userRequest.Username}).Error("User database create failure")
-		return nil, err
-	}
 
 	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 
