@@ -5,7 +5,7 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import { postService } from "../services/PostService";
 import { Link } from "react-router-dom";
 
-const Timeline = ({search}) => {
+const Timeline = ({ search }) => {
 	const { postState, dispatch } = useContext(PostContext);
 
 	useEffect(() => {
@@ -18,7 +18,7 @@ const Timeline = ({search}) => {
 	return (
 		<React.Fragment>
 			<div className="d-flex flex-column mt-4 mb-4">
-				<div hidden={search}  className="card">
+				<div hidden={search} className="card">
 					<Link type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" to="/add-posts">
 						Create new post
 					</Link>

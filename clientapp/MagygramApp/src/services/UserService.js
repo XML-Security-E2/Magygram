@@ -456,11 +456,11 @@ function register(user, dispatch) {
 					let image = URL.createObjectURL(blob)
 					dispatch(success(user.email,image));
 				} else {
-					dispatch(failure(res.data.message));
+					dispatch(failure("Email adress and username must be unique"));
 				}
 			})
 			.catch((err) => {
-				console.log(err);
+
 			});
 	}
 

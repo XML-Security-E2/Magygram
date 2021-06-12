@@ -1,12 +1,18 @@
 import { useContext } from "react";
 import { modalConstants } from "../constants/ModalConstants";
 import { StoryContext } from "../contexts/StoryContext";
+import { storyService } from "../services/StoryService";
 
 const CreateStoryHighlightsButton = ({ userId }) => {
 	const { dispatch } = useContext(StoryContext);
 
+	const getUserStoriesHandler = async () => {
+		await storyService.findAllUserStories(dispatch);
+	};
+
 	const handleOpenStory = () => {
 		dispatch({ type: modalConstants.SHOW_STORY_SELECT_HIGHLIGHTS_MODAL });
+		getUserStoriesHandler();
 	};
 	return (
 		<li class="list-inline-item" hidden={userId !== localStorage.getItem("userId")}>
