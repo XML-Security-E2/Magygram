@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 time="2021-06-09T23:33:38+02:00" level=info msg="Server started" func="github.com/sirupsen/logrus.(*Entry).Info" file="C:/Users/Dusan/go/pkg/mod/github.com/sirupsen/logrus@v1.4.2/entry.go:285" host=localhost port=462
 time="2021-06-10T00:45:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:72" host=localhost port=462
 time="2021-06-10T00:46:06+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:67" post_id=c0a40c8f-78a1-4be6-8912-2cbbdeb02074 request_ip=127.0.0.1 user_id=b105f72b-d4b1-4f07-82f1-26de708c882a
@@ -85,3 +86,6 @@ time="2021-06-12T15:42:23+02:00" level=info msg="Post created" func=post-service
 time="2021-06-12T15:49:51+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:67" post_id=1781a9e9-a554-43b5-844b-f6c59f9c77e7 request_ip=127.0.0.1 user_id=4f98b887-08cc-4ab6-a7f0-2c546996b34a
 time="2021-06-12T15:58:16+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:72" host=localhost port=462
 time="2021-06-12T16:52:09+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/main.go:72" host=localhost port=462
+=======
+time="2021-06-11T23:37:29+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+>>>>>>> develop

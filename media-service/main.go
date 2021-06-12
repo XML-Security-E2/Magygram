@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/sirupsen/logrus"
+	"media-service/controller/middleware"
 	"media-service/logger"
 	"os"
 	"github.com/labstack/echo"
@@ -25,6 +26,7 @@ func main() {
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
+	middleware.NewMiddleware(e)
 
 	logger.Logger.WithFields(logrus.Fields{
 		"host": conf.Current.Server.Host,

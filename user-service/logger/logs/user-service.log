@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 time="2021-06-09T23:32:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
 time="2021-06-09T23:37:43+02:00" level=info msg="User registered" func="user-service/service.(*userService).RegisterUser" file="C:/Users/Dusan/Desktop/Magygram/user-service/service/user_service.go:151" request_ip=127.0.0.1 user_id=8578fdc7-ed98-428a-af8f-d8fd709c5988
 time="2021-06-09T23:37:47+02:00" level=info msg="Activation e-mail sent" func=user-service/service.SendActivationMail file="C:/Users/Dusan/Desktop/Magygram/user-service/service/email_service.go:41" activation_id=ee5a2817-0654-454d-b439-b35705137932
@@ -297,3 +298,12 @@ time="2021-06-12T16:59:19+02:00" level=info msg="User registered" func="user-ser
 time="2021-06-12T16:59:21+02:00" level=info msg="Activation e-mail sent" func=user-service/service.SendActivationMail file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/email_service.go:41" activation_id=c8ee5f0e-1f1b-47ef-8204-c4dadc367cd3
 time="2021-06-12T17:02:09+02:00" level=error msg="User database create failure" func="user-service/service.(*userService).RegisterUser" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/user_service.go:143" email=nikolakolovic7@gmail.com name="Nikola " request_ip=127.0.0.1 surname=Kolovic username=nkl
 time="2021-06-12T17:05:06+02:00" level=error msg="User database create failure" func="user-service/service.(*userService).RegisterUser" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/user_service.go:143" email=nikoladskv@gmail.com name="Nikola " request_ip=127.0.0.1 surname=Kolovic username=nikolakolovic
+=======
+time="2021-06-11T23:10:47+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
+time="2021-06-11T23:10:59+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
+time="2021-06-11T23:11:15+02:00" level=error msg="Relationship-service not available" func=user-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/user-service/service/intercomm/relationship_client.go:86" request_ip=127.0.0.1 user_id=6ccfaa94-0009-4d6f-97ad-82fb15137029
+time="2021-06-11T23:11:15+02:00" level=error msg="Relationship-service get followed users" func=user-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/user-service/service/intercomm/relationship_client.go:89" request_ip=127.0.0.1 user_id=6ccfaa94-0009-4d6f-97ad-82fb15137029
+time="2021-06-11T23:13:20+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
+time="2021-06-11T23:13:26+02:00" level=error msg="Relationship-service not available" func=user-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/user-service/service/intercomm/relationship_client.go:86" request_ip=127.0.0.1 user_id=6ccfaa94-0009-4d6f-97ad-82fb15137029
+{"file":"C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97","func":"main.main","host":"localhost","level":"info","msg":"Server started","port":"460","time":"2021-06-11T23:31:26+02:00"}
+>>>>>>> develop

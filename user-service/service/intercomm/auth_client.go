@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -53,6 +54,8 @@ func (a authClient) GetLoggedUserId(bearer string) (string,error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged-user", baseUrl), nil)
 	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -93,8 +96,17 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 	userRequest := &userAuthRequest{Id: user.Id, Email: user.Email, Password: password, RepeatedPassword: passwordRepeat}
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
-	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
-		"application/json", bytes.NewBuffer(jsonUserRequest))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+										bytes.NewBuffer(jsonUserRequest))
+	req.Header.Add("Content-Type","application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	//resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+	//	"application/json", bytes.NewBuffer(jsonUserRequest))
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
 			logger.LoggingEntry.WithFields(logrus.Fields{"name": user.Name,
@@ -117,7 +129,17 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 
 func (a authClient) ActivateUser(userId string) error {
 
-	resp, err := http.Get(fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId))
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId),
+								  nil)
+	//resp, err := http.Get(fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId))
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
 			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("Auth-service not available")
@@ -135,7 +157,17 @@ func (a authClient) ChangePassword(userId string, password string, passwordRepea
 	passwordRequest := &passwordChangeRequest{UserId: userId, Password: password, PasswordRepeat: passwordRepeat}
 	jsonPasswordRequest, _ := json.Marshal(passwordRequest)
 
-	resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port), "application/json", bytes.NewBuffer(jsonPasswordRequest))
+	//resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port), "application/json", bytes.NewBuffer(jsonPasswordRequest))
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+										bytes.NewBuffer(jsonPasswordRequest))
+	req.Header.Add("Content-Type","application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
 	if err != nil || resp.StatusCode != 200 {
 		if resp == nil {
 			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Auth-service not available")

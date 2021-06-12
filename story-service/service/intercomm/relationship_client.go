@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"story-service/conf"
@@ -33,6 +34,9 @@ func NewRelationshipClient() RelationshipClient {
 func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsersResponse, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/followed-users/%s", baseRelationshipUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 201 {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
 	"story-service/conf"
@@ -30,6 +31,8 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

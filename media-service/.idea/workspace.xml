@@ -2,21 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../auth-service/controller/handler/auth_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/handler/auth_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/handler/user_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../auth-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/service/user_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../clientapp/MagygramApp/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../clientapp/MagygramApp/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/handler/media_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/controller/handler/media_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/handler/follow_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/handler/follow_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/service/follow_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/service/follow_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logger/logs/media-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/relationship_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/service/intercomm/story_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/service/intercomm/story_client.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,9 +58,18 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../user-service" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Go Build.go build main.go">
+    <configuration name="go build logger.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="media-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/logger/logger.go" />
+      <package value="media-service" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
@@ -72,6 +81,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build main.go" />
+        <item itemvalue="Go Build.go build logger.go" />
       </list>
     </recent_temporary>
   </component>

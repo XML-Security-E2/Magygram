@@ -2,6 +2,8 @@ server:
     port: "464"
     host: "story-service"
     secret: "MagyGram"
+    name: "story-service"
+    handshake : "ms-handshake"
 
 database:
     host: "mongodb://mongo-db"

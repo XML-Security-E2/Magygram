@@ -6,6 +6,7 @@ import (
 	"auth-service/logger"
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -41,6 +42,9 @@ func (u userHandler) UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFu
 }
 
 func (u userHandler) RegisterUser(c echo.Context) error {
+	fmt.Println(c.Request().Header.Get("X-Forwarded-For"))// capitalisation )
+	fmt.Println(c.Request().Header.Get("proba-proba"))// capitalisation )
+
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {
 		return err

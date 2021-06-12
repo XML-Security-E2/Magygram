@@ -4,8 +4,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"golang.org/x/crypto/bcrypt"
+	"media-service/conf"
 	"net/http"
-	"user-service/conf"
 )
 
 var (

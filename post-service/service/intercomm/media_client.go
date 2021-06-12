@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -48,6 +49,9 @@ func handleSaveMediaRequest(body *bytes.Buffer, writer *multipart.Writer) ([]mod
 	}
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 201 {
 		if resp == nil {
