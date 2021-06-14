@@ -4,18 +4,21 @@ import (
 	"gorm.io/gorm"
 	"magyAgent/controller/handler"
 	"magyAgent/domain/repository"
-	service_contracts "magyAgent/domain/service-contracts"
+	"magyAgent/domain/service-contracts"
 	"magyAgent/infrastructure/persistence/pgsql"
 	"magyAgent/service"
 )
 
 type Interactor interface {
 	NewUserRepository() repository.UserRepository
+	NewProductRepository() repository.ProductRepository
 	NewLoginEventRepository() repository.LoginEventRepository
 	NewAccountActivationRepository() repository.AccountActivationRepository
 	NewAuthService() service_contracts.AuthService
+	NewProductService() service_contracts.ProductService
 	NewAccountActivationService() service_contracts.AccountActivationService
 	NewAuthHandler() handler.AuthHandler
+	NewProductHandler() handler.ProductHandler
 	NewAppHandler() handler.AppHandler
 }
 
@@ -29,12 +32,15 @@ func NewInteractor(Conn *gorm.DB) Interactor {
 
 type appHandler struct {
 	handler.AuthHandler
+	handler.ProductHandler
 	// embed all handler interfaces
 }
 
 func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.AuthHandler = i.NewAuthHandler()
+	appHandler.ProductHandler = i.NewProductHandler()
+
 	return appHandler
 }
 
@@ -68,4 +74,16 @@ func (i *interactor) NewAccountResetPasswordService() service_contracts.AccountR
 
 func (i *interactor) NewAuthHandler() handler.AuthHandler {
 	return handler.NewAuthHandler(i.NewAuthService())
+}
+
+func (i *interactor) NewProductHandler() handler.ProductHandler {
+	return handler.NewProductHandler(i.NewProductService())
+}
+
+func (i *interactor) NewProductRepository() repository.ProductRepository {
+	return pgsql.NewProductRepository(i.Conn)
+}
+
+func (i *interactor) NewProductService() service_contracts.ProductService {
+	return service.NewProductService(i.NewProductRepository())
 }

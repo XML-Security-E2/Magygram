@@ -8,7 +8,7 @@ database :
   port : "5432"
   user : "postgres"
   password : "root"
-  database : "test"
+  database : "magy-agent"
 
 mail :
   sender : "info.magygram@gmail.com"
