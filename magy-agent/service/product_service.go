@@ -22,7 +22,7 @@ func NewProductService(r repository.ProductRepository) service_contracts.Product
 
 var (
 	FileDirectory = "files"
-	FileRequestPrefix = "/api/agent/media/"
+	FileRequestPrefix = "/api/media/"
 )
 
 func (p productService) CreateProduct(ctx context.Context, productReq *model.ProductRequest) (*model.Product, error) {
