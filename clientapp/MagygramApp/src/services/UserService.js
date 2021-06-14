@@ -2,6 +2,7 @@ import Axios from "axios";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 import { authHeader } from "../helpers/auth-header";
+import { hasRoles } from "../helpers/auth-header";
 
 export const userService = {
 	loginFirstAuthorization,
@@ -110,7 +111,13 @@ function loginFirstAuthorization(loginRequest, dispatch) {
 	Axios.post(`/api/auth/login/firststage`, loginRequest, { validateStatus: () => true })
 		.then((res) => {
 			if (res.status === 200) {
-				dispatch(success())
+				setAuthInLocalStorage(res.data);
+				if(!hasRoles(["admin"])){
+					getLoggedData(dispatch);
+				}else{
+					window.location = "#/";
+				}
+				//dispatch(success())
 			} else if (res.status === 401) {
 				dispatch(failure("Sorry, your email or password was incorrect. Please double-check your password."));
 			} else if (res.status === 403) {
@@ -124,9 +131,9 @@ function loginFirstAuthorization(loginRequest, dispatch) {
 	function request() {
 		return { type: userConstants.LOGIN_REQUEST };
 	}
-	function success() {
-		return { type: userConstants.LOGIN_SUCCESS };
-	}
+	//function success() {
+	//	return { type: userConstants.LOGIN_SUCCESS };
+	//}
 	function failure(error) {
 		return { type: userConstants.LOGIN_FAILURE, error };
 	}
