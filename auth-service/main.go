@@ -11,8 +11,10 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 	"os"
 	"time"
 )
@@ -61,6 +63,39 @@ func main() {
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	loginEventsCol := client.Database(*mongoDatabase).Collection("login-events")
 
+	_, err = usersCol.InsertOne(ctx, bson.D{
+		{Key: "_id", Value: "2bdfa5ed-be19-4573-8fe9-49bdfbd8dc12"},
+		{Key: "active", Value: true},
+		{Key: "email", Value: "admin1@admin.com"},
+		{Key: "password", Value: HashAndSaltPasswordIfStrongAndMatching("Adminadmin1!")},
+		{Key: "roles", Value: bson.A{
+			bson.D{
+				{Key: "name", Value: "admin"},
+				{Key: "permissions", Value: bson.A{
+					bson.D{{Key: "name", Value: "get_verification_request"}},
+					bson.D{{Key: "name", Value: "confirm_verification_request"}},
+					bson.D{{Key: "name", Value: "reject_verification_request"}},
+				}}}}},
+		{Key: "totp_token", Value: "123"},
+	})
+
+	_, err = usersCol.InsertOne(ctx, bson.D{
+		{Key: "_id", Value: "37f66e74-71cd-45b5-8070-daeb01323a3b"},
+		{Key: "active", Value: true},
+		{Key: "email", Value: "admin2@admin.com"},
+		{Key: "password", Value: HashAndSaltPasswordIfStrongAndMatching("Adminadmin2!")},
+		{Key: "roles", Value: bson.A{
+			bson.D{
+				{Key: "name", Value: "admin"},
+				{Key: "permissions", Value: bson.A{
+					bson.D{{Key: "name", Value: "get_verification_request"}},
+					bson.D{{Key: "name", Value: "confirm_verification_request"}},
+					bson.D{{Key: "name", Value: "reject_verification_request"}},
+				}}}}},
+		{Key: "totp_token", Value: "123"},
+	})
+
+
 	e := echo.New()
 	i := interactor.NewInteractor(usersCol, loginEventsCol)
 	h := i.NewAppHandler()
@@ -79,3 +114,11 @@ func main() {
 		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 	}
 }
+
+func HashAndSaltPasswordIfStrongAndMatching(password string) string {
+	pwd := []byte(password)
+	hash, _ := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+
+	return string(hash)
+}
+

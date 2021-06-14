@@ -59,8 +59,21 @@ func (a authHandler) LoginFirstStage(c echo.Context) error {
 			"userId" : user.Id,
 		})
 	}
+	//vracati ako je ukljucen 2fa
+	//return c.JSON(http.StatusOK, user.Id)
 
-	return c.JSON(http.StatusOK, user.Id)
+	expireTime := time.Now().Add(time.Hour).Unix() * 1000
+	token, err := generateToken(user, expireTime)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	rolesString, _ := json.Marshal(user.Roles)
+	return c.JSON(http.StatusOK, map[string]string{
+		"accessToken": token,
+		"roles" : string(rolesString),
+		"expireTime" : strconv.FormatInt(expireTime, 10) ,
+	})
 }
 
 func (a authHandler) LoginSecondStage(c echo.Context) error {
