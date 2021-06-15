@@ -26,6 +26,9 @@ func (o orderService) CreateOrder(ctx context.Context, orderReq *model.OrderRequ
 		Timestamp: time.Now(),
 		Items:     []*model.OrderItem{},
 	}
+	if len(orderReq.Items) == 0 {
+		return nil, errors.New("at least one product must be selected")
+	}
 
 	for _, item := range orderReq.Items {
 		product, err := o.ProductRepository.GetById(ctx, item.ProductId)
