@@ -55,3 +55,5 @@ time="2021-06-12T17:05:06+02:00" level=info msg="User node created" func="relati
 =======
 time="2021-06-11T23:36:56+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
 >>>>>>> develop
+time="2021-06-14T20:06:21+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-06-14T20:42:53+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
