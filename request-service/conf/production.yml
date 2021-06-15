@@ -1,0 +1,21 @@
+server:
+  port: "466"
+  host: "request-service"
+  secret: "MagyGram"
+  name: "request-service"
+  handshake : "ms-handshake"
+
+database:
+  host: "mongodb://mongo-db"
+  port: "27017"
+  user: "root"
+  password: "root"
+  database: "no-waiter-request-service"
+
+mail:
+  sender: "info.magygram@gmail.com"
+  password: "magygramxml"
+  host: "smtp.gmail.com"
+  port: "587"
+
+
