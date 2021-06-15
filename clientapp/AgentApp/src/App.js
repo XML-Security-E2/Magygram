@@ -14,7 +14,7 @@ function App() {
 	return (
 		<Router>
 			<Switch>
-				<ProtectedRoute roles={["user"]} exact path="/" redirectTo="/unauthorized" component={HomePage} />
+				<Route exact path="/" component={HomePage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/login" component={LoginPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/forgot-password" component={ForgotPasswordPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/registration" component={RegistrationPage} />
