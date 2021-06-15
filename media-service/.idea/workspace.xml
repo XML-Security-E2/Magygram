@@ -2,37 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35fdbfd2-88c9-4804-85d0-f276e98d88aa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/logger/logs/auth-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/conf/local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/conf/local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/controller/handler/appHandler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/controller/handler/app_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/controller/handler/authHandler.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/controller/handler/auth_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/model/accountActivation.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/model/account_activation.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/model/accountResetPassword.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/model/account_reset_password.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/model/loginEvent.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/model/login_event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/repository/accountActivationRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/repository/account_activation_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/repository/accountResetPasswordRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/repository/reset_password_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/repository/loginEventRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/repository/login_event_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/repository/userRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/repository/user_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/service-contracts/accountActivationService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/service-contracts/account_activation_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/service-contracts/accountResetPasswordService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/service-contracts/reset_password_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/domain/service-contracts/authService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/domain/service-contracts/auth_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/accountActivationRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/account_activation_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/accountResetPasswordRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/reset_password_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/loginEventRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/login_event_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/userRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/infrastructure/persistence/pgsql/user_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/interactor/interactor.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/interactor/interactor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/service/accountActivationService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/service/account_activation_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/service/accountResetPasswordService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/service/reset_password_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/service/authService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/service/auth_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../magy-agent/service/emailService.go" beforeDir="false" afterPath="$PROJECT_DIR$/../magy-agent/service/email_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/logger/logs/media-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../post-service/logger/logs/post-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../relationship-service/logger/logs/relationship-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../story-service/logger/logs/story-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/logger/logs/user-service.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,24 +44,24 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../auth-service" />
   </component>
   <component name="RunManager" selected="Go Build.go build main.go">
     <configuration name="go build logger.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/logger/logger.go" />
       <package value="media-service" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/logger/logger.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="media-service" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/main.go" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
