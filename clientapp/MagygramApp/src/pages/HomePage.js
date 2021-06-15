@@ -42,10 +42,27 @@ const HomePage = () => {
 			</UserContextProvider>
 		</div> : 
 			
-	
+		<div>
+			{hasRoles(["admin"]) ? 
+			<PostContextProvider>
+					<div>
+						<div class="mt-4">
+							<div class="container d-flex justify-content-center">
+								<div class="col-9">
+									<div class="row">
+										<div class="col-8">
+											<h1>Admin zona</h1>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+			</PostContextProvider>
+			:
 			<div>
 				<PostContextProvider>
-					<GuestHeader />
+				<GuestHeader />
 					<div>
 						<div class="mt-4">
 							<div class="container d-flex justify-content-center">
@@ -60,9 +77,8 @@ const HomePage = () => {
 						</div>
 					</div>
 				</PostContextProvider>
-			</div>
-
-		}
+			</div>}
+	</div>}
 			
 		</React.Fragment>
 	);
