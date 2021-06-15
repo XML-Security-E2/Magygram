@@ -57,3 +57,4 @@ time="2021-06-11T23:36:56+02:00" level=info msg="Server started" func=main.main 
 >>>>>>> develop
 time="2021-06-15T22:13:55+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463
 time="2021-06-15T22:21:00+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:102" request_ip="::1" user_id=c1ea55d5-43bd-4a18-89f7-9de09b4dc465
+time="2021-06-15T23:24:24+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463
