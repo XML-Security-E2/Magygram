@@ -2,11 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/request-service/domain/repository/reports.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/request-service/infrastructure/persistance/mongodb/reports.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/EditProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/EditProfile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/ProfilePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/domain/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/domain/model/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/infrastructure/persistence/mongodb/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/infrastructure/persistence/mongodb/users.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/controller/handler/verification_request_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/controller/handler/verification_request_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/model/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/model/request.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/repository/verification_requests.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/repository/verification_requests.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/service-contracts/verification_request_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/service-contracts/verification_request_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/infrastructure/persistance/mongodb/verificationRequests.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/infrastructure/persistance/mongodb/verificationRequests.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/interactor/interactor.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/interactor/interactor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/service/verification_request.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/service/verification_request.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,16 +116,5 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/user-service/service/user_service.go</url>
-          <line>29</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

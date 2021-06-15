@@ -9,10 +9,11 @@ import (
 
 type verificationService struct {
 	repository.VerificationRequestsRepository
+	repository.ReportRequestsRepository
 }
 
-func NewVerificationServiceService(v repository.VerificationRequestsRepository) service_contracts.VerificationRequestService {
-	return &verificationService{v}
+func NewVerificationServiceService(v repository.VerificationRequestsRepository,r repository.ReportRequestsRepository) service_contracts.VerificationRequestService {
+	return &verificationService{v, r}
 }
 
 func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequestDTO *model.VerificationRequestDTO) (string, error) {
@@ -29,6 +30,26 @@ func (v verificationService) CreateVerificationRequest(ctx context.Context, veri
 	}
 
 	result, err := v.VerificationRequestsRepository.Create(ctx, verificationRequest)
+	if err != nil {
+		return "", err
+	}
+
+	if requestId, ok := result.InsertedID.(string); ok {
+		return requestId, nil
+	}
+
+	return "",err
+}
+
+func (v verificationService) CreateReportRequest(ctx context.Context, reportRequestDTO *model.ReportRequestDTO) (string, error) {
+
+	reportRequest, err := model.NewReportRequest(reportRequestDTO)
+
+	if err != nil {
+		return "", err
+	}
+
+	result, err := v.ReportRequestsRepository.CreateReport(ctx, reportRequest)
 	if err != nil {
 		return "", err
 	}
