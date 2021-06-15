@@ -36,11 +36,14 @@ type PostHandler interface {
 	GetPostForUserTimelineByLocation(c echo.Context) error
 	GetPostByIdForGuest(c echo.Context) error
 	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	GetLikedPosts(c echo.Context) error
+	GetDislikedPosts(c echo.Context) error
 }
 
 type postHandler struct {
 	PostService service_contracts.PostService
 }
+
 
 func NewPostHandler(p service_contracts.PostService) PostHandler {
 	return &postHandler{p}
@@ -427,4 +430,44 @@ func (p postHandler) GetPostByIdForGuest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, post)
+}
+
+func (p postHandler) GetLikedPosts(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetUserLikedPosts(ctx, bearer)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, posts)
+}
+
+func (p postHandler) GetDislikedPosts(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetUserDislikedPosts(ctx, bearer)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, t.Error())
+		}
+	}
+
+	return c.JSON(http.StatusOK, posts)
 }

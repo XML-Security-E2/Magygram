@@ -548,3 +548,102 @@ func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, us
 
 	return nil
 }
+
+func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		errors.New("invalid user id")
+	}
+
+	var result, index = didUserLikedPost(user,postId)
+
+	if result{
+		user.LikedPosts = append(user.LikedPosts[:index], user.LikedPosts[index+1:]...)
+	}else{
+		user.LikedPosts = append(user.LikedPosts, postId)
+	}
+
+	_, err = u.UserRepository.Update(ctx, user)
+	if err != nil {
+		errors.New("user not modified")
+	}
+
+	return nil
+}
+
+func (u *userService) UpdateDislikedPost(ctx context.Context, bearer string, postId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		errors.New("invalid user id")
+	}
+
+	var result, index = didUserDislikedPost(user,postId)
+
+	if result{
+		user.DislikedPosts = append(user.DislikedPosts[:index], user.DislikedPosts[index+1:]...)
+	}else{
+		user.DislikedPosts = append(user.DislikedPosts, postId)
+	}
+
+	_, err = u.UserRepository.Update(ctx, user)
+	if err != nil {
+		errors.New("user not modified")
+	}
+
+	return nil}
+
+func didUserDislikedPost(user *model.User, postId string) (bool, int) {
+	for index,dislikedPostId := range user.DislikedPosts{
+		if dislikedPostId==postId{
+			return true, index
+		}
+	}
+	return false ,0
+}
+
+func didUserLikedPost(user *model.User, postId string) (bool, int) {
+	for index,likedPostId := range user.LikedPosts{
+		if likedPostId==postId{
+			return true, index
+		}
+	}
+	return false ,0
+}
+
+func (u *userService) GetUserLikedPost(ctx context.Context, bearer string) ([]string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return []string{},err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return []string{},errors.New("invalid user id")
+	}
+
+	return user.LikedPosts,nil
+}
+
+func (u *userService) GetUserDislikedPost(ctx context.Context, bearer string) ([]string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return []string{},err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return []string{},errors.New("invalid user id")
+	}
+
+	return user.DislikedPosts,nil
+}

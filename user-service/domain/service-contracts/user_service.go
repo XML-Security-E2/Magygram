@@ -28,4 +28,8 @@ type UserService interface {
 	SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
 	AcceptFollowRequest(ctx context.Context, bearer string, userId string) error
+	UpdateLikedPost(ctx context.Context, bearer string, postId string) error
+	UpdateDislikedPost(ctx context.Context, bearer string, postId string) error
+	GetUserLikedPost(ctx context.Context, bearer string) ([]string,error)
+	GetUserDislikedPost(ctx context.Context, bearer string) ([]string,error)
 }

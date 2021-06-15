@@ -114,6 +114,11 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 
 	result.LikedBy = append(result.LikedBy, res)
 
+	err = p.UserClient.UpdateLikedPosts(bearer, postId)
+	if err != nil {
+		return err
+	}
+
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
@@ -138,6 +143,11 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 	}
 
 	result.LikedBy = findAndDeleteLikedBy(result, userInfo)
+
+	err = p.UserClient.UpdateLikedPosts(bearer, postId)
+	if err != nil {
+		return err
+	}
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
@@ -169,6 +179,11 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 
 	result.DislikedBy = append(result.DislikedBy, res)
 
+	err = p.UserClient.UpdateDislikedPosts(bearer, postId)
+	if err != nil {
+		return err
+	}
+
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
@@ -195,6 +210,11 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 	}
 
 	result.DislikedBy = findAndDeleteDislikedBy(result, userInfo)
+
+	err = p.UserClient.UpdateDislikedPosts(bearer, postId)
+	if err != nil {
+		return err
+	}
 
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
@@ -702,4 +722,42 @@ func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*m
 	var retVal,_ = model.NewGuestTimelinePostResponse(post)
 
 	return retVal, nil
+}
+
+func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
+	userLikedPostIds, err := p.UserClient.GetLikedPosts(bearer)
+	if err!=nil{
+		return []*model.PostProfileResponse{},err
+	}
+
+	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, userLikedPostIds)
+
+	var userPostsResponse []*model.PostProfileResponse
+	for _, post := range userPosts {
+		userPostsResponse = append(userPostsResponse, &model.PostProfileResponse{
+			Id:    post.Id,
+			Media: post.Media[0],
+		})
+	}
+
+	return userPostsResponse, nil
+}
+
+func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
+	userLikedPostIds, err := p.UserClient.GetDislikedPosts(bearer)
+	if err!=nil{
+		return []*model.PostProfileResponse{},err
+	}
+
+	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, userLikedPostIds)
+
+	var userPostsResponse []*model.PostProfileResponse
+	for _, post := range userPosts {
+		userPostsResponse = append(userPostsResponse, &model.PostProfileResponse{
+			Id:    post.Id,
+			Media: post.Media[0],
+		})
+	}
+
+	return userPostsResponse, nil
 }

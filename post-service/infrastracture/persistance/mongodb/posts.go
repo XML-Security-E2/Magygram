@@ -19,7 +19,6 @@ type postRepository struct {
 	tagCol *mongo.Collection
 }
 
-
 func NewPostRepository(Col *mongo.Collection, locationCol *mongo.Collection, tagCol *mongo.Collection) repository.PostRepository {
 	return &postRepository{Col, locationCol, tagCol}
 }
@@ -204,4 +203,24 @@ func (r *postRepository) GetPostsByLocation(ctx context.Context, location string
 		}
 	}
 
-	return posts, nil}
+	return posts, nil
+}
+
+func (r *postRepository) GetPostsByPostIdArray(ctx context.Context, ids []string) ([]*model.Post, error) {
+	cursor, err := r.Col.Find(ctx,bson.M{"_id": bson.M{"$in": ids}})
+	var results []*model.Post
+
+	if err != nil {
+		defer cursor.Close(ctx)
+		return nil, err
+	} else {
+		for cursor.Next(ctx) {
+			var result model.Post
+
+			_ = cursor.Decode(&result)
+			results = append(results, &result)
+
+		}
+	}
+	return results, nil
+}
