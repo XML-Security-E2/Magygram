@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { modalConstants } from "../constants/ModalConstants";
 import { OrderContext } from "../contexts/OrderContext";
+import { hasRoles } from "../helpers/auth-header";
 import ShoppingCartList from "./ShoppingCartList";
 
 const Header = () => {
@@ -32,7 +33,7 @@ const Header = () => {
 					<span className="navbar-toggler-icon"></span>
 				</button>
 				<div className="d-flex align-items-center">
-					<div className="dropdown">
+					<div className="dropdown" hidden={hasRoles(["admin"])}>
 						<i className="fa fa-shopping-cart" style={iconStyle} id="dropdownMenu2" data-toggle="dropdown" />
 						<span className="ml-1 bg-primary rounded text-white pl-1 pr-1">{orderState.shoppingCart.items.length}</span>
 						<ul style={{ width: "300px", marginLeft: "15px", minWidth: "350px" }} className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">

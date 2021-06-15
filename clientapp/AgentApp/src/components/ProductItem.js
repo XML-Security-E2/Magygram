@@ -17,9 +17,9 @@ const ProductItem = ({ id, imagePath, name, price, handleEditProducts, handleDel
 					</h5>
 				</div>
 
-				<hr className="mt-2" />
+				<hr className="mt-2" hidden={hasRoles(["admin"])} />
 
-				<div hidden={hasRoles(["admin"])} className="ml-1 mb-2 row w-100 d-flex justify-content-between">
+				<div hidden={hasRoles(["admin"])} className={hasRoles(["admin"]) ? "" : "ml-1 mb-2 row w-100 d-flex justify-content-between"}>
 					<input type="number" required className="form-control col-sm-4" id="quantity" min="1" value={count} onChange={(e) => setCount(e.target.value)} />
 					<button
 						type="button"

@@ -3,6 +3,7 @@ import { modalConstants } from "../constants/ModalConstants";
 import { orderConstants } from "../constants/OrderConstants";
 import { OrderContext } from "../contexts/OrderContext";
 import { ProductContext } from "../contexts/ProductContext";
+import { hasRoles } from "../helpers/auth-header";
 import { productService } from "../services/ProductService";
 import ProductItem from "./ProductItem";
 
@@ -40,7 +41,7 @@ const ProductList = () => {
 
 	return (
 		<React.Fragment>
-			<button type="button" className="btn btn-primary row" onClick={handleOpenCreateProductsModal}>
+			<button hidden={!hasRoles(["admin"])} type="button" className="btn btn-primary row" onClick={handleOpenCreateProductsModal}>
 				+ Create product
 			</button>
 			<div className="content-wrapper mt-4">
