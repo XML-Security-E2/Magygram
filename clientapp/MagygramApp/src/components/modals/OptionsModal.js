@@ -30,6 +30,8 @@ const OptionsModal = () => {
 			console.log(res.data);
 			if (res.status === 200) {
 				console.log(res.data);
+				dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
+				alert("You have successfully reported this post!")
 			} else {
 				console.log("Error");
 			}
