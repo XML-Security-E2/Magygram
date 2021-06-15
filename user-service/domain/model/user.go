@@ -20,6 +20,8 @@ type User struct {
 	FavouritePosts map[string][]IdWithMedia `bson:"favouritePosts"`
 	HighlightsStory map[string]HighlightImageWithMedia `bson:"highlightsStory"`
 	IsPrivate bool `bson:"private_profile"`
+	LikedPosts []string `bson:"liked_posts"`
+	DislikedPosts []string `bson:"disliked_posts"`
 }
 
 type UserProfileResponse struct {
@@ -170,6 +172,8 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		FavouritePosts: map[string][]IdWithMedia{},
 		HighlightsStory: map[string]HighlightImageWithMedia{},
 		IsPrivate: true,
+		LikedPosts: []string{},
+		DislikedPosts: []string{},
 	}, nil
 }
 

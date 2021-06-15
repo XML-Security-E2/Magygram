@@ -18,9 +18,12 @@ type UserClient interface {
 	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
 	MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
 	IsUserPrivate(userId string) (bool, error)
+	UpdateLikedPosts(bearer string, postId string) error
+	UpdateDislikedPosts(bearer string, postId string) error
 }
 
 type userClient struct {}
+
 
 func NewUserClient() UserClient {
 	baseUsersUrl = fmt.Sprintf("%s%s:%s/api/users", conf.Current.Userservice.Protocol, conf.Current.Userservice.Domain, conf.Current.Userservice.Port)
@@ -58,6 +61,36 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 	_ = json.Unmarshal(bodyBytes, &userInfo)
 
 	return &userInfo, nil
+}
+
+func (u userClient) UpdateLikedPosts(bearer string, postId string) error {
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/like/" + postId, baseUsersUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return err
+	}
+
+	return nil
+}
+
+func (u userClient) UpdateDislikedPosts(bearer string, postId string) error {
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/dislike/" + postId, baseUsersUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return err
+	}
+
+	return nil
 }
 
 func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag, error) {

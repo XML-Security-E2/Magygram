@@ -38,6 +38,8 @@ type UserHandler interface {
 	GetFollowRequests(c echo.Context) error
 	AcceptFollowRequest(c echo.Context) error
 	UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	UpdateLikedPost(c echo.Context) error
+	UpdateDislikedPost(c echo.Context) error
 }
 
 var (
@@ -474,6 +476,50 @@ func (h *userHandler) AcceptFollowRequest(c echo.Context) error {
 	}
 
 	err := h.UserService.AcceptFollowRequest(ctx, bearer, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) UpdateLikedPost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	err := h.UserService.UpdateLikedPost(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) UpdateDislikedPost(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	err := h.UserService.UpdateDislikedPost(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
