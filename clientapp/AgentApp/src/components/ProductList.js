@@ -1,11 +1,14 @@
 import React, { useContext, useEffect } from "react";
 import { modalConstants } from "../constants/ModalConstants";
+import { orderConstants } from "../constants/OrderConstants";
+import { OrderContext } from "../contexts/OrderContext";
 import { ProductContext } from "../contexts/ProductContext";
 import { productService } from "../services/ProductService";
 import ProductItem from "./ProductItem";
 
 const ProductList = () => {
 	const { productState, dispatch } = useContext(ProductContext);
+	const orderCtx = useContext(OrderContext);
 
 	useEffect(() => {
 		const getProductsHandler = async () => {
@@ -31,6 +34,10 @@ const ProductList = () => {
 		productService.deleteProduct(id, dispatch);
 	};
 
+	const handleAddToCart = (item) => {
+		orderCtx.dispatch({ type: orderConstants.ADD_PRODUCT_TO_ORDER, item });
+	};
+
 	return (
 		<React.Fragment>
 			<button type="button" className="btn btn-primary row" onClick={handleOpenCreateProductsModal}>
@@ -48,6 +55,7 @@ const ProductList = () => {
 								price={product.price}
 								handleEditProducts={handleEditProducts}
 								handleDeleteProducts={handleDeleteProducts}
+								handleAddToCart={handleAddToCart}
 							/>
 						);
 					})}

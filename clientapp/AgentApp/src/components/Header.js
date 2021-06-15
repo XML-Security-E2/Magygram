@@ -1,8 +1,25 @@
+import { useContext } from "react";
+import { modalConstants } from "../constants/ModalConstants";
+import { OrderContext } from "../contexts/OrderContext";
+import ShoppingCartList from "./ShoppingCartList";
+
 const Header = () => {
+	const { orderState, dispatch } = useContext(OrderContext);
+
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
-	const inputStyle = { border: "1px solid rgb(200,200,200)", color: "rgb(210,210,210)", textAlign: "center" };
 	const iconStyle = { fontSize: "30px", margin: "0px", marginLeft: "13px" };
-	const imgStyle = { width: "30px", height: "30px", marginLeft: "13px", borderWidth: "1px", borderStyle: "solid" };
+
+	const openCheckoutModal = () => {
+		dispatch({ type: modalConstants.SHOW_ORDER_CHECKOUT_MODAL });
+	};
+
+	const getOrderSum = () => {
+		let sum = 0;
+		orderState.shoppingCart.items.forEach((item) => {
+			sum += item.count * item.price;
+		});
+		return sum;
+	};
 
 	return (
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
@@ -14,27 +31,43 @@ const Header = () => {
 					<span className="sr-only">Toggle navigation</span>
 					<span className="navbar-toggler-icon"></span>
 				</button>
-				<div>
-					<input type="text" style={inputStyle} placeholder="Search" value="Search" />
-				</div>
-				<div className="d-xl-flex align-items-xl-center dropdown">
+				<div className="d-flex align-items-center">
+					<div className="dropdown">
+						<i className="fa fa-shopping-cart" style={iconStyle} id="dropdownMenu2" data-toggle="dropdown" />
+						<span className="ml-1 bg-primary rounded text-white pl-1 pr-1">{orderState.shoppingCart.items.length}</span>
+						<ul style={{ width: "300px", marginLeft: "15px", minWidth: "350px" }} className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+							<li className="mb-3">
+								<h4 className="ml-2">Shopping cart</h4>
+							</li>
+							<hr />
+							<ShoppingCartList />
+							<div className="row d-flex justify-content-end">
+								<div className="mr-4">
+									<b>Total:</b>
+									<span style={{ color: "#198ae3" }} className="ml-2">
+										<b>{Number(getOrderSum()).toFixed(2)} RSD</b>
+									</span>
+								</div>
+							</div>
+							<hr />
+							<div className="row d-flex justify-content-end">
+								<button disabled={orderState.shoppingCart.items.length === 0} type="button" className="btn btn-primary mr-4" onClick={openCheckoutModal}>
+									Checkout
+								</button>
+							</div>
+						</ul>
+					</div>
+
 					<i className="fa fa-home" style={iconStyle} />
-					<i className="la la-wechat" style={iconStyle} />
-					<i className="la la-compass" style={iconStyle} />
-					<i className="fa fa-heart-o" style={iconStyle} />
-					<img className="rounded-circle dropdown-toggle" data-toggle="dropdown" style={imgStyle} src="assets/img/hitmanImage.jpeg" alt="ProfileImage" />
-					<ul style={{ width: "200px", marginLeft: "15px" }} class="dropdown-menu">
-						<li>
-							<button className="la la-user btn shadow-none">Profile</button>
-						</li>
-						<li>
-							<button className="la la-cog btn shadow-none"> Settings</button>
-						</li>
-						<hr className="solid" />
-						<li>
-							<button className=" btn shadow-none"> Logout</button>
-						</li>
-					</ul>
+					<div className="dropdown">
+						<i className="fa fa-user" style={iconStyle} id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" />
+
+						<ul style={{ width: "200px", marginLeft: "15px" }} className="dropdown-menu" aria-labelledby="dropdownMenu1">
+							<li>
+								<button className=" btn shadow-none">Logout</button>
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</nav>
