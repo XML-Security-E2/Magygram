@@ -12,13 +12,16 @@ import (
 type Interactor interface {
 	NewUserRepository() repository.UserRepository
 	NewProductRepository() repository.ProductRepository
+	NewOrderRepository() repository.OrderRepository
 	NewLoginEventRepository() repository.LoginEventRepository
 	NewAccountActivationRepository() repository.AccountActivationRepository
 	NewAuthService() service_contracts.AuthService
 	NewProductService() service_contracts.ProductService
+	NewOrderService() service_contracts.OrderService
 	NewAccountActivationService() service_contracts.AccountActivationService
 	NewAuthHandler() handler.AuthHandler
 	NewProductHandler() handler.ProductHandler
+	NewOrderHandler() handler.OrderHandler
 	NewAppHandler() handler.AppHandler
 }
 
@@ -33,6 +36,7 @@ func NewInteractor(Conn *gorm.DB) Interactor {
 type appHandler struct {
 	handler.AuthHandler
 	handler.ProductHandler
+	handler.OrderHandler
 	// embed all handler interfaces
 }
 
@@ -40,12 +44,24 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.AuthHandler = i.NewAuthHandler()
 	appHandler.ProductHandler = i.NewProductHandler()
-
+	appHandler.OrderHandler = i.NewOrderHandler()
 	return appHandler
 }
 
+func (i *interactor) NewOrderRepository() repository.OrderRepository {
+	return pgsql.NewOrderRepository(i.Conn)
+}
+
+func (i *interactor) NewOrderService() service_contracts.OrderService {
+	return service.NewOrderService(i.NewOrderRepository(), i.NewProductRepository())
+}
+
+func (i *interactor) NewOrderHandler() handler.OrderHandler {
+	return handler.NewOrderHandler(i.NewOrderService())
+}
+
 func (i *interactor) NewLoginEventRepository() repository.LoginEventRepository {
-return pgsql.NewLoginEventRepository(i.Conn)
+	return pgsql.NewLoginEventRepository(i.Conn)
 }
 
 func (i *interactor) NewUserRepository() repository.UserRepository {

@@ -28,4 +28,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.Static("/api/media", "./files")
 
+	e.POST("/api/orders", h.CreateOrder)
+
 }
