@@ -2,6 +2,8 @@ import { useContext } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
+import { authHeader } from "../../helpers/auth-header";
+import Axios from "axios";
 
 const OptionsModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -12,6 +14,32 @@ const OptionsModal = () => {
 
 	const handleOpenPostEditModal = () => {
 		dispatch({ type: modalConstants.SHOW_POST_EDIT_MODAL });
+	};
+
+	const handleReportPost = () => {
+		
+		console.log(postState.editPost.post.id)
+
+		var reportDTO = {
+			contentId: postState.editPost.post.id,
+			contentType: "POST"
+		}
+
+		Axios.post(`/api/report`, reportDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				console.log(res.data);
+				dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
+				alert("You have successfully reported this post!")
+			} else {
+				console.log("Error");
+			}
+		})
+		.catch((err) => {
+			console.log(err)
+		});
+		
 	};
 
 	return (
@@ -26,7 +54,7 @@ const OptionsModal = () => {
 					</button>
 				</div>
 				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0">
+					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleReportPost}>
 						Report
 					</button>
 				</div>
