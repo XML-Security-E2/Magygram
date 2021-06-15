@@ -83,8 +83,8 @@ export const userReducer = (state, action) => {
 				loginSecondError:{
 					showError: false,
 					errorMessage: "",
-				},
-				showTwoFactorAuth:true,
+				}, 
+				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.LOGIN_TWO_REQUEST:
 			return {
@@ -132,7 +132,7 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:true,
+				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.LOGIN_DATA_FAILURE:
 			return {
@@ -141,7 +141,7 @@ export const userReducer = (state, action) => {
 					showError: true,
 					errorMessage: action.error,
 				},
-				showTwoFactorAuth:true,
+				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.LOGIN_DATA_SUCCESS:
 			return {
@@ -154,7 +154,7 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:true,
+				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.RESET_PASSWORD_LINK_REQUEST:
 			return {
