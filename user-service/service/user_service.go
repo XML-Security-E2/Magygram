@@ -619,3 +619,31 @@ func didUserLikedPost(user *model.User, postId string) (bool, int) {
 	}
 	return false ,0
 }
+
+func (u *userService) GetUserLikedPost(ctx context.Context, bearer string) ([]string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return []string{},err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return []string{},errors.New("invalid user id")
+	}
+
+	return user.LikedPosts,nil
+}
+
+func (u *userService) GetUserDislikedPost(ctx context.Context, bearer string) ([]string, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return []string{},err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return []string{},errors.New("invalid user id")
+	}
+
+	return user.DislikedPosts,nil
+}

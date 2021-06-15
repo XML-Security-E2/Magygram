@@ -740,6 +740,21 @@ export const postReducer = (state, action) => {
 				UserInfo: {},
 			};
 			return strcpy;
+		case postConstants.LIKED_POSTS_REQUEST:
+			return {
+				...state,
+				userLikedPosts:null
+			};
+		case postConstants.LIKED_POSTS_SUCCESS:
+			return {
+				...state,
+				userLikedPosts: action.posts
+			};
+		case postConstants.LIKED_POSTS_FAILURE:
+			return {
+				...state,
+				userLikedPosts:null
+			};
 		default:
 			return state;
 	}

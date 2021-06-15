@@ -68,6 +68,14 @@ const Header = () => {
 		alert("TOD1O");
 	};
 
+	const handleLikedPosts = () => {
+		postService.findAllLikedPosts(dispatch);
+	};
+
+	const handleDisikedPosts = () => {
+		alert("TODO2");
+	};
+
 	const backToHome = () => {
         window.location = "#/"
     }
@@ -124,6 +132,16 @@ const Header = () => {
 							<li>
 								<button className="la la-cog btn shadow-none" onClick={handleSettings}>
 									Settings
+								</button>
+							</li>
+							<li>
+								<button className="la la-thumbs-up btn shadow-none" onClick={handleLikedPosts}>
+									Liked posts
+								</button>
+							</li>
+							<li>
+								<button className="la la-thumbs-down btn shadow-none" onClick={handleDisikedPosts}>
+									Disiked posts
 								</button>
 							</li>
 							<hr className="solid" />

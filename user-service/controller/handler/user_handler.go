@@ -40,6 +40,8 @@ type UserHandler interface {
 	UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 	UpdateLikedPost(c echo.Context) error
 	UpdateDislikedPost(c echo.Context) error
+	GetUserLikedPost(c echo.Context) error
+	GetUserDislikedPost(c echo.Context) error
 }
 
 var (
@@ -525,4 +527,44 @@ func (h *userHandler) UpdateDislikedPost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) GetUserLikedPost(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	retVal, err := h.UserService.GetUserLikedPost(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, retVal)
+}
+
+func (h *userHandler) GetUserDislikedPost(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	retVal, err := h.UserService.GetUserDislikedPost(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, retVal)
 }

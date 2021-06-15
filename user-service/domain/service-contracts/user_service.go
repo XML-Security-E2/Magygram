@@ -30,4 +30,6 @@ type UserService interface {
 	AcceptFollowRequest(ctx context.Context, bearer string, userId string) error
 	UpdateLikedPost(ctx context.Context, bearer string, postId string) error
 	UpdateDislikedPost(ctx context.Context, bearer string, postId string) error
+	GetUserLikedPost(ctx context.Context, bearer string) ([]string,error)
+	GetUserDislikedPost(ctx context.Context, bearer string) ([]string,error)
 }

@@ -18,3 +18,7 @@ time="2021-06-15T15:59:31+02:00" level=info msg="User registered" func="user-ser
 time="2021-06-15T15:59:34+02:00" level=info msg="Activation e-mail sent" func=user-service/service.SendActivationMail file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/email_service.go:41" activation_id=d13e55c5-19fb-4db0-9e87-52034abce67c
 time="2021-06-15T16:03:55+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
 time="2021-06-15T16:05:31+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
+time="2021-06-15T16:10:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
+time="2021-06-15T16:37:40+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/infrastructure/persistence/mongodb/users.go:49" request_ip="::1" user_id=likedposts
+time="2021-06-15T16:37:40+02:00" level=warning msg="Invalid user id" func="user-service/service.(*userService).GetUserById" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/user_service.go:256" request_ip="::1" user_id=likedposts
+time="2021-06-15T17:17:23+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
