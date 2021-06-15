@@ -25,6 +25,7 @@ export const postService = {
 	findPostsForUserByLocation,
 	findPostByIdForGuest,
 	findAllLikedPosts,
+	findAllDislikedPosts,
 };
 
 async function findPostsForTimeline(dispatch) {
@@ -656,6 +657,36 @@ async function findAllLikedPosts(dispatch) {
 	}
 	function failure(error) {
 		return { type: postConstants.LIKED_POSTS_FAILURE, errorMessage: error };
+	}
+
+}
+
+async function findAllDislikedPosts(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/dislikedposts`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+				window.location = "#/disliked";
+			} else {
+				dispatch(failure(res.data.message));
+				window.location = "#/disliked";
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("error"));
+		});
+
+	function request() {
+		return { type: postConstants.DISLIKED_POSTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.DISLIKED_POSTS_SUCCESS, posts: data };
+	}
+	function failure(error) {
+		return { type: postConstants.DISLIKED_POSTS_FAILURE, errorMessage: error };
 	}
 
 }

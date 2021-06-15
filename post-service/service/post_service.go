@@ -742,3 +742,22 @@ func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*m
 
 	return userPostsResponse, nil
 }
+
+func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
+	userLikedPostIds, err := p.UserClient.GetDislikedPosts(bearer)
+	if err!=nil{
+		return []*model.PostProfileResponse{},err
+	}
+
+	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, userLikedPostIds)
+
+	var userPostsResponse []*model.PostProfileResponse
+	for _, post := range userPosts {
+		userPostsResponse = append(userPostsResponse, &model.PostProfileResponse{
+			Id:    post.Id,
+			Media: post.Media[0],
+		})
+	}
+
+	return userPostsResponse, nil
+}

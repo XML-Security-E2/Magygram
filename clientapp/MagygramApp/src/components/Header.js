@@ -69,11 +69,11 @@ const Header = () => {
 	};
 
 	const handleLikedPosts = () => {
-		postService.findAllLikedPosts(dispatch);
+		window.location = "#/liked";
 	};
 
 	const handleDisikedPosts = () => {
-		alert("TODO2");
+		window.location = "#/disliked";
 	};
 
 	const backToHome = () => {

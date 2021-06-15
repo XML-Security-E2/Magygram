@@ -21,6 +21,7 @@ type UserClient interface {
 	UpdateLikedPosts(bearer string, postId string) error
 	UpdateDislikedPosts(bearer string, postId string) error
 	GetLikedPosts(bearer string) ([]string, error)
+	GetDislikedPosts(bearer string) ([]string, error)
 }
 
 type userClient struct {}
@@ -180,3 +181,27 @@ func (u userClient) GetLikedPosts(bearer string) ([]string, error) {
 
 	return users, nil
 }
+
+func (u userClient) GetDislikedPosts(bearer string) ([]string, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/post/disliked", baseUsersUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return []string{} ,err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []string{}, err
+	}
+
+	var users []string
+	_ = json.Unmarshal(bodyBytes, &users)
+
+	fmt.Println(users)
+
+	return users, nil}

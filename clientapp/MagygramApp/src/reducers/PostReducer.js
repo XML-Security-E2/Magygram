@@ -755,6 +755,21 @@ export const postReducer = (state, action) => {
 				...state,
 				userLikedPosts:null
 			};
+		case postConstants.DISLIKED_POSTS_REQUEST:
+			return {
+				...state,
+				userDislikedPosts:null
+			};
+		case postConstants.DISLIKED_POSTS_SUCCESS:
+			return {
+				...state,
+				userDislikedPosts: action.posts
+			};
+		case postConstants.DISLIKED_POSTS_FAILURE:
+			return {
+				...state,
+				userDislikedPosts:null
+			};
 		default:
 			return state;
 	}
