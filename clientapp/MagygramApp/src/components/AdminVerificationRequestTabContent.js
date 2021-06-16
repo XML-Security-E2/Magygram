@@ -1,6 +1,8 @@
 import React, {useContext, useEffect} from "react";
 import { AdminContext } from "../contexts/AdminContext";
 import {requestsService} from "../services/RequestsService"
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const AdminVerificationRequestTabContent = () => {
 	const { state,dispatch } = useContext(AdminContext);
@@ -9,12 +11,52 @@ const AdminVerificationRequestTabContent = () => {
 		window.location = "#/profile/" + userId;
 	}
 
+	const handleDownload = async (event,request) => {
+		event.preventDefault();
+		const response = await fetch(
+			request.Document
+		);
+		if (response.status === 200) {
+		  const blob = await response.blob();
+		  const url = URL.createObjectURL(blob);
+		  const link = document.createElement("a");
+		  link.href = url;
+		  link.download = request.Name+" "+request.Surname;
+		  document.body.appendChild(link);
+		  link.click();
+		  link.remove();
+		  return { success: true };
+		}
+	}
+
 	const approveVerificationRequest = (requestId)=>{
-		requestsService.approveVerificationRequest(requestId,dispatch)
+		confirmAlert({
+			message: 'Are you sure to do this?',
+			buttons: [
+			  {
+				label: 'Yes',
+				onClick: () => requestsService.rejectVerificationRequest(requestId,dispatch)
+			  },
+			  {
+				label: 'No',
+			  }
+			]
+		  });
 	}
 
 	const rejectVerificationRequest = (requestId)=>{
-		requestsService.rejectVerificationRequest(requestId,dispatch)
+		confirmAlert({
+			message: 'Are you sure to do this?',
+			buttons: [
+			  {
+				label: 'Yes',
+				onClick: () => requestsService.rejectVerificationRequest(requestId,dispatch)
+			  },
+			  {
+				label: 'No',
+			  }
+			]
+		  });
 	}
 
 	useEffect(() => {
@@ -44,7 +86,7 @@ const AdminVerificationRequestTabContent = () => {
 										<a href="#" class="link-primary">View document</a>
 									</div>
 									<div>
-										<a href="#" class="link-primary">Download document</a>
+										<a href="#" onClick={(event)=>handleDownload(event,request)}  class="link-primary">Download document</a>
 									</div>
 								</td>
 								<td className="text-right">
