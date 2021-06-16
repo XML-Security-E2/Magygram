@@ -1,15 +1,28 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useCallback, useState} from "react";
 import { AdminContext } from "../contexts/AdminContext";
 import {requestsService} from "../services/RequestsService"
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
+import ImageViewer from 'react-simple-image-viewer';
 
 const AdminVerificationRequestTabContent = () => {
 	const { state,dispatch } = useContext(AdminContext);
+	const [isViewerOpen, setIsViewerOpen] = useState(false);
+	const [images, setImages]= useState("")
 
 	const handleVisitProfile = (userId) => {
 		window.location = "#/profile/" + userId;
 	}
+
+	const openImageViewer = useCallback(() => {
+		setIsViewerOpen(true);
+		setImages(["https://localhost:8085/api/media/5ff2ecfa-85f8-4ca9-8841-47097e1a73b5.jpg"])
+	  }, []);
+
+	const closeImageViewer = (image) => {
+		setImages([image]);
+		setIsViewerOpen(false);
+	};
 
 	const handleDownload = async (event,request) => {
 		event.preventDefault();
@@ -83,7 +96,7 @@ const AdminVerificationRequestTabContent = () => {
 										<a onClick={() => handleVisitProfile(request.UserId)} class="link-primary">Visit profile</a>
 									</div>
 									<div>
-										<a href="#" class="link-primary">View document</a>
+										<a href="#" class="link-primary" onClick={() => openImageViewer(request.Document)}>View document</a>
 									</div>
 									<div>
 										<a href="#" onClick={(event)=>handleDownload(event,request)}  class="link-primary">Download document</a>
@@ -106,6 +119,12 @@ const AdminVerificationRequestTabContent = () => {
 						<h3>Verification request not exist</h3>
 					</div>
 				</div>
+				{isViewerOpen && (
+					<ImageViewer
+					src={ images }
+					onClose={ closeImageViewer }
+					/>
+				)}
 			</div>
             
 		</React.Fragment>
