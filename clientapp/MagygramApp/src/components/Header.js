@@ -18,11 +18,11 @@ const Header = () => {
 	const [search, setSearch] = useState("");
 
 	const loadOptions = (value, callback) => {
-		if (value.startsWith("#")) {
+		if (value.startsWith("#") && value.length>=2) {
 			setTimeout(() => {
 				searchService.guestSearchHashtagPosts(value, callback);
 			}, 1000);
-		} else if (value.startsWith("%")) {
+		} else if (value.startsWith("%") && value.length>=2) {
 			setTimeout(() => {
 				searchService.guestSearchLocation(value, callback);
 			}, 1000);
@@ -50,9 +50,10 @@ const Header = () => {
 
 	const onChange = (option) => {
 		if (option.searchType === "hashtag") {
-			postService.findPostsForUserByHashtag(option.value, dispatch);
+			window.location = "#/search/hashtag/" + option.value;
 		} else if (option.searchType === "location") {
-			postService.findPostsForUserByLocation(option.value, dispatch);
+			window.location = "#/search/location/" +option.value;
+
 		} else {
 			window.location = "#/profile?userId=" + option.id;
 		}
