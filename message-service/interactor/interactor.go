@@ -16,6 +16,7 @@ type Interactor interface {
 	NewNotificationService() service_contracts.NotificationService
 	NewNotificationHandler() handler.NotificationHandler
 	NewAuthClient() intercomm.AuthClient
+	NewUserClient() intercomm.UserClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -38,17 +39,20 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	return appHandler
 }
 
+func (i *interactor) NewUserClient() intercomm.UserClient {
+	return intercomm.NewUserClient()
+}
+
 func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
 }
-
 
 func (i *interactor) NewNotificationRepository() repository.NotificationRepository {
 	return redisdb.NewNotificationRepository(i.Db)
 }
 
 func (i *interactor) NewNotificationService() service_contracts.NotificationService {
-	return service.NewNotificationService(i.NewNotificationRepository(), i.NewAuthClient())
+	return service.NewNotificationService(i.NewNotificationRepository(), i.NewAuthClient(), i.NewUserClient())
 }
 
 func (i *interactor) NewNotificationHandler() handler.NotificationHandler {

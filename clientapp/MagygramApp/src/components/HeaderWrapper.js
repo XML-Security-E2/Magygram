@@ -1,4 +1,5 @@
 import React from "react";
+import NotificationContextProvider from "../contexts/NotificationContext";
 import PostContextProvider from "../contexts/PostContext";
 import UserContextProvider from "../contexts/UserContext";
 import GuestHeader from "./GuestHeader";
@@ -8,7 +9,9 @@ const HeaderWrapper = () => {
 	return (
 		<React.Fragment>
 			<PostContextProvider>
-				<UserContextProvider>{localStorage.getItem("userId") !== null ? <Header /> : <GuestHeader />}</UserContextProvider>
+				<NotificationContextProvider>
+					<UserContextProvider>{localStorage.getItem("userId") !== null ? <Header /> : <GuestHeader />}</UserContextProvider>
+				</NotificationContextProvider>
 			</PostContextProvider>
 		</React.Fragment>
 	);

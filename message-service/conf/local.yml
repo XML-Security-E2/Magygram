@@ -15,3 +15,8 @@ authservice:
   protocol: "https://"
   domain: "localhost"
   port: "461"
+
+userservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "460"

@@ -21,10 +21,11 @@ type storyService struct {
 	intercomm.UserClient
 	intercomm.AuthClient
 	intercomm.RelationshipClient
+	intercomm.MessageClient
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient) service_contracts.StoryService {
-	return &storyService{r , ic, uc,ac,rc}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient) service_contracts.StoryService {
+	return &storyService{r , ic, uc,ac,rc, mc}
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
@@ -48,6 +49,18 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userInfo.Id}).Error("Story database create failure")
 		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedStory,
+	})
+	if err != nil {
+		return "", err
+	}
+
 
 	if postId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"story_id": post.Id, "user_id" : userInfo.Id}).Info("Story created")

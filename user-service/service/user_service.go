@@ -34,6 +34,67 @@ func NewAuthService(r repository.UserRepository, a service_contracts.AccountActi
 	return &userService{r, a,  rp , ic, rC, pc, mc}
 }
 
+func (u *userService) GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
+
+	followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	if err != nil {
+		return []*model.UserInfo{}, err
+	}
+
+	var retVal []*model.UserInfo
+
+	for _, followingUserId := range followingUsers.Users {
+		followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
+		if err == nil && followingUser.NotificationSettings.NotifyPost {
+			retVal = append(retVal, &model.UserInfo{
+				Id:       followingUserId,
+				Username: followingUser.Username,
+				ImageURL: followingUser.ImageUrl,
+			})
+		}
+	}
+
+	return retVal, nil
+}
+
+func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
+
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(userId)
+	if err != nil {
+		return []*model.UserInfo{}, err
+	}
+
+	var retVal []*model.UserInfo
+
+	for _, followingUserId := range followingUsers.Users {
+		followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
+		if err == nil && followingUser.NotificationSettings.NotifyStory {
+			retVal = append(retVal, &model.UserInfo{
+				Id:       followingUserId,
+				Username: followingUser.Username,
+				ImageURL: followingUser.ImageUrl,
+			})
+		}
+	}
+
+	return retVal, nil}
+
+func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, interactionType string) (bool, error) {
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return false, errors.New("invalid user id")
+	}
+
+	if interactionType == "like" {
+		return user.NotificationSettings.NotifyLike, nil
+	} else if interactionType == "dislike" {
+		return user.NotificationSettings.NotifyLike, nil
+	} else if interactionType == "comment" {
+		return user.NotificationSettings.NotifyComment, nil
+	}
+	return false, nil
+}
+
 func (u *userService) EditUser(ctx context.Context, bearer string, userId string, userRequest *model.EditUserRequest) (string, error) {
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {

@@ -13,8 +13,11 @@ import (
 
 type NotificationHandler interface {
 	CreateNotification(c echo.Context) error
+	CreateNotifications(c echo.Context) error
 	GetAllNotViewedNotificationsForUser(c echo.Context) error
+	GetAllNotificationsForUser(c echo.Context) error
 	HandleNotifyWs(c echo.Context) error
+	ViewNotifications(c echo.Context) error
 }
 
 type notificationHandler struct {
@@ -38,24 +41,67 @@ func (n notificationHandler) CreateNotification(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	err := n.NotificationService.Create(ctx, notificationRequest)
-
-	notifications, err := n.NotificationService.GetAllNotViewedForUser(ctx, notificationRequest.UserId)
-
-	fmt.Println(len(notifications))
-	n.Hub.Notify <- &hub.Notification{
-		Count:    len(notifications),
-		Receiver: notificationRequest.UserId,
-	}
-
+	notify, err := n.NotificationService.CreatePostInteractionNotification(ctx, notificationRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+
+	if notify {
+		notifications, err := n.NotificationService.GetAllNotViewedForUser(ctx, notificationRequest.UserId)
+		if err == nil {
+			n.Hub.Notify <- &hub.Notification{
+				Count:    len(notifications),
+				Receiver: notificationRequest.UserId,
+			}
+		}
+	}
+
+	return c.JSON(http.StatusCreated, "")
+}
+
+func (n notificationHandler) CreateNotifications(c echo.Context) error {
+	notificationRequest := &model.NotificationRequest{}
+	if err := c.Bind(notificationRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	userInfos, err := n.NotificationService.CreatePostOrStoryNotification(ctx, notificationRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	for _, userInfo := range userInfos {
+		notifications, err := n.NotificationService.GetAllNotViewedForUser(ctx, userInfo.Id)
+		if err == nil {
+			n.Hub.Notify <- &hub.Notification{
+				Count:    len(notifications),
+				Receiver: userInfo.Id,
+			}
+		}
+	}
+
 	return c.JSON(http.StatusCreated, "")
 }
 
 func (n notificationHandler) GetAllNotViewedNotificationsForUser(c echo.Context) error {
-	panic("implement me")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	retVal, err := n.NotificationService.GetAllNotViewedForLoggedUser(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
 }
 
 func (n notificationHandler) HandleNotifyWs(c echo.Context) error {
@@ -64,4 +110,33 @@ func (n notificationHandler) HandleNotifyWs(c echo.Context) error {
 
 	hub.ServeNotifyWs(n.Hub, c.Response().Writer, c.Request(), userId)
 	return nil
+}
+
+func (n notificationHandler) GetAllNotificationsForUser(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	retVal, err := n.NotificationService.GetAllForUser(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
+}
+
+func (n notificationHandler) ViewNotifications(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := n.NotificationService.ViewUsersNotifications(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, "")
 }

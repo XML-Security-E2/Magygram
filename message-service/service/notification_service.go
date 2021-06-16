@@ -16,17 +16,93 @@ var (
 type notificationService struct {
 	repository.NotificationRepository
 	intercomm.AuthClient
+	intercomm.UserClient
 }
 
-func NewNotificationService(r repository.NotificationRepository, ac intercomm.AuthClient) service_contracts.NotificationService {
-	return &notificationService{r, ac}
+func NewNotificationService(r repository.NotificationRepository, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.NotificationService {
+	return &notificationService{r, ac, uc}
 }
 
-func (n notificationService) Create(ctx context.Context, notificationReq *model.NotificationRequest) error {
-	notification := model.NewNotification(notificationReq)
-	fmt.Println(notification.Id)
-	return n.NotificationRepository.Create(ctx, notification)
+func (n notificationService) CreatePostInteractionNotification(ctx context.Context, notificationReq *model.NotificationRequest) (bool, error) {
+
+	if notificationReq.Type == model.Liked {
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, "like")
+		if err != nil {
+			return false, err
+		}
+
+		if notify {
+			notification := model.NewNotification(notificationReq)
+			return true, n.NotificationRepository.Create(ctx, notification)
+		}
+	} else if notificationReq.Type == model.Disliked {
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, "dislike")
+		if err != nil {
+			return false, err
+		}
+
+		if notify {
+			notification := model.NewNotification(notificationReq)
+			return true, n.NotificationRepository.Create(ctx, notification)
+		}
+	} else if notificationReq.Type == model.Commented {
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, "comment")
+		if err != nil {
+			return false, err
+		}
+
+		if notify {
+			notification := model.NewNotification(notificationReq)
+			return true, n.NotificationRepository.Create(ctx, notification)
+		}
+	}
+
+	return false, nil
 }
+
+
+func (n notificationService) CreatePostOrStoryNotification(ctx context.Context, notificationReq *model.NotificationRequest) ([]*model.UserInfo, error) {
+	if notificationReq.Type == model.PublishedPost {
+		userInfos, err := n.UserClient.GetUsersForPostNotification(notificationReq.UserId)
+		fmt.Println(len(userInfos))
+		fmt.Println(notificationReq.UserId)
+
+		if err != nil {
+			return []*model.UserInfo{}, err
+		}
+		for _, userInfo := range userInfos {
+			notification := model.NewNotification(&model.NotificationRequest{
+				Username:  notificationReq.Username,
+				UserId:    userInfo.Id,
+				NotifyUrl: "TODO",
+				ImageUrl:  notificationReq.ImageUrl,
+				Type:      model.PublishedPost,
+			})
+
+			_ = n.NotificationRepository.Create(ctx, notification)
+		}
+		return userInfos, nil
+	} else if notificationReq.Type == model.PublishedStory {
+		userInfos, err := n.UserClient.GetUsersForStoryNotification(notificationReq.UserId)
+		if err != nil {
+			return []*model.UserInfo{}, err
+		}
+		for _, userInfo := range userInfos {
+			notification := model.NewNotification(&model.NotificationRequest{
+				Username:  notificationReq.Username,
+				UserId:    userInfo.Id,
+				NotifyUrl: "TODO",
+				ImageUrl:  notificationReq.ImageUrl,
+				Type:      model.PublishedStory,
+			})
+
+			_ = n.NotificationRepository.Create(ctx, notification)
+		}
+		return userInfos, nil
+	}
+	return []*model.UserInfo{}, nil
+}
+
 
 func (n notificationService) GetAllForUser(ctx context.Context, bearer string) ([]*model.Notification, error) {
 	userId, err := n.AuthClient.GetLoggedUserId(bearer)

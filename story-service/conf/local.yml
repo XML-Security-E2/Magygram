@@ -37,3 +37,8 @@ relationshipservice:
   protocol: "https://"
   domain: "localhost"
   port: "463"
+
+messageservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "467"

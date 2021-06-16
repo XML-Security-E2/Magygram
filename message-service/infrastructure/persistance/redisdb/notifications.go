@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/beevik/guid"
 	"github.com/go-redis/redis/v8"
 	"message-service/domain/model"
 	"message-service/domain/repository"
@@ -70,6 +71,7 @@ func (n notificationRepository) ViewNotifications(ctx context.Context, userId st
 	keys, _, err := n.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/*/false", model.Prefix, userId), 1000).Result()
 
 	for _, key := range keys {
+		fmt.Println(key)
 		val, err := n.Db.Get(ctx, key).Bytes()
 		if err != nil {
 			return err
@@ -83,7 +85,11 @@ func (n notificationRepository) ViewNotifications(ctx context.Context, userId st
 			return err
 		}
 
-		err = n.Db.Set(ctx, fmt.Sprintf("%s/%s/true", model.Prefix, userId), temp, 0).Err()
+		newId := fmt.Sprintf("%s/%s/%s/true", model.Prefix, userId, guid.New().String())
+		temp.Id = newId
+
+		jsonString, _ := json.Marshal(temp)
+		err = n.Db.Set(ctx, newId, jsonString, 0).Err()
 		if err != nil {
 			return err
 		}

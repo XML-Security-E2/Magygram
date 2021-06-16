@@ -53,4 +53,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("api/users/post/disliked", h.GetUserDislikedPost)
 
 
+	e.GET("api/users/:userId/notify/post", h.GetUsersForPostNotification)
+	e.GET("api/users/:userId/notify/story", h.GetUsersForStoryNotification)
+	e.GET("api/users/:userId/notify/:interactionType", h.CheckIfPostInteractionNotificationEnabled)
+
 }

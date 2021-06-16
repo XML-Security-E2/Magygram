@@ -22,6 +22,15 @@ type User struct {
 	IsPrivate bool `bson:"private_profile"`
 	LikedPosts []string `bson:"liked_posts"`
 	DislikedPosts []string `bson:"disliked_posts"`
+	NotificationSettings NotificationSettings `bson:"notification_settings" json:"notificationSettings"`
+}
+
+type NotificationSettings struct {
+	NotifyStory bool `json:"notifyStory"`
+	NotifyPost bool `json:"notifyPost"`
+	NotifyLike bool `json:"notifyLike"`
+	NotifyDislike bool `json:"notifyDislike"`
+	NotifyComment bool `json:"notifyComments"`
 }
 
 type UserProfileResponse struct {
@@ -174,6 +183,13 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		IsPrivate: true,
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
+		NotificationSettings: NotificationSettings{
+				NotifyStory:   false,
+				NotifyPost:    false,
+				NotifyLike:    true,
+				NotifyDislike: true,
+				NotifyComment: true,
+		},
 	}, nil
 }
 

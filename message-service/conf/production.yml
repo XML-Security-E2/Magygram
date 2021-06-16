@@ -15,3 +15,8 @@ authservice:
   protocol: "http://"
   domain: "auth-service"
   port: "461"
+
+userservice:
+  protocol: "http://"
+  domain: "user-service"
+  port: "460"

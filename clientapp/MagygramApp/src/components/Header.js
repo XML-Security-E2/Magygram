@@ -3,22 +3,22 @@ import { userService } from "../services/UserService";
 import { Link } from "react-router-dom";
 import AsyncSelect from "react-select/async";
 import { searchService } from "../services/SearchService";
-import { postService } from "../services/PostService";
-import { PostContext } from "../contexts/PostContext";
 import FollowRequestsList from "./FollowRequestsList";
 import { UserContext } from "../contexts/UserContext";
+import { notificationService } from "../services/NotificationService";
+import { NotificationContext } from "../contexts/NotificationContext";
+import NotificationsList from "./NotificationsList";
+import { notificationConstants } from "../constants/NotificationConstants";
+import ActivityList from "./ActivityList";
 
 const Header = () => {
-	const { dispatch } = useContext(PostContext);
 	const userCtx = useContext(UserContext);
+	const notifyCtx = useContext(NotificationContext);
 
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
 	const iconStyle = { fontSize: "30px", cursor: "pointer" };
 
 	const [search, setSearch] = useState("");
-
-	const [message, setMessage] = useState("");
-	const [receiver, setReceiver] = useState("");
 
 	const [rmessages, setRmessages] = useState([]);
 
@@ -39,6 +39,7 @@ const Header = () => {
 			a.push(evt.data);
 
 			setRmessages(a);
+			notifyCtx.dispatch({ type: notificationConstants.NOTIFICATION_RECEIVED });
 		};
 	}, [rmessages]);
 
@@ -105,8 +106,16 @@ const Header = () => {
 		window.location = "#/";
 	};
 
-	const handleLoadFollowRequests = async () => {
+	const handleViewNotifications = () => {
+		return new Promise(function () {
+			notificationService.viewNotifications(notifyCtx.dispatch);
+		});
+	};
+
+	const handleLoadActivity = async () => {
 		await userService.findAllFollowRequests(userCtx.dispatch);
+
+		await notificationService.getUserNotifiactions(notifyCtx.dispatch).then(handleViewNotifications());
 	};
 
 	return (
@@ -128,13 +137,16 @@ const Header = () => {
 					<i className="la la-compass ml-3" style={iconStyle} />
 
 					<div>
-						<i className="fa fa-heart-o ml-3" onClick={handleLoadFollowRequests} style={iconStyle} id="dropdownMenu2" data-toggle="dropdown" />
-
-						<ul style={{ width: "200px", marginLeft: "15px", minWidth: "300px" }} className="dropdown-menu" aria-labelledby="dropdownMenu2">
-							<li className="mb-3">
-								<b className="ml-2">Follow requests</b>
-							</li>
-							<FollowRequestsList />
+						<div className="count-indicator ml-3" id="dropdownMenu3" data-toggle="dropdown" onClick={handleLoadActivity}>
+							<i className="la la-bell" style={{ fontSize: "30px", cursor: "pointer", color: "black" }}></i>
+							{notifyCtx.notificationState.notificationsNumber > 0 && <span className="count count-varient1">{notifyCtx.notificationState.notificationsNumber}</span>}
+						</div>
+						<ul
+							style={{ width: "200px", marginLeft: "15px", minWidth: "370px", height: "auto", maxHeight: "500px", overflowX: "hidden" }}
+							className="dropdown-menu  dropdown-menu-right"
+							aria-labelledby="dropdownMenu3"
+						>
+							<ActivityList />
 						</ul>
 					</div>
 

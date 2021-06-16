@@ -42,6 +42,9 @@ type UserHandler interface {
 	UpdateDislikedPost(c echo.Context) error
 	GetUserLikedPost(c echo.Context) error
 	GetUserDislikedPost(c echo.Context) error
+	GetUsersForPostNotification(c echo.Context) error
+	GetUsersForStoryNotification(c echo.Context) error
+	CheckIfPostInteractionNotificationEnabled(c echo.Context) error
 }
 
 var (
@@ -53,6 +56,58 @@ type userHandler struct {
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
+}
+
+func (h *userHandler) GetUsersForPostNotification(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	users, err := h.UserService.GetUsersForPostNotification(ctx, userId)
+	if err != nil {
+		fmt.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK,users)
+}
+
+func (h *userHandler) GetUsersForStoryNotification(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	users, err := h.UserService.GetUsersForStoryNotification(ctx, userId)
+	if err != nil {
+		fmt.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK,users)
+}
+
+func (h *userHandler) CheckIfPostInteractionNotificationEnabled(c echo.Context) error {
+	userId := c.Param("userId")
+	interactionType := c.Param("interactionType")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	check, err := h.UserService.CheckIfPostInteractionNotificationEnabled(ctx, userId, interactionType)
+	if err != nil {
+		fmt.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, check)
 }
 
 func (h *userHandler) UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {

@@ -22,11 +22,23 @@ type NotificationRequest struct {
 	UserId string `json:"userId"`
 	NotifyUrl string `json:"notifyUrl"`
 	ImageUrl string `json:"imageUrl"`
-	Note  string `json:"note"`
+	Type  string `json:"type"`
+}
+
+type UserInfo struct {
+	Id string
+	Username string
+	ImageURL string
 }
 
 var (
 	Prefix = "notifications"
+	Liked = "Liked"
+	Disliked = "Disliked"
+	Commented = "Commented"
+	Followed = "Followed"
+	PublishedStory = "PublishedStory"
+	PublishedPost = "PublishedPost"
 )
 
 func NewNotification(notificationReq *NotificationRequest) *Notification {
@@ -36,8 +48,25 @@ func NewNotification(notificationReq *NotificationRequest) *Notification {
 		UserId:    notificationReq.UserId,
 		NotifyUrl: notificationReq.NotifyUrl,
 		ImageUrl:  notificationReq.ImageUrl,
-		Note:      notificationReq.Note,
+		Note:      createNote(notificationReq.Type, notificationReq.Username),
 		Viewed:    false,
 		Timestamp: time.Now(),
 	}
+}
+
+func createNote(notificationType string, username string) string {
+	if notificationType == Liked {
+		return fmt.Sprintf("%s liked your post", username)
+	} else if notificationType == Disliked {
+		return fmt.Sprintf("%s disliked your post", username)
+	} else if notificationType == Commented {
+		return fmt.Sprintf("%s commented on your post", username)
+	} else if notificationType == Followed {
+		return fmt.Sprintf("%s started following you", username)
+	} else if notificationType == PublishedStory {
+		return fmt.Sprintf("%s published story", username)
+	} else if notificationType == PublishedPost {
+		return fmt.Sprintf("%s published post", username)
+	}
+	return ""
 }

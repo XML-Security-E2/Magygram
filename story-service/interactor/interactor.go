@@ -16,6 +16,7 @@ type Interactor interface {
 	NewStoryHandler() handler.StoryHandler
 	NewMediaClient() intercomm.MediaClient
 	NewUserClient() intercomm.UserClient
+	NewMessageClient() intercomm.MessageClient
 	NewAuthClient() intercomm.AuthClient
 	NewAppHandler() handler.AppHandler
 }
@@ -31,6 +32,10 @@ func NewInteractor(StoryCol *mongo.Collection) Interactor {
 
 type appHandler struct {
 	handler.StoryHandler
+}
+
+func (i *interactor) NewMessageClient() intercomm.MessageClient {
+	return intercomm.NewMessageClient()
 }
 
 func (i *interactor) NewAuthClient() intercomm.AuthClient {
@@ -59,7 +64,7 @@ func (i *interactor) NewStoryRepository() repository.StoryRepository {
 }
 
 func (i *interactor) NewStoryService() service_contracts.StoryService {
-	return service.NewStoryService(i.NewStoryRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewAuthClient(),i.NewRelationshipClient())
+	return service.NewStoryService(i.NewStoryRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewAuthClient(),i.NewRelationshipClient(), i.NewMessageClient())
 }
 
 func (i *interactor) NewStoryHandler() handler.StoryHandler {

@@ -37,3 +37,8 @@ relationshipservice:
     protocol: "http://"
     domain: "relationship-service"
     port: "463"
+
+messageservice:
+    protocol: "http://"
+    domain: "message-service"
+    port: "467"
