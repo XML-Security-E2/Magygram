@@ -4,6 +4,8 @@ import { colorConstants } from "../constants/ColorConstants";
 import { UserContext } from "../contexts/UserContext";
 import { userService } from "../services/UserService";
 import FollowingUsersModal from "./modals/FollowingUsersModal";
+import Axios from "axios";
+import { authHeader } from "../helpers/auth-header";
 
 const UserProfileHeaderInfo = ({ userId }) => {
 	const { userState, dispatch } = useContext(UserContext);
@@ -31,6 +33,27 @@ const UserProfileHeaderInfo = ({ userId }) => {
 
 	const handleUserUnfollow = () => {
 		userService.unfollowUser(userId, dispatch);
+	};
+
+	const reportUser = () => {
+		let reportDTO = {
+			contentId: userId,
+			contentType: "USER",
+		};
+
+		Axios.post(`/api/report`, reportDTO , { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				alert("You have reported this user successfully")
+			} else {
+				console.log("err")
+			}
+		})
+		.catch((err) => {
+			console.log("err")
+		});
+
 	};
 
 	return (
@@ -76,6 +99,11 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							>
 								Edit Profile
 							</Link>
+						</div>
+						<div>
+							<button hidden={(localStorage.getItem("userId") == userId) || (localStorage.getItem("userId") === null)} style={{ backgroundColor: "red", borderColor: "red" }} type="button" className="btn btn-primary ml-2" tabindex="0" onClick={reportUser}>
+								Report
+							</button>
 						</div>
 					</div>
 					<div className="flexbox-container d-flex align-items-center">

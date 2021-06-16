@@ -2,35 +2,26 @@ import { useContext, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
-import { UserContext } from "../../contexts/UserContext";
 import Axios from "axios";
 import { authHeader } from "../../helpers/auth-header";
 
-const OptionsModal = () => {
+const OptionsModalStory = () => {
 	const { postState, dispatch } = useContext(PostContext);
 
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
 	};
 
-	useEffect(() => {
-	
-	});
-
-	const handleOpenPostEditModal = () => {
-		dispatch({ type: modalConstants.SHOW_POST_EDIT_MODAL });
-	};
-
 	const handleReportModal = () => {
 
 		let reportDTO = {
 			contentId: postState.editPost.post.id,
-			contentType: "POST",
+			contentType: "STORY",
 		};
 
 		Axios.post(`/api/report`, reportDTO , { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
-			console.log("blaa");
+			console.log(res.data);
 			if (res.status === 200) {
 				alert("You have reported this post successfully")
 				dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
@@ -51,18 +42,8 @@ const OptionsModal = () => {
 			</Modal.Header>
 			<Modal.Body>
 				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleOpenPostEditModal}>
-						Edit
-					</button>
-				</div>
-				<div className="row">
-					<button hidden={localStorage.getItem("userId") === null} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleReportModal}>
+					<button hidden={localStorage.getItem("userId") === null}  type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleReportModal}>
 						Report
-					</button>
-				</div>
-				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-danger w-100 border-0">
-						Delete?
 					</button>
 				</div>
 			</Modal.Body>
