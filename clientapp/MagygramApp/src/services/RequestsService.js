@@ -68,9 +68,9 @@ function approveVerificationRequest(requestId, dispatch) {
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(requestId));
+				dispatch(success(requestId,"Verification request has been approved"));
 			} else {
-				dispatch(failure("Error"));
+				dispatch(failure(res.data.message));
 			}
 		})
 		.catch((err) => {
@@ -80,8 +80,8 @@ function approveVerificationRequest(requestId, dispatch) {
 	function request() {
 		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_REQUEST };
 	}
-	function success(requestId) {
-		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_SUCCESS, requestId };
+	function success(requestId,successMessage) {
+		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_SUCCESS, requestId,successMessage };
 	}
 	function failure(message) {
 		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_FAILURE, errorMessage: message };
@@ -95,9 +95,9 @@ function rejectVerificationRequest(requestId, dispatch) {
 		.then((res) => {
 			console.log(res);
 			if (res.status === 200) {
-				dispatch(success(requestId));
+				dispatch(success(requestId,"Verification request has been rejected"));
 			} else {
-				dispatch(failure("Error"));
+				dispatch(failure(res.data.message));
 			}
 		})
 		.catch((err) => {
@@ -107,8 +107,8 @@ function rejectVerificationRequest(requestId, dispatch) {
 	function request() {
 		return { type: adminConstants.REJECT_VERIFICATION_REQUEST_REQUEST };
 	}
-	function success(requestId) {
-		return { type: adminConstants.REJECT_VERIFICATION_REQUEST_SUCCESS, requestId };
+	function success(requestId,successMessage) {
+		return { type: adminConstants.REJECT_VERIFICATION_REQUEST_SUCCESS, requestId,successMessage };
 	}
 	function failure(message) {
 		return { type: adminConstants.REJECT_VERIFICATION_REQUEST_FAILURE, errorMessage: message };

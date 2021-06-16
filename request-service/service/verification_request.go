@@ -130,7 +130,7 @@ func (v verificationService) RejectVerificationRequest(ctx context.Context, requ
 		return errors.New("The request has already been processed.")
 	}
 
-	request.Status="REJECT"
+	request.Status="REJECTED"
 
 	//TODO: pozvati userClient da verifikuje u userServicu i eventualno poslati mail useru
 	v.VerificationRequestsRepository.UpdateVerificationRequest(ctx,request)
