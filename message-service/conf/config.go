@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+
 	Server struct {
 		Port string
 		Host string
@@ -14,30 +15,13 @@ type Config struct {
 		Name string
 		Handshake string
 	}
+
 	Database struct {
 		Host     string
 		Port     string
 		User     string
 		Password string
-		Database string
-	}
-	Mail struct {
-		Sender   string
-		Password string
-		Host 	 string
-		Port 	 string
-	}
-
-	Mediaservice struct {
-		Protocol   string
-		Domain 	 string
-		Port 	 string
-	}
-
-	Userservice struct {
-		Protocol   string
-		Domain 	 string
-		Port 	 string
+		Database int
 	}
 
 	Authservice struct {
@@ -46,17 +30,6 @@ type Config struct {
 		Port 	 string
 	}
 
-	Relationshipservice struct {
-		Protocol   string
-		Domain 	 string
-		Port 	 string
-	}
-
-	Messageservice struct {
-		Protocol   string
-		Domain string
-		Port 	 string
-	}
 }
 
 var Current *Config

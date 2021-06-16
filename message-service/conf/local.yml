@@ -1,0 +1,17 @@
+server :
+  port : "467"
+  host : "localhost"
+  secret : "MagyGram"
+  name: "message-service"
+  handshake : "ms-handshake"
+
+database :
+  host : "localhost"
+  port : "6379"
+  password : ""
+  database : 0
+
+authservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "461"

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import { userService } from "../services/UserService";
 import { Link } from "react-router-dom";
 import AsyncSelect from "react-select/async";
@@ -17,12 +17,37 @@ const Header = () => {
 
 	const [search, setSearch] = useState("");
 
+	const [message, setMessage] = useState("");
+	const [receiver, setReceiver] = useState("");
+
+	const [rmessages, setRmessages] = useState([]);
+
+	const ws = useRef(null);
+
+	useEffect(() => {
+		ws.current = new WebSocket("wss://localhost:467/ws/notify/" + localStorage.getItem("userId"));
+		ws.current.onopen = () => console.log("ws opened");
+		ws.current.onclose = () => console.log("ws closed");
+	}, []);
+
+	useEffect(() => {
+		if (!ws.current) return;
+
+		ws.current.onmessage = (evt) => {
+			console.log(evt.data);
+			let a = [...rmessages];
+			a.push(evt.data);
+
+			setRmessages(a);
+		};
+	}, [rmessages]);
+
 	const loadOptions = (value, callback) => {
-		if (value.startsWith("#") && value.length>=2) {
+		if (value.startsWith("#") && value.length >= 2) {
 			setTimeout(() => {
 				searchService.guestSearchHashtagPosts(value, callback);
 			}, 1000);
-		} else if (value.startsWith("%") && value.length>=2) {
+		} else if (value.startsWith("%") && value.length >= 2) {
 			setTimeout(() => {
 				searchService.guestSearchLocation(value, callback);
 			}, 1000);
@@ -52,8 +77,7 @@ const Header = () => {
 		if (option.searchType === "hashtag") {
 			window.location = "#/search/hashtag/" + option.value;
 		} else if (option.searchType === "location") {
-			window.location = "#/search/location/" +option.value;
-
+			window.location = "#/search/location/" + option.value;
 		} else {
 			window.location = "#/profile?userId=" + option.id;
 		}
@@ -78,9 +102,9 @@ const Header = () => {
 	};
 
 	const backToHome = () => {
-        window.location = "#/"
-    }
-	
+		window.location = "#/";
+	};
+
 	const handleLoadFollowRequests = async () => {
 		await userService.findAllFollowRequests(userCtx.dispatch);
 	};
@@ -89,7 +113,7 @@ const Header = () => {
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
 			<div className="container">
 				<div>
-					<img onClick={() =>backToHome()} src="assets/img/logotest.png" alt="NistagramLogo" />
+					<img onClick={() => backToHome()} src="assets/img/logotest.png" alt="NistagramLogo" />
 				</div>
 				<button className="navbar-toggler" data-toggle="collapse">
 					<span className="sr-only">Toggle navigation</span>

@@ -27,10 +27,11 @@ type postService struct {
 	intercomm.UserClient
 	intercomm.RelationshipClient
 	intercomm.AuthClient
+	intercomm.MessageClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient) service_contracts.PostService {
-	return &postService{r , ic, uc, ir, ac}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient) service_contracts.PostService {
+	return &postService{r , ic, uc, ir, ac, mc}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -123,6 +124,18 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
 													"post_id" : postId}).Error("Post like, database update failure")
+		return err
+	}
+
+	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+		Username:  result.UserInfo.Username,
+		UserId:    result.UserInfo.Id,
+		NotifyUrl: "TODOOO",
+		ImageUrl:  result.UserInfo.ImageURL,
+		Note:      "Post liked",
+	})
+
+	if err != nil {
 		return err
 	}
 
