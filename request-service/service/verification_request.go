@@ -14,10 +14,12 @@ type verificationService struct {
 	repository.VerificationRequestsRepository
 	intercomm.MediaClient
 	intercomm.AuthClient
+	repository.ReportRequestsRepository
+
 }
 
-func NewVerificationServiceService(v repository.VerificationRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient) service_contracts.VerificationRequestService {
-	return &verificationService{v,mc, ac}
+func NewVerificationServiceService(v repository.VerificationRequestsRepository,r repository.ReportRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient) service_contracts.VerificationRequestService {
+	return &verificationService{v,mc, ac,r}
 }
 
 func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequsetDTO model.VerificationRequestDTO, bearer string, documentImage []*multipart.FileHeader) (string, error) {
@@ -39,6 +41,26 @@ func (v verificationService) CreateVerificationRequest(ctx context.Context, veri
 	}
 
 	result, err := v.VerificationRequestsRepository.Create(ctx, verificationRequest)
+	if err != nil {
+		return "", err
+	}
+
+	if requestId, ok := result.InsertedID.(string); ok {
+		return requestId, nil
+	}
+
+	return "",err
+}
+
+func (v verificationService) CreateReportRequest(ctx context.Context, reportRequestDTO *model.ReportRequestDTO) (string, error) {
+
+	reportRequest, err := model.NewReportRequest(reportRequestDTO)
+
+	if err != nil {
+		return "", err
+	}
+
+	result, err := v.ReportRequestsRepository.CreateReport(ctx, reportRequest)
 	if err != nil {
 		return "", err
 	}

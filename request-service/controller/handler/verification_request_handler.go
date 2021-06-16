@@ -11,6 +11,7 @@ import (
 
 type VerificationRequestHandler interface {
 	CreateVerificationRequest(c echo.Context) error
+	CreateReportRequest(c echo.Context) error
 }
 
 type verificationRequestHandler struct {
@@ -44,6 +45,26 @@ func (v verificationRequestHandler) CreateVerificationRequest(c echo.Context) er
 	bearer := c.Request().Header.Get("Authorization")
 
 	request, err := v.VerificationRequestService.CreateVerificationRequest(ctx, verificationRequestDTO, bearer ,headers)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, request)
+}
+
+func (v verificationRequestHandler) CreateReportRequest(c echo.Context) error {
+	reportRequest := &model.ReportRequestDTO{}
+	if err := c.Bind(reportRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	request, err := v.VerificationRequestService.CreateReportRequest(ctx, reportRequest)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

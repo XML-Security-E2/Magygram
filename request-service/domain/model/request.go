@@ -15,6 +15,20 @@ type VerificationRequest struct {
 	Category Category `bson:"category"`
 }
 
+type ReportRequest struct {
+	Id string `bson:"_id,omitempty"`
+	ContentId string `bson:"content_id"`
+	ContentType ContentType `bson:"content_type"`
+}
+
+type ContentType string
+
+const(
+	USER = iota
+	POST
+	STORY
+)
+
 type UserInfo struct {
 	Id string
 	Username string
@@ -48,16 +62,22 @@ type VerificationRequestDTO struct {
 	Category string
 }
 
+
+type ReportRequestDTO struct {
+	ContentId string `json:"contentId"`
+	ContentType ContentType `json:"contentType"`
+}
+
 func NewVerificationRequest(verificationRequest *VerificationRequestDTO, requestStatus RequestStatus, category Category, userId string, imageUrl string) (*VerificationRequest, error) {
 	err := validateRequestStatusTypeEnums(requestStatus)
 	if err != nil {
-		return nil, err
-	}
+			return nil, err
+		}
 
-	err = validateCategoryTypeEnums(category)
-	if err != nil {
-		return nil, err
-	}
+		err = validateCategoryTypeEnums(category)
+		if err != nil {
+			return nil, err
+		}
 
 	return &VerificationRequest{Id: guid.New().String(),
 		Name:   verificationRequest.Name,
@@ -68,6 +88,7 @@ func NewVerificationRequest(verificationRequest *VerificationRequestDTO, request
 		Category: category,
 	}, nil
 }
+
 
 func validateCategoryTypeEnums(category Category) error {
 	switch category {
@@ -86,6 +107,14 @@ func validateRequestStatusTypeEnums(status RequestStatus) error{
 }
 
 type Media struct {
-	Url string `json:"url"`
+	Url       string `json:"url"`
 	MediaType string `json:"mediaType"`
+}
+
+func NewReportRequest(reportRequest *ReportRequestDTO) (*ReportRequest, error) {
+	return &ReportRequest{Id: guid.New().String(),
+		ContentId:   reportRequest.ContentId,
+		ContentType:    reportRequest.ContentType,
+	}, nil
+
 }

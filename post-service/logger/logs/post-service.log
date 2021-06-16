@@ -130,4 +130,10 @@ time="2021-06-15T16:53:38+02:00" level=info msg="Post created" func=post-service
 time="2021-06-15T17:23:50+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/main.go:74" host=localhost port=462
 time="2021-06-15T17:24:13+02:00" level=info msg="Post liked" func=post-service/service.postService.LikePost file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/post_service.go:130" post_id=df27cd88-999e-4855-99aa-fed4526e51f2 request_ip=127.0.0.1 user_id=6c80282a-0ebe-47d9-8c10-6650dcfe23b7
 time="2021-06-15T17:24:15+02:00" level=info msg="Post liked" func=post-service/service.postService.LikePost file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/post_service.go:130" post_id=81415ef7-6ab1-41f0-a138-6a6db1e86fc6 request_ip=127.0.0.1 user_id=6c80282a-0ebe-47d9-8c10-6650dcfe23b7
+<<<<<<< HEAD
 time="2021-06-15T19:15:50+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/main.go:74" host=localhost port=462
+=======
+time="2021-06-15T22:13:55+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-15T22:22:04+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:67" post_id=d21ef149-eb8c-4d46-a2ea-54d4832466ff request_ip=127.0.0.1 user_id=c1ea55d5-43bd-4a18-89f7-9de09b4dc465
+time="2021-06-15T23:24:17+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+>>>>>>> develop

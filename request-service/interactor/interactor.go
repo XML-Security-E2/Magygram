@@ -21,10 +21,11 @@ type Interactor interface {
 
 type interactor struct {
 	VerificationRequestCol *mongo.Collection
+	ReportRequestCol *mongo.Collection
 }
 
-func NewInteractor(VerificationRequestCol *mongo.Collection) Interactor {
-	return &interactor{VerificationRequestCol}
+func NewInteractor(VerificationRequestCol *mongo.Collection, ReportRequestCol *mongo.Collection) Interactor {
+	return &interactor{VerificationRequestCol, ReportRequestCol}
 }
 
 type appHandler struct {
@@ -49,8 +50,12 @@ func (i interactor) NewVerificationRequestRepository() repository.VerificationRe
 	return mongodb.NewVerificatioRequestsRepository(i.VerificationRequestCol)
 }
 
+func (i interactor) NewReportRequestRepository() repository.ReportRequestsRepository {
+	return mongodb.NewReportRequestsRepository(i.ReportRequestCol)
+}
+
 func (i interactor) NewVerificationRequestService() service_contracts.VerificationRequestService {
-	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewMediaClient(),i.NewAuthClient())
+	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewMediaClient(),i.NewAuthClient())
 }
 
 func (i interactor) NewVerificationRequestHandler() handler.VerificationRequestHandler {

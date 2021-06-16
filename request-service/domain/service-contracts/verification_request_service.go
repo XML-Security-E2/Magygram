@@ -8,4 +8,5 @@ import (
 
 type VerificationRequestService interface {
 	CreateVerificationRequest(ctx context.Context, verificationRequsetDTO model.VerificationRequestDTO, bearer string, documentImage []*multipart.FileHeader)  (string, error)
+	CreateReportRequest(ctx context.Context, report *model.ReportRequestDTO)  (string, error)
 }
