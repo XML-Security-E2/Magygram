@@ -14,6 +14,7 @@ type FollowRepository interface {
 	CreateUser(user *model.User) error
 	Unfollow(followRequest *model.FollowRequest)  error
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
+	ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
 	ReturnFollowRequestsForUser(user *model.User, loggedId string) (interface{}, error)
@@ -21,6 +22,7 @@ type FollowRepository interface {
 	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
 	IsMuted(mute *model.Mute) (interface{}, error)
 	Mute(mute *model.Mute) error
+	Unmute(mute *model.Mute) error
 }
 
 type followRepository struct {
@@ -217,6 +219,35 @@ func (f *followRepository) CreateUser(user *model.User) (err error) {
 		return err
 	}
 	return err
+}
+
+func (f *followRepository) ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (s:User)-[f:FOLLOW {muted: true}]->(o:User) WHERE s.id = $sId return o.id as id"
+		parameters := map[string]interface{}{
+			"sId": user.Id,
+		}
+		records, err := tx.Run(query, parameters)
+		if err != nil {
+			return nil, err
+		}
+		users := model.Users{}
+		for records.Next() {
+			record := records.Record()
+			id, _ := record.Get("id")
+			users.Users = append(users.Users, id.(string))
+		}
+		return users, nil
+	})
+	if err != nil {
+		log.Println("error querying graph:", err)
+		return nil, err
+	}
+	return result, nil
 }
 
 func (f *followRepository) ReturnFollowedUsers(user *model.User) (interface{}, error) {

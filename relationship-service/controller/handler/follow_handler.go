@@ -17,6 +17,7 @@ type FollowHandler interface {
 	CreateUser(ctx echo.Context) error
 	IsUserFollowed(ctx echo.Context) error
 	ReturnFollowedUsers(ctx echo.Context) error
+	ReturnUnmutedFollowedUsers(ctx echo.Context) error
 	ReturnFollowingUsers(ctx echo.Context) error
 	ReturnFollowRequests(ctx echo.Context) error
 	AcceptFollowRequest(ctx echo.Context) error
@@ -61,7 +62,7 @@ func (f followHandler) Unmute(ctx echo.Context) error {
 		return err
 	}
 
-	if err := f.FollowService.Mute(mute); err != nil {
+	if err := f.FollowService.Unmute(mute); err != nil {
 		return err
 	}
 
@@ -130,6 +131,16 @@ func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
 	return ctx.JSON(http.StatusCreated, result)
 }
 
+func (f *followHandler) ReturnUnmutedFollowedUsers(ctx echo.Context) error {
+	user := &model.User{Id: ctx.Param("userId")}
+
+	result, err := f.FollowService.ReturnUnmutedFollowedUsers(user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusCreated, result)
+}
 
 func (f *followHandler) ReturnFollowingUsers(ctx echo.Context) error {
 	user := &model.User{Id: ctx.Param("userId")}

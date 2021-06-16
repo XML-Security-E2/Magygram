@@ -27,6 +27,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/follow-requests/:userId/accept", h.AcceptFollowRequest, h.UserLoggingMiddleware)
 	e.POST("/api/users/follow", h.FollowUser, h.UserLoggingMiddleware)
 	e.POST("/api/users/unfollow", h.UnollowUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/mute", h.MuteUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/unmute", h.UnmuteUser, h.UserLoggingMiddleware)
 
 	e.GET("/api/users/:userId/profile", h.GetUserProfileById, h.UserLoggingMiddleware)
 

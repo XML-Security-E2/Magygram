@@ -33,6 +33,14 @@ const UserProfileHeaderInfo = ({ userId }) => {
 		userService.unfollowUser(userId, dispatch);
 	};
 
+	const handleUserMute = () => {
+		userService.muteUser(userId, dispatch);
+	};
+
+	const handleUserUnmute = () => {
+		userService.unmuteUser(userId, dispatch);
+	};
+
 	return (
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={{ backgroundColor: colorConstants.COLOR_BACKGROUND }}>
 			<div className="flexbox-container">
@@ -65,7 +73,6 @@ const UserProfileHeaderInfo = ({ userId }) => {
 										</button>
 									))
 								))}
-
 							<Link
 								type="button"
 								hidden={userId !== localStorage.getItem("userId")}
@@ -76,6 +83,19 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							>
 								Edit Profile
 							</Link>
+						</div>
+						<div>
+						{localStorage.getItem("userId") !== null && userId !== localStorage.getItem("userId") && userState.userProfile.user.following &&
+									(userState.userProfile.user.muted ? (
+										<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnmute}>
+											Unmute
+										</button>
+									) : (
+										<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserMute}>
+											Mute
+										</button>
+									))
+								}
 						</div>
 					</div>
 					<div className="flexbox-container d-flex align-items-center">

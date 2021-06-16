@@ -17,10 +17,12 @@ type FollowService interface {
 	AcceptFollowRequest(bearer string, userId string) error
 	CreateUser(user *model.User) error
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
+	ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(bearer string) (interface{}, error)
 	ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error)
 	Mute(mute *model.Mute) error
+	Unmute(mute *model.Mute) error
 }
 
 type followService struct {
@@ -47,7 +49,7 @@ func (f *followService) Unmute(mute *model.Mute) error {
 	if err := validator.New().Struct(mute); err != nil {
 		return err
 	}
-	if err := f.FollowRepository.Mute(mute); err != nil {
+	if err := f.FollowRepository.Unmute(mute); err != nil {
 		return err
 	}
 	return nil
@@ -161,6 +163,15 @@ func (f *followService) AcceptFollowRequest(bearer string, userId string) error 
 
 func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, error) {
 	retVal, err := f.FollowRepository.ReturnFollowedUsers(user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
+}
+
+func (f *followService) ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error) {
+	retVal, err := f.FollowRepository.ReturnUnmutedFollowedUsers(user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
 		return retVal, err

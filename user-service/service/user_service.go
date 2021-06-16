@@ -511,6 +511,34 @@ func (u *userService) UnfollowUser(ctx context.Context, bearer string, userId st
 	return err
 }
 
+func (u *userService) MuteUser(ctx context.Context, bearer string, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	err = u.RelationshipClient.Mute(&model.Mute{
+		SubjectId: loggedId,
+		ObjectId:  userId,
+	})
+
+	return err
+}
+
+func (u *userService) UnmuteUser(ctx context.Context, bearer string, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	err = u.RelationshipClient.Unmute(&model.Mute{
+		SubjectId: loggedId,
+		ObjectId:  userId,
+	})
+
+	return err
+}
+
 func (u *userService) GetFollowRequests(ctx context.Context, bearer string) ([]*model.UserFollowingResponse, error) {
 	requestsFrom, err := u.RelationshipClient.ReturnFollowRequests(bearer)
 	if err != nil {

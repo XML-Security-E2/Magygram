@@ -21,7 +21,9 @@ export const userService = {
 	checkIfUserIdExist,
 	followUser,
 	unfollowUser,
-	loginSecondAuthorization
+	loginSecondAuthorization,
+	muteUser,
+	unmuteUser
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -417,6 +419,44 @@ function unfollowUser(userId, dispatch) {
 	}
 	function failure() {
 		return { type: userConstants.UNFOLLOW_USER_FAILURE };
+	}
+}
+
+function muteUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+
+	Axios.post(`/api/users/mute`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.MUTE_USER_SUCCESS};
+	}
+}
+
+function unmuteUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+
+	Axios.post(`/api/users/unmute`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.UNMUTE_USER_SUCCESS};
 	}
 }
 

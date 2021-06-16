@@ -20,6 +20,8 @@ type RelationshipClient interface {
 	GetFollowingUsers(userId string) (model.FollowedUsersResponse, error)
 	FollowRequest(request *model.FollowRequest) (bool,error)
 	Unfollow(request *model.FollowRequest) error
+	Mute(request *model.Mute) error
+	Unmute(request *model.Mute) error
 	ReturnFollowRequestsForUser(bearer string, objectId string) (bool, error)
 	ReturnFollowRequests(bearer string) (model.FollowedUsersResponse, error)
 	AcceptFollowRequest(bearer string, userId string) error
@@ -165,6 +167,42 @@ func (r relationshipClient) FollowRequest(request *model.FollowRequest) (bool,er
 	json.Unmarshal(bodyBytes, &followRequest)
 
 	return followRequest, nil
+}
+
+func (r relationshipClient) Mute(request *model.Mute) error {
+	jsonRequest, _ := json.Marshal(request)
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/mute", baseRelationshipUrl), bytes.NewBuffer(jsonRequest))
+	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	_, err = client.Do(req)
+
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	return nil
+}
+
+func (r relationshipClient) Unmute(request *model.Mute) error {
+	jsonRequest, _ := json.Marshal(request)
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/unmute", baseRelationshipUrl), bytes.NewBuffer(jsonRequest))
+	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	_, err = client.Do(req)
+
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	return nil
 }
 
 func (r relationshipClient) Unfollow(request *model.FollowRequest) error {

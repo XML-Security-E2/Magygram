@@ -415,6 +415,14 @@ export const userReducer = (state, action) => {
 			return a;
 		case userConstants.ACCEPT_FOLLOW_REQUESTS_FAILURE:
 			return state;
+		case userConstants.MUTE_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.muted = true;
+			return a;
+		case userConstants.UNMUTE_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.muted = false;
+			return a;
 
 		default:
 			return state;

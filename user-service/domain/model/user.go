@@ -89,6 +89,11 @@ type FollowRequest struct {
 	ObjectId string `json:"objectId"`
 }
 
+type Mute struct {
+	SubjectId string `json:"subjectId"`
+	ObjectId string `json:"objectId"`
+}
+
 type FollowedUsersResponse struct {
 	Users []string
 }

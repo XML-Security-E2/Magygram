@@ -69,6 +69,7 @@ const UserContextProvider = (props) => {
 				followersNumber: "",
 				followingNumber: "",
 				sentFollowRequest: false,
+				muted: false,
 			},
 		},
 	});
