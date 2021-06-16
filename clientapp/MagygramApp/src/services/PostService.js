@@ -519,14 +519,13 @@ function findPostsForGuestByHashtag(hashtag, dispatch) {
 	}
 }
 
-function findPostsForUserByHashtag(hashtag, dispatch) {
+async function findPostsForUserByHashtag(hashtag, dispatch) {
 	dispatch(request());
-	Axios.get(`/api/posts/hashtag/${hashtag}/user`, { validateStatus: () => true, headers: authHeader() })
+	await Axios.get(`/api/posts/hashtag/${hashtag}/user`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
-				window.location = "#/search";
 			} else {
 				failure();
 			}
@@ -582,7 +581,6 @@ function findPostsForUserByLocation(location, dispatch) {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
-				window.location = "#/search";
 			} else {
 				failure();
 			}
