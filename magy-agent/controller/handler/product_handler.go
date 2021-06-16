@@ -51,7 +51,7 @@ func (p productHandler) CreateProduct(c echo.Context) error {
 	}
 	bearer := c.Request().Header.Get("Authorization")
 	if bearer == "" {
-		c.JSON(http.StatusUnauthorized, "")
+		return c.JSON(http.StatusUnauthorized, "")
 	}
 
 	product, err := p.ProductService.CreateProduct(ctx, productRequest)
@@ -59,7 +59,7 @@ func (p productHandler) CreateProduct(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, product.Id)
+	return c.JSON(http.StatusCreated, product)
 }
 
 func (p productHandler) UpdateProduct(c echo.Context) error {
@@ -76,14 +76,14 @@ func (p productHandler) UpdateProduct(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	if bearer == "" {
-		c.JSON(http.StatusUnauthorized, "")
+		return c.JSON(http.StatusUnauthorized, "")
 	}
 
 	product, err := p.ProductService.UpdateProduct(ctx, productId, updateReq)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
-	return c.JSON(http.StatusOK, product.Id)
+	return c.JSON(http.StatusOK, product)
 }
 
 func (p productHandler) UpdateProductImage(c echo.Context) error {
@@ -99,7 +99,7 @@ func (p productHandler) UpdateProductImage(c echo.Context) error {
 	}
 	bearer := c.Request().Header.Get("Authorization")
 	if bearer == "" {
-		c.JSON(http.StatusUnauthorized, "")
+		return c.JSON(http.StatusUnauthorized, "")
 	}
 
 	product, err := p.ProductService.UpdateProductImage(ctx, productId, image)
@@ -107,7 +107,7 @@ func (p productHandler) UpdateProductImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, product.Id)
+	return c.JSON(http.StatusOK, product.ImageURL)
 }
 
 func (p productHandler) GetProductById(c echo.Context) error {
@@ -123,7 +123,7 @@ func (p productHandler) GetProductById(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, product.Id)
+	return c.JSON(http.StatusOK, product)
 }
 
 func (p productHandler) DeleteProductById(c echo.Context) error {

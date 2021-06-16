@@ -3,10 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/EditProfile.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/EditProfile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/ProfilePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/domain/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/domain/model/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/infrastructure/persistence/mongodb/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/infrastructure/persistence/mongodb/users.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/UserProfileHeaderInfo.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/UserProfileHeaderInfo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,16 +107,5 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/user-service/service/user_service.go</url>
-          <line>29</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -1,6 +1,7 @@
 import React from "react";
 import HeaderWrapper from "../components/HeaderWrapper";
 import UserEditProfile from "../components/UserEditProfile";
+import ProfileSettingsContextProvider from "../contexts/ProfileSettingsContext";
 import UserContextProvider from "../contexts/UserContext";
 
 const EditProfilePage = () => {
@@ -11,7 +12,9 @@ const EditProfilePage = () => {
 				<div className="container d-flex justify-content-center ">
 					<div className="col-9">
 						<UserContextProvider>
-							<UserEditProfile />
+							<ProfileSettingsContextProvider>
+								<UserEditProfile />
+							</ProfileSettingsContextProvider>
 						</UserContextProvider>
 					</div>
 				</div>

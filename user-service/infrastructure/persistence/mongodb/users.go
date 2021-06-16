@@ -36,7 +36,9 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"imageUrl" , user.ImageUrl},
 																{"number" , user.Number},
 																{"gender" , user.Gender},
-																}}})
+																{"liked_posts" , user.LikedPosts},
+																{"disliked_posts" , user.DislikedPosts},
+																					}}})
 }
 
 func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, error) {

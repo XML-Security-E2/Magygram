@@ -1,7 +1,10 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
+import { UserContext } from "../../contexts/UserContext";
+import Axios from "axios";
+import { authHeader } from "../../helpers/auth-header";
 
 const OptionsModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -10,8 +13,35 @@ const OptionsModal = () => {
 		dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
 	};
 
+	useEffect(() => {
+	
+	});
+
 	const handleOpenPostEditModal = () => {
 		dispatch({ type: modalConstants.SHOW_POST_EDIT_MODAL });
+	};
+
+	const handleReportModal = () => {
+
+		let reportDTO = {
+			contentId: postState.editPost.post.id,
+			contentType: "POST",
+		};
+
+		Axios.post(`/api/report`, reportDTO , { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log("blaa");
+			if (res.status === 200) {
+				alert("You have reported this post successfully")
+				dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
+			} else {
+				console.log("err")
+			}
+		})
+		.catch((err) => {
+			console.log("err")
+		});
+
 	};
 
 	return (
@@ -26,7 +56,7 @@ const OptionsModal = () => {
 					</button>
 				</div>
 				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0">
+					<button hidden={localStorage.getItem("userId") === null} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleReportModal}>
 						Report
 					</button>
 				</div>

@@ -18,3 +18,12 @@ mail :
   host : "smtp.gmail.com"
   port : "587"
 
+mediaservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "465"
+
+authservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "461"

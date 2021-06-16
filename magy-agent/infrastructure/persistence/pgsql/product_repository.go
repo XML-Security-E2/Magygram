@@ -43,5 +43,5 @@ func (p productRepository) GetAll(ctx context.Context) (*[]model.Product, error)
 }
 
 func (p productRepository) DeleteById(ctx context.Context, id string) error {
-	return p.Conn.Delete(&model.Product{}, id).Error
+	return p.Conn.Delete(&model.Product{Id: id}).Error
 }

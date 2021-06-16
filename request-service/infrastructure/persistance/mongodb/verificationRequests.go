@@ -11,7 +11,6 @@ type verificatioRequestsRepository struct {
 	Col *mongo.Collection
 }
 
-
 func NewVerificatioRequestsRepository(Col *mongo.Collection) repository.VerificationRequestsRepository {
 	return &verificatioRequestsRepository{Col}
 }

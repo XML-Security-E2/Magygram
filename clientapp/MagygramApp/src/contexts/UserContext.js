@@ -72,6 +72,7 @@ const UserContextProvider = (props) => {
 				muted: false,
 			},
 		},
+
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

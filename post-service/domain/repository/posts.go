@@ -16,4 +16,5 @@ type PostRepository interface {
 	GetPostsByHashTag(ctx context.Context, hashTag string) ([]*model.Post, error)
 	GetPostsThatContainLocation(ctx context.Context, location string) ([]*model.Post, error)
 	GetPostsByLocation(ctx context.Context, location string)([]*model.Post, error)
+	GetPostsByPostIdArray(ctx context.Context, ids []string) ([]*model.Post, error)
 }
