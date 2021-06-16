@@ -24,14 +24,15 @@ type userService struct {
 	intercomm.RelationshipClient
 	intercomm.PostClient
 	intercomm.MediaClient
+	intercomm.MessageClient
 }
 
 var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient) service_contracts.UserService {
-	return &userService{r, a,  rp , ic, rC, pc, mc}
+func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient) service_contracts.UserService {
+	return &userService{r, a,  rp , ic, rC, pc, mc, msc}
 }
 
 func (u *userService) GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
@@ -91,6 +92,12 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 		return user.NotificationSettings.NotifyLike, nil
 	} else if interactionType == "comment" {
 		return user.NotificationSettings.NotifyComment, nil
+	} else if interactionType == "follow" {
+		return user.NotificationSettings.NotifyFollow, nil
+	} else if interactionType == "follow-request" {
+		return user.NotificationSettings.NotifyFollowRequest, nil
+	} else if interactionType == "accepted-follow-request" {
+		return user.NotificationSettings.NotifyAcceptFollowRequest, nil
 	}
 	return false, nil
 }
@@ -552,10 +559,32 @@ func (u *userService) FollowUser(ctx context.Context, bearer string, userId stri
 		return false, err
 	}
 
+	user, _ := u.UserRepository.GetByID(ctx, loggedId)
+
 	followRequest, err := u.RelationshipClient.FollowRequest(&model.FollowRequest{
 		SubjectId: loggedId,
 		ObjectId:  userId,
 	})
+	if err == nil {
+		if followRequest {
+			err = u.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+				Username:  user.Username,
+				UserId:    userId,
+				NotifyUrl: "TODO",
+				ImageUrl:  user.ImageUrl,
+				Type:      intercomm.FollowRequest,
+			})
+		} else {
+			err = u.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+				Username:  user.Username,
+				UserId:    userId,
+				NotifyUrl: "TODO",
+				ImageUrl:  user.ImageUrl,
+				Type:      intercomm.Followed,
+			})
+		}
+	}
+
 	return followRequest, err
 }
 
@@ -601,11 +630,25 @@ func (u *userService) GetFollowRequests(ctx context.Context, bearer string) ([]*
 }
 
 func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, userId string) error {
-
-	err := u.RelationshipClient.AcceptFollowRequest(bearer, userId)
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
 		return err
 	}
+
+	user, _ := u.UserRepository.GetByID(ctx, loggedId)
+
+	err = u.RelationshipClient.AcceptFollowRequest(bearer, userId)
+	if err != nil {
+		return err
+	}
+
+	err = u.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+		Username:  user.Username,
+		UserId:    userId,
+		NotifyUrl: "TODO",
+		ImageUrl:  user.ImageUrl,
+		Type:      intercomm.AcceptedFollowRequest,
+	})
 
 	return nil
 }

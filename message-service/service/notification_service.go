@@ -55,6 +55,36 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 			notification := model.NewNotification(notificationReq)
 			return true, n.NotificationRepository.Create(ctx, notification)
 		}
+	} else if notificationReq.Type == model.Followed {
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, "follow")
+		if err != nil {
+			return false, err
+		}
+
+		if notify {
+			notification := model.NewNotification(notificationReq)
+			return true, n.NotificationRepository.Create(ctx, notification)
+		}
+	} else if notificationReq.Type == model.FollowRequest {
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, "follow-request")
+		if err != nil {
+			return false, err
+		}
+
+		if notify {
+			notification := model.NewNotification(notificationReq)
+			return true, n.NotificationRepository.Create(ctx, notification)
+		}
+	} else if notificationReq.Type == model.AcceptedFollowRequest {
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, "accepted-follow-request")
+		if err != nil {
+			return false, err
+		}
+
+		if notify {
+			notification := model.NewNotification(notificationReq)
+			return true, n.NotificationRepository.Create(ctx, notification)
+		}
 	}
 
 	return false, nil

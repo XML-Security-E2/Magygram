@@ -62,6 +62,12 @@ type Config struct {
 		Protocol   string
 		Domain string
 	}
+
+	Messageservice struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
 }
 
 var Current *Config

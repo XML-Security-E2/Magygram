@@ -37,6 +37,8 @@ var (
 	Disliked = "Disliked"
 	Commented = "Commented"
 	Followed = "Followed"
+	FollowRequest = "FollowRequest"
+	AcceptedFollowRequest = "AcceptedFollowRequest"
 	PublishedStory = "PublishedStory"
 	PublishedPost = "PublishedPost"
 )
@@ -67,6 +69,10 @@ func createNote(notificationType string, username string) string {
 		return fmt.Sprintf("%s published story", username)
 	} else if notificationType == PublishedPost {
 		return fmt.Sprintf("%s published post", username)
+	} else if notificationType == FollowRequest {
+		return fmt.Sprintf("%s wants to follow you", username)
+	} else if notificationType == AcceptedFollowRequest {
+		return fmt.Sprintf("%s accepted follow request", username)
 	}
 	return ""
 }

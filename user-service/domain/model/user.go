@@ -30,6 +30,9 @@ type NotificationSettings struct {
 	NotifyPost bool `json:"notifyPost"`
 	NotifyLike bool `json:"notifyLike"`
 	NotifyDislike bool `json:"notifyDislike"`
+	NotifyFollow bool `json:"notifyFollow"`
+	NotifyFollowRequest bool `json:"notifyFollowRequest"`
+	NotifyAcceptFollowRequest bool `json:"notifyAcceptFollowRequest"`
 	NotifyComment bool `json:"notifyComments"`
 }
 
@@ -184,11 +187,14 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
 		NotificationSettings: NotificationSettings{
-				NotifyStory:   false,
-				NotifyPost:    false,
-				NotifyLike:    true,
-				NotifyDislike: true,
-				NotifyComment: true,
+			NotifyStory:         false,
+			NotifyPost:          false,
+			NotifyLike:          true,
+			NotifyDislike:       true,
+			NotifyFollow:        true,
+			NotifyFollowRequest: true,
+			NotifyComment:       true,
+			NotifyAcceptFollowRequest: true,
 		},
 	}, nil
 }
