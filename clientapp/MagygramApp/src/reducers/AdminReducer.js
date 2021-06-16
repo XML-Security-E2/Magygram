@@ -34,6 +34,60 @@ export const adminReducer = (state, action) => {
                 },
             }
         }
+        case adminConstants.GET_PENDING_VERIFICATION_REQUEST_REQUEST:{
+            return{
+                ...state,
+                verificationRequests:{
+                    requests:[]
+                }
+            }
+        }
+        case adminConstants.GET_PENDING_VERIFICATION_REQUEST_SUCCESS:{
+            return{
+                ...state,
+                verificationRequests:{
+                    requests:action.requests
+                }
+            }
+        }
+        case adminConstants.GET_PENDING_VERIFICATION_REQUEST_FAILURE:{
+            return{
+                ...state,
+                verificationRequests:{
+                    requests:[]
+                },
+            }
+        }
+        case adminConstants.APPROVE_VERIFICATION_REQUEST_REQUEST:{
+            return{
+                ...state,
+            }
+        }
+        case adminConstants.APPROVE_VERIFICATION_REQUEST_SUCCESS:{
+            return{
+                ...state,
+            }
+        }
+        case adminConstants.APPROVE_VERIFICATION_REQUEST_FAILURE:{
+            return{
+                ...state,
+            }
+        }
+        case adminConstants.REJECT_VERIFICATION_REQUEST_REQUEST:{
+            return{
+                ...state,
+            }
+        }
+        case adminConstants.REJECT_VERIFICATION_REQUEST_SUCCESS:{
+            return{
+                ...state,
+            }
+        }
+        case adminConstants.REJECT_VERIFICATION_REQUEST_FAILURE:{
+            return{
+                ...state,
+            }
+        }
 		default:
 			return state;
 	}

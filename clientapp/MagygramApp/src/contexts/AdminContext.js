@@ -10,6 +10,9 @@ const AdminContextProvider = (props) => {
             contentReportShow: false,
             agentRequestsShow: false,
         },
+        verificationRequests:{
+            requests:[]
+        }
 	});
 
 	return <AdminContext.Provider value={{ state, dispatch }}>{props.children}</AdminContext.Provider>;

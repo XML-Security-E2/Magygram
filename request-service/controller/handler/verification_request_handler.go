@@ -12,11 +12,15 @@ import (
 type VerificationRequestHandler interface {
 	CreateVerificationRequest(c echo.Context) error
 	CreateReportRequest(c echo.Context) error
+	GetVerificationRequests(c echo.Context) error
+	ApproveVerificationRequest(c echo.Context) error
+	RejectVerificationRequest(c echo.Context) error
 }
 
 type verificationRequestHandler struct {
 	VerificationRequestService service_contracts.VerificationRequestService
 }
+
 
 func NewVerificationRequestHandler(u service_contracts.VerificationRequestService) VerificationRequestHandler {
 	return &verificationRequestHandler{u}
@@ -71,4 +75,50 @@ func (v verificationRequestHandler) CreateReportRequest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, request)
+}
+
+func (v verificationRequestHandler) GetVerificationRequests(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := v.VerificationRequestService.GetVerificationRequests(ctx)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, retVal)
+}
+
+func (v verificationRequestHandler) ApproveVerificationRequest(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := v.VerificationRequestService.ApproveVerificationRequest(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (v verificationRequestHandler) RejectVerificationRequest(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := v.VerificationRequestService.RejectVerificationRequest(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
