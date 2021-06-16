@@ -3,7 +3,7 @@ import { useState } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { userService } from "../services/UserService";
 
-const EditProfileInfoForm = () => {
+const EditProfileInfoForm = ({show}) => {
 	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 	const { userState, dispatch } = useContext(UserContext);
 
@@ -79,7 +79,7 @@ const EditProfileInfoForm = () => {
 
 	return (
 		<React.Fragment>
-			<form method="post" onSubmit={handleSubmit}>
+			<form hidden={!show} method="post" onSubmit={handleSubmit}>
 				<div>
 					<br />
 
@@ -176,7 +176,6 @@ const EditProfileInfoForm = () => {
 							<input className="form-control" type="text" id="website" name="numberInput" placeholder="Number" value={number} onChange={(e) => setNumber(e.target.value)} />
 						</div>
 					</div>
-					<br />
 					<div className="form-group row">
 						<label for="gender" className="col-sm-3 col-form-label">
 							<b>Gender</b>

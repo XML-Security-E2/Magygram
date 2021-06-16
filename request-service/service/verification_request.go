@@ -2,28 +2,38 @@ package service
 
 import (
 	"context"
+	"errors"
+	"mime/multipart"
 	"request-service/domain/model"
 	"request-service/domain/repository"
-	service_contracts "request-service/domain/service-contracts"
+	"request-service/domain/service-contracts"
+	"request-service/service/intercomm"
 )
 
 type verificationService struct {
 	repository.VerificationRequestsRepository
+	intercomm.MediaClient
+	intercomm.AuthClient
 }
 
-func NewVerificationServiceService(v repository.VerificationRequestsRepository) service_contracts.VerificationRequestService {
-	return &verificationService{v}
+func NewVerificationServiceService(v repository.VerificationRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient) service_contracts.VerificationRequestService {
+	return &verificationService{v,mc, ac}
 }
 
-func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequestDTO *model.VerificationRequestDTO) (string, error) {
-	//TODO
-	var userInfo = model.UserInfo{Id: "123",
-		Username: "pera",
-		ImageURL: "djura",
-		}
+func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequsetDTO model.VerificationRequestDTO, bearer string, documentImage []*multipart.FileHeader) (string, error) {
+	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return "", err
+	}
 
-	verificationRequest, err := model.NewVerificationRequest(verificationRequestDTO,userInfo)
+	media, err := v.MediaClient.SaveMedia(documentImage)
+	if err != nil { return "", err}
 
+	if len(media) == 0 {
+		return "", errors.New("error while saving image")
+	}
+
+	verificationRequest, err:= model.NewVerificationRequest(&verificationRequsetDTO,"PENDING", model.Category(verificationRequsetDTO.Category), loggedId, media[0].Url)
 	if err != nil {
 		return "", err
 	}

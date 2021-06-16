@@ -27,6 +27,16 @@ type Config struct {
 		Host 	 string
 		Port 	 string
 	}
+	Mediaservice struct {
+		Protocol   string
+		Domain 	 string
+		Port 	 string
+	}
+	Authservice struct {
+		Protocol string
+		Domain   string
+		Port     string
+	}
 }
 
 var Current *Config
