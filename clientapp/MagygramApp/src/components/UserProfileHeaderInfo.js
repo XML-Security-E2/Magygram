@@ -101,7 +101,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							</Link>
 						</div>
 						<div>
-							<button hidden={(localStorage.getItem("userId") == userId) || (localStorage.getItem("userId") === null)} style={{ backgroundColor: "red", borderColor: "red" }} type="button" className="btn btn-primary ml-2" tabindex="0" onClick={reportUser}>
+							<button hidden={(localStorage.getItem("userId") === userId) || (localStorage.getItem("userId") === null)} style={{ backgroundColor: "red", borderColor: "red" }} type="button" className="btn btn-primary ml-2" tabindex="0" onClick={reportUser}>
 								Report
 							</button>
 						</div>
