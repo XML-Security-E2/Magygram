@@ -7,6 +7,7 @@ import (
 	"request-service/domain/service-contracts"
 	"request-service/infrastructure/persistance/mongodb"
 	"request-service/service"
+	"request-service/service/intercomm"
 )
 
 type Interactor interface {
@@ -14,6 +15,8 @@ type Interactor interface {
 	NewVerificationRequestService() service_contracts.VerificationRequestService
 	NewVerificationRequestHandler() handler.VerificationRequestHandler
 	NewAppHandler() handler.AppHandler
+	NewMediaClient() intercomm.MediaClient
+	NewAuthClient() intercomm.AuthClient
 }
 
 type interactor struct {
@@ -27,6 +30,14 @@ func NewInteractor(VerificationRequestCol *mongo.Collection, ReportRequestCol *m
 
 type appHandler struct {
 	handler.VerificationRequestHandler
+}
+
+func (i *interactor) NewMediaClient() intercomm.MediaClient {
+	return intercomm.NewMediaClient()
+}
+
+func (i *interactor) NewAuthClient() intercomm.AuthClient {
+	return intercomm.NewAuthClient()
 }
 
 func (i interactor) NewAppHandler() handler.AppHandler {
@@ -44,7 +55,7 @@ func (i interactor) NewReportRequestRepository() repository.ReportRequestsReposi
 }
 
 func (i interactor) NewVerificationRequestService() service_contracts.VerificationRequestService {
-	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(), i.NewReportRequestRepository())
+	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewMediaClient(),i.NewAuthClient())
 }
 
 func (i interactor) NewVerificationRequestHandler() handler.VerificationRequestHandler {

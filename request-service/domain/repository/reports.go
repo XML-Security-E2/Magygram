@@ -9,3 +9,5 @@ import (
 type ReportRequestsRepository interface {
 	CreateReport(ctx context.Context, user *model.ReportRequest) (*mongo.InsertOneResult, error)
 }
+
+

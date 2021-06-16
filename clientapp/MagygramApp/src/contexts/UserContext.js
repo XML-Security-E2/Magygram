@@ -71,6 +71,7 @@ const UserContextProvider = (props) => {
 				sentFollowRequest: false,
 			},
 		},
+
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;
