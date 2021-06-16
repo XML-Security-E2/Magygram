@@ -23,7 +23,9 @@ export const userService = {
 	unfollowUser,
 	loginSecondAuthorization,
 	muteUser,
-	unmuteUser
+	unmuteUser,
+	blockUser,
+	unblockUser
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -457,6 +459,52 @@ function unmuteUser(userId, dispatch) {
 
 	function success() {
 		return { type: userConstants.UNMUTE_USER_SUCCESS};
+	}
+}
+
+function blockUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request())
+
+	Axios.post(`/api/users/block`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.BLOCK_USER_SUCCESS};
+	}
+	function request() {
+		return { type: userConstants.BLOCK_USER_REQUEST };
+	}
+}
+
+function unblockUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request())
+
+	Axios.post(`/api/users/unblock`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.UNBLOCK_USER_SUCCESS};
+	}
+	function request() {
+		return { type: userConstants.UNBLOCK_USER_REQUEST };
 	}
 }
 

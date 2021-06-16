@@ -22,6 +22,7 @@ type User struct {
 	IsPrivate bool `bson:"private_profile"`
 	LikedPosts []string `bson:"liked_posts"`
 	DislikedPosts []string `bson:"disliked_posts"`
+	BlockedUsers []string `bson:"blocked_users"`
 }
 
 type UserProfileResponse struct {
@@ -179,6 +180,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		IsPrivate: true,
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
+		BlockedUsers: []string{},
 	}, nil
 }
 

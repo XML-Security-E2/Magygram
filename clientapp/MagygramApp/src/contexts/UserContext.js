@@ -70,6 +70,7 @@ const UserContextProvider = (props) => {
 				followingNumber: "",
 				sentFollowRequest: false,
 				muted: false,
+				blocked: false,
 			},
 		},
 

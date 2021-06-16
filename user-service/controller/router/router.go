@@ -29,6 +29,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/unfollow", h.UnollowUser, h.UserLoggingMiddleware)
 	e.POST("/api/users/mute", h.MuteUser, h.UserLoggingMiddleware)
 	e.POST("/api/users/unmute", h.UnmuteUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/block", h.BlockUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/unblock", h.UnblockUser, h.UserLoggingMiddleware)
 
 	e.GET("/api/users/:userId/profile", h.GetUserProfileById, h.UserLoggingMiddleware)
 

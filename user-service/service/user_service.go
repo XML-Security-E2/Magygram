@@ -539,6 +539,49 @@ func (u *userService) UnmuteUser(ctx context.Context, bearer string, userId stri
 	return err
 }
 
+func (u *userService) BlockUser(ctx context.Context, bearer string, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	user.BlockedUsers = append(user.BlockedUsers, userId)
+	if _, err = u.UserRepository.Update(ctx, user); err != nil {
+		return err
+	}
+	if err = u.RelationshipClient.Unfollow(&model.FollowRequest{SubjectId: loggedId, ObjectId: userId}); err != nil {
+		return err
+	}
+	if err = u.RelationshipClient.Unfollow(&model.FollowRequest{SubjectId: userId, ObjectId: loggedId}); err != nil {
+		return err
+	}
+	return err
+}
+
+func (u *userService) UnblockUser(ctx context.Context, bearer string, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	result, index := isUserBlocked(user, userId)
+	if result {
+		user.BlockedUsers = append(user.BlockedUsers[:index], user.BlockedUsers[index+1:]...)
+		u.UserRepository.Update(ctx, user)
+	}
+
+	return err
+}
+
+func isUserBlocked(user *model.User, userId string) (bool, int) {
+	for index, blockedUserId := range user.BlockedUsers{
+		if blockedUserId == userId {
+			return true, index
+		}
+	}
+	return false ,0
+}
+
 func (u *userService) GetFollowRequests(ctx context.Context, bearer string) ([]*model.UserFollowingResponse, error) {
 	requestsFrom, err := u.RelationshipClient.ReturnFollowRequests(bearer)
 	if err != nil {

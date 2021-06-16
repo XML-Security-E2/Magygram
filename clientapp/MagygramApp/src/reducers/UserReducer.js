@@ -260,6 +260,7 @@ export const userReducer = (state, action) => {
 						followersNumber: "",
 						followingNumber: "",
 						sentFollowRequest: false,
+						blocked: false,
 					},
 				},
 			};
@@ -423,6 +424,18 @@ export const userReducer = (state, action) => {
 			a = { ...state };
 			a.userProfile.user.muted = false;
 			return a;
+		case userConstants.BLOCK_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.blocked = true;
+			return a;
+		case userConstants.UNBLOCK_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.blocked = false;
+			return a;
+		case userConstants.BLOCK_USER_REQUEST:
+			return state;
+		case userConstants.UNBLOCK_USER_REQUEST:
+			return state;
 
 		default:
 			return state;
