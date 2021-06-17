@@ -647,3 +647,34 @@ func (u *userService) GetUserDislikedPost(ctx context.Context, bearer string) ([
 
 	return user.DislikedPosts,nil
 }
+
+func (u *userService) VerifyUser(ctx context.Context, dto *model.VerifyAccountDTO) error {
+	user, err := u.UserRepository.GetByID(ctx, dto.UserId)
+	if err != nil {
+		return errors.New("invalid user id")
+	}
+
+	user.IsVerified=true
+	user.Category= model.Category(dto.Category)
+
+	_, err = u.UserRepository.Update(ctx, user)
+	if err != nil {
+		errors.New("user not modified")
+	}
+
+	return nil
+}
+
+func (u *userService) CheckIfUserVerified(ctx context.Context, bearer string) (bool, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return false,err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return false, errors.New("invalid user id")
+	}
+
+	return user.IsVerified,nil
+}

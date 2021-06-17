@@ -52,5 +52,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("api/users/post/liked", h.GetUserLikedPost)
 	e.GET("api/users/post/disliked", h.GetUserDislikedPost)
 
+	e.PUT("/api/users/verify", h.VerifyUser)
+	e.GET("/api/users/isverified", h.CheckIfUserVerified)
 
 }

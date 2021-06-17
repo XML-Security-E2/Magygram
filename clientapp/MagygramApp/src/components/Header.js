@@ -3,13 +3,11 @@ import { userService } from "../services/UserService";
 import { Link } from "react-router-dom";
 import AsyncSelect from "react-select/async";
 import { searchService } from "../services/SearchService";
-import { postService } from "../services/PostService";
-import { PostContext } from "../contexts/PostContext";
 import FollowRequestsList from "./FollowRequestsList";
 import { UserContext } from "../contexts/UserContext";
+import { hasRoles } from "../helpers/auth-header"
 
 const Header = () => {
-	const { dispatch } = useContext(PostContext);
 	const userCtx = useContext(UserContext);
 
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
@@ -99,11 +97,11 @@ const Header = () => {
 					<AsyncSelect defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
 				</div>
 				<div className="d-flex align-items-center dropdown">
-					<i className="fa fa-home ml-3" style={iconStyle} />
-					<i className="la la-wechat ml-3" style={iconStyle} />
-					<i className="la la-compass ml-3" style={iconStyle} />
+					<i hidden={hasRoles(["admin"])} className="fa fa-home ml-3" style={iconStyle} />
+					<i hidden={hasRoles(["admin"])} className="la la-wechat ml-3" style={iconStyle} />
+					<i hidden={hasRoles(["admin"])} className="la la-compass ml-3" style={iconStyle} />
 
-					<div>
+					<div hidden={hasRoles(["admin"])}>
 						<i className="fa fa-heart-o ml-3" onClick={handleLoadFollowRequests} style={iconStyle} id="dropdownMenu2" data-toggle="dropdown" />
 
 						<ul style={{ width: "200px", marginLeft: "15px", minWidth: "300px" }} className="dropdown-menu" aria-labelledby="dropdownMenu2">
@@ -114,7 +112,7 @@ const Header = () => {
 						</ul>
 					</div>
 
-					<div>
+					<div hidden={hasRoles(["admin"])}>
 						<img
 							className="rounded-circle overflow-hidden border border-danger header-image-photo dropdown-toggle ml-3"
 							style={{ cursor: "pointer" }}

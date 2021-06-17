@@ -32,4 +32,6 @@ type UserService interface {
 	UpdateDislikedPost(ctx context.Context, bearer string, postId string) error
 	GetUserLikedPost(ctx context.Context, bearer string) ([]string,error)
 	GetUserDislikedPost(ctx context.Context, bearer string) ([]string,error)
+	VerifyUser(ctx context.Context, dto *model.VerifyAccountDTO) error
+	CheckIfUserVerified(ctx context.Context, bearer string) (bool, error)
 }

@@ -22,7 +22,22 @@ type User struct {
 	IsPrivate bool `bson:"private_profile"`
 	LikedPosts []string `bson:"liked_posts"`
 	DislikedPosts []string `bson:"disliked_posts"`
+	Category Category `bson:"category"`
+	IsVerified bool `bson:"verified_profile"`
 }
+
+type Category string
+
+const(
+	INFLUENCER = iota
+	SPORTS
+	NEWS//MEDIA
+	BUSINESS
+	BRAND
+	ORGANIZATION
+	MUSIC
+	ACTOR
+)
 
 type UserProfileResponse struct {
 	Username  string `json:"username"`
@@ -174,6 +189,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		IsPrivate: true,
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
+		IsVerified: false,
 	}, nil
 }
 
@@ -193,4 +209,9 @@ var (
 type RegisteredUserResponseDTO struct {
 	userId string
 	qrCode string
+}
+
+type VerifyAccountDTO struct{
+	UserId string
+	Category string
 }

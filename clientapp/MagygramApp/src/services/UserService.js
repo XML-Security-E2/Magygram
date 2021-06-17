@@ -21,7 +21,8 @@ export const userService = {
 	checkIfUserIdExist,
 	followUser,
 	unfollowUser,
-	loginSecondAuthorization
+	loginSecondAuthorization,
+	IsUserVerified,
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -528,5 +529,30 @@ function checkIfUserIdExist(userId, dispatch) {
 
 	function success(emailAddress) {
 		return { type: userConstants.BLOCKED_USER_EMAIL_REQUEST, emailAddress };
+	}
+}
+
+
+function IsUserVerified(dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/users/isverified`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.CHECK_IF_USER_VERIFIED_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.CHECK_IF_USER_VERIFIED_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.CHECK_IF_USER_VERIFIED_FAILURE, error };
 	}
 }

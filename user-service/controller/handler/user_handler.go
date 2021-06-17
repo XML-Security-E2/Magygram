@@ -42,6 +42,8 @@ type UserHandler interface {
 	UpdateDislikedPost(c echo.Context) error
 	GetUserLikedPost(c echo.Context) error
 	GetUserDislikedPost(c echo.Context) error
+	VerifyUser(c echo.Context) error
+	CheckIfUserVerified(c echo.Context) error
 }
 
 var (
@@ -567,4 +569,39 @@ func (h *userHandler) GetUserDislikedPost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, retVal)
+}
+
+func (h *userHandler) VerifyUser(c echo.Context) error {
+	verifyAccountDTO := &model.VerifyAccountDTO{}
+	if err := c.Bind(verifyAccountDTO); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := h.UserService.VerifyUser(ctx, verifyAccountDTO)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) CheckIfUserVerified(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	result,err := h.UserService.CheckIfUserVerified(ctx,bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, result)
 }
