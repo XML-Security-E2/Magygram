@@ -45,6 +45,7 @@ type UserHandler interface {
 	GetUsersForPostNotification(c echo.Context) error
 	GetUsersForStoryNotification(c echo.Context) error
 	CheckIfPostInteractionNotificationEnabled(c echo.Context) error
+	EditUsersNotifications(c echo.Context) error
 }
 
 var (
@@ -141,6 +142,27 @@ func (h *userHandler) EditUser(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, updatedId)
 }
+
+func (h *userHandler) EditUsersNotifications(c echo.Context) error {
+	notificationReq := &model.NotificationSettings{}
+	if err := c.Bind(notificationReq); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := h.UserService.EditUsersNotifications(ctx, bearer, notificationReq)
+	if err != nil{
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
 
 func (h *userHandler) EditUserImage(c echo.Context) error {
 	userId := c.Param("userId")

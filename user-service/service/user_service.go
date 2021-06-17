@@ -89,7 +89,7 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 	if interactionType == "like" {
 		return user.NotificationSettings.NotifyLike, nil
 	} else if interactionType == "dislike" {
-		return user.NotificationSettings.NotifyLike, nil
+		return user.NotificationSettings.NotifyDislike, nil
 	} else if interactionType == "comment" {
 		return user.NotificationSettings.NotifyComment, nil
 	} else if interactionType == "follow" {
@@ -186,6 +186,25 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 	return media[0].Url ,err
 }
 
+func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettings) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return errors.New("invalid user id")
+	}
+
+	user.NotificationSettings = *notificationReq
+	_, err = u.UserRepository.Update(ctx, user)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*http.Response, error) {
 	user, _ := model.NewUser(userRequest)
@@ -420,6 +439,7 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),
 		SentFollowRequest: sentReq,
+		NotificationSettings: user.NotificationSettings,
 	}
 	return retVal, nil
 }
