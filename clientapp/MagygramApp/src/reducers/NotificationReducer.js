@@ -26,7 +26,7 @@ export const notificationReducer = (state, action) => {
 				...state,
 				notificationsNumber: 0,
 			};
-		case notificationConstants.VIEW_NOTIFICATIONS_REQUEST:
+		case notificationConstants.VIEW_NOTIFICATIONS_FAILURE:
 			return state;
 
 		case notificationConstants.NOTIFICATION_RECEIVED:
