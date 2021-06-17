@@ -11,4 +11,5 @@ type VerificationRequestsRepository interface {
 	GetAllPendingRequests(ctx context.Context) ([]*model.VerificationRequest, error)
 	GetVerificationRequestById(ctx context.Context, requestId string) (*model.VerificationRequest, error)
 	UpdateVerificationRequest(ctx context.Context, request *model.VerificationRequest) (*mongo.UpdateResult, error)
+	GetVerificationPendingRequestByUserId(ctx context.Context, userId string) (*model.VerificationRequest, error)
 }

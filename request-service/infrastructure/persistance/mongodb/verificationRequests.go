@@ -64,3 +64,17 @@ func (v verificatioRequestsRepository) UpdateVerificationRequest(ctx context.Con
 		{"request_status" , request.Status},
 		{"category" , request.Category}}}})
 }
+
+func (v verificatioRequestsRepository) GetVerificationPendingRequestByUserId(ctx context.Context, userId string) (*model.VerificationRequest, error) {
+	var verificationRequest = model.VerificationRequest{}
+	err := v.Col.FindOne(ctx, bson.M{"user_id": userId,"request_status": "PENDING"}).Decode(&verificationRequest)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("ErrNoDocuments")
+		}
+		return nil, err
+	}
+
+	return &verificationRequest, nil
+}

@@ -8,6 +8,7 @@ export const requestsService = {
 	getAllPendingVerificationRequest,
 	approveVerificationRequest,
 	rejectVerificationRequest,
+	hasUserPendingRequest,
 };
 
 function createVerificationRequest(formData,dispatch){
@@ -112,5 +113,29 @@ function rejectVerificationRequest(requestId, dispatch) {
 	}
 	function failure(message) {
 		return { type: adminConstants.REJECT_VERIFICATION_REQUEST_FAILURE, errorMessage: message };
+	}
+}
+
+function hasUserPendingRequest(dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/requests/verification/has-pending-request`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_REQUEST };
+	}
+	function success(result) {
+		return { type: profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_FAILURE, error };
 	}
 }

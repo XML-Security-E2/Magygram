@@ -125,5 +125,10 @@ func NewReportRequest(reportRequest *ReportRequestDTO) (*ReportRequest, error) {
 		ContentId:   reportRequest.ContentId,
 		ContentType:    reportRequest.ContentType,
 	}, nil
-
 }
+
+type VerifyAccountDTO struct{
+	UserId string
+	Category string
+}
+

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { userConstants } from "../constants/UserConstants";
 import { ProfileSettingsContext } from "../contexts/ProfileSettingsContext";
 import { UserContext } from "../contexts/UserContext";
@@ -9,6 +9,8 @@ import SuccessAlert from "./SuccessAlert";
 import VerifyAccoundSidebar from "./VerifyAccountSidebar";
 import { profileSettingsConstants } from "../constants/ProfileSettingsConstants";
 import VerifyAccontInfoForm from "./VerifyAccountInfoForm";
+import { userService } from "../services/UserService";
+import { requestsService } from "../services/RequestsService";
 
 const UserEditProfile = () => {
 	const { userState, dispatch } = useContext(UserContext);
@@ -21,6 +23,11 @@ const UserEditProfile = () => {
 	const handleVerifyAccount =()=>{
 		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_VERIFY_ACCOUNT_PAGE })
 	}
+
+	useEffect(() => {
+		userService.IsUserVerified(profileSettingsDispatch)
+		requestsService.hasUserPendingRequest(profileSettingsDispatch)
+	}, [profileSettingsDispatch]);
 
 	return (
 		<React.Fragment>

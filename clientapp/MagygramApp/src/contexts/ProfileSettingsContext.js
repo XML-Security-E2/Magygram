@@ -13,7 +13,8 @@ const ProfileSettingsContextProvider = (props) => {
 		sendRequest:{
 			showError:false,
 			errorMessage:'',
-		}
+		},
+		isUserVerified:false,
 	});
 
 	return <ProfileSettingsContext.Provider value={{ profileSettingsState, profileSettingsDispatch }}>{props.children}</ProfileSettingsContext.Provider>;

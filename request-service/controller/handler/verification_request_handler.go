@@ -15,12 +15,12 @@ type VerificationRequestHandler interface {
 	GetVerificationRequests(c echo.Context) error
 	ApproveVerificationRequest(c echo.Context) error
 	RejectVerificationRequest(c echo.Context) error
+	HasUserPendingRequest(c echo.Context) error
 }
 
 type verificationRequestHandler struct {
 	VerificationRequestService service_contracts.VerificationRequestService
 }
-
 
 func NewVerificationRequestHandler(u service_contracts.VerificationRequestService) VerificationRequestHandler {
 	return &verificationRequestHandler{u}
@@ -121,4 +121,20 @@ func (v verificationRequestHandler) RejectVerificationRequest(c echo.Context) er
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (v verificationRequestHandler) HasUserPendingRequest(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	result,err := v.VerificationRequestService.HasUserPendingRequest(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, result)
 }

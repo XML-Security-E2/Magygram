@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 	"mime/multipart"
 	"request-service/domain/model"
 	"request-service/domain/repository"
@@ -16,12 +17,12 @@ type verificationService struct {
 	intercomm.MediaClient
 	intercomm.AuthClient
 	repository.ReportRequestsRepository
-
+	intercomm.UserClient
 }
 
 
-func NewVerificationServiceService(vr repository.VerificationRequestsRepository,r repository.ReportRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient) service_contracts.VerificationRequestService {
-	return &verificationService{vr,mc, ac,r}
+func NewVerificationServiceService(vr repository.VerificationRequestsRepository,r repository.ReportRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.VerificationRequestService {
+	return &verificationService{vr,mc, ac,r ,uc}
 }
 
 func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequsetDTO model.VerificationRequestDTO, bearer string, documentImage []*multipart.FileHeader) (string, error) {
@@ -115,6 +116,17 @@ func (v verificationService) ApproveVerificationRequest(ctx context.Context, req
 
 	request.Status="APPROVED"
 	//TODO: pozvati userClient da verifikuje u userServicu i eventualno poslati mail useru
+	verifyDTO := model.VerifyAccountDTO{
+		UserId:   request.UserId,
+		Category: string(request.Category),
+	}
+
+	log.Println("test")
+	err = v.UserClient.VerifyAccount(verifyDTO)
+	if err!=nil{
+		return err
+	}
+
 	v.VerificationRequestsRepository.UpdateVerificationRequest(ctx,request)
 
 	return nil
@@ -136,4 +148,18 @@ func (v verificationService) RejectVerificationRequest(ctx context.Context, requ
 	v.VerificationRequestsRepository.UpdateVerificationRequest(ctx,request)
 
 	return nil
+}
+
+func (v verificationService) HasUserPendingRequest(ctx context.Context, bearer string) (bool, error) {
+	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = v.VerificationRequestsRepository.GetVerificationPendingRequestByUserId(ctx,loggedId)
+	if err!=nil{
+		return false, nil
+	}
+
+	return true,nil
 }
