@@ -32,6 +32,11 @@ type UserService interface {
 	UpdateDislikedPost(ctx context.Context, bearer string, postId string) error
 	GetUserLikedPost(ctx context.Context, bearer string) ([]string,error)
 	GetUserDislikedPost(ctx context.Context, bearer string) ([]string,error)
+	EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettings) error
+
+	GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
+	GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
+	CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, interactionType string) (bool, error)
 	VerifyUser(ctx context.Context, dto *model.VerifyAccountDTO) error
 	CheckIfUserVerified(ctx context.Context, bearer string) (bool, error)
 }

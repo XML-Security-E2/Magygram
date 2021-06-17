@@ -147,3 +147,30 @@
 	background-color: rgb(31, 31, 31);
 	color: #000;
 }
+
+.count-indicator {
+	position: relative;
+	border-radius: 100%;
+	text-align: center;
+}
+.count-indicator i {
+	font-size: 0.9375rem;
+	margin-right: 0;
+	vertical-align: middle;
+}
+.count-indicator .count {
+	position: absolute;
+	left: 20px;
+	width: 14px;
+	height: 14px;
+	border-radius: 100%;
+	top: -4px;
+	font-size: 0.5875rem;
+	color: #ffffff;
+}
+.count-indicator:after {
+	display: none;
+}
+.count-indicator .count-varient1 {
+	background: #198ae3;
+}

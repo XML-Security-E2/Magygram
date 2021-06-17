@@ -10,6 +10,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users", h.RegisterUser, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId", h.EditUser, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/image", h.EditUserImage, h.UserLoggingMiddleware)
+	e.PUT("/api/users/:userId/notifications", h.EditUsersNotifications)
 
 	e.GET("/api/users/logged", h.GetLoggedUserInfo, h.UserLoggingMiddleware)
 	e.GET("/api/users/activate/:activationId", h.ActivateUser, h.UserLoggingMiddleware)
@@ -54,5 +55,9 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.PUT("/api/users/verify", h.VerifyUser)
 	e.GET("/api/users/isverified", h.CheckIfUserVerified)
+
+	e.GET("api/users/:userId/notify/post", h.GetUsersForPostNotification)
+	e.GET("api/users/:userId/notify/story", h.GetUsersForStoryNotification)
+	e.GET("api/users/:userId/notify/:interactionType", h.CheckIfPostInteractionNotificationEnabled)
 
 }

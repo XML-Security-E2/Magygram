@@ -5,16 +5,17 @@ export const ProfileSettingsContext = createContext();
 
 const ProfileSettingsContextProvider = (props) => {
 	const [profileSettingsState, profileSettingsDispatch] = useReducer(profileSettingsReducer, {
-		activeSideBar:{
-            showEditProfile: true,
-            showVerifyAccount: false,
-        },
-		sendedVerifyRequest:false,
-		sendRequest:{
-			showError:false,
-			errorMessage:'',
+		activeSideBar: {
+			showEditProfile: true,
+			showVerifyAccount: false,
+			showEditNotifications: false,
 		},
-		isUserVerified:false,
+		sendedVerifyRequest: false,
+		sendRequest: {
+			showError: false,
+			errorMessage: "",
+		},
+		isUserVerified: false,
 	});
 
 	return <ProfileSettingsContext.Provider value={{ profileSettingsState, profileSettingsDispatch }}>{props.children}</ProfileSettingsContext.Provider>;

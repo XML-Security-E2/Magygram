@@ -47,3 +47,8 @@ gateway:
     port: "8085"
     protocol: "http://"
     domain: "localhost"
+
+messageservice:
+    protocol: "http://"
+    domain: "message-service"
+    port: "467"

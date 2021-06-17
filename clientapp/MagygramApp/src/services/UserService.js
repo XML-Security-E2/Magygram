@@ -10,6 +10,7 @@ export const userService = {
 	register,
 	getUserProfileByUserId,
 	editUser,
+	editUserNotifications,
 	editUserImage,
 	resetPasswordLinkRequest,
 	resetPasswordRequest,
@@ -113,9 +114,9 @@ function loginFirstAuthorization(loginRequest, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				setAuthInLocalStorage(res.data);
-				if(!hasRoles(["admin"])){
+				if (!hasRoles(["admin"])) {
 					getLoggedData(dispatch);
-				}else{
+				} else {
 					window.location = "#/";
 				}
 				//dispatch(success())
@@ -196,6 +197,32 @@ function editUser(userId, userRequestDTO, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success("User info successfully changed"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.UPDATE_USER_REQUEST };
+	}
+
+	function success(successMessage) {
+		return { type: userConstants.UPDATE_USER_SUCCESS, successMessage };
+	}
+
+	function failure(error) {
+		return { type: userConstants.UPDATE_USER_FAILURE, errorMessage: error };
+	}
+}
+
+function editUserNotifications(userId, notificationDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/users/${userId}/notifications`, notificationDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("User notifications successfully changed"));
 			} else {
 				dispatch(failure(res.data.message));
 			}
@@ -454,29 +481,24 @@ function logout() {
 function register(user, dispatch) {
 	if (validateUser(user, dispatch)) {
 		dispatch(request());
-		Axios.post(`/api/users`, user, { responseType: 'arraybuffer' ,validateStatus: () => true })
+		Axios.post(`/api/users`, user, { responseType: "arraybuffer", validateStatus: () => true })
 			.then((res) => {
 				if (res.status === 201) {
-					let blob = new Blob(
-						[res.data], 
-						{ type: res.headers['image/png'] }
-					)
-					let image = URL.createObjectURL(blob)
-					dispatch(success(user.email,image));
+					let blob = new Blob([res.data], { type: res.headers["image/png"] });
+					let image = URL.createObjectURL(blob);
+					dispatch(success(user.email, image));
 				} else {
 					dispatch(failure("Email adress and username must be unique"));
 				}
 			})
-			.catch((err) => {
-
-			});
+			.catch((err) => {});
 	}
 
 	function request() {
 		return { type: userConstants.REGISTER_REQUEST };
 	}
-	function success(emailAddress,imageData) {
-		return { type: userConstants.REGISTER_SUCCESS, emailAddress ,imageData};
+	function success(emailAddress, imageData) {
+		return { type: userConstants.REGISTER_SUCCESS, emailAddress, imageData };
 	}
 	function failure(error) {
 		return { type: userConstants.REGISTER_FAILURE, errorMessage: error };
@@ -531,7 +553,6 @@ function checkIfUserIdExist(userId, dispatch) {
 		return { type: userConstants.BLOCKED_USER_EMAIL_REQUEST, emailAddress };
 	}
 }
-
 
 function IsUserVerified(dispatch) {
 	dispatch(request());
