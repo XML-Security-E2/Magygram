@@ -1,4 +1,5 @@
 import { profileSettingsConstants } from "../constants/ProfileSettingsConstants";
+import { userConstants } from "../constants/UserConstants";
 
 export const profileSettingsReducer = (state, action) => {
 	switch (action.type) {
@@ -54,6 +55,36 @@ export const profileSettingsReducer = (state, action) => {
 					showError: true,
 					errorMessage: action.error,
 				},
+			};
+		case userConstants.CHECK_IF_USER_VERIFIED_REQUEST:
+			return {
+				...state,
+				isUserVerified:false
+			};
+		case userConstants.CHECK_IF_USER_VERIFIED_SUCCESS:
+			return {
+				...state,
+				isUserVerified:action.result
+			};
+		case userConstants.CHECK_IF_USER_VERIFIED_FAILURE:
+			return {
+				...state,
+				isUserVerified:false
+			};
+		case profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_REQUEST:
+			return {
+				...state,
+				sendedVerifyRequest:false
+			};
+		case profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_SUCCESS:
+			return {
+				...state,
+				sendedVerifyRequest:action.result
+			};
+		case profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_FAILURE:
+			return {
+				...state,
+				sendedVerifyRequest:false
 			};
 		default:
 			return state;

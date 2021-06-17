@@ -15,6 +15,15 @@ type VerificationRequest struct {
 	Category Category `bson:"category"`
 }
 
+type VerificationRequestResponseDTO struct {
+	Id string
+	UserId string
+	Name string
+	Surname string
+	Document string
+	Category string
+}
+
 type ReportRequest struct {
 	Id string `bson:"_id,omitempty"`
 	ContentId string `bson:"content_id"`
@@ -116,5 +125,10 @@ func NewReportRequest(reportRequest *ReportRequestDTO) (*ReportRequest, error) {
 		ContentId:   reportRequest.ContentId,
 		ContentType:    reportRequest.ContentType,
 	}, nil
-
 }
+
+type VerifyAccountDTO struct{
+	UserId string
+	Category string
+}
+

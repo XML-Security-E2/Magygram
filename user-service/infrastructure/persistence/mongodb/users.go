@@ -39,7 +39,8 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"liked_posts" , user.LikedPosts},
 																{"disliked_posts" , user.DislikedPosts},
 																{"notification_settings" , user.NotificationSettings},
-
+																{"verified_profile" , user.IsVerified},
+																{"category" , user.Category},
 	}}})
 }
 

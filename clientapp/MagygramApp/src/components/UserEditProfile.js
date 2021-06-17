@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { userConstants } from "../constants/UserConstants";
 import { ProfileSettingsContext } from "../contexts/ProfileSettingsContext";
 import { UserContext } from "../contexts/UserContext";
@@ -11,6 +11,8 @@ import { profileSettingsConstants } from "../constants/ProfileSettingsConstants"
 import VerifyAccontInfoForm from "./VerifyAccountInfoForm";
 import EditNotificationsSidebar from "./EditNotificationsSidebar";
 import EditNotificationsForm from "./EditNotificationsForm";
+import { userService } from "../services/UserService";
+import { requestsService } from "../services/RequestsService";
 
 const UserEditProfile = () => {
 	const { userState, dispatch } = useContext(UserContext);
@@ -27,6 +29,11 @@ const UserEditProfile = () => {
 	const handleEditNotifications = () => {
 		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_NOTIFICATIONS_PAGE });
 	};
+
+	useEffect(() => {
+		userService.IsUserVerified(profileSettingsDispatch);
+		requestsService.hasUserPendingRequest(profileSettingsDispatch);
+	}, [profileSettingsDispatch]);
 
 	return (
 		<React.Fragment>

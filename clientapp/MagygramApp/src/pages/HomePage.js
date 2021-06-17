@@ -11,6 +11,9 @@ import { hasRoles } from "../helpers/auth-header";
 import GuestHeader from "../components/GuestHeader";
 import GuestTimeline from "../components/GuestTimeline";
 import NotificationContextProvider from "../contexts/NotificationContext";
+import AdminHomePageTabs from "../components/AdminHomePageTabs";
+import AdminVerificationRequestTabContent from "../components/AdminVerificationRequestTabContent";
+import AdminContextProvider from "../contexts/AdminContext";
 
 const HomePage = () => {
 	return (
@@ -46,21 +49,29 @@ const HomePage = () => {
 			) : (
 				<div>
 					{hasRoles(["admin"]) ? (
-						<PostContextProvider>
-							<div>
-								<div class="mt-4">
-									<div class="container d-flex justify-content-center">
-										<div class="col-9">
-											<div class="row">
-												<div class="col-8">
-													<h1>Admin zona</h1>
+						<UserContextProvider>
+							<StoryContextProvider>
+								<PostContextProvider>
+									<AdminContextProvider>
+										<Header />
+										<div>
+											<div className="mt-4">
+												<div className="container d-flex justify-content-center">
+													<div className="col-12">
+														<div className="row">
+															<div className="col-12">
+																<AdminHomePageTabs />
+																<AdminVerificationRequestTabContent />
+															</div>
+														</div>
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-								</div>
-							</div>
-						</PostContextProvider>
+									</AdminContextProvider>
+								</PostContextProvider>
+							</StoryContextProvider>
+						</UserContextProvider>
 					) : (
 						<div>
 							<PostContextProvider>

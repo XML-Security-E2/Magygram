@@ -3,13 +3,12 @@ import { userService } from "../services/UserService";
 import { Link } from "react-router-dom";
 import AsyncSelect from "react-select/async";
 import { searchService } from "../services/SearchService";
-import FollowRequestsList from "./FollowRequestsList";
 import { UserContext } from "../contexts/UserContext";
 import { notificationService } from "../services/NotificationService";
 import { NotificationContext } from "../contexts/NotificationContext";
-import NotificationsList from "./NotificationsList";
 import { notificationConstants } from "../constants/NotificationConstants";
 import ActivityList from "./ActivityList";
+import { hasRoles } from "../helpers/auth-header";
 
 const Header = () => {
 	const userCtx = useContext(UserContext);
@@ -132,9 +131,9 @@ const Header = () => {
 					<AsyncSelect defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
 				</div>
 				<div className="d-flex align-items-center dropdown">
-					<i className="fa fa-home ml-3" style={iconStyle} />
-					<i className="la la-wechat ml-3" style={iconStyle} />
-					<i className="la la-compass ml-3" style={iconStyle} />
+					<i hidden={hasRoles(["admin"])} className="fa fa-home ml-3" style={iconStyle} />
+					<i hidden={hasRoles(["admin"])} className="la la-wechat ml-3" style={iconStyle} />
+					<i hidden={hasRoles(["admin"])} className="la la-compass ml-3" style={iconStyle} />
 
 					<div>
 						<div className="count-indicator ml-3" id="dropdownMenu3" data-toggle="dropdown" onClick={handleLoadActivity}>
@@ -150,7 +149,7 @@ const Header = () => {
 						</ul>
 					</div>
 
-					<div>
+					<div hidden={hasRoles(["admin"])}>
 						<img
 							className="rounded-circle overflow-hidden border border-danger header-image-photo dropdown-toggle ml-3"
 							style={{ cursor: "pointer" }}

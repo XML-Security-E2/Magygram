@@ -37,4 +37,6 @@ type UserService interface {
 	GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
 	GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
 	CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, interactionType string) (bool, error)
+	VerifyUser(ctx context.Context, dto *model.VerifyAccountDTO) error
+	CheckIfUserVerified(ctx context.Context, bearer string) (bool, error)
 }
