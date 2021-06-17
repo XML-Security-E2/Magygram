@@ -10,6 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -135,6 +136,7 @@ func (a authHandler) AuthorizationMiddleware() echo.MiddlewareFunc {
 		return func (c echo.Context) error {
 			var allowedPermissions []string
 			permissionsHeader := c.Request().Header.Get("X-permissions")
+			log.Println(permissionsHeader)
 			json.Unmarshal([]byte(permissionsHeader), &allowedPermissions)
 
 			authStringHeader := c.Request().Header.Get("Authorization")
