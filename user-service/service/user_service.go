@@ -60,7 +60,7 @@ func (u *userService) GetUsersForPostNotification(ctx context.Context, userId st
 
 func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
 
-	followingUsers, err := u.RelationshipClient.GetFollowedUsers(userId)
+	followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
 	if err != nil {
 		return []*model.UserInfo{}, err
 	}
