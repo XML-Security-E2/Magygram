@@ -30,11 +30,10 @@ export const notificationReducer = (state, action) => {
 			return state;
 
 		case notificationConstants.NOTIFICATION_RECEIVED:
-			let cpy = { ...state };
-			cpy.notificationsNumber += 1;
-
-			console.log(cpy);
-			return cpy;
+			return {
+				...state,
+				notificationsNumber: action.count,
+			};
 		default:
 			return state;
 	}

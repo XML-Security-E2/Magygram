@@ -8,6 +8,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"message-service/domain/model"
 	"message-service/domain/repository"
+	"sort"
 )
 
 type notificationRepository struct {
@@ -45,6 +46,28 @@ func (n notificationRepository) GetAllForUser(ctx context.Context, userId string
 		json.Unmarshal(val, &temp)
 		notifications = append(notifications, temp)
 	}
+
+	return notifications, err
+}
+
+func (n notificationRepository) GetAllForUserSortedByTime(ctx context.Context, userId string, limit int64) ([]*model.Notification, error) {
+	keys, _, err := n.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/*", model.Prefix, userId), limit).Result()
+
+	var notifications []*model.Notification
+	for _, key := range keys {
+		val, err := n.Db.Get(ctx, key).Bytes()
+		if err != nil {
+			return nil, err
+		}
+
+		var temp *model.Notification
+		json.Unmarshal(val, &temp)
+		notifications = append(notifications, temp)
+	}
+
+	sort.Slice(notifications, func(i, j int) bool {
+		return notifications[i].Timestamp.After(notifications[j].Timestamp)
+	})
 
 	return notifications, err
 }

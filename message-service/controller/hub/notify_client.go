@@ -68,7 +68,7 @@ func (c *NotifyClient) writePump() {
 	}
 }
 // serveWs handles websocket requests from the peer.
-func ServeNotifyWs(hub *NotifyHub, w http.ResponseWriter, r *http.Request, userId string) {
+func ServeNotifyWs(hub *NotifyHub, w http.ResponseWriter, r *http.Request, userId string, unviewedNotifications int) {
 	conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
 	if err != nil {
 		log.Println(err)
@@ -77,8 +77,14 @@ func ServeNotifyWs(hub *NotifyHub, w http.ResponseWriter, r *http.Request, userI
 
 	client := &NotifyClient{hub: hub, conn: conn, Send: make(chan *Notification), Id: userId}
 	client.hub.Register <- client
+
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go client.writePump()
+
+	client.hub.Notify <- &Notification{
+		Count:    unviewedNotifications,
+		Receiver: userId,
+	}
 }
 

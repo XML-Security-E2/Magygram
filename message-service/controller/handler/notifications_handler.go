@@ -108,7 +108,18 @@ func (n notificationHandler) HandleNotifyWs(c echo.Context) error {
 	fmt.Println("USAO")
 	userId := c.Param("userId")
 
-	hub.ServeNotifyWs(n.Hub, c.Response().Writer, c.Request(), userId)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	notifications, _ := n.NotificationService.GetAllNotViewedForUser(ctx, userId)
+	a := 0
+	if notifications != nil {
+		a = len(notifications)
+	}
+	hub.ServeNotifyWs(n.Hub, c.Response().Writer, c.Request(), userId, a)
+
 	return nil
 }
 
@@ -120,7 +131,7 @@ func (n notificationHandler) GetAllNotificationsForUser(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 
-	retVal, err := n.NotificationService.GetAllForUser(ctx, bearer)
+	retVal, err := n.NotificationService.GetAllForUserSortedByTime(ctx, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

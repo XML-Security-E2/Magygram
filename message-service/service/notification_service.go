@@ -143,6 +143,15 @@ func (n notificationService) GetAllForUser(ctx context.Context, bearer string) (
 	return n.NotificationRepository.GetAllForUser(ctx, userId, limit)
 }
 
+func (n notificationService) GetAllForUserSortedByTime(ctx context.Context, bearer string) ([]*model.Notification, error) {
+	userId, err := n.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	return n.NotificationRepository.GetAllForUserSortedByTime(ctx, userId, limit)
+}
+
 func (n notificationService) GetAllNotViewedForUser(ctx context.Context, userId string) ([]*model.Notification, error) {
 	return n.NotificationRepository.GetAllNotViewedForUser(ctx, userId, limit)
 }

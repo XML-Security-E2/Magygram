@@ -39,7 +39,7 @@ const Header = () => {
 			a.push(evt.data);
 
 			setRmessages(a);
-			notifyCtx.dispatch({ type: notificationConstants.NOTIFICATION_RECEIVED });
+			notifyCtx.dispatch({ type: notificationConstants.NOTIFICATION_RECEIVED, count: JSON.parse(evt.data).count });
 		};
 	}, [rmessages]);
 
