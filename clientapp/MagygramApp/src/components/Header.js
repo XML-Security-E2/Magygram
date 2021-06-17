@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
+import React, { useState, useContext, useRef, useEffect, createRef } from "react";
 import { userService } from "../services/UserService";
 import { Link } from "react-router-dom";
 import AsyncSelect from "react-select/async";
@@ -18,6 +18,7 @@ const Header = () => {
 	const iconStyle = { fontSize: "30px", cursor: "pointer" };
 
 	const [search, setSearch] = useState("");
+	const [loadData, setLoadData] = useState(true);
 
 	const [rmessages, setRmessages] = useState([]);
 
@@ -112,9 +113,12 @@ const Header = () => {
 	};
 
 	const handleLoadActivity = async () => {
-		await userService.findAllFollowRequests(userCtx.dispatch);
+		if (loadData) {
+			await userService.findAllFollowRequests(userCtx.dispatch);
 
-		await notificationService.getUserNotifiactions(notifyCtx.dispatch).then(handleViewNotifications());
+			await notificationService.getUserNotifiactions(notifyCtx.dispatch).then(handleViewNotifications());
+		}
+		setLoadData(!loadData);
 	};
 
 	return (
@@ -136,7 +140,7 @@ const Header = () => {
 					<i hidden={hasRoles(["admin"])} className="la la-compass ml-3" style={iconStyle} />
 
 					<div>
-						<div className="count-indicator ml-3" id="dropdownMenu3" data-toggle="dropdown" onClick={handleLoadActivity}>
+						<div className="count-indicator ml-3" id="dropdownMenu3" data-toggle="dropdown" onClickCapture={handleLoadActivity}>
 							<i className="la la-bell" style={{ fontSize: "30px", cursor: "pointer", color: "black" }}></i>
 							{notifyCtx.notificationState.notificationsNumber > 0 && <span className="count count-varient1">{notifyCtx.notificationState.notificationsNumber}</span>}
 						</div>

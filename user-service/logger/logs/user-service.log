@@ -106,3 +106,4 @@ time="2021-06-17T02:18:00+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-17T02:32:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
 >>>>>>> develop
 time="2021-06-17T12:14:10+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
+time="2021-06-18T00:18:30+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
