@@ -13,15 +13,15 @@ const UserContextProvider = (props) => {
 			showError: false,
 			errorMessage: "",
 		},
-		showTwoFactorAuth:false,
+		showTwoFactorAuth: false,
 		registrationError: {
 			showError: false,
 			errorMessage: "",
 			showSuccessMessage: false,
 			emailAddress: "",
-			imageData:"",
+			imageData: "",
 		},
-		registrationShowQr:false,
+		registrationShowQr: false,
 		forgotPasswordLinkError: {
 			showError: false,
 			errorMessage: "",
@@ -71,9 +71,18 @@ const UserContextProvider = (props) => {
 				sentFollowRequest: false,
 				muted: false,
 				blocked: false,
+				notificationSettings: {
+					notifyStory: false,
+					notifyPost: false,
+					notifyLike: false,
+					notifyDislike: false,
+					notifyFollow: false,
+					notifyFollowRequest: false,
+					notifyAcceptFollowRequest: false,
+					notifyComments: false,
+				},
 			},
 		},
-
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

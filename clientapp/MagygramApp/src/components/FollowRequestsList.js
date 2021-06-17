@@ -14,6 +14,9 @@ const FollowRequestsList = () => {
 
 	return (
 		<React.Fragment>
+			<li className="mb-3">
+				<b className="ml-2">Follow requests</b>
+			</li>
 			{userState.userFollowRequests.userInfos !== null ? (
 				userState.userFollowRequests.userInfos.map((user) => {
 					return (
@@ -44,9 +47,9 @@ const FollowRequestsList = () => {
 					);
 				})
 			) : (
-				<li className="mt-5 d-flex justify-content-center ">
+				<li className=" d-flex justify-content-center ">
 					<div>
-						<h4 className="d-flex justify-content-center text-secondary">No follow requests</h4>
+						<h5 className="d-flex justify-content-center text-secondary">No follow requests</h5>
 					</div>
 				</li>
 			)}

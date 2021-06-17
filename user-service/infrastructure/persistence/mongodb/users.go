@@ -39,7 +39,10 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"liked_posts" , user.LikedPosts},
 																{"disliked_posts" , user.DislikedPosts},
 																{"blocked_users" , user.BlockedUsers},
-																					}}})
+																{"notification_settings" , user.NotificationSettings},
+																{"verified_profile" , user.IsVerified},
+																{"category" , user.Category},
+	}}})
 }
 
 func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, error) {

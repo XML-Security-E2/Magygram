@@ -10,76 +10,90 @@ import UserContextProvider from "../contexts/UserContext";
 import { hasRoles } from "../helpers/auth-header";
 import GuestHeader from "../components/GuestHeader";
 import GuestTimeline from "../components/GuestTimeline";
+import NotificationContextProvider from "../contexts/NotificationContext";
+import AdminHomePageTabs from "../components/AdminHomePageTabs";
+import AdminVerificationRequestTabContent from "../components/AdminVerificationRequestTabContent";
+import AdminContextProvider from "../contexts/AdminContext";
 
 const HomePage = () => {
-
 	return (
 		<React.Fragment>
-			{hasRoles(["user"]) ? 
-			<div>
-			<UserContextProvider>
-				<StoryContextProvider>
-					<PostContextProvider>
-						<Header />
-						<CreateStoryModal />
-						<AddPostToFavouritesModal />
-						<div>
-							<div class="mt-4">
-								<div class="container d-flex justify-content-center">
-									<div class="col-9">
-										<div class="row">
-											<div class="col-8">
-												<Storyline />
-												<Timeline search={false} />
+			{hasRoles(["user"]) ? (
+				<div>
+					<UserContextProvider>
+						<StoryContextProvider>
+							<PostContextProvider>
+								<NotificationContextProvider>
+									<Header />
+								</NotificationContextProvider>
+								<CreateStoryModal />
+								<AddPostToFavouritesModal />
+								<div>
+									<div class="mt-4">
+										<div class="container d-flex justify-content-center">
+											<div class="col-9">
+												<div class="row">
+													<div class="col-8">
+														<Storyline />
+														<Timeline search={false} />
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-						</div>
-					</PostContextProvider>
-				</StoryContextProvider>
-			</UserContextProvider>
-		</div> : 
-			
-		<div>
-			{hasRoles(["admin"]) ? 
-			<PostContextProvider>
-					<div>
-						<div class="mt-4">
-							<div class="container d-flex justify-content-center">
-								<div class="col-9">
-									<div class="row">
-										<div class="col-8">
-											<h1>Admin zona</h1>
+							</PostContextProvider>
+						</StoryContextProvider>
+					</UserContextProvider>
+				</div>
+			) : (
+				<div>
+					{hasRoles(["admin"]) ? (
+						<UserContextProvider>
+							<StoryContextProvider>
+								<PostContextProvider>
+									<AdminContextProvider>
+										<Header />
+										<div>
+											<div className="mt-4">
+												<div className="container d-flex justify-content-center">
+													<div className="col-12">
+														<div className="row">
+															<div className="col-12">
+																<AdminHomePageTabs />
+																<AdminVerificationRequestTabContent />
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</AdminContextProvider>
+								</PostContextProvider>
+							</StoryContextProvider>
+						</UserContextProvider>
+					) : (
+						<div>
+							<PostContextProvider>
+								<GuestHeader />
+								<div>
+									<div class="mt-4">
+										<div class="container d-flex justify-content-center">
+											<div class="col-9">
+												<div class="row">
+													<div class="col-8">
+														<GuestTimeline />
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
+							</PostContextProvider>
 						</div>
-					</div>
-			</PostContextProvider>
-			:
-			<div>
-				<PostContextProvider>
-				<GuestHeader />
-					<div>
-						<div class="mt-4">
-							<div class="container d-flex justify-content-center">
-								<div class="col-9">
-									<div class="row">
-										<div class="col-8">
-											<GuestTimeline />
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</PostContextProvider>
-			</div>}
-	</div>}
-			
+					)}
+				</div>
+			)}
 		</React.Fragment>
 	);
 };

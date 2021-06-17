@@ -17,6 +17,7 @@ type Interactor interface {
 	NewAppHandler() handler.AppHandler
 	NewMediaClient() intercomm.MediaClient
 	NewAuthClient() intercomm.AuthClient
+	NewUserClient() intercomm.UserClient
 }
 
 type interactor struct {
@@ -40,6 +41,10 @@ func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
 }
 
+func (i *interactor) NewUserClient() intercomm.UserClient {
+	return intercomm.NewUserClient()
+}
+
 func (i interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.VerificationRequestHandler = i.NewVerificationRequestHandler()
@@ -55,7 +60,7 @@ func (i interactor) NewReportRequestRepository() repository.ReportRequestsReposi
 }
 
 func (i interactor) NewVerificationRequestService() service_contracts.VerificationRequestService {
-	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewMediaClient(),i.NewAuthClient())
+	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewMediaClient(),i.NewAuthClient(),i.NewUserClient())
 }
 
 func (i interactor) NewVerificationRequestHandler() handler.VerificationRequestHandler {

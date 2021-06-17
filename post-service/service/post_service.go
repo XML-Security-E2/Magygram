@@ -27,10 +27,11 @@ type postService struct {
 	intercomm.UserClient
 	intercomm.RelationshipClient
 	intercomm.AuthClient
+	intercomm.MessageClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient) service_contracts.PostService {
-	return &postService{r , ic, uc, ir, ac}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient) service_contracts.PostService {
+	return &postService{r , ic, uc, ir, ac, mc}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -62,6 +63,18 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 													 "description" : postRequest.Description,
 													 "location" : postRequest.Location}).Error("Post database create failure")
 		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedPost,
+	})
+
+	if err != nil {
+		return "", err
+	}
 
 	if postId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id" : userInfo.Id}).Info("Post created")
@@ -123,6 +136,18 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
 													"post_id" : postId}).Error("Post like, database update failure")
+		return err
+	}
+
+	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    result.UserInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  userInfo.ImageURL,
+		Type:      intercomm.Liked,
+	})
+
+	if err != nil {
 		return err
 	}
 
@@ -191,6 +216,18 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 		return err
 	}
 
+	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    result.UserInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  userInfo.ImageURL,
+		Type:      intercomm.Disliked,
+	})
+
+	if err != nil {
+		return err
+	}
+
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
 												 "post_id" : postId}).Info("Post disliked")
 	return nil
@@ -252,6 +289,18 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
 												     "post_id" : postId}).Error("Post comment, database update failure")
+		return nil, err
+	}
+
+	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    result.UserInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  userInfo.ImageURL,
+		Type:      intercomm.Commented,
+	})
+
+	if err != nil {
 		return nil, err
 	}
 

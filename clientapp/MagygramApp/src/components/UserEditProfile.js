@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { userConstants } from "../constants/UserConstants";
 import { ProfileSettingsContext } from "../contexts/ProfileSettingsContext";
 import { UserContext } from "../contexts/UserContext";
@@ -9,18 +9,31 @@ import SuccessAlert from "./SuccessAlert";
 import VerifyAccoundSidebar from "./VerifyAccountSidebar";
 import { profileSettingsConstants } from "../constants/ProfileSettingsConstants";
 import VerifyAccontInfoForm from "./VerifyAccountInfoForm";
+import EditNotificationsSidebar from "./EditNotificationsSidebar";
+import EditNotificationsForm from "./EditNotificationsForm";
+import { userService } from "../services/UserService";
+import { requestsService } from "../services/RequestsService";
 
 const UserEditProfile = () => {
 	const { userState, dispatch } = useContext(UserContext);
 	const { profileSettingsState, profileSettingsDispatch } = useContext(ProfileSettingsContext);
 
-	const handleEditProfile= () =>{
-		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_PROFILE_PAGE })
-	}
+	const handleEditProfile = () => {
+		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_PROFILE_PAGE });
+	};
 
-	const handleVerifyAccount =()=>{
-		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_VERIFY_ACCOUNT_PAGE })
-	}
+	const handleVerifyAccount = () => {
+		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_VERIFY_ACCOUNT_PAGE });
+	};
+
+	const handleEditNotifications = () => {
+		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_NOTIFICATIONS_PAGE });
+	};
+
+	useEffect(() => {
+		userService.IsUserVerified(profileSettingsDispatch);
+		requestsService.hasUserPendingRequest(profileSettingsDispatch);
+	}, [profileSettingsDispatch]);
 
 	return (
 		<React.Fragment>
@@ -44,11 +57,13 @@ const UserEditProfile = () => {
 			<div className="row border" style={{ backgroundColor: "white" }}>
 				<div className="col-3">
 					<EditProfileSidebar show={profileSettingsState.activeSideBar.showEditProfile} handleEditProfile={handleEditProfile} />
-					<VerifyAccoundSidebar show={profileSettingsState.activeSideBar.showVerifyAccount} handleVerifyAccount={handleVerifyAccount}/>
+					<EditNotificationsSidebar show={profileSettingsState.activeSideBar.showEditNotifications} handleEditNotifications={handleEditNotifications} />
+					<VerifyAccoundSidebar show={profileSettingsState.activeSideBar.showVerifyAccount} handleVerifyAccount={handleVerifyAccount} />
 				</div>
-				<div className="col-9 border-left" style={{minHeight: "600px"}}>
+				<div className="col-9 border-left" style={{ minHeight: "600px" }}>
 					<EditProfileInfoForm show={profileSettingsState.activeSideBar.showEditProfile} />
-					<VerifyAccontInfoForm show={profileSettingsState.activeSideBar.showVerifyAccount}/ >
+					<EditNotificationsForm show={profileSettingsState.activeSideBar.showEditNotifications} />
+					<VerifyAccontInfoForm show={profileSettingsState.activeSideBar.showVerifyAccount} />
 				</div>
 			</div>
 		</React.Fragment>

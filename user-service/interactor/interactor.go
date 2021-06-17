@@ -22,6 +22,7 @@ type Interactor interface {
 	NewHighlightsService() service_contracts.HighlightsService
 	NewPostClient() intercomm.PostClient
 	NewMediaClient() intercomm.MediaClient
+	NewMessageClient() intercomm.MessageClient
 	NewUserHandler() handler.UserHandler
 	NewCollectionsHandler() handler.CollectionsHandler
 	NewAppHandler() handler.AppHandler
@@ -42,6 +43,10 @@ type appHandler struct {
 	handler.CollectionsHandler
 	handler.HighlightsHandler
 	// embed all handler interfaces
+}
+
+func (i *interactor) NewMessageClient() intercomm.MessageClient {
+	return intercomm.NewMessageClient()
 }
 
 func (i *interactor) NewAuthClient() intercomm.AuthClient {
@@ -100,7 +105,7 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient())
+	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient())
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {

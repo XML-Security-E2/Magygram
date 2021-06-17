@@ -11,6 +11,7 @@
 		"bootstrap-icons": "^1.5.0",
 		"react": "^17.0.2",
 		"react-bootstrap": "^1.6.0",
+		"react-confirm-alert": "^2.7.0",
 		"react-datepicker": "^4.1.0",
 		"react-dom": "^17.0.2",
 		"react-image-gallery": "^1.0.10",
@@ -21,6 +22,7 @@
 		"react-scripts": "4.0.3",
 		"react-select": "^4.3.1",
 		"react-simple-image-slider": "^2.1.0",
+		"react-simple-image-viewer": "0.0.8",
 		"web-vitals": "^1.1.1"
 	},
 	"scripts": {

@@ -23,7 +23,34 @@ type User struct {
 	LikedPosts []string `bson:"liked_posts"`
 	DislikedPosts []string `bson:"disliked_posts"`
 	BlockedUsers []string `bson:"blocked_users"`
+	NotificationSettings NotificationSettings `bson:"notification_settings" json:"notificationSettings"`
+	Category Category `bson:"category"`
+	IsVerified bool `bson:"verified_profile"`
 }
+
+type NotificationSettings struct {
+	NotifyStory bool `json:"notifyStory"`
+	NotifyPost bool `json:"notifyPost"`
+	NotifyLike bool `json:"notifyLike"`
+	NotifyDislike bool `json:"notifyDislike"`
+	NotifyFollow bool `json:"notifyFollow"`
+	NotifyFollowRequest bool `json:"notifyFollowRequest"`
+	NotifyAcceptFollowRequest bool `json:"notifyAcceptFollowRequest"`
+	NotifyComment bool `json:"notifyComments"`
+}
+
+type Category string
+
+const(
+	INFLUENCER = iota
+	SPORTS
+	NEWS//MEDIA
+	BUSINESS
+	BRAND
+	ORGANIZATION
+	MUSIC
+	ACTOR
+)
 
 type UserProfileResponse struct {
 	Username  string `json:"username"`
@@ -40,6 +67,7 @@ type UserProfileResponse struct {
 	FollowersNumber int `json:"followersNumber"`
 	FollowingNumber int `json:"followingNumber"`
 	SentFollowRequest bool `json:"sentFollowRequest"`
+	NotificationSettings NotificationSettings `json:"notificationSettings"`
 }
 
 type PostProfileResponse struct {
@@ -181,6 +209,17 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
 		BlockedUsers: []string{},
+		NotificationSettings: NotificationSettings{
+			NotifyStory:         false,
+			NotifyPost:          false,
+			NotifyLike:          true,
+			NotifyDislike:       true,
+			NotifyFollow:        true,
+			NotifyFollowRequest: true,
+			NotifyComment:       true,
+			NotifyAcceptFollowRequest: true,
+		},
+		IsVerified: false,
 	}, nil
 }
 
@@ -200,4 +239,9 @@ var (
 type RegisteredUserResponseDTO struct {
 	userId string
 	qrCode string
+}
+
+type VerifyAccountDTO struct{
+	UserId string
+	Category string
 }

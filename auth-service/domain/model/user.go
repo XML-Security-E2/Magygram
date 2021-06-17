@@ -92,6 +92,9 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 			{"get_user_stories"},
 			{"get_personal_stories"},
 			{"visit_user_story"},
+			{"get_liked_posts"},
+			{"get_disliked_posts"},
+			{"check_if_verified"},
 		}}},
 		TotpToken: token}, err
 }

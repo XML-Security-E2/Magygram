@@ -21,7 +21,7 @@ export const userReducer = (state, action) => {
 					errorMessage: "",
 					showSuccessMessage: true,
 					emailAddress: action.emailAddress,
-					imageData:action.imageData
+					imageData: action.imageData,
 				},
 			};
 		case userConstants.REGISTER_FAILURE:
@@ -36,8 +36,8 @@ export const userReducer = (state, action) => {
 		case userConstants.REGISTRATION_SHOW_QR_CODE:
 			return {
 				...state,
-				registrationShowQr:true
-			}
+				registrationShowQr: true,
+			};
 		case userConstants.REGISTER_VALIDATION_FAILURE:
 			return {
 				registrationError: {
@@ -54,11 +54,11 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:false,
+				showTwoFactorAuth: false,
 			};
 		case userConstants.LOGIN_FAILURE:
 			return {
@@ -67,11 +67,11 @@ export const userReducer = (state, action) => {
 					showError: true,
 					errorMessage: action.error,
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:false,
+				showTwoFactorAuth: false,
 			};
 		case userConstants.LOGIN_SUCCESS:
 			return {
@@ -80,11 +80,11 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
-				}, 
-				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
+				},
+				showTwoFactorAuth: false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.LOGIN_TWO_REQUEST:
 			return {
@@ -93,20 +93,20 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:true,
+				showTwoFactorAuth: true,
 			};
 		case userConstants.LOGIN_TWO_FAILURE:
 			return {
 				...state,
-				loginSecondError:{
+				loginSecondError: {
 					showError: true,
 					errorMessage: action.error,
 				},
-				showTwoFactorAuth:true,
+				showTwoFactorAuth: true,
 			};
 		case userConstants.LOGIN_TWO_SUCCESS:
 			return {
@@ -115,11 +115,11 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:true,
+				showTwoFactorAuth: true,
 			};
 		case userConstants.LOGIN_DATA_REQUEST:
 			return {
@@ -128,20 +128,20 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
+				showTwoFactorAuth: false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.LOGIN_DATA_FAILURE:
 			return {
 				...state,
-				loginSecondError:{
+				loginSecondError: {
 					showError: true,
 					errorMessage: action.error,
 				},
-				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
+				showTwoFactorAuth: false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.LOGIN_DATA_SUCCESS:
 			return {
@@ -150,11 +150,11 @@ export const userReducer = (state, action) => {
 					showError: false,
 					errorMessage: "",
 				},
-				loginSecondError:{
+				loginSecondError: {
 					showError: false,
 					errorMessage: "",
 				},
-				showTwoFactorAuth:false, // edit na true za aktiviranje 2fa
+				showTwoFactorAuth: false, // edit na true za aktiviranje 2fa
 			};
 		case userConstants.RESET_PASSWORD_LINK_REQUEST:
 			return {
@@ -261,6 +261,16 @@ export const userReducer = (state, action) => {
 						followingNumber: "",
 						sentFollowRequest: false,
 						blocked: false,
+						notificationSettings: {
+							notifyStory: false,
+							notifyPost: false,
+							notifyLike: false,
+							notifyDislike: false,
+							notifyFollow: false,
+							notifyFollowRequest: false,
+							notifyAcceptFollowRequest: false,
+							notifyComments: false,
+						},
 					},
 				},
 			};
