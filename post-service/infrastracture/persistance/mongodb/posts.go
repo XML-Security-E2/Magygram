@@ -37,8 +37,7 @@ func (r *postRepository) InsertLocation(ctx context.Context, name string) error 
 	return err
 }
 
-func (r *postRepository) InsertTag(ctx context.Context, name string) error {
-	tag := model.Tag{guid.New().String(), name}
+func (r *postRepository) InsertTag(ctx context.Context, tag model.Tag) error {
 	_, err := r.tagCol.InsertOne(ctx, tag)
 	return err
 }

@@ -71,6 +71,10 @@ const ViewPostModal = () => {
 		dispatch({ type: modalConstants.SHOW_POST_OPTIONS_MODAL, post: postState.viewPostModal.post });
 	};
 
+	const handleRedirect = (userId) => {
+		window.location = "#/profile?userId=" + userId;
+	};
+
 	return (
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body>
@@ -78,6 +82,17 @@ const ViewPostModal = () => {
 					<PostImageSliderModalView media={postState.viewPostModal.post.Media} />
 					<div className="p-2" style={style}>
 						<div className="align-top" style={style}>
+							<div>
+								<label className="m-1">Tagged users: </label>
+								{postState.viewPostModal.post.Tags !== null &&
+								postState.viewPostModal.post.Tags.map((tag) => {
+									return (
+										<button type="button" className="btn btn-light" onClick={handleRedirect(tag.id)}>
+											{tag.Username}
+										</button>
+									);
+								})}
+							</div>	
 							<PostHeaderModalView
 								username={postState.viewPostModal.post.UserInfo.Username}
 								image={postState.viewPostModal.post.UserInfo.ImageURL}
