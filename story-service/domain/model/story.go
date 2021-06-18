@@ -101,6 +101,7 @@ type MediaContent struct{
 	Url string
 	MediaType string
 	StoryId string
+	Tags []Tag
 }
 
 type HighlightImageWithMedia struct {

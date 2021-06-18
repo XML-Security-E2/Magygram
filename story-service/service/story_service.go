@@ -278,6 +278,7 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 			Url: story.Media.Url,
 			MediaType: story.Media.MediaType,
 			StoryId: story.Id,
+			Tags: story.Tags,
 		}
 		retVal = append(retVal, mediaContent)
 	}
