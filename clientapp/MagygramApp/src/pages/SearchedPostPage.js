@@ -6,6 +6,7 @@ import AddPostToFavouritesModal from "../components/modals/AddPostToFavouritesMo
 import Header from "../components/Header";
 import UserContextProvider from "../contexts/UserContext";
 import SearchedPostTimeline from "../components/SearchedPostsTimeline";
+import NotificationContextProvider from "../contexts/NotificationContext";
 
 const SearchPostPage = (props) => {
 
@@ -14,7 +15,9 @@ const SearchPostPage = (props) => {
 			<UserContextProvider>
 				<StoryContextProvider>
 					<PostContextProvider>
-						<Header />
+						<NotificationContextProvider>
+							<Header />
+						</NotificationContextProvider>
 						<CreateStoryModal />
 						<AddPostToFavouritesModal />
 						<div>

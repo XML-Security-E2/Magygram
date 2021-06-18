@@ -53,7 +53,9 @@ const HomePage = () => {
 							<StoryContextProvider>
 								<PostContextProvider>
 									<AdminContextProvider>
-										<Header />
+										<NotificationContextProvider>
+											<Header />
+										</NotificationContextProvider>
 										<div>
 											<div className="mt-4">
 												<div className="container d-flex justify-content-center">

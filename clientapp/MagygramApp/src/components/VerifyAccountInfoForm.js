@@ -136,7 +136,7 @@ const VerifyAccontInfoForm = ({show}) => {
                     </div>
                 </form>
                 </div>:
-                <div>
+                <div hidden={!show}>
                     <div className="col-12 mt-5 d-flex justify-content-center text-secondary" >
                         <h3>Your account is verified</h3>
                     </div>

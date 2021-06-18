@@ -75,6 +75,11 @@ func main() {
 					bson.D{{Key: "name", Value: "get_verification_request"}},
 					bson.D{{Key: "name", Value: "confirm_verification_request"}},
 					bson.D{{Key: "name", Value: "reject_verification_request"}},
+					bson.D{{Key: "name", Value: "visit_private_profiles"}},
+					bson.D{{Key: "name", Value: "search"}},
+					bson.D{{Key: "name", Value: "search_all_post_by_hashtag"}},
+					bson.D{{Key: "name", Value: "search_all_post_by_location"}},
+					bson.D{{Key: "name", Value: "view_profile_highlights"}},
 				}}}}},
 		{Key: "totp_token", Value: "123"},
 	})
@@ -91,6 +96,11 @@ func main() {
 					bson.D{{Key: "name", Value: "get_verification_request"}},
 					bson.D{{Key: "name", Value: "confirm_verification_request"}},
 					bson.D{{Key: "name", Value: "reject_verification_request"}},
+					bson.D{{Key: "name", Value: "visit_private_profiles"}},
+					bson.D{{Key: "name", Value: "search"}},
+					bson.D{{Key: "name", Value: "search_all_post_by_hashtag"}},
+					bson.D{{Key: "name", Value: "search_all_post_by_location"}},
+					bson.D{{Key: "name", Value: "view_profile_highlights"}},
 				}}}}},
 		{Key: "totp_token", Value: "123"},
 	})
