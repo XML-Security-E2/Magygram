@@ -28,4 +28,5 @@ type PostService interface {
 	GetPostByIdForGuest(ctx context.Context, postId string) (*model.GuestTimelinePostResponse , error)
 	GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 	GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
+	DeletePost(ctx context.Context, requestId string) error
 }

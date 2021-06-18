@@ -25,6 +25,7 @@ type User struct {
 	NotificationSettings NotificationSettings `bson:"notification_settings" json:"notificationSettings"`
 	Category Category `bson:"category"`
 	IsVerified bool `bson:"verified_profile"`
+	IsDeleted bool `bson:"deleted"`
 }
 
 type NotificationSettings struct {
@@ -215,6 +216,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		IsPrivate: true,
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
+		IsDeleted: false,
 		NotificationSettings: NotificationSettings{
 			NotifyLike:          FromEveryOne,
 			NotifyDislike:       FromEveryOne,

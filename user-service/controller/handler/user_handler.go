@@ -50,6 +50,7 @@ type UserHandler interface {
 	CheckIfUserVerified(c echo.Context) error
 	GetUsersNotificationsSettings(c echo.Context) error
 	ChangeUsersNotificationsSettings(c echo.Context) error
+	DeleteUser(c echo.Context) error
 }
 
 var (
@@ -79,6 +80,22 @@ func (h *userHandler) GetUsersNotificationsSettings(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, settings)}
+
+func (h userHandler) DeleteUser(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := h.UserService.DeleteUser(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
 
 func (h *userHandler) ChangeUsersNotificationsSettings(c echo.Context) error {
 	userId := c.Param("userId")

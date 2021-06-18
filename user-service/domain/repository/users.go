@@ -13,4 +13,5 @@ type UserRepository interface {
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
+	DeleteUser(ctx context.Context, request *model.User) (*mongo.UpdateResult, error)
 }

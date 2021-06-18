@@ -99,6 +99,11 @@ func (r *userRepository) SearchForUsersByUsernameByGuest(ctx context.Context, us
 	return users, nil
 }
 
+func (r userRepository) DeleteUser(ctx context.Context, request *model.User) (*mongo.UpdateResult, error) {
+	return r.Col.UpdateOne(ctx, bson.M{"_id":  request.Id},bson.D{{"$set", bson.D{
+		{"deleted" , true}}}})
+}
+
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 
 	var user = model.User{}

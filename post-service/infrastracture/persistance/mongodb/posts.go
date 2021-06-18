@@ -78,6 +78,10 @@ func (r *postRepository) GetByID(ctx context.Context, id string) (*model.Post, e
 	}
 	return &post, nil
 }
+func (r postRepository) DeletePost(ctx context.Context, request *model.Post) (*mongo.UpdateResult, error) {
+	return r.Col.UpdateOne(ctx, bson.M{"_id":  request.Id},bson.D{{"$set", bson.D{
+		{"deleted" , true}}}})
+}
 
 
 func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.UpdateResult, error) {
