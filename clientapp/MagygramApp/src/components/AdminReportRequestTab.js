@@ -2,15 +2,20 @@ import React, {useContext, useEffect, useCallback, useState} from "react";
 import { AdminContext } from "../contexts/AdminContext";
 import {requestsService} from "../services/RequestsService"
 import { confirmAlert } from 'react-confirm-alert';
+import { PostContext } from "../contexts/PostContext";
+import { hasPermissions } from "../helpers/auth-header";
+import { postService } from "../services/PostService";
 import { adminConstants } from "../constants/AdminConstants";
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import FailureAlert from "./FailureAlert";
 import SuccessAlert from "./SuccessAlert";
+import ViewPostModal from "./modals/ViewPostModal";
 import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
 
 const AdminReportRequestTab = () => {
 	const { state,dispatch } = useContext(AdminContext);
+	const { statePost,dispatchPost } = useContext(PostContext);
 
 	const handleVisitProfile = (userId) => {
 		window.location = "#/profile/" + userId;
@@ -47,6 +52,16 @@ const AdminReportRequestTab = () => {
 		  });
 	}
 
+    
+	const handleViewStory = (requestId)=>{
+
+    }
+    
+	const handleViewPost = async (postId) => {
+	
+		await postService.findPostById(postId, dispatchPost);
+	};
+
     useEffect(() => {
 		const getReportRequestsHandler = async () => {
 			await requestsService.getAllReportRequest(dispatch)
@@ -82,7 +97,13 @@ const AdminReportRequestTab = () => {
 									</td>
 									<td className="text-center">
 										<div>
-											<a onClick={() => handleVisitProfile(request.ContentId)} class="link-primary">Visit profile</a>
+											<a hidden={(request.ContentType === "POST") || (request.ContentType === "STORY")} onClick={() => handleVisitProfile(request.ContentId)} class="link-primary">Visit profile</a>
+										</div>
+                                        <div>
+											<a hidden={(request.ContentType === "POST") || (request.ContentType === "USER")} onClick={() => handleViewStory(request.ContentId)} class="link-primary">View story</a>
+										</div>
+                                        <div>
+											<a hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} onClick={() => handleViewPost(request.ContentId)} class="link-primary">View post</a>
 										</div>
 									</td>
 									<td className="text-right">
@@ -92,7 +113,9 @@ const AdminReportRequestTab = () => {
 										</div>
 									</td>
 								</tr>
-							)}							
+							)}		
+                            
+                			<ViewPostModal />					
 						</tbody>
 					</table> : 
 					<div>
