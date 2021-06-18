@@ -106,6 +106,7 @@ time="2021-06-17T02:18:00+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-17T02:32:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
 >>>>>>> develop
 time="2021-06-17T12:14:10+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
+<<<<<<< HEAD
 time="2021-06-17T17:30:58+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
 time="2021-06-17T17:39:41+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/infrastructure/persistence/mongodb/users.go:52" request_ip="::1" user_id=f9857da7-083a-4ae5-82b3-4cba0479166b
 time="2021-06-17T17:39:41+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/infrastructure/persistence/mongodb/users.go:52" request_ip="::1" user_id=f9857da7-083a-4ae5-82b3-4cba0479166b
@@ -192,3 +193,6 @@ time="2021-06-18T10:19:38+02:00" level=warning msg="Unauthorized access" func=us
 time="2021-06-18T10:20:22+02:00" level=warning msg="Unauthorized access" func=user-service/service.highlightsService.GetProfileHighlightsByHighlightName file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/highlights_service.go:139" content_owner_id=f00f180f-9a37-4c29-a13e-58f419e83355 request_ip=127.0.0.1
 time="2021-06-18T10:20:24+02:00" level=warning msg="Unauthorized access" func=user-service/service.highlightsService.GetProfileHighlightsByHighlightName file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/highlights_service.go:139" content_owner_id=f00f180f-9a37-4c29-a13e-58f419e83355 request_ip=127.0.0.1
 time="2021-06-18T10:22:43+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:97" host=localhost port=460
+=======
+time="2021-06-18T00:18:30+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:97" host=localhost port=460
+>>>>>>> develop

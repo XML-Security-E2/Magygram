@@ -12,6 +12,7 @@ time="2021-06-16T12:54:08+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-16T14:00:53+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/story_service.go:53" request_ip=127.0.0.1 story_id=452cde04-b2c0-45d2-b39f-ee4b3faf83c2 user_id=25ff3998-6ab3-44b4-b803-16cf472df4c3
 time="2021-06-16T21:39:34+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
 >>>>>>> develop
+<<<<<<< HEAD
 time="2021-06-17T17:29:53+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-17T18:59:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-17T19:31:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
@@ -26,3 +27,10 @@ time="2021-06-17T19:52:21+02:00" level=error msg="Story database create failure"
 time="2021-06-17T19:52:21+02:00" level=error msg="Story database create failure" func=story-service/service.storyService.CreatePost file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/service/story_service.go:50" request_ip=127.0.0.1 user_id=f00f180f-9a37-4c29-a13e-58f419e83355
 time="2021-06-17T19:52:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-18T09:46:58+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
+=======
+time="2021-06-18T00:19:48+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-18T00:23:31+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=0dadc513-f411-459c-b3f2-91b4e5c71738 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+time="2021-06-18T00:24:26+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=569d49ea-8d18-48e0-83ce-b276737a518a user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+time="2021-06-18T01:02:48+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=91b9f1a3-9764-435f-9490-ae302de06dac user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+time="2021-06-18T01:03:06+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=1f5dc74f-0b1e-4b29-9220-021f97c7676a user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+>>>>>>> develop
