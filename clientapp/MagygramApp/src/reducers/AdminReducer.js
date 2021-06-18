@@ -55,6 +55,27 @@ export const adminReducer = (state, action) => {
             strCpy.verificationRequests.requests=action.requests
 			return strCpy;
         }
+        case adminConstants.GET_REPORT_REQUEST:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.reportRequests.requests=[]
+			return strCpy;
+        }
+        case adminConstants.GET_REPORT_REQUEST_SUCCESS:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.reportRequests.requests=action.requests
+			return strCpy;
+        }
+        case adminConstants.GET_REPORT_REQUEST_FAILURE:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.reportRequests.requests=action.requests
+			return strCpy;
+        }
         case adminConstants.APPROVE_VERIFICATION_REQUEST_REQUEST:{
             let strCpy = {
 				...state,

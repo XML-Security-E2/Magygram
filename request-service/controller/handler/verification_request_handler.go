@@ -16,6 +16,8 @@ type VerificationRequestHandler interface {
 	ApproveVerificationRequest(c echo.Context) error
 	RejectVerificationRequest(c echo.Context) error
 	HasUserPendingRequest(c echo.Context) error
+	GetReportRequests(c echo.Context) error
+	DeleteReportRequest(c echo.Context) error
 }
 
 type verificationRequestHandler struct {
@@ -89,6 +91,36 @@ func (v verificationRequestHandler) GetVerificationRequests(c echo.Context) erro
 	}
 
 	return c.JSON(http.StatusOK, retVal)
+}
+
+func (v verificationRequestHandler) GetReportRequests(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := v.VerificationRequestService.GetReportRequests(ctx)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, retVal)
+}
+
+func (v verificationRequestHandler) DeleteReportRequest(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := v.VerificationRequestService.DeleteReportRequest(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
 
 func (v verificationRequestHandler) ApproveVerificationRequest(c echo.Context) error {
