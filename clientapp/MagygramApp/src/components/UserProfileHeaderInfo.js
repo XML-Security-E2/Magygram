@@ -58,6 +58,24 @@ const UserProfileHeaderInfo = ({ userId }) => {
 				console.log("err");
 			});
 	};
+	
+	const deleteUser = () => {
+		console.log(localStorage.getItem("roles"))
+		let requestId =  userId;
+		Axios.put(`/api/users/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				console.log("User has been deleted");
+				alert("You have successfully deleted this user!")
+			} else {
+				console.log("ERROR")
+			}
+		})
+		.catch((err) => {
+			console.log("ERROR")
+		});
+	}
 
 	const handleNotificationsSetttings = async () => {
 		await notificationService.getProfileNotificationsSettings(userId, ntfxCtx.dispatch);
@@ -121,6 +139,18 @@ const UserProfileHeaderInfo = ({ userId }) => {
 								onClick={reportUser}
 							>
 								Report
+							</button>
+						</div>
+						<div>
+							<button
+								hidden={!(localStorage.getItem("userId") === userId)}
+								style={{ backgroundColor: "red", borderColor: "red" }}
+								type="button"
+								className="btn btn-primary ml-2"
+								tabindex="0"
+								onClick={deleteUser}
+							>
+								Delete profile
 							</button>
 						</div>
 					</div>

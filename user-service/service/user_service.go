@@ -219,6 +219,21 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 	return false, nil
 }
 
+
+func (u userService) DeleteUser(ctx context.Context, requestId string) error {
+	request, err := u.UserRepository.GetByID(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	request.IsDeleted=true
+
+	u.UserRepository.DeleteUser(ctx,request)
+
+	return nil
+}
+
+
 func (u *userService) EditUser(ctx context.Context, bearer string, userId string, userRequest *model.EditUserRequest) (string, error) {
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {

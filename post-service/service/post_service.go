@@ -110,6 +110,19 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 	return retVal, nil
 }
 
+func (p postService) DeletePost(ctx context.Context, requestId string) error {
+	request, err := p.PostRepository.GetByID(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	request.IsDeleted=true
+
+	p.PostRepository.DeletePost(ctx,request)
+
+	return nil
+}
+
 func (p postService) LikePost(ctx context.Context, bearer string, postId string) error {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {

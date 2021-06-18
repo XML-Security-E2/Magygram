@@ -109,3 +109,8 @@ time="2021-06-18T15:24:56+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-18T15:50:07+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
 time="2021-06-18T16:29:52+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
 time="2021-06-18T18:03:34+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
+time="2021-06-18T21:08:53+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
+time="2021-06-18T21:12:22+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/6a43491d-3371-4635-a338-54ff30a7a77b.png IMAGE}]" request_ip="::1"
+time="2021-06-18T22:03:15+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
+time="2021-06-18T22:08:01+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
+time="2021-06-18T22:08:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
