@@ -4,20 +4,25 @@
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostCommentInputModalView.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostCommentInputModalView.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostComments.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostComments.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostInteraction.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostInteraction.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostInteractionModalView.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostInteractionModalView.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/VerifyAccountInfoForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/VerifyAccountInfoForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/constants/AdminConstants.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/constants/AdminConstants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/AdminContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/AdminContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/AdminReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/AdminReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/RequestsService.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/RequestsService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/api_gateway.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/controller/handler/verification_request_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/controller/handler/verification_request_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/model/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/model/request.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/repository/reports.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/repository/reports.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/repository/verification_requests.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/repository/verification_requests.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/domain/service-contracts/verification_request_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/domain/service-contracts/verification_request_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/infrastructure/persistance/mongodb/reports.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/infrastructure/persistance/mongodb/reports.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/request-service/service/verification_request.go" beforeDir="false" afterPath="$PROJECT_DIR$/request-service/service/verification_request.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/service/highlights_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/service/highlights_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/service/intercomm/auth_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/service/intercomm/auth_client.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

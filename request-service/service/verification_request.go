@@ -20,7 +20,6 @@ type verificationService struct {
 	intercomm.UserClient
 }
 
-
 func NewVerificationServiceService(vr repository.VerificationRequestsRepository,r repository.ReportRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.VerificationRequestService {
 	return &verificationService{vr,mc, ac,r ,uc}
 }
@@ -72,6 +71,33 @@ func (v verificationService) CreateReportRequest(ctx context.Context, reportRequ
 	}
 
 	return "",err
+}
+
+func (v verificationService) GetReportRequests(ctx context.Context) ([]*model.ReportRequestResponseDTO, error) {
+	var reportRequest []*model.ReportRequest
+
+	reportRequest, err := v.ReportRequestsRepository.GetAllReports(ctx)
+	if err != nil {
+		return []*model.ReportRequestResponseDTO{}, err
+	}
+
+	retVal := mapReportRequestToReportRequestDTO(reportRequest)
+
+	return retVal, nil
+}
+
+func mapReportRequestToReportRequestDTO(requests []*model.ReportRequest) []*model.ReportRequestResponseDTO {
+	var retVal []*model.ReportRequestResponseDTO
+
+	for _, request := range requests{
+		var result = model.ReportRequestResponseDTO{ Id: request.Id,
+			ContentId:      request.ContentId,
+			ContentType:   request.ContentType,
+		}
+		retVal = append(retVal, &result)
+	}
+
+	return retVal
 }
 
 func (v verificationService) GetVerificationRequests(ctx context.Context) ([]*model.VerificationRequestResponseDTO, error) {
@@ -149,6 +175,20 @@ func (v verificationService) RejectVerificationRequest(ctx context.Context, requ
 
 	return nil
 }
+
+func (v verificationService) DeleteReportRequest(ctx context.Context, requestId string) error {
+	request, err := v.ReportRequestsRepository.GetReportRequestById(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	request.IsDeleted=true
+
+	v.ReportRequestsRepository.DeleteReportRequest(ctx,request)
+
+	return nil
+}
+
 
 func (v verificationService) HasUserPendingRequest(ctx context.Context, bearer string) (bool, error) {
 	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)

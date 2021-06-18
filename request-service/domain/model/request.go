@@ -24,10 +24,17 @@ type VerificationRequestResponseDTO struct {
 	Category string
 }
 
+type ReportRequestResponseDTO struct {
+	Id string
+	ContentId string
+	ContentType ContentType
+}
+
 type ReportRequest struct {
 	Id string `bson:"_id,omitempty"`
 	ContentId string `bson:"content_id"`
 	ContentType ContentType `bson:"content_type"`
+	IsDeleted bool `bson:"deleted"`
 }
 
 type ContentType string
@@ -124,6 +131,7 @@ func NewReportRequest(reportRequest *ReportRequestDTO) (*ReportRequest, error) {
 	return &ReportRequest{Id: guid.New().String(),
 		ContentId:   reportRequest.ContentId,
 		ContentType:    reportRequest.ContentType,
+		IsDeleted: false,
 	}, nil
 }
 

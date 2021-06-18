@@ -14,6 +14,7 @@ import NotificationContextProvider from "../contexts/NotificationContext";
 import AdminHomePageTabs from "../components/AdminHomePageTabs";
 import AdminVerificationRequestTabContent from "../components/AdminVerificationRequestTabContent";
 import AdminContextProvider from "../contexts/AdminContext";
+import AdminReportRequestTab from "../components/AdminReportRequestTab";
 
 const HomePage = () => {
 	return (
@@ -64,6 +65,7 @@ const HomePage = () => {
 															<div className="col-12">
 																<AdminHomePageTabs />
 																<AdminVerificationRequestTabContent />
+																<AdminReportRequestTab />
 															</div>
 														</div>
 													</div>
