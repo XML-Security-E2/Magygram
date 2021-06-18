@@ -1,12 +1,13 @@
 import React, { useContext } from "react";
 import { PostContext } from "../contexts/PostContext";
+import { hasPermissions } from "../helpers/auth-header";
 import { postService } from "../services/PostService";
 
 const UserProfilePosts = () => {
 	const { postState, dispatch } = useContext(PostContext);
 
 	const getPostDetailsHandler = async (postId) => {
-		if(localStorage.getItem("userId")===null){
+		if(localStorage.getItem("userId")===null && !hasPermissions(["visit_private_profiles"])){
 			await postService.findPostByIdForGuest(postId, dispatch);
 		}else{
 			await postService.findPostById(postId, dispatch);

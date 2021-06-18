@@ -354,6 +354,21 @@ func (p postService) mapPostsToResponsePostDTO(bearer string, result []*model.Po
 	return retVal
 }
 
+func (p postService) mapPostsToResponsePostDTOForAdmin(bearer string, result []*model.Post) []*model.PostResponse {
+	var retVal []*model.PostResponse
+
+
+	for _, post := range result {
+		res, err := model.NewPostResponse(post,false,false,false)
+
+		if err != nil { return nil}
+
+		retVal = append(retVal, res)
+	}
+
+	return retVal
+}
+
 func isInFavourites(post *model.Post, favourites []*model.PostIdFavouritesFlag) bool {
 	for _, postFav := range favourites {
 		if post.Id == postFav.Id {
@@ -464,9 +479,17 @@ func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId strin
 
 func (p postService) GetUsersPosts(ctx context.Context, bearer string, postOwnerId string) ([]*model.PostProfileResponse, error) {
 
-	if !p.checkIfUserContentIsAccessible(bearer, postOwnerId) {
-		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	retVal, err := p.AuthClient.HasRole(bearer,"visit_private_profiles")
+	if err!=nil{
+		return nil, errors.New("auth service not found")
 	}
+
+	if !p.checkIfUserContentIsAccessible(bearer, postOwnerId) {
+		if !retVal{
+			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		}
+	}
+
 
 	userPosts, err := p.PostRepository.GetPostsForUser(ctx, postOwnerId)
 	if err != nil {
@@ -543,16 +566,30 @@ func (p postService) GetPostById(ctx context.Context, bearer string, postId stri
 		return nil, errors.New("invalid post id")
 	}
 
-	if !p.checkIfUserContentIsAccessible(bearer, post.UserInfo.Id) {
-		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+	retVal, err := p.AuthClient.HasRole(bearer,"visit_private_profiles")
+	if err!=nil{
+		return nil, errors.New("auth service not found")
 	}
 
-	postIdFavourite, err := p.UserClient.MapPostsToFavourites(bearer, []string{post.Id})
-	if err != nil {
-		return nil, err
+	if !retVal {
+		if !p.checkIfUserContentIsAccessible(bearer, post.UserInfo.Id) {
+			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		}
+
+		postIdFavourite, err := p.UserClient.MapPostsToFavourites(bearer, []string{post.Id})
+		if err != nil {
+			return nil, err
+		}
+
+		res, err := model.NewPostResponse(post, hasUserLikedPost(post, userId), hasUserDislikedPost(post, userId), isInFavourites(post, postIdFavourite))
+		if err != nil {
+			return nil, err
+		}
+
+		return res, nil
 	}
 
-	res, err := model.NewPostResponse(post, hasUserLikedPost(post, userId), hasUserDislikedPost(post, userId), isInFavourites(post, postIdFavourite))
+	res, err := model.NewPostResponse(post, false, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -649,26 +686,38 @@ func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashta
 		return nil,err
 	}
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
-	if err != nil {
-		return nil, err
-	}
-
 	var publicPosts []*model.Post
-	for _,post := range posts{
-		value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
-		if err!=nil{
-			return nil,err
-		}
 
-		if !value {
-			publicPosts=append(publicPosts, post)
-		}
+	retValRole, err := p.AuthClient.HasRole(bearer,"search_all_post_by_hashtag")
+	if err!=nil{
+		return nil, errors.New("auth service not found")
 	}
 
-	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+	if retValRole{
+		publicPosts=posts
+		retVal := p.mapPostsToResponsePostDTOForAdmin(bearer, publicPosts)
 
-	return retVal, nil
+		return retVal, nil
+	}else {
+		userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+		if err != nil {
+			return nil, err
+		}
+
+		for _,post := range posts{
+			value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
+			if err!=nil{
+				return nil,err
+			}
+
+			if !value {
+				publicPosts=append(publicPosts, post)
+			}
+		}
+		retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+
+		return retVal, nil
+	}
 }
 
 func (p postService) SearchPostsByLocation(ctx context.Context, locationValue string) ([]*model.LocationSearchResponseDTO, error) {
@@ -744,26 +793,39 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 		return nil,err
 	}
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
-	if err != nil {
-		return nil, err
+
+	retValRole, err := p.AuthClient.HasRole(bearer,"search_all_post_by_location")
+	if err!=nil{
+		return nil, errors.New("auth service not found")
 	}
 
-	var publicPosts []*model.Post
-	for _,post := range posts{
-		value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
-		if err!=nil{
-			return nil,err
+	if retValRole{
+		retVal := p.mapPostsToResponsePostDTOForAdmin(bearer, posts)
+
+		return retVal, nil
+	}else {
+		userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+		if err != nil {
+			return nil, err
 		}
 
-		if !value {
-			publicPosts=append(publicPosts, post)
+		var publicPosts []*model.Post
+		for _,post := range posts{
+			value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
+			if err!=nil{
+				return nil,err
+			}
+
+			if !value {
+				publicPosts=append(publicPosts, post)
+			}
 		}
+
+		retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+
+		return retVal, nil
 	}
 
-	retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
-
-	return retVal, nil
 }
 
 func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*model.GuestTimelinePostResponse, error) {

@@ -31,8 +31,8 @@ function App() {
 				<Route path="/profile" component={UserProfilePage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/edit-profile" component={EditProfilePage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/add-posts" component={CreatePostPage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/search/hashtag/:id" component={SearchPostPage} />
-				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/search/location/:id" component={SearchPostPage} />
+				<ProtectedRoute roles={["user","admin"]} redirectTo="/unauthorized" path="/search/hashtag/:id" component={SearchPostPage} />
+				<ProtectedRoute roles={["user","admin"]} redirectTo="/unauthorized" path="/search/location/:id" component={SearchPostPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/liked" component={LikedPostPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/disliked" component={DislikedPostPage} />
 

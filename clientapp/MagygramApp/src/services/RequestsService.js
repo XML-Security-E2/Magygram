@@ -9,6 +9,8 @@ export const requestsService = {
 	approveVerificationRequest,
 	rejectVerificationRequest,
 	hasUserPendingRequest,
+	getAllReportRequest,
+	deleteReportRequest,
 };
 
 function createVerificationRequest(formData,dispatch){
@@ -32,6 +34,61 @@ function createVerificationRequest(formData,dispatch){
 	}
 	function failure(error) {
 		return { type: profileSettingsConstants.CREATE_VERIFICATION_REQUEST_FAILURE, error };
+	}
+}
+
+
+function deleteReportRequest(requestId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/report/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(requestId,"Report request has been deleted"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_REQUEST };
+	}
+	function success(requestId,successMessage) {
+		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_SUCCESS, requestId,successMessage };
+	}
+	function failure(message) {
+		return { type: adminConstants.APPROVE_VERIFICATION_REQUEST_FAILURE, errorMessage: message };
+	}
+}
+
+async function getAllReportRequest(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/report`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: adminConstants.GET_REPORT_REQUEST };
+	}
+
+	function success(data) {
+		return { type: adminConstants.GET_REPORT_REQUEST_SUCCESS, requests: data };
+	}
+	function failure() {
+		return { type: adminConstants.GET_REPORT_REQUEST_FAILURE };
 	}
 }
 
