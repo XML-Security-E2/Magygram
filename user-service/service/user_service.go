@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/beevik/guid"
 	"github.com/go-playground/validator"
 	"github.com/sirupsen/logrus"
 	"mime/multipart"
@@ -18,6 +19,7 @@ import (
 
 type userService struct {
 	repository.UserRepository
+	repository.NotificationRulesRepository
 	service_contracts.AccountActivationService
 	service_contracts.ResetPasswordService
 	intercomm.AuthClient
@@ -31,68 +33,183 @@ var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient) service_contracts.UserService {
-	return &userService{r, a,  rp , ic, rC, pc, mc, msc}
+func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient) service_contracts.UserService {
+	return &userService{r, nrr,a,  rp , ic, rC, pc, mc, msc}
+}
+
+func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	notificationRule, err := u.NotificationRulesRepository.GetRuleForUser(ctx, loggedId, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.SettingsRequest{
+		PostNotifications:  notificationRule.PostNotifications,
+		StoryNotifications: notificationRule.StoryNotifications,
+	},nil
+}
+
+func (u *userService) ChangeUsersNotificationsSettings(ctx context.Context, bearer string, settingsReq *model.SettingsRequest, userId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	notificationRule, err := u.NotificationRulesRepository.GetRuleForUser(ctx, loggedId, userId)
+	if err != nil {
+		u.NotificationRulesRepository.Create(ctx, &model.PostStoryNotifications{
+			Id:                  guid.New().String(),
+			UserId:              loggedId,
+			NotificationsFromId: userId,
+			PostNotifications:   settingsReq.PostNotifications,
+			StoryNotifications:  settingsReq.StoryNotifications,
+		})
+	} else {
+		notificationRule.StoryNotifications = settingsReq.StoryNotifications
+		notificationRule.PostNotifications = settingsReq.PostNotifications
+		u.NotificationRulesRepository.Update(ctx, notificationRule)
+	}
+	return nil
+
 }
 
 func (u *userService) GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
 
-	followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-	if err != nil {
-		return []*model.UserInfo{}, err
+	notifyIds, err := u.NotificationRulesRepository.GetNotifiersForPost(ctx, userId)
+	if err != nil || len(notifyIds) == 0{
+		return []*model.UserInfo{}, nil
 	}
-
 	var retVal []*model.UserInfo
 
-	for _, followingUserId := range followingUsers.Users {
-		followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
-		if err == nil && followingUser.NotificationSettings.NotifyPost {
+	for _, notifyId := range notifyIds {
+		notifyUser, err := u.UserRepository.GetByID(ctx, notifyId)
+		if err == nil {
 			retVal = append(retVal, &model.UserInfo{
-				Id:       followingUserId,
-				Username: followingUser.Username,
-				ImageURL: followingUser.ImageUrl,
+				Id:       notifyId,
+				Username: notifyUser.Username,
+				ImageURL: notifyUser.ImageUrl,
 			})
 		}
 	}
-
+	//followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	//if err != nil {
+	//	return []*model.UserInfo{}, err
+	//}
+	//
+	//var retVal []*model.UserInfo
+	//
+	//for _, followingUserId := range followingUsers.Users {
+	//	followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
+	//	if err == nil && followingUser.NotificationSettings.NotifyPost {
+	//		retVal = append(retVal, &model.UserInfo{
+	//			Id:       followingUserId,
+	//			Username: followingUser.Username,
+	//			ImageURL: followingUser.ImageUrl,
+	//		})
+	//	}
+	//}
+	//
 	return retVal, nil
 }
 
 func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
 
-	followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-	if err != nil {
-		return []*model.UserInfo{}, err
+	notifyIds, err := u.NotificationRulesRepository.GetNotifiersForStory(ctx, userId)
+	if err != nil || len(notifyIds) == 0{
+		return []*model.UserInfo{}, nil
 	}
-
 	var retVal []*model.UserInfo
 
-	for _, followingUserId := range followingUsers.Users {
-		followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
-		if err == nil && followingUser.NotificationSettings.NotifyStory {
+	for _, notifyId := range notifyIds {
+		notifyUser, err := u.UserRepository.GetByID(ctx, notifyId)
+		if err == nil {
 			retVal = append(retVal, &model.UserInfo{
-				Id:       followingUserId,
-				Username: followingUser.Username,
-				ImageURL: followingUser.ImageUrl,
+				Id:       notifyId,
+				Username: notifyUser.Username,
+				ImageURL: notifyUser.ImageUrl,
 			})
 		}
 	}
 
+	//followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	//if err != nil {
+	//	return []*model.UserInfo{}, err
+	//}
+	//
+	//var retVal []*model.UserInfo
+	//
+	//for _, followingUserId := range followingUsers.Users {
+	//	followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
+	//	if err == nil && followingUser.NotificationSettings.NotifyStory {
+	//		retVal = append(retVal, &model.UserInfo{
+	//			Id:       followingUserId,
+	//			Username: followingUser.Username,
+	//			ImageURL: followingUser.ImageUrl,
+	//		})
+	//	}
+	//}
+
 	return retVal, nil}
 
-func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, interactionType string) (bool, error) {
+func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, userFromId string,  interactionType string) (bool, error) {
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return false, errors.New("invalid user id")
 	}
 
 	if interactionType == "like" {
-		return user.NotificationSettings.NotifyLike, nil
+		if user.NotificationSettings.NotifyLike == model.FromEveryOne {
+			return true, nil
+		} else if user.NotificationSettings.NotifyLike == model.FromPeopleIFollow {
+			followedUsers, err := u.RelationshipClient.GetFollowedUsers(user.Id)
+			if err == nil {
+				for _, followedUser := range followedUsers.Users {
+					if followedUser == userFromId {
+						return true, nil
+					}
+				}
+			}
+			return false, nil
+		} else  {
+			return false, nil
+		}
 	} else if interactionType == "dislike" {
-		return user.NotificationSettings.NotifyDislike, nil
+		if user.NotificationSettings.NotifyDislike == model.FromEveryOne {
+			return true, nil
+		} else if user.NotificationSettings.NotifyDislike == model.FromPeopleIFollow {
+			followedUsers, err := u.RelationshipClient.GetFollowedUsers(user.Id)
+			if err == nil {
+				for _, followedUser := range followedUsers.Users {
+					if followedUser == userFromId {
+						return true, nil
+					}
+				}
+			}
+			return false, nil
+		} else  {
+			return false, nil
+		}
 	} else if interactionType == "comment" {
-		return user.NotificationSettings.NotifyComment, nil
-	} else if interactionType == "follow" {
+		if user.NotificationSettings.NotifyComment == model.FromEveryOne {
+			return true, nil
+		} else if user.NotificationSettings.NotifyComment == model.FromPeopleIFollow {
+			followedUsers, err := u.RelationshipClient.GetFollowedUsers(user.Id)
+			if err == nil {
+				for _, followedUser := range followedUsers.Users {
+					if followedUser == userFromId {
+						return true, nil
+					}
+				}
+			}
+			return false, nil
+		} else  {
+			return false, nil
+		}	} else if interactionType == "follow" {
 		return user.NotificationSettings.NotifyFollow, nil
 	} else if interactionType == "follow-request" {
 		return user.NotificationSettings.NotifyFollowRequest, nil
@@ -186,7 +303,7 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 	return media[0].Url ,err
 }
 
-func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettings) error {
+func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettingsUpdateReq) error {
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
 		return err
@@ -197,7 +314,40 @@ func (u *userService) EditUsersNotifications(ctx context.Context, bearer string,
 		return errors.New("invalid user id")
 	}
 
-	user.NotificationSettings = *notificationReq
+	notifications := &model.NotificationSettings{
+		NotifyLike:                "",
+		NotifyDislike:             "",
+		NotifyFollow:              notificationReq.NotifyFollow,
+		NotifyFollowRequest:       notificationReq.NotifyFollowRequest,
+		NotifyAcceptFollowRequest: notificationReq.NotifyAcceptFollowRequest,
+		NotifyComment:             "",
+	}
+
+	if notificationReq.NotifyLike == 0 {
+		notifications.NotifyLike = model.Mute
+	} else if notificationReq.NotifyLike == 1 {
+		notifications.NotifyLike = model.FromPeopleIFollow
+	} else {
+		notifications.NotifyLike = model.FromEveryOne
+	}
+
+	if notificationReq.NotifyDislike == 0 {
+		notifications.NotifyDislike = model.Mute
+	} else if notificationReq.NotifyDislike == 1 {
+		notifications.NotifyDislike = model.FromPeopleIFollow
+	} else {
+		notifications.NotifyDislike = model.FromEveryOne
+	}
+
+	if notificationReq.NotifyComment == 0 {
+		notifications.NotifyComment = model.Mute
+	} else if notificationReq.NotifyComment == 1 {
+		notifications.NotifyComment = model.FromPeopleIFollow
+	} else {
+		notifications.NotifyComment = model.FromEveryOne
+	}
+
+	user.NotificationSettings = *notifications
 	_, err = u.UserRepository.Update(ctx, user)
 
 	if err != nil {
@@ -423,6 +573,39 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		sentReq, _ = u.RelationshipClient.ReturnFollowRequestsForUser(bearer, userId)
 	}
 
+	notificationSettings := model.NotificationSettingsUpdateReq{
+		NotifyLike:                0,
+		NotifyDislike:             0,
+		NotifyFollow:              user.NotificationSettings.NotifyFollow,
+		NotifyFollowRequest:       user.NotificationSettings.NotifyFollowRequest,
+		NotifyAcceptFollowRequest: user.NotificationSettings.NotifyAcceptFollowRequest,
+		NotifyComment:             0,
+	}
+
+	if user.NotificationSettings.NotifyLike == model.Mute {
+		notificationSettings.NotifyLike = 0
+	} else if user.NotificationSettings.NotifyLike  == model.FromPeopleIFollow {
+		notificationSettings.NotifyLike = 1
+	} else {
+		notificationSettings.NotifyLike = 2
+	}
+
+	if user.NotificationSettings.NotifyDislike == model.Mute {
+		notificationSettings.NotifyDislike = 0
+	} else if user.NotificationSettings.NotifyDislike == model.FromPeopleIFollow {
+		notificationSettings.NotifyDislike = 1
+	} else {
+		notificationSettings.NotifyDislike = 2
+	}
+
+	if user.NotificationSettings.NotifyComment == model.Mute {
+		notificationSettings.NotifyComment = 0
+	} else if user.NotificationSettings.NotifyComment == model.FromPeopleIFollow {
+		notificationSettings.NotifyComment = 1
+	} else {
+		notificationSettings.NotifyComment = 2
+	}
+
 	fmt.Println(sentReq)
 	retVal := &model.UserProfileResponse{
 		Username:        user.Username,
@@ -439,7 +622,7 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),
 		SentFollowRequest: sentReq,
-		NotificationSettings: user.NotificationSettings,
+		NotificationSettings: notificationSettings,
 	}
 	return retVal, nil
 }

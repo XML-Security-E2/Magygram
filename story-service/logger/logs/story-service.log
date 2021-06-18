@@ -33,9 +33,19 @@ time="2021-06-18T00:23:31+02:00" level=info msg="Story created" func=story-servi
 time="2021-06-18T00:24:26+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=569d49ea-8d18-48e0-83ce-b276737a518a user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-18T01:02:48+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=91b9f1a3-9764-435f-9490-ae302de06dac user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-18T01:03:06+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=1f5dc74f-0b1e-4b29-9220-021f97c7676a user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+<<<<<<< HEAD
+time="2021-06-18T19:11:10+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-18T19:12:23+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/story-service/service/intercomm/relationship_client.go:47" request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+time="2021-06-18T19:12:42+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/story-service/service/intercomm/relationship_client.go:47" request_ip=127.0.0.1 user_id=5ceea0b9-f951-488a-9ec7-731300eee802
+time="2021-06-18T19:21:14+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:66" request_ip=127.0.0.1 story_id=7f20eb8f-1b46-4ea3-8542-b9d19c5d6d2f user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+=======
 >>>>>>> develop
 time="2021-06-18T13:20:43+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-18T15:25:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-18T15:50:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+<<<<<<< HEAD
 time="2021-06-18T16:29:58+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-18T18:03:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+=======
+>>>>>>> develop
+>>>>>>> develop

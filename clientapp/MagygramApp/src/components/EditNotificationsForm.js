@@ -8,8 +8,6 @@ const EditNotificationsForm = ({ show }) => {
 	const [notifyLike, setNotifyLike] = useState(userState.userProfile.user.notificationSettings.notifyLike);
 	const [notifyDislike, setNotifyDislike] = useState(userState.userProfile.user.notificationSettings.notifyDislike);
 	const [notifyComments, setNotifyComments] = useState(userState.userProfile.user.notificationSettings.notifyComments);
-	const [notifyPost, setNotifyPost] = useState(userState.userProfile.user.notificationSettings.notifyPost);
-	const [notifyStory, setNotifyStory] = useState(userState.userProfile.user.notificationSettings.notifyStory);
 	const [notifyFollow, setNotifyFollow] = useState(userState.userProfile.user.notificationSettings.notifyFollow);
 	const [notifyFollowRequest, setNotifyFollowRequest] = useState(userState.userProfile.user.notificationSettings.notifyFollowRequest);
 	const [notifyAcceptFollowRequest, setNotifyAcceptFollowRequest] = useState(userState.userProfile.user.notificationSettings.notifyAcceptFollowRequest);
@@ -21,8 +19,6 @@ const EditNotificationsForm = ({ show }) => {
 			notifyLike,
 			notifyDislike,
 			notifyComments,
-			notifyPost,
-			notifyStory,
 			notifyFollow,
 			notifyFollowRequest,
 			notifyAcceptFollowRequest,
@@ -35,8 +31,6 @@ const EditNotificationsForm = ({ show }) => {
 		setNotifyLike(userState.userProfile.user.notificationSettings.notifyLike);
 		setNotifyDislike(userState.userProfile.user.notificationSettings.notifyDislike);
 		setNotifyComments(userState.userProfile.user.notificationSettings.notifyComments);
-		setNotifyPost(userState.userProfile.user.notificationSettings.notifyPost);
-		setNotifyStory(userState.userProfile.user.notificationSettings.notifyStory);
 		setNotifyFollow(userState.userProfile.user.notificationSettings.notifyFollow);
 		setNotifyFollowRequest(userState.userProfile.user.notificationSettings.notifyFollowRequest);
 		setNotifyAcceptFollowRequest(userState.userProfile.user.notificationSettings.notifyAcceptFollowRequest);
@@ -46,48 +40,62 @@ const EditNotificationsForm = ({ show }) => {
 		<form hidden={!show} method="post" onSubmit={handleSubmit}>
 			<div>
 				<br />
-				<div className="form-group row">
-					<label className="col-sm-8 col-form-label">Story notifications</label>
-					<div className="col-sm-4">
-						<label>
-							<input type="checkbox" className="mr-1" checked={notifyStory} onChange={() => setNotifyStory(!notifyStory)} />
-						</label>
+				<div className="form-group row d-flex align-items-center">
+					<label className="col-sm-4 col-form-label">Like notifications</label>
+					<div className="col-sm-2">
+						<label>Mute </label>
+
+						<input type="checkbox" className="mr-1" checked={notifyLike == 0} onChange={() => setNotifyLike(0)} />
+					</div>
+					<div className="col-sm-3">
+						<label>People I follow </label>
+
+						<input type="checkbox" className="mr-1" checked={notifyLike == 1} onChange={() => setNotifyLike(1)} />
+					</div>
+					<div className="col-sm-3">
+						<label>Everyone </label>
+
+						<input type="checkbox" className="mr-1" checked={notifyLike == 2} onChange={() => setNotifyLike(2)} />
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Post notifications</label>
-					<div className="col-sm-4">
-						<label>
-							<input type="checkbox" className="mr-1" checked={notifyPost} onChange={() => setNotifyPost(!notifyPost)} />
-						</label>
+					<label className="col-sm-4 col-form-label">Dislike notifications</label>
+					<div className="col-sm-2">
+						<label>Mute </label>
+
+						<input type="checkbox" className="mr-1" checked={notifyDislike == 0} onChange={() => setNotifyDislike(0)} />
+					</div>
+					<div className="col-sm-3">
+						<label>People I follow </label>
+
+						<input type="checkbox" className="mr-1" checked={notifyDislike == 1} onChange={() => setNotifyDislike(1)} />
+					</div>
+					<div className="col-sm-3">
+						<label>Everyone</label>
+
+						<input type="checkbox" className="mr-1" checked={notifyDislike == 2} onChange={() => setNotifyDislike(2)} />
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Like notifications</label>
-					<div className="col-sm-4">
-						<label>
-							<input type="checkbox" className="mr-1" checked={notifyLike} onChange={() => setNotifyLike(!notifyLike)} />
-						</label>
+					<label className="col-sm-4 col-form-label">Comment notifications</label>
+					<div className="col-sm-2 -flex align-items-center">
+						<label>Mute</label>
+
+						<input type="checkbox" className="mr-1" checked={notifyComments == 0} onChange={() => setNotifyComments(0)} />
+					</div>
+					<div className="col-sm-3 -flex align-items-center">
+						<label>People I follow</label>
+
+						<input type="checkbox" className="mr-1" checked={notifyComments == 1} onChange={() => setNotifyComments(1)} />
+					</div>
+					<div className="col-sm-3 -flex align-items-center">
+						<label>Everyone</label>
+
+						<input type="checkbox" className="mr-1" checked={notifyComments == 2} onChange={() => setNotifyComments(2)} />
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Dislike notifications</label>
-					<div className="col-sm-4">
-						<label>
-							<input type="checkbox" className="mr-1" checked={notifyDislike} onChange={() => setNotifyDislike(!notifyDislike)} />
-						</label>
-					</div>
-				</div>
-				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Post comment notifications</label>
-					<div className="col-sm-4">
-						<label>
-							<input type="checkbox" className="mr-1" checked={notifyComments} onChange={() => setNotifyComments(!notifyComments)} />
-						</label>
-					</div>
-				</div>
-				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Notify when user follow me</label>
+					<label className="col-sm-6 col-form-label">Notify when user follow me</label>
 					<div className="col-sm-4">
 						<label>
 							<input type="checkbox" className="mr-1" checked={notifyFollow} onChange={() => setNotifyFollow(!notifyFollow)} />
@@ -95,7 +103,7 @@ const EditNotificationsForm = ({ show }) => {
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Notify when receive follow request</label>
+					<label className="col-sm-6 col-form-label">Notify when receive follow request</label>
 					<div className="col-sm-4">
 						<label>
 							<input type="checkbox" className="mr-1" checked={notifyFollowRequest} onChange={() => setNotifyFollowRequest(!notifyFollowRequest)} />
@@ -103,7 +111,7 @@ const EditNotificationsForm = ({ show }) => {
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
-					<label className="col-sm-8 col-form-label">Accepted follow request notifications</label>
+					<label className="col-sm-6 col-form-label">Accepted follow request notifications</label>
 					<div className="col-sm-4">
 						<label>
 							<input type="checkbox" className="mr-1" checked={notifyAcceptFollowRequest} onChange={(e) => setNotifyAcceptFollowRequest(!notifyAcceptFollowRequest)} />
