@@ -81,6 +81,11 @@ const UserContextProvider = (props) => {
 					notifyAcceptFollowRequest: false,
 					notifyComments: false,
 				},
+				privacySettings: {
+					isPrivate: false,
+					receiveMessages: true,
+					isTaggable: true,
+				}
 			},
 		},
 	});

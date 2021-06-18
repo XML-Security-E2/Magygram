@@ -203,6 +203,7 @@ function fetchFormData(storyDTO) {
 	} else {
 		formData.append("images", null);
 	}
+	formData.append("tags", JSON.stringify(storyDTO.tags));
 	return formData;
 }
 

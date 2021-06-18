@@ -108,5 +108,7 @@ func (s storyRepository) Update(ctx context.Context, story *model.Story) (*mongo
 	return s.Col.UpdateOne(ctx, bson.M{"_id":  story.Id},bson.D{{"$set", bson.D{{"content_type" , story.ContentType},
 		{"media" , story.Media},
 		{"user_info" , story.UserInfo},
-		{"visited_by" , story.VisitedBy}}}})
+		{"visited_by" , story.VisitedBy},
+		{"tags", story.Tags},
+		}}})
 }

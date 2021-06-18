@@ -206,6 +206,28 @@ func (u *userService) EditUsersNotifications(ctx context.Context, bearer string,
 	return nil
 }
 
+func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer string, privacySettingsReq *model.PrivacySettings) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return errors.New("invalid user id")
+	}
+
+	user.PrivacySettings = *privacySettingsReq
+	_, err = u.UserRepository.Update(ctx, user)
+
+	if err != nil {
+		return err
+
+
+	}
+	return nil
+}
+
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*http.Response, error) {
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err!= nil {
@@ -440,6 +462,7 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		FollowingNumber: len(followingUsers.Users),
 		SentFollowRequest: sentReq,
 		NotificationSettings: user.NotificationSettings,
+		PrivacySettings: user.PrivacySettings,
 	}
 	return retVal, nil
 }

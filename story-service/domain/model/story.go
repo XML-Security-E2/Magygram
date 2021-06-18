@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Tag struct {
+	Id string `bson:"_id,omitempty"`
+	Username string `bson:"username"`
+}
+
 type Story struct {
 	Id string `bson:"_id,omitempty"`
 	ContentType ContentType `bson:"content_type"`
@@ -13,6 +18,7 @@ type Story struct {
 	UserInfo UserInfo `bson:"user_info"`
 	VisitedBy []UserInfo `bson:"visited_by"`
 	CreatedTime time.Time `bson:"created_time"`
+	Tags []Tag `bson:"tags"`
 }
 
 type ContentType string
@@ -22,7 +28,7 @@ const(
 	CAMPAIGN
 )
 
-func NewStory(postOwner UserInfo, storyType ContentType, media Media) (*Story, error) {
+func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag) (*Story, error) {
 	err := validateStoryTypeEnums(storyType)
 	if err != nil {
 		return nil, err
@@ -39,6 +45,7 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media) (*Story, e
 				UserInfo: postOwner,
 				VisitedBy: []UserInfo{},
 				CreatedTime: time.Now(),
+				Tags: tags,
 	}, nil
 }
 

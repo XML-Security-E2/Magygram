@@ -271,6 +271,11 @@ export const userReducer = (state, action) => {
 							notifyAcceptFollowRequest: false,
 							notifyComments: false,
 						},
+						privacySettings: {
+							isPrivate: false,
+							receiveMessages: true,
+							isTaggable: true,
+						},
 					},
 				},
 			};

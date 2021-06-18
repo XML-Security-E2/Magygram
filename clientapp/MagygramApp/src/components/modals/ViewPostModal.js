@@ -11,6 +11,7 @@ import PostCommentInputModalView from "../PostCommentInputModalView";
 import PostLikesAndDislikesModalView from "../PostLikesAndDislikesModalView";
 import OptionsModal from "./OptionsModal";
 import { getUserInfo } from "../../helpers/auth-header";
+import { postConstants } from "../../constants/PostConstants";
 
 const ViewPostModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -72,6 +73,7 @@ const ViewPostModal = () => {
 	};
 
 	const handleRedirect = (userId) => {
+		handleModalClose();
 		window.location = "#/profile?userId=" + userId;
 	};
 
@@ -87,7 +89,7 @@ const ViewPostModal = () => {
 								{postState.viewPostModal.post.Tags !== null &&
 								postState.viewPostModal.post.Tags.map((tag) => {
 									return (
-										<button type="button" className="btn btn-light" onClick={handleRedirect(tag.id)}>
+										<button type="button" className="btn btn-light m-1" onClick={() => handleRedirect(tag.Id)}>
 											{tag.Username}
 										</button>
 									);

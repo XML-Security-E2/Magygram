@@ -24,6 +24,7 @@ type User struct {
 	DislikedPosts []string `bson:"disliked_posts"`
 	BlockedUsers []string `bson:"blocked_users"`
 	NotificationSettings NotificationSettings `bson:"notification_settings" json:"notificationSettings"`
+	PrivacySettings PrivacySettings `bson:"privacy_settings" json:"privacySettings"`
 	Category Category `bson:"category"`
 	IsVerified bool `bson:"verified_profile"`
 }
@@ -37,6 +38,12 @@ type NotificationSettings struct {
 	NotifyFollowRequest bool `json:"notifyFollowRequest"`
 	NotifyAcceptFollowRequest bool `json:"notifyAcceptFollowRequest"`
 	NotifyComment bool `json:"notifyComments"`
+}
+
+type PrivacySettings struct {
+	IsPrivate bool `json:"isPrivate"`
+	ReceiveMessages bool `json:"receiveMessages"`
+	IsTaggable bool `json:"isTaggable"`
 }
 
 type Category string
@@ -68,6 +75,7 @@ type UserProfileResponse struct {
 	FollowingNumber int `json:"followingNumber"`
 	SentFollowRequest bool `json:"sentFollowRequest"`
 	NotificationSettings NotificationSettings `json:"notificationSettings"`
+	PrivacySettings PrivacySettings `json:"privacySettings"`
 }
 
 type PostProfileResponse struct {
@@ -218,6 +226,11 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 			NotifyFollowRequest: true,
 			NotifyComment:       true,
 			NotifyAcceptFollowRequest: true,
+		},
+		PrivacySettings: PrivacySettings{
+			IsPrivate: false,
+			ReceiveMessages: true,
+			IsTaggable: true,
 		},
 		IsVerified: false,
 	}, nil

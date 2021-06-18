@@ -28,6 +28,7 @@ export const userService = {
 	blockUser,
 	unblockUser,
 	IsUserVerified,
+	editUserPrivacySettings,
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -227,6 +228,32 @@ function editUserNotifications(userId, notificationDTO, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success("User notifications successfully changed"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.UPDATE_USER_REQUEST };
+	}
+
+	function success(successMessage) {
+		return { type: userConstants.UPDATE_USER_SUCCESS, successMessage };
+	}
+
+	function failure(error) {
+		return { type: userConstants.UPDATE_USER_FAILURE, errorMessage: error };
+	}
+}
+
+function editUserPrivacySettings(userId, privacySettingsReq, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/users/${userId}/privacy-settings`, privacySettingsReq, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("User privacy settings successfully changed"));
 			} else {
 				dispatch(failure(res.data.message));
 			}

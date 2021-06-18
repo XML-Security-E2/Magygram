@@ -10,7 +10,9 @@ import VerifyAccoundSidebar from "./VerifyAccountSidebar";
 import { profileSettingsConstants } from "../constants/ProfileSettingsConstants";
 import VerifyAccontInfoForm from "./VerifyAccountInfoForm";
 import EditNotificationsSidebar from "./EditNotificationsSidebar";
+import EditPrivacySettingsSidebar from "./EditPrivacySettingsSidebar";
 import EditNotificationsForm from "./EditNotificationsForm";
+import EditPrivacySettingsForm from "./EditPrivacySettingsForm";
 import { userService } from "../services/UserService";
 import { requestsService } from "../services/RequestsService";
 
@@ -28,6 +30,10 @@ const UserEditProfile = () => {
 
 	const handleEditNotifications = () => {
 		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_NOTIFICATIONS_PAGE });
+	};
+
+	const handleEditPrivacySettings = () => {
+		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_PRIVACY_SETTINGS_PAGE });
 	};
 
 	useEffect(() => {
@@ -58,12 +64,14 @@ const UserEditProfile = () => {
 				<div className="col-3">
 					<EditProfileSidebar show={profileSettingsState.activeSideBar.showEditProfile} handleEditProfile={handleEditProfile} />
 					<EditNotificationsSidebar show={profileSettingsState.activeSideBar.showEditNotifications} handleEditNotifications={handleEditNotifications} />
+					<EditPrivacySettingsSidebar show={profileSettingsState.activeSideBar.showEditPrivacySettings} handleEditPrivacySettings={handleEditPrivacySettings} />
 					<VerifyAccoundSidebar show={profileSettingsState.activeSideBar.showVerifyAccount} handleVerifyAccount={handleVerifyAccount} />
 				</div>
 				<div className="col-9 border-left" style={{ minHeight: "600px" }}>
 					<EditProfileInfoForm show={profileSettingsState.activeSideBar.showEditProfile} />
 					<EditNotificationsForm show={profileSettingsState.activeSideBar.showEditNotifications} />
 					<VerifyAccontInfoForm show={profileSettingsState.activeSideBar.showVerifyAccount} />
+					<EditPrivacySettingsForm show={profileSettingsState.activeSideBar.showEditPrivacySettings} />
 				</div>
 			</div>
 		</React.Fragment>

@@ -40,6 +40,7 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"disliked_posts" , user.DislikedPosts},
 																{"blocked_users" , user.BlockedUsers},
 																{"notification_settings" , user.NotificationSettings},
+																{"privacy_settings" , user.PrivacySettings},
 																{"verified_profile" , user.IsVerified},
 																{"category" , user.Category},
 	}}})

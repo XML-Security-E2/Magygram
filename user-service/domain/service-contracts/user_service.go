@@ -37,6 +37,7 @@ type UserService interface {
 	GetUserLikedPost(ctx context.Context, bearer string) ([]string,error)
 	GetUserDislikedPost(ctx context.Context, bearer string) ([]string,error)
 	EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettings) error
+	EditUsersPrivacySettings(ctx context.Context, bearer string, privacySettingsReq *model.PrivacySettings) error
 
 	GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
 	GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)

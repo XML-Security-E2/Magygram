@@ -50,6 +50,7 @@ type UserHandler interface {
 	GetUsersForStoryNotification(c echo.Context) error
 	CheckIfPostInteractionNotificationEnabled(c echo.Context) error
 	EditUsersNotifications(c echo.Context) error
+	EditUsersPrivacySettings(c echo.Context) error
 	VerifyUser(c echo.Context) error
 	CheckIfUserVerified(c echo.Context) error
 }
@@ -169,6 +170,25 @@ func (h *userHandler) EditUsersNotifications(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")
 }
 
+func (h *userHandler) EditUsersPrivacySettings(c echo.Context) error {
+	privacySettingsReq := &model.PrivacySettings{}
+	if err := c.Bind(privacySettingsReq); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := h.UserService.EditUsersPrivacySettings(ctx, bearer, privacySettingsReq)
+	if err != nil{
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
 
 func (h *userHandler) EditUserImage(c echo.Context) error {
 	userId := c.Param("userId")

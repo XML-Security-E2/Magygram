@@ -1,0 +1,3 @@
+time="2021-06-17T16:24:47+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-17T17:20:57+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/zindo/Desktop/Magygram/post-service/service/post_service.go:514" post_owner_id=50ff546d-74d9-4e89-bb7e-7c344868c782 request_ip=127.0.0.1 user_id=375b15c2-1869-4f77-a982-690bbf00031d
+time="2021-06-18T15:21:23+02:00" level=error msg="User-service not available" func=post-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/zindo/Desktop/Magygram/post-service/service/intercomm/user_client.go:50" request_ip=127.0.0.1

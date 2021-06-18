@@ -11,6 +11,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/users/:userId", h.EditUser, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/image", h.EditUserImage, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/notifications", h.EditUsersNotifications)
+	e.PUT("/api/users/:userId/privacy-settings", h.EditUsersPrivacySettings)
 
 	e.GET("/api/users/logged", h.GetLoggedUserInfo, h.UserLoggingMiddleware)
 	e.GET("/api/users/activate/:activationId", h.ActivateUser, h.UserLoggingMiddleware)

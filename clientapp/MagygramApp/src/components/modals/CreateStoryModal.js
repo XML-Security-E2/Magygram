@@ -32,9 +32,15 @@ const CreateStoryModal = () => {
 	};
 
 	const handleStoryUpload = () => {
+		let tagCollection = [];
+		tags.forEach((tag) => {
+			tagCollection.push({username: tag.value, id: tag.id});
+		});
 		let story = {
 			media: showedMedia.content,
+			tags: tagCollection,
 		};
+		console.log(story);
 		storyService.createStory(story, dispatch);
 	};
 
