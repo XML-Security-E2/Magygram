@@ -43,4 +43,9 @@ time="2021-06-18T19:21:14+02:00" level=info msg="Story created" func=story-servi
 time="2021-06-18T13:20:43+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-18T15:25:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-18T15:50:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+<<<<<<< HEAD
+time="2021-06-18T16:29:58+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-18T18:03:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+=======
+>>>>>>> develop
 >>>>>>> develop
