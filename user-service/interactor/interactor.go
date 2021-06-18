@@ -12,6 +12,7 @@ import (
 
 type Interactor interface {
 	NewUserRepository() repository.UserRepository
+	NewNotificationRulesRepository() repository.NotificationRulesRepository
 	NewAccountActivationRepository() repository.AccountActivationRepository
 	NewCollectionsService() service_contracts.CollectionsService
 	NewUserService() service_contracts.UserService
@@ -32,10 +33,11 @@ type interactor struct {
 	UserCol *mongo.Collection
 	AccCol *mongo.Collection
 	ResPwdCol *mongo.Collection
+	NotifyRulesCol *mongo.Collection
 }
 
-func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection) Interactor {
-	return &interactor{UserCol, AccCol,  ResPwdCol}
+func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection, NotifyRulesCol *mongo.Collection) Interactor {
+	return &interactor{UserCol, AccCol,  ResPwdCol, NotifyRulesCol}
 }
 
 type appHandler struct {
@@ -105,7 +107,12 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient())
+	return service.NewAuthService(i.NewUserRepository(),i.NewNotificationRulesRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient())
+}
+
+
+func (i *interactor) NewNotificationRulesRepository() repository.NotificationRulesRepository {
+	return mongodb.NewNotificationRulesRepository(i.NotifyRulesCol)
 }
 
 func (i *interactor) NewAccountActivationService() service_contracts.AccountActivationService {

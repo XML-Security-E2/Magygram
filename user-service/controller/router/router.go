@@ -58,6 +58,10 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.GET("api/users/:userId/notify/post", h.GetUsersForPostNotification)
 	e.GET("api/users/:userId/notify/story", h.GetUsersForStoryNotification)
-	e.GET("api/users/:userId/notify/:interactionType", h.CheckIfPostInteractionNotificationEnabled)
+
+	e.GET("api/users/notifications/get/:userId", h.GetUsersNotificationsSettings)
+	e.POST("api/users/notifications/settings/:userId", h.ChangeUsersNotificationsSettings)
+
+	e.GET("api/users/:userId/:fromId/notify/:interactionType", h.CheckIfPostInteractionNotificationEnabled)
 
 }
