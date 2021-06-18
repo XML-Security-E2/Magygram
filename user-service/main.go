@@ -63,6 +63,7 @@ func main() {
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	accActivationsCol := client.Database(*mongoDatabase).Collection("account-activations")
 	resetPasswordsCol := client.Database(*mongoDatabase).Collection("reset-passwords")
+	notificationsCol := client.Database(*mongoDatabase).Collection("notification-rules")
 
 	usersCol.Indexes().CreateMany(context.Background(),
 		[]mongo.IndexModel{{
@@ -79,7 +80,7 @@ func main() {
 
 
 	e := echo.New()
-	i := interactor.NewInteractor(usersCol, accActivationsCol, resetPasswordsCol)
+	i := interactor.NewInteractor(usersCol, accActivationsCol, resetPasswordsCol, notificationsCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

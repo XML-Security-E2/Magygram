@@ -28,14 +28,21 @@ type User struct {
 }
 
 type NotificationSettings struct {
-	NotifyStory bool `json:"notifyStory"`
-	NotifyPost bool `json:"notifyPost"`
-	NotifyLike bool `json:"notifyLike"`
-	NotifyDislike bool `json:"notifyDislike"`
+	NotifyLike string `json:"notifyLike"`
+	NotifyDislike string `json:"notifyDislike"`
 	NotifyFollow bool `json:"notifyFollow"`
 	NotifyFollowRequest bool `json:"notifyFollowRequest"`
 	NotifyAcceptFollowRequest bool `json:"notifyAcceptFollowRequest"`
-	NotifyComment bool `json:"notifyComments"`
+	NotifyComment string `json:"notifyComments"`
+}
+
+type NotificationSettingsUpdateReq struct {
+	NotifyLike int `json:"notifyLike"`
+	NotifyDislike int `json:"notifyDislike"`
+	NotifyFollow bool `json:"notifyFollow"`
+	NotifyFollowRequest bool `json:"notifyFollowRequest"`
+	NotifyAcceptFollowRequest bool `json:"notifyAcceptFollowRequest"`
+	NotifyComment int `json:"notifyComments"`
 }
 
 type Category string
@@ -66,7 +73,7 @@ type UserProfileResponse struct {
 	FollowersNumber int `json:"followersNumber"`
 	FollowingNumber int `json:"followingNumber"`
 	SentFollowRequest bool `json:"sentFollowRequest"`
-	NotificationSettings NotificationSettings `json:"notificationSettings"`
+	NotificationSettings NotificationSettingsUpdateReq `json:"notificationSettings"`
 }
 
 type PostProfileResponse struct {
@@ -191,6 +198,12 @@ const(
 	VIDEO
 )
 
+var (
+	Mute = "Mute"
+	FromPeopleIFollow = "FromPeopleIFollow"
+	FromEveryOne = "FromEveryOne"
+)
+
 func NewUser(userRequest *UserRequest) (*User, error) {
 	return &User{Id: guid.New().String(),
 		Name:           html.EscapeString(userRequest.Name),
@@ -203,13 +216,11 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		LikedPosts: []string{},
 		DislikedPosts: []string{},
 		NotificationSettings: NotificationSettings{
-			NotifyStory:         false,
-			NotifyPost:          false,
-			NotifyLike:          true,
-			NotifyDislike:       true,
+			NotifyLike:          FromEveryOne,
+			NotifyDislike:       FromEveryOne,
 			NotifyFollow:        true,
 			NotifyFollowRequest: true,
-			NotifyComment:       true,
+			NotifyComment:       FromEveryOne,
 			NotifyAcceptFollowRequest: true,
 		},
 		IsVerified: false,

@@ -10,6 +10,15 @@ const NotificationContextProvider = (props) => {
 		},
 		notifications: [],
 		notificationsNumber: 0,
+		notificationSettingsModal: {
+			showModal: false,
+			showSuccessMessage: false,
+			successMessage: "",
+			settings: {
+				notifyPost: false,
+				notifyStory: false,
+			},
+		},
 	});
 
 	return <NotificationContext.Provider value={{ notificationState, dispatch }}>{props.children}</NotificationContext.Provider>;
