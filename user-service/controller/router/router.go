@@ -70,4 +70,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("api/users/:userId/:fromId/notify/:interactionType", h.CheckIfPostInteractionNotificationEnabled)
 
 	e.PUT("/api/users/:requestId/delete", h.DeleteUser)
+
+	e.GET("/api/users/follow-recommendation", h.GetFollowRecommendation)
+
 }

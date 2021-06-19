@@ -23,6 +23,7 @@ type FollowService interface {
 	ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error)
 	Mute(mute *model.Mute) error
 	Unmute(mute *model.Mute) error
+	ReturnRecommendedUsers(user *model.User) (interface{}, error)
 }
 
 type followService struct {
@@ -211,6 +212,14 @@ func (f *followService) ReturnFollowRequestsForUser(bearer string, objectId stri
 	retVal, err := f.FollowRepository.ReturnFollowRequestsForUser(&model.User{Id: objectId}, loggedId)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"logged_user_id": loggedId, "object_id" : objectId}).Error("Get follow requests for user, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
+}
+
+func (f *followService) ReturnRecommendedUsers(user *model.User) (interface{}, error) {
+	retVal, err := f.FollowRepository.ReturnRecommendedUsers(user)
+	if err != nil {
 		return retVal, err
 	}
 	return retVal, err

@@ -29,6 +29,8 @@ export const userService = {
 	unblockUser,
 	IsUserVerified,
 	editUserPrivacySettings,
+	getFollowRecommendationHandler,
+	followRecommendedUser,
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -690,5 +692,65 @@ function IsUserVerified(dispatch) {
 	}
 	function failure(error) {
 		return { type: userConstants.CHECK_IF_USER_VERIFIED_FAILURE, error };
+	}
+}
+
+async function getFollowRecommendationHandler(dispatch) {
+	dispatch(request())
+	await Axios.get(`/api/users/follow-recommendation`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure());
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: userConstants.GET_FOLLOW_RECOMMENDATION_REQUEST };
+	}
+
+	function success(data) {
+		return { type: userConstants.GET_FOLLOW_RECOMMENDATION_SUCCESS, data };
+	}
+	function failure() {
+		return { type: userConstants.GET_FOLLOW_RECOMMENDATION_FAILRUE };
+	}
+}
+
+function followRecommendedUser(userId,dispatch){
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request());
+
+	Axios.post(`/api/users/follow`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(userId));
+			} else if (res.status === 201) {
+				dispatch(followRequestSuccess(userId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: userConstants.RECOMMENDED_FOLLOW_USER_REQUEST };
+	}
+	function success(userId) {
+		return { type: userConstants.RECOMMENDED_FOLLOW_USER_SUCCESS, userId };
+	}
+	function followRequestSuccess(userId) {
+		return { type: userConstants.RECOMMENDED_FOLLOW_USER_SEND_REQUEST_SUCCESS,userId };
+	}
+	function failure() {
+		return { type: userConstants.RECOMMENDED_FOLLOW_USER_FAILURE };
 	}
 }

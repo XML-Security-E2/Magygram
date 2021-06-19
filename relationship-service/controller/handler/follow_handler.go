@@ -26,6 +26,7 @@ type FollowHandler interface {
 	Mute(ctx echo.Context) error
 	Unmute(ctx echo.Context) error
 	IsMuted(ctx echo.Context) error
+	ReturnRecommendedUsers(ctx echo.Context) error
 }
 
 type followHandler struct {
@@ -209,4 +210,15 @@ func (f *followHandler) ReturnFollowRequestsForUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, exists)
+}
+
+func (f *followHandler) ReturnRecommendedUsers(ctx echo.Context) error {
+	user := &model.User{Id: ctx.Param("userId")}
+
+	result, err := f.FollowService.ReturnRecommendedUsers(user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, result)
 }

@@ -88,6 +88,13 @@ const UserContextProvider = (props) => {
 				}
 			},
 		},
+		followRecommendationInfo: {
+			imageUrl:'',
+			name:'',
+			surname:'',
+			username:'',
+			recommendUserInfo: [],
+		},
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

@@ -48,4 +48,5 @@ type UserService interface {
 	GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error)
 	ChangeUsersNotificationsSettings(ctx context.Context, bearer string, settingsReq *model.SettingsRequest, userId string) error
 	DeleteUser(ctx context.Context, requestId string) error
+	GetFollowRecommendation(ctx context.Context, bearer string) (*model.FollowRecommendationResponse, error)
 }

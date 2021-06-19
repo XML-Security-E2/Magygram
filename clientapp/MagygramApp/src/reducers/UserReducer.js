@@ -453,7 +453,61 @@ export const userReducer = (state, action) => {
 			return state;
 		case userConstants.UNBLOCK_USER_REQUEST:
 			return state;
+		case userConstants.GET_FOLLOW_RECOMMENDATION_REQUEST:
+			return {
+				...state,
+				followRecommendationInfo: {
+					imageUrl:'',
+					name:'',
+					surname:'',
+					username:'',
+					recommendUserInfo: [],
+				}
+			}
+		case userConstants.GET_FOLLOW_RECOMMENDATION_FAILURE:
+			return {
+				...state,
+				followRecommendationInfo: {
+				imageUrl:'',
+				name:'',
+				surname:'',
+				username:'',
+				recommendUserInfo: [],
+			}
+		}
+		case userConstants.GET_FOLLOW_RECOMMENDATION_SUCCESS:
+			return {
+				...state,
+					followRecommendationInfo: {
+					imageUrl:action.data.ImageURL,
+					name:action.data.Name,
+					surname:action.data.Surname,
+					username:action.data.Username,
+					recommendUserInfo: action.data.RecommendedUsers,
+				}
+			}
 
+		case userConstants.RECOMMENDED_FOLLOW_USER_REQUEST:
+			return state;
+		case userConstants.RECOMMENDED_FOLLOW_USER_SUCCESS:
+			a = { ...state };
+			let recommendFollowSuccess = a.followRecommendationInfo.recommendUserInfo.find((info) => info.Id === action.userId);
+			if (recommendFollowSuccess !== undefined) {
+				recommendFollowSuccess.Followed = true;
+			}
+
+			return a;
+
+		case userConstants.RECOMMENDED_FOLLOW_USER_SEND_REQUEST_SUCCESS:
+			a = { ...state };
+			let recommendFollow = a.followRecommendationInfo.recommendUserInfo.find((info) => info.Id === action.userId);
+			if (recommendFollow !== undefined) {
+				recommendFollow.SendedRequest = true;
+			}
+
+			return a;
+		case userConstants.RECOMMENDED_FOLLOW_USER_FAILURE:
+			return state;
 		default:
 			return state;
 	}
