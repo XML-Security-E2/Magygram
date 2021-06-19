@@ -38,6 +38,7 @@ type Post struct {
 	LikedBy []UserInfo `bson:"liked_by"`
 	DislikedBy []UserInfo `bson:"disliked_by"`
 	Comments []Comment `bson:"comments"`
+	IsDeleted bool `bson:"deleted"`
 }
 
 type ContentType string
@@ -83,6 +84,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
+		IsDeleted: false,
 	}, nil
 }
 

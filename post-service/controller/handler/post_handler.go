@@ -38,12 +38,28 @@ type PostHandler interface {
 	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 	GetLikedPosts(c echo.Context) error
 	GetDislikedPosts(c echo.Context) error
+	DeletePost(c echo.Context) error
 }
 
 type postHandler struct {
 	PostService service_contracts.PostService
 }
 
+func (p postHandler) DeletePost(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := p.PostService.DeletePost(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
 
 func NewPostHandler(p service_contracts.PostService) PostHandler {
 	return &postHandler{p}

@@ -17,4 +17,5 @@ type PostRepository interface {
 	GetPostsThatContainLocation(ctx context.Context, location string) ([]*model.Post, error)
 	GetPostsByLocation(ctx context.Context, location string)([]*model.Post, error)
 	GetPostsByPostIdArray(ctx context.Context, ids []string) ([]*model.Post, error)
+	DeletePost(ctx context.Context, request *model.Post) (*mongo.UpdateResult, error)
 }

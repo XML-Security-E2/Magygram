@@ -6,9 +6,13 @@ import { userService } from "../services/UserService";
 import FollowingUsersModal from "./modals/FollowingUsersModal";
 import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
+import { notificationService } from "../services/NotificationService";
+import { NotificationContext } from "../contexts/NotificationContext";
+import NotificationSettingsModal from "./modals/NotificationSettingsModal";
 
 const UserProfileHeaderInfo = ({ userId }) => {
 	const { userState, dispatch } = useContext(UserContext);
+	const ntfxCtx = useContext(NotificationContext);
 
 	const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
 
@@ -57,19 +61,40 @@ const UserProfileHeaderInfo = ({ userId }) => {
 			contentType: "USER",
 		};
 
-		Axios.post(`/api/report`, reportDTO , { validateStatus: () => true, headers: authHeader() })
+		Axios.post(`/api/report`, reportDTO, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res.data);
+				if (res.status === 200) {
+					alert("You have reported this user successfully");
+				} else {
+					console.log("err");
+				}
+			})
+			.catch((err) => {
+				console.log("err");
+			});
+	};
+	
+	const deleteUser = () => {
+		console.log(localStorage.getItem("roles"))
+		let requestId =  userId;
+		Axios.put(`/api/users/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
-			console.log(res.data);
+			console.log(res);
 			if (res.status === 200) {
-				alert("You have reported this user successfully")
+				console.log("User has been deleted");
+				alert("You have successfully deleted this user!")
 			} else {
-				console.log("err")
+				console.log("ERROR")
 			}
 		})
 		.catch((err) => {
-			console.log("err")
+			console.log("ERROR")
 		});
+	}
 
+	const handleNotificationsSetttings = async () => {
+		await notificationService.getProfileNotificationsSettings(userId, ntfxCtx.dispatch);
 	};
 
 	return (
@@ -104,6 +129,11 @@ const UserProfileHeaderInfo = ({ userId }) => {
 										</button>
 									))
 								))}
+							{userState.userProfile.user.following && (
+								<button type="button" className="btn btn-outline-secondary ml-2 btn-rounded btn-icon" onClick={handleNotificationsSetttings}>
+									<i className="mdi mdi-bell"></i>
+								</button>
+							)}
 							<Link
 								type="button"
 								hidden={userId !== localStorage.getItem("userId")}
@@ -142,8 +172,27 @@ const UserProfileHeaderInfo = ({ userId }) => {
 								}
 						</div>
 						<div>
-							<button hidden={(localStorage.getItem("userId") == userId) || (localStorage.getItem("userId") === null)} style={{ backgroundColor: "red", borderColor: "red" }} type="button" className="btn btn-primary ml-2" tabindex="0" onClick={reportUser}>
+							<button
+								hidden={localStorage.getItem("userId") === userId || localStorage.getItem("userId") === null}
+								style={{ backgroundColor: "red", borderColor: "red" }}
+								type="button"
+								className="btn btn-primary ml-2"
+								tabindex="0"
+								onClick={reportUser}
+							>
 								Report
+							</button>
+						</div>
+						<div>
+							<button
+								hidden={!(localStorage.getItem("userId") === userId)}
+								style={{ backgroundColor: "red", borderColor: "red" }}
+								type="button"
+								className="btn btn-primary ml-2"
+								tabindex="0"
+								onClick={deleteUser}
+							>
+								Delete profile
 							</button>
 						</div>
 					</div>
@@ -176,6 +225,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 					</div>
 				</section>
 			</div>
+			<NotificationSettingsModal />
 			<FollowingUsersModal />
 		</nav>
 	);

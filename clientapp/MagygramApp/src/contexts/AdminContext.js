@@ -17,6 +17,13 @@ const AdminContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
         },
+        reportRequests:{
+            requests:[],
+            showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+        },
 	});
 
 	return <AdminContext.Provider value={{ state, dispatch }}>{props.children}</AdminContext.Provider>;

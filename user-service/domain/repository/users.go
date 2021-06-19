@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
 	"user-service/domain/model"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserRepository interface {
@@ -14,4 +15,5 @@ type UserRepository interface {
 	SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
 	IsBlocked(ctx context.Context, subjectId string, objectId string) (bool, error)
+	DeleteUser(ctx context.Context, request *model.User) (*mongo.UpdateResult, error)
 }

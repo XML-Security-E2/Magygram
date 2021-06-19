@@ -75,9 +75,16 @@ func (h highlightsService) GetProfileHighlights(ctx context.Context, bearer stri
 		return nil, errors.New("invalid user id")
 	}
 
+	retVal, err := h.AuthClient.HasRole(bearer,"search_all_post_by_hashtag")
+	if err!=nil{
+		return nil, errors.New("auth service not found")
+	}
+
 	if !h.checkIfUserContentIsAccessible(bearer, owner) {
-		logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id" : owner.Id}).Warn("Unauthorized access")
-		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		if !retVal {
+			logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id": owner.Id}).Warn("Unauthorized access")
+			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		}
 	}
 
 	var response []*model.HighlightProfileResponse
@@ -127,9 +134,16 @@ func (h highlightsService) GetProfileHighlightsByHighlightName(ctx context.Conte
 		return nil, errors.New("invalid user id")
 	}
 
+	retValRole, err := h.AuthClient.HasRole(bearer,"view_profile_highlights")
+	if err!=nil{
+		return nil, errors.New("auth service not found")
+	}
+
 	if !h.checkIfUserContentIsAccessible(bearer, owner) {
-		logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id" : owner.Id}).Warn("Unauthorized access")
-		return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		if !retValRole {
+			logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id" : owner.Id}).Warn("Unauthorized access")
+			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		}
 	}
 
 	if _, ok := owner.HighlightsStory[name]; !ok {

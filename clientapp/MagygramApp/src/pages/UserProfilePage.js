@@ -7,6 +7,7 @@ import UserProfileContent from "../components/UserProfileContent";
 import PostContextProvider from "../contexts/PostContext";
 import HeaderWrapper from "../components/HeaderWrapper";
 import EditPostModal from "../components/modals/EditPostModal";
+import NotificationContextProvider from "../contexts/NotificationContext";
 
 const UserProfilePage = (props) => {
 	const search = props.location.search;
@@ -24,7 +25,9 @@ const UserProfilePage = (props) => {
 									<div className="row">
 										<div className="col-12">
 											<UserContextProvider>
-												<UserProfileHeaderInfo userId={userId} />
+												<NotificationContextProvider>
+													<UserProfileHeaderInfo userId={userId} />
+												</NotificationContextProvider>
 											</UserContextProvider>
 											<UserProfileContent userId={userId} />
 										</div>

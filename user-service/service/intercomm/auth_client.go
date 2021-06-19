@@ -20,6 +20,7 @@ type AuthClient interface {
 	ActivateUser(userId string) error
 	GetLoggedUserId(bearer string) (string,error)
 	ChangePassword(userId string, password string, passwordRepeat string) error
+	HasRole(bearer string, role string) (bool,error)
 }
 
 type userAuthRequest struct {
@@ -182,4 +183,25 @@ func (a authClient) ChangePassword(userId string, password string, passwordRepea
 		return errors.New(message)
 	}
 	return nil
+}
+
+func (a authClient) HasRole(bearer string,role string) (bool,error) {
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/has-role", baseUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	req.Header.Add("X-permissions", "[" + "\"" + role+ "\"" +"]")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			return false, err
+		}
+
+		return false, nil
+	}
+
+	return true, nil
 }

@@ -53,6 +53,9 @@ type UserHandler interface {
 	EditUsersPrivacySettings(c echo.Context) error
 	VerifyUser(c echo.Context) error
 	CheckIfUserVerified(c echo.Context) error
+	GetUsersNotificationsSettings(c echo.Context) error
+	ChangeUsersNotificationsSettings(c echo.Context) error
+	DeleteUser(c echo.Context) error
 }
 
 var (
@@ -64,6 +67,61 @@ type userHandler struct {
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
+}
+
+func (h *userHandler) GetUsersNotificationsSettings(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	settings, err := h.UserService.GetUsersNotificationsSettings(ctx, bearer, userId)
+	if err != nil {
+		fmt.Println(err)
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, settings)}
+
+func (h userHandler) DeleteUser(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := h.UserService.DeleteUser(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) ChangeUsersNotificationsSettings(c echo.Context) error {
+	userId := c.Param("userId")
+	setReq := &model.SettingsRequest{}
+	if err := c.Bind(setReq); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := h.UserService.ChangeUsersNotificationsSettings(ctx, bearer, setReq, userId)
+	if err != nil {
+		fmt.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
 
 func (h *userHandler) GetUsersForPostNotification(c echo.Context) error {
@@ -102,6 +160,8 @@ func (h *userHandler) GetUsersForStoryNotification(c echo.Context) error {
 
 func (h *userHandler) CheckIfPostInteractionNotificationEnabled(c echo.Context) error {
 	userId := c.Param("userId")
+	fromId := c.Param("fromId")
+
 	interactionType := c.Param("interactionType")
 
 	ctx := c.Request().Context()
@@ -109,7 +169,7 @@ func (h *userHandler) CheckIfPostInteractionNotificationEnabled(c echo.Context) 
 		ctx = context.Background()
 	}
 
-	check, err := h.UserService.CheckIfPostInteractionNotificationEnabled(ctx, userId, interactionType)
+	check, err := h.UserService.CheckIfPostInteractionNotificationEnabled(ctx, userId, fromId, interactionType)
 	if err != nil {
 		fmt.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -151,7 +211,7 @@ func (h *userHandler) EditUser(c echo.Context) error {
 }
 
 func (h *userHandler) EditUsersNotifications(c echo.Context) error {
-	notificationReq := &model.NotificationSettings{}
+	notificationReq := &model.NotificationSettingsUpdateReq{}
 	if err := c.Bind(notificationReq); err != nil {
 		return err
 	}

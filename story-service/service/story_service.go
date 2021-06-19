@@ -53,6 +53,7 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
 		NotifyUrl: "TODO",
 		ImageUrl:  post.UserInfo.ImageURL,
 		Type:      intercomm.PublishedStory,
