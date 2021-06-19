@@ -19,6 +19,12 @@ type storyRepository struct {
 	Col *mongo.Collection
 }
 
+func (s storyRepository) DeleteStory(ctx context.Context, request *model.Story) (*mongo.UpdateResult, error) {
+	return s.Col.UpdateOne(ctx, bson.M{"_id":  request.Id},bson.D{{"$set", bson.D{
+			{"deleted" , true}}}})
+}
+
+
 func NewStoryRepository(Col *mongo.Collection) repository.StoryRepository {
 	return &storyRepository{Col}
 }

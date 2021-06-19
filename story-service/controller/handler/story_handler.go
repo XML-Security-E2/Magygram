@@ -21,11 +21,29 @@ type StoryHandler interface {
 	GetStoryHighlight(c echo.Context) error
 	HaveActiveStoriesLoggedUser(c echo.Context) error
 	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	DeleteStory(c echo.Context) error
 }
 
 type storyHandler struct {
 	StoryService service_contracts.StoryService
 }
+
+func (p storyHandler) DeleteStory(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := p.StoryService.DeleteStory(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
 
 func (p storyHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {

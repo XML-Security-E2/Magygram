@@ -13,4 +13,5 @@ type StoryRepository interface {
 	GetByID(ctx context.Context, storyId string) (*model.Story, error)
 	Update(ctx context.Context, story *model.Story) (*mongo.UpdateResult, error)
 	GetActiveStoriesForUser(ctx context.Context, userId string) ([]*model.Story, error)
+	DeleteStory(ctx context.Context, request *model.Story) (*mongo.UpdateResult, error)
 }
