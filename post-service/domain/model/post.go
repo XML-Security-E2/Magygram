@@ -31,7 +31,7 @@ type Post struct {
 	Description string `bson:"description"`
 	Location string `bson:"location"`
 	ContentType ContentType `bson:"post_type"`
-	Tags []string `bson:"tags"`
+	Tags []Tag `bson:"tags"`
 	HashTags []string `bson:"hashTags"`
 	Media []Media `bson:"media"`
 	UserInfo UserInfo `bson:"user_info"`
@@ -52,14 +52,14 @@ type PostEditRequest struct {
 	Id string `json:"id"`
 	Description string `json:"description"`
 	Location string `json:"location"`
-	Tags []string `json:"tags"`
+	Tags []Tag `json:"tags"`
 }
 
 type PostRequest struct {
 	Description string `json:"description"`
 	Location string `json:"location"`
 	Media []*multipart.FileHeader `json:"media"`
-	Tags []string `json:"tags"`
+	Tags []Tag `json:"tags"`
 }
 
 func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media) (*Post, error) {
@@ -154,7 +154,7 @@ type PostResponse struct {
 	Description string
 	Location string
 	ContentType ContentType
-	Tags []string
+	Tags []Tag
 	HashTags []string
 	Media []Media
 	UserInfo UserInfo
@@ -203,13 +203,13 @@ type CommentRequest struct {
 }
 
 type Location struct {
-	Id string `bson:"_id,omitempty"`
-	Name string `bson:"name"`
+	Id string `bson:"_id,omitempty" json:"id"`
+	Name string `bson:"name" json:"username"`
 }
 
 type Tag struct {
 	Id string `bson:"_id,omitempty"`
-	Name string `bson:"name"`
+	Username string `bson:"username"`
 }
 
 type FollowedUsersResponse struct {

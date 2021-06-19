@@ -9,6 +9,7 @@ const ProfileSettingsContextProvider = (props) => {
 			showEditProfile: true,
 			showVerifyAccount: false,
 			showEditNotifications: false,
+			showEditPrivacySettings: false,
 		},
 		sendedVerifyRequest: false,
 		sendRequest: {

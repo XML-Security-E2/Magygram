@@ -10,6 +10,7 @@ export const profileSettingsReducer = (state, action) => {
 					showEditProfile: true,
 					showVerifyAccount: false,
 					showEditNotifications: false,
+					showEditPrivacySettings: false,
 				},
 			};
 		case profileSettingsConstants.SHOW_VERIFY_ACCOUNT_PAGE:
@@ -19,6 +20,7 @@ export const profileSettingsReducer = (state, action) => {
 					showEditProfile: false,
 					showVerifyAccount: true,
 					showEditNotifications: false,
+					showEditPrivacySettings: false,
 				},
 			};
 
@@ -29,6 +31,17 @@ export const profileSettingsReducer = (state, action) => {
 					showEditProfile: false,
 					showVerifyAccount: false,
 					showEditNotifications: true,
+					showEditPrivacySettings: false,
+				},
+			};
+		case profileSettingsConstants.SHOW_EDIT_PRIVACY_SETTINGS_PAGE:
+			return {
+				...state,
+				activeSideBar: {
+					showEditProfile: false,
+					showVerifyAccount: false,
+					showEditNotifications: false,
+					showEditPrivacySettings: true,
 				},
 			};
 		case profileSettingsConstants.CREATE_VERIFICATION_REQUEST_REQUEST:

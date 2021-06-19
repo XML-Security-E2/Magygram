@@ -69,6 +69,8 @@ const UserContextProvider = (props) => {
 				followersNumber: "",
 				followingNumber: "",
 				sentFollowRequest: false,
+				muted: false,
+				blocked: false,
 				notificationSettings: {
 					notifyStory: false,
 					notifyPost: false,
@@ -79,6 +81,11 @@ const UserContextProvider = (props) => {
 					notifyAcceptFollowRequest: false,
 					notifyComments: false,
 				},
+				privacySettings: {
+					isPrivate: false,
+					receiveMessages: true,
+					isTaggable: true,
+				}
 			},
 		},
 	});

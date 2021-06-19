@@ -39,6 +39,22 @@ const UserProfileHeaderInfo = ({ userId }) => {
 		userService.unfollowUser(userId, dispatch);
 	};
 
+	const handleUserMute = () => {
+		userService.muteUser(userId, dispatch);
+	};
+
+	const handleUserUnmute = () => {
+		userService.unmuteUser(userId, dispatch);
+	};
+
+	const handleUserBlock = () => {
+		userService.blockUser(userId, dispatch);
+	};
+
+	const handleUserUnblock = () => {
+		userService.unblockUser(userId, dispatch);
+	};
+
 	const reportUser = () => {
 		let reportDTO = {
 			contentId: userId,
@@ -98,7 +114,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							<h2>{userState.userProfile.user.username}</h2>
 						</div>
 						<div>
-							{localStorage.getItem("userId") !== null &&
+							{localStorage.getItem("userId") !== null && userState.userProfile.user.blocked === false &&
 								(userState.userProfile.user.sentFollowRequest ? (
 									<h5 className="text-secondary ml-2">Following request sent</h5>
 								) : (
@@ -128,6 +144,32 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							>
 								Edit Profile
 							</Link>
+						</div>
+						<div>
+						{localStorage.getItem("userId") !== null && userId !== localStorage.getItem("userId") && userState.userProfile.user.following && userState.userProfile.user.blocked === false &&
+									(userState.userProfile.user.muted ? (
+										<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnmute}>
+											Unmute
+										</button>
+									) : (
+										<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserMute}>
+											Mute
+										</button>
+									))
+								}
+						</div>
+						<div>
+						{localStorage.getItem("userId") !== null && userId !== localStorage.getItem("userId") && 
+									(userState.userProfile.user.blocked ? (
+										<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnblock}>
+											Unblock
+										</button>
+									) : (
+										<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserBlock}>
+											Block
+										</button>
+									))
+								}
 						</div>
 						<div>
 							<button

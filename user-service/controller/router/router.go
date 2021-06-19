@@ -11,6 +11,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/users/:userId", h.EditUser, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/image", h.EditUserImage, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/notifications", h.EditUsersNotifications)
+	e.PUT("/api/users/:userId/privacy-settings", h.EditUsersPrivacySettings)
 
 	e.GET("/api/users/logged", h.GetLoggedUserInfo, h.UserLoggingMiddleware)
 	e.GET("/api/users/activate/:activationId", h.ActivateUser, h.UserLoggingMiddleware)
@@ -28,6 +29,10 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/follow-requests/:userId/accept", h.AcceptFollowRequest, h.UserLoggingMiddleware)
 	e.POST("/api/users/follow", h.FollowUser, h.UserLoggingMiddleware)
 	e.POST("/api/users/unfollow", h.UnollowUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/mute", h.MuteUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/unmute", h.UnmuteUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/block", h.BlockUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/unblock", h.UnblockUser, h.UserLoggingMiddleware)
 
 	e.GET("/api/users/:userId/profile", h.GetUserProfileById, h.UserLoggingMiddleware)
 

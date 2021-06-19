@@ -2,37 +2,38 @@ package model
 
 import (
 	"errors"
-	"golang.org/x/crypto/bcrypt"
 	"html"
 	"log"
 	"regexp"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Id string `bson:"_id,omitempty"`
-	Active bool `bson:"active"`
-	Email string `bson:"email" validate:"required,email"`
-	Password string `bson:"password"`
-	Roles []Role `bson:"roles"`
+	Id        string `bson:"_id,omitempty"`
+	Active    bool   `bson:"active"`
+	Email     string `bson:"email" validate:"required,email"`
+	Password  string `bson:"password"`
+	Roles     []Role `bson:"roles"`
 	TotpToken string `bson:"totp_token"`
 }
 
 type UserRequest struct {
-	Id string `json:"id"`
-	Email string `json:"email"`
-	Password string `json:"password"`
+	Id               string `json:"id"`
+	Email            string `json:"email"`
+	Password         string `json:"password"`
 	RepeatedPassword string `json:"repeatedPassword"`
 }
 
 type LoginRequest struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type LoginTwoFactoryRequest struct{
-	Email string
+type LoginTwoFactoryRequest struct {
+	Email    string
 	Password string
-	Token string
+	Token    string
 }
 
 type ActivatedRequest struct {
@@ -40,8 +41,8 @@ type ActivatedRequest struct {
 }
 
 type PasswordChangeRequest struct {
-	UserId string `json:"userId"`
-	Password string `json:"password"`
+	UserId         string `json:"userId"`
+	Password       string `json:"password"`
 	PasswordRepeat string `json:"passwordRepeat"`
 }
 
@@ -54,7 +55,7 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 		Active:   false,
 		Email:    html.EscapeString(userRequest.Email),
 		Password: hashAndSalt,
-		Roles: []Role{{ Name: "user", Permissions: []Permission{
+		Roles: []Role{{Name: "user", Permissions: []Permission{
 			{"create_post"},
 			{"edit_profile"},
 			{"edit_profile_photo"},
@@ -66,6 +67,8 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 			{"accept_follow_request"},
 			{"follow"},
 			{"unfollow"},
+			{"mute"},
+			{"unmute"},
 			{"search"},
 			{"create_highlights"},
 			{"get_profile_highlights"},

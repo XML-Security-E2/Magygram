@@ -79,7 +79,7 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	tagsString := c.FormValue("tags")
 
 	mpf, _ := c.MultipartForm()
-	var tags []string
+	var tags []model.Tag
 	json.Unmarshal([]byte(tagsString), &tags)
 
 	var headers []*multipart.FileHeader

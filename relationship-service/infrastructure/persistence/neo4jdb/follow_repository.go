@@ -14,11 +14,16 @@ type FollowRepository interface {
 	CreateUser(user *model.User) error
 	Unfollow(followRequest *model.FollowRequest)  error
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
+	ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
 	ReturnFollowRequestsForUser(user *model.User, loggedId string) (interface{}, error)
+	ReturnRecommendedUsers(user *model.User) (interface{}, error)
 	AcceptFollowRequest(followRequest *model.FollowRequest) error
 	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
+	IsMuted(mute *model.Mute) (interface{}, error)
+	Mute(mute *model.Mute) error
+	Unmute(mute *model.Mute) error
 }
 
 type followRepository struct {
@@ -27,6 +32,44 @@ type followRepository struct {
 
 func NewFollowRepository(driver neo4j.Driver) FollowRepository {
 	return &followRepository{driver}
+}
+
+func (f *followRepository) Mute(mute *model.Mute) error {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer unsafeClose(session)
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (subject:User)-[f:FOLLOW]->(object:User) where subject.id = $subjectId and object.id = $objectId SET f.muted = true"
+		parameters := map[string]interface{}{
+			"subjectId": mute.SubjectId,
+			"objectId": mute.ObjectId,
+		}
+		_, err := tx.Run(query, parameters)
+		return nil, err
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f *followRepository) Unmute(mute *model.Mute) error {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer unsafeClose(session)
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (subject:User)-[f:FOLLOW]->(object:User) where subject.id = $subjectId and object.id = $objectId REMOVE f.muted"
+		parameters := map[string]interface{}{
+			"subjectId": mute.SubjectId,
+			"objectId": mute.ObjectId,
+		}
+		_, err := tx.Run(query, parameters)
+		return nil, err
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *followRepository) CreateFollow(followRequest *model.FollowRequest) (err error) {
@@ -113,6 +156,30 @@ func (f *followRepository) IsUserFollowed(followRequest *model.FollowRequest) (i
 	return result, nil
 }
 
+func (f *followRepository) IsMuted(mute *model.Mute) (interface{}, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error){
+		query := "MATCH (subject:User)-[f:FOLLOW{muted:true}]->(object:User) WHERE subject.id = $subjectId AND object.id = $objectId RETURN f"
+		parameters := map[string]interface{}{
+			"subjectId": mute.SubjectId,
+			"objectId": mute.ObjectId,
+		}
+		records, err := tx.Run(query, parameters)
+		for records.Next() {
+			return true, err
+		}
+		return false, err
+	});
+	if err != nil {
+		return false, err
+	}
+	return result, nil
+}
+
 func (f *followRepository) AcceptFollowRequest(followRequest *model.FollowRequest) error {
 	session := f.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeWrite,
@@ -155,6 +222,35 @@ func (f *followRepository) CreateUser(user *model.User) (err error) {
 	return err
 }
 
+func (f *followRepository) ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (s:User)-[f:FOLLOW {muted: true}]->(o:User) WHERE s.id = $sId return o.id as id"
+		parameters := map[string]interface{}{
+			"sId": user.Id,
+		}
+		records, err := tx.Run(query, parameters)
+		if err != nil {
+			return nil, err
+		}
+		users := model.Users{}
+		for records.Next() {
+			record := records.Record()
+			id, _ := record.Get("id")
+			users.Users = append(users.Users, id.(string))
+		}
+		return users, nil
+	})
+	if err != nil {
+		log.Println("error querying graph:", err)
+		return nil, err
+	}
+	return result, nil
+}
+
 func (f *followRepository) ReturnFollowedUsers(user *model.User) (interface{}, error) {
 	session := f.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeRead,
@@ -191,6 +287,35 @@ func (f *followRepository) ReturnFollowingUsers(user *model.User) (interface{}, 
 	defer unsafeClose(session)
 	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		query := "MATCH (s:User)<-[f:FOLLOW]-(o:User) WHERE s.id = $sId return o.id as id"
+		parameters := map[string]interface{}{
+			"sId": user.Id,
+		}
+		records, err := tx.Run(query, parameters)
+		if err != nil {
+			return nil, err
+		}
+		users := model.Users{}
+		for records.Next() {
+			record := records.Record()
+			id, _ := record.Get("id")
+			users.Users = append(users.Users, id.(string))
+		}
+		return users, nil
+	})
+	if err != nil {
+		log.Println("error querying graph:", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+func (f *followRepository) ReturnRecommendedUsers(user *model.User) (interface{}, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (s:User)-[:FOLLOW]->(o:User)-[:FOLLOW]-(r:User) WHERE s.id = $sId WITH r,count(*) as score return r.id as id ORDER BY score DESC LIMIT 10"
 		parameters := map[string]interface{}{
 			"sId": user.Id,
 		}

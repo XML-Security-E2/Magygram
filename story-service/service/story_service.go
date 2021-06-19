@@ -28,14 +28,14 @@ func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc 
 	return &storyService{r , ic, uc,ac,rc, mc}
 }
 
-func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
+func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil { return "", err}
 
 	media, err := p.MediaClient.SaveMedia(file)
 	if err != nil { return "", err}
 
-	post, err := model.NewStory(*userInfo, "REGULAR", media)
+	post, err := model.NewStory(*userInfo, "REGULAR", media, tags)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
 		return "", err}
@@ -279,6 +279,7 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 			Url: story.Media.Url,
 			MediaType: story.Media.MediaType,
 			StoryId: story.Id,
+			Tags: story.Tags,
 		}
 		retVal = append(retVal, mediaContent)
 	}

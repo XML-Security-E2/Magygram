@@ -33,6 +33,10 @@ type UserHandler interface {
 	GetFollowingUsers(c echo.Context) error
 	FollowUser(c echo.Context) error
 	UnollowUser(c echo.Context) error
+	MuteUser(c echo.Context) error
+	UnmuteUser(c echo.Context) error
+	BlockUser(c echo.Context) error
+	UnblockUser(c echo.Context) error
 	SearchForUsersByUsernameByGuest(c echo.Context) error
 	IsUserPrivate(c echo.Context) error
 	GetFollowRequests(c echo.Context) error
@@ -46,6 +50,7 @@ type UserHandler interface {
 	GetUsersForStoryNotification(c echo.Context) error
 	CheckIfPostInteractionNotificationEnabled(c echo.Context) error
 	EditUsersNotifications(c echo.Context) error
+	EditUsersPrivacySettings(c echo.Context) error
 	VerifyUser(c echo.Context) error
 	CheckIfUserVerified(c echo.Context) error
 	GetUsersNotificationsSettings(c echo.Context) error
@@ -225,6 +230,25 @@ func (h *userHandler) EditUsersNotifications(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")
 }
 
+func (h *userHandler) EditUsersPrivacySettings(c echo.Context) error {
+	privacySettingsReq := &model.PrivacySettings{}
+	if err := c.Bind(privacySettingsReq); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := h.UserService.EditUsersPrivacySettings(ctx, bearer, privacySettingsReq)
+	if err != nil{
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
 
 func (h *userHandler) EditUserImage(c echo.Context) error {
 	userId := c.Param("userId")
@@ -557,6 +581,86 @@ func (h *userHandler) FollowUser(c echo.Context) error {
 	if followRequest {
 		return c.JSON(http.StatusCreated, "")
 	}
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) MuteUser(c echo.Context) error {
+	userId := c.FormValue("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	err := h.UserService.MuteUser(ctx, bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) UnmuteUser(c echo.Context) error {
+	userId := c.FormValue("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	err := h.UserService.UnmuteUser(ctx, bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) BlockUser(c echo.Context) error {
+	userId := c.FormValue("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	err := h.UserService.BlockUser(ctx, bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) UnblockUser(c echo.Context) error {
+	userId := c.FormValue("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+	err := h.UserService.UnblockUser(ctx, bearer, userId)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
+	}
+
 	return c.JSON(http.StatusOK, "")
 }
 

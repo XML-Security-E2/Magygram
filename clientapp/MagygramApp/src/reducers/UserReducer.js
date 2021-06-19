@@ -260,6 +260,7 @@ export const userReducer = (state, action) => {
 						followersNumber: "",
 						followingNumber: "",
 						sentFollowRequest: false,
+						blocked: false,
 						notificationSettings: {
 							notifyStory: false,
 							notifyPost: false,
@@ -269,6 +270,11 @@ export const userReducer = (state, action) => {
 							notifyFollowRequest: false,
 							notifyAcceptFollowRequest: false,
 							notifyComments: false,
+						},
+						privacySettings: {
+							isPrivate: false,
+							receiveMessages: true,
+							isTaggable: true,
 						},
 					},
 				},
@@ -424,6 +430,28 @@ export const userReducer = (state, action) => {
 			console.log(action.userInfos);
 			return a;
 		case userConstants.ACCEPT_FOLLOW_REQUESTS_FAILURE:
+			return state;
+		case userConstants.MUTE_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.muted = true;
+			return a;
+		case userConstants.UNMUTE_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.muted = false;
+			return a;
+		case userConstants.BLOCK_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.blocked = true;
+			a.userProfile.user.muted = false;
+			a.userProfile.user.following = false;
+			return a;
+		case userConstants.UNBLOCK_USER_SUCCESS:
+			a = { ...state };
+			a.userProfile.user.blocked = false;
+			return a;
+		case userConstants.BLOCK_USER_REQUEST:
+			return state;
+		case userConstants.UNBLOCK_USER_REQUEST:
 			return state;
 
 		default:

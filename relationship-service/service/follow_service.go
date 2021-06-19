@@ -13,12 +13,16 @@ type FollowService interface {
 	FollowRequest(followRequest *model.FollowRequest) (bool, error)
 	Unfollow(followRequest *model.FollowRequest) error
 	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
+	IsMuted(mute *model.Mute) (interface{}, error)
 	AcceptFollowRequest(bearer string, userId string) error
 	CreateUser(user *model.User) error
 	ReturnFollowedUsers(user *model.User) (interface{}, error)
+	ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error)
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(bearer string) (interface{}, error)
 	ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error)
+	Mute(mute *model.Mute) error
+	Unmute(mute *model.Mute) error
 }
 
 type followService struct {
@@ -29,6 +33,26 @@ type followService struct {
 
 func NewFollowService(r neo4jdb.FollowRepository, userClient intercomm.UserClient, ac intercomm.AuthClient) FollowService {
 	return &followService{r, userClient, ac}
+}
+
+func (f *followService) Mute(mute *model.Mute) error {
+	if err := validator.New().Struct(mute); err != nil {
+		return err
+	}
+	if err := f.FollowRepository.Mute(mute); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f *followService) Unmute(mute *model.Mute) error {
+	if err := validator.New().Struct(mute); err != nil {
+		return err
+	}
+	if err := f.FollowRepository.Unmute(mute); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool, error) {
@@ -91,6 +115,19 @@ func (f *followService) IsUserFollowed(followRequest *model.FollowRequest) (inte
 	return exists, nil
 }
 
+func (f *followService) IsMuted(mute *model.Mute) (interface{}, error) {
+	if err := validator.New().Struct(mute); err != nil {
+		return false, err
+	}
+
+	exists, err := f.FollowRepository.IsMuted(mute)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
+
 func (f *followService) CreateUser(user *model.User) error {
 	if err := validator.New().Struct(user); err != nil {
 		return err
@@ -126,6 +163,15 @@ func (f *followService) AcceptFollowRequest(bearer string, userId string) error 
 
 func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, error) {
 	retVal, err := f.FollowRepository.ReturnFollowedUsers(user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
+		return retVal, err
+	}
+	return retVal, err
+}
+
+func (f *followService) ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error) {
+	retVal, err := f.FollowRepository.ReturnUnmutedFollowedUsers(user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
 		return retVal, err
