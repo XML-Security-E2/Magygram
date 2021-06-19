@@ -12,13 +12,15 @@ import SuccessAlert from "./SuccessAlert";
 import ViewPostModal from "./modals/ViewPostModal";
 import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
+import ReportedPost from "./ReportedPost";
+import ReportedStory from "./ReportedStory";
 
 const AdminReportRequestTab = () => {
 	const { state,dispatch } = useContext(AdminContext);
 	const { statePost,dispatchPost } = useContext(PostContext);
 
 	const handleVisitProfile = (userId) => {
-		window.location = "#/profile/" + userId;
+		window.location = "#/profile?userId=" + userId;
 	}
 
 	const approveVerificationRequest = (requestId)=>{
@@ -92,20 +94,19 @@ const AdminReportRequestTab = () => {
 							{state.reportRequests.requests.map(request => 
 								<tr id={request.Id} key={request.Id} >
 									<td >
-										<div><b>ID:</b> {request.ContentId}</div>
-										<div><b>TYPE:</b> {request.ContentType}</div>
+										<div><b>REPORT TYPE:</b> {request.ContentType}</div>
 									</td>
 									<td className="text-center">
 										<div>
 											<a hidden={(request.ContentType === "POST") || (request.ContentType === "STORY")} onClick={() => handleVisitProfile(request.ContentId)} class="link-primary">Visit profile</a>
 										</div>
-                                        <div>
-											<a hidden={(request.ContentType === "POST") || (request.ContentType === "USER")} onClick={() => handleViewStory(request.ContentId)} class="link-primary">View story</a>
-										</div>
-                                        <div>
-											<a hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} onClick={() => handleViewPost(request.ContentId)} class="link-primary">View post</a>
-										</div>
-									</td>
+                                        <div  hidden={(request.ContentType === "USER") || (request.ContentType === "POST")}>
+                                            <ReportedStory  userId={"7ffa004c-f23c-4647-a830-271c3a000c77"}/>
+                                        </div>
+                                        <div hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} >
+                                            <ReportedPost  id={request.ContentId}/>
+                                        </div>
+                                	</td>
 									<td className="text-right">
 										<div className="mt-2">
 											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>approveVerificationRequest(request.Id)}><i className="icofont-subscribe mr-1"></i>Delete report</button>
@@ -115,7 +116,7 @@ const AdminReportRequestTab = () => {
 								</tr>
 							)}		
                             
-                			<ViewPostModal />					
+                			<ViewPostModal/>					
 						</tbody>
 					</table> : 
 					<div>

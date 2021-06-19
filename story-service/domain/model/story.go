@@ -19,6 +19,7 @@ type Story struct {
 	VisitedBy []UserInfo `bson:"visited_by"`
 	CreatedTime time.Time `bson:"created_time"`
 	Tags []Tag `bson:"tags"`
+	IsDeleted bool `bson:"deleted"`
 }
 
 type ContentType string
@@ -46,6 +47,7 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag
 				VisitedBy: []UserInfo{},
 				CreatedTime: time.Now(),
 				Tags: tags,
+				IsDeleted: false,
 	}, nil
 }
 

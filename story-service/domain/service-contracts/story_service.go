@@ -14,4 +14,5 @@ type StoryService interface {
 	VisitedStoryByUser(ctx context.Context, storyId string, bearer string) error
 	GetStoryHighlight(ctx context.Context, bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia , error)
 	HaveActiveStoriesLoggedUser(ctx context.Context, bearer string) (bool, error)
+	DeleteStory(ctx context.Context, requestId string) error
 }

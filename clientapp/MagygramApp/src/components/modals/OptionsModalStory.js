@@ -1,24 +1,24 @@
 import { useContext, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
-import { PostContext } from "../../contexts/PostContext";
+import { StoryContext } from "../../contexts/StoryContext";
 import Axios from "axios";
 import { authHeader } from "../../helpers/auth-header";
 
-const OptionsModalStory = () => {
-	const { postState, dispatch } = useContext(PostContext);
+const OptionsModalStory = (userId) => {
+	const { storyState, dispatch } = useContext(StoryContext);
 
 	const handleModalClose = () => {
-		dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
+		dispatch({ type: modalConstants.HIDE_STORY_OPTIONS_MODAL });
 	};
 
 	const handleReportModal = () => {
 
 		let reportDTO = {
-			contentId: postState.editPost.post.id,
+			contentId: userId,
 			contentType: "STORY",
 		};
-
+		console.log(userId)
 		Axios.post(`/api/report`, reportDTO , { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
@@ -36,7 +36,7 @@ const OptionsModalStory = () => {
 	};
 
 	return (
-		<Modal show={postState.postOptions.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
+		<Modal show={storyState.postOptions.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">Options</Modal.Title>
 			</Modal.Header>
@@ -51,4 +51,4 @@ const OptionsModalStory = () => {
 	);
 };
 
-export default OptionsModal;
+export default OptionsModalStory;

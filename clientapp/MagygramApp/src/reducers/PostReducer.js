@@ -615,6 +615,7 @@ export const postReducer = (state, action) => {
 					showModal: false,
 					post: {
 						id: action.post.Id,
+						userId: action.post.UserInfo.Id,
 						location: action.post.Location,
 						tags: action.post.Tags,
 						description: action.post.Description,
