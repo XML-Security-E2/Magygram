@@ -3,10 +3,14 @@ import { Modal } from "react-bootstrap";
 import { storyConstants } from "../../constants/StoryConstants";
 import { StoryContext } from "../../contexts/StoryContext";
 import { storyService } from "../../services/StoryService";
+import AsyncSelect from "react-select/async";
+import { searchService } from "../../services/SearchService";
 
 const CreateStoryModal = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 	const [showedMedia, setShowedMedia] = useState("");
+	const [search, setSearch] = useState("");
+	const [tags, setTags] = useState([]);
 
 	const imgRef = React.createRef();
 	const videoRef = React.createRef();
@@ -28,14 +32,46 @@ const CreateStoryModal = () => {
 	};
 
 	const handleStoryUpload = () => {
+		let tagCollection = [];
+		tags.forEach((tag) => {
+			tagCollection.push({username: tag.value, id: tag.id});
+		});
 		let story = {
 			media: showedMedia.content,
+			tags: tagCollection,
 		};
+		console.log(story);
 		storyService.createStory(story, dispatch);
 	};
 
 	const handleModalClose = () => {
 		dispatch({ type: storyConstants.CREATE_STORY_REQUEST });
+	};
+
+	const loadOptions = (value, callback) => {
+		setTimeout(() => {
+			searchService.userSearchUsers(value, callback);
+		}, 1000);
+	};
+
+	const onInputChange = (inputValue, { action }) => {
+		switch (action) {
+			case "set-value":
+				return;
+			case "menu-close":
+				setSearch("");
+				return;
+			case "input-change":
+				setSearch(inputValue);
+				return;
+			default:
+				return;
+		}
+	};
+
+	const onChange = (option) => {
+		setTags(option);
+		return false;
 	};
 
 	return (
@@ -78,6 +114,9 @@ const CreateStoryModal = () => {
 								)}
 							</div>
 							<div hidden={showedMedia === ""} className="row d-flex align-items-center justify-content-center">
+								<div style={{ width: "300px", margin: "10px" }}>
+									<AsyncSelect isMulti defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
+								</div>
 								<button type="button" onClick={handleStoryUpload} className="btn btn-outline-secondary btn-icon-text border-0">
 									<i className="mdi mdi-upload btn-icon-prepend"></i> Upload
 								</button>

@@ -17,11 +17,15 @@ type FollowHandler interface {
 	CreateUser(ctx echo.Context) error
 	IsUserFollowed(ctx echo.Context) error
 	ReturnFollowedUsers(ctx echo.Context) error
+	ReturnUnmutedFollowedUsers(ctx echo.Context) error
 	ReturnFollowingUsers(ctx echo.Context) error
 	ReturnFollowRequests(ctx echo.Context) error
 	AcceptFollowRequest(ctx echo.Context) error
 	ReturnFollowRequestsForUser(ctx echo.Context) error
 	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	Mute(ctx echo.Context) error
+	Unmute(ctx echo.Context) error
+	IsMuted(ctx echo.Context) error
 }
 
 type followHandler struct {
@@ -37,6 +41,32 @@ func (f followHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
 		return next(c)
 	}
+}
+
+func (f followHandler) Mute(ctx echo.Context) error {
+	mute := &model.Mute{}
+	if err := ctx.Bind(mute); err != nil {
+		return err
+	}
+
+	if err := f.FollowService.Mute(mute); err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, "User successfully muted")
+}
+
+func (f followHandler) Unmute(ctx echo.Context) error {
+	mute := &model.Mute{}
+	if err := ctx.Bind(mute); err != nil {
+		return err
+	}
+
+	if err := f.FollowService.Unmute(mute); err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, "User successfully muted")
 }
 
 func (f *followHandler) FollowRequest(c echo.Context) error {
@@ -101,6 +131,16 @@ func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
 	return ctx.JSON(http.StatusCreated, result)
 }
 
+func (f *followHandler) ReturnUnmutedFollowedUsers(ctx echo.Context) error {
+	user := &model.User{Id: ctx.Param("userId")}
+
+	result, err := f.FollowService.ReturnUnmutedFollowedUsers(user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusCreated, result)
+}
 
 func (f *followHandler) ReturnFollowingUsers(ctx echo.Context) error {
 	user := &model.User{Id: ctx.Param("userId")}
@@ -135,6 +175,20 @@ func (f *followHandler) IsUserFollowed(ctx echo.Context) error {
 	exists, err := f.FollowService.IsUserFollowed(followRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	return ctx.JSON(http.StatusOK, exists)
+}
+
+func (f *followHandler) IsMuted(ctx echo.Context) error {
+	mute := &model.Mute{}
+	if err := ctx.Bind(mute); err != nil {
+		return err
+	}
+
+	exists, err := f.FollowService.IsMuted(mute)
+	if err != nil {
+		return err
 	}
 
 	return ctx.JSON(http.StatusOK, exists)

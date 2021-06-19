@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
@@ -38,8 +39,11 @@ func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 }
 
 func (p storyHandler) CreateStory(c echo.Context) error {
-	fmt.Println("UDJE")
 	headers, err := c.FormFile("images")
+	tagsString := c.FormValue("tags")
+	var tags []model.Tag
+	json.Unmarshal([]byte(tagsString), &tags)
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -50,7 +54,7 @@ func (p storyHandler) CreateStory(c echo.Context) error {
 	}
 	bearer := c.Request().Header.Get("Authorization")
 
-	storyId, err := p.StoryService.CreatePost(ctx, bearer, headers)
+	storyId, err := p.StoryService.CreatePost(ctx, bearer, headers, tags)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

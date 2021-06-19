@@ -23,7 +23,12 @@ export const userService = {
 	followUser,
 	unfollowUser,
 	loginSecondAuthorization,
+	muteUser,
+	unmuteUser,
+	blockUser,
+	unblockUser,
 	IsUserVerified,
+	editUserPrivacySettings,
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -223,6 +228,32 @@ function editUserNotifications(userId, notificationDTO, dispatch) {
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success("User notifications successfully changed"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.UPDATE_USER_REQUEST };
+	}
+
+	function success(successMessage) {
+		return { type: userConstants.UPDATE_USER_SUCCESS, successMessage };
+	}
+
+	function failure(error) {
+		return { type: userConstants.UPDATE_USER_FAILURE, errorMessage: error };
+	}
+}
+
+function editUserPrivacySettings(userId, privacySettingsReq, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/users/${userId}/privacy-settings`, privacySettingsReq, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("User privacy settings successfully changed"));
 			} else {
 				dispatch(failure(res.data.message));
 			}
@@ -445,6 +476,90 @@ function unfollowUser(userId, dispatch) {
 	}
 	function failure() {
 		return { type: userConstants.UNFOLLOW_USER_FAILURE };
+	}
+}
+
+function muteUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+
+	Axios.post(`/api/users/mute`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.MUTE_USER_SUCCESS};
+	}
+}
+
+function unmuteUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+
+	Axios.post(`/api/users/unmute`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.UNMUTE_USER_SUCCESS};
+	}
+}
+
+function blockUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request())
+
+	Axios.post(`/api/users/block`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.BLOCK_USER_SUCCESS};
+	}
+	function request() {
+		return { type: userConstants.BLOCK_USER_REQUEST };
+	}
+}
+
+function unblockUser(userId, dispatch) {
+	let formData = new FormData();
+	formData.append("userId", userId);
+	dispatch(request())
+
+	Axios.post(`/api/users/unblock`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function success() {
+		return { type: userConstants.UNBLOCK_USER_SUCCESS};
+	}
+	function request() {
+		return { type: userConstants.UNBLOCK_USER_REQUEST };
 	}
 }
 

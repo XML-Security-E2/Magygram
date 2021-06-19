@@ -37,8 +37,7 @@ func (r *postRepository) InsertLocation(ctx context.Context, name string) error 
 	return err
 }
 
-func (r *postRepository) InsertTag(ctx context.Context, name string) error {
-	tag := model.Tag{guid.New().String(), name}
+func (r *postRepository) InsertTag(ctx context.Context, tag model.Tag) error {
 	_, err := r.tagCol.InsertOne(ctx, tag)
 	return err
 }
@@ -77,6 +76,10 @@ func (r *postRepository) GetByID(ctx context.Context, id string) (*model.Post, e
 		return nil, err
 	}
 	return &post, nil
+}
+func (r postRepository) DeletePost(ctx context.Context, request *model.Post) (*mongo.UpdateResult, error) {
+	return r.Col.UpdateOne(ctx, bson.M{"_id":  request.Id},bson.D{{"$set", bson.D{
+		{"deleted" , true}}}})
 }
 
 

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 time="2021-06-09T23:33:38+02:00" level=info msg="Server started" func="github.com/sirupsen/logrus.(*Entry).Info" file="C:/Users/Dusan/go/pkg/mod/github.com/sirupsen/logrus@v1.4.2/entry.go:285" host=localhost port=462
 time="2021-06-10T00:45:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:72" host=localhost port=462
 time="2021-06-10T00:46:06+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:67" post_id=c0a40c8f-78a1-4be6-8912-2cbbdeb02074 request_ip=127.0.0.1 user_id=b105f72b-d4b1-4f07-82f1-26de708c882a
@@ -304,3 +305,7 @@ time="2021-06-18T12:53:43+02:00" level=error msg="Relationship-service get follo
 time="2021-06-18T12:53:49+02:00" level=error msg="Relationship-service not available" func=post-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/intercomm/relationship_client.go:44" request_ip=127.0.0.1 user_id=cf02a235-4f20-4bdb-af45-44295d4aee88
 time="2021-06-18T12:53:49+02:00" level=error msg="Relationship-service get followed users" func=post-service/service/intercomm.relationshipClient.GetFollowedUsers file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/intercomm/relationship_client.go:47" request_ip=127.0.0.1 user_id=cf02a235-4f20-4bdb-af45-44295d4aee88
 time="2021-06-18T17:27:11+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/post_service.go:537" post_owner_id=f00f180f-9a37-4c29-a13e-58f419e83355 request_ip=127.0.0.1 user_id=2bdfa5ed-be19-4573-8fe9-49bdfbd8dc12
+=======
+time="2021-06-19T04:05:02+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-19T04:11:11+02:00" level=error msg="User-service not available" func=post-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/zindo/Desktop/Magygram/post-service/service/intercomm/user_client.go:50" request_ip=127.0.0.1
+>>>>>>> develop

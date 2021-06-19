@@ -20,6 +20,7 @@ type Notification struct {
 type NotificationRequest struct {
 	Username string `json:"username"`
 	UserId string `json:"userId"`
+	UserFromId string `json:"userFromId"`
 	NotifyUrl string `json:"notifyUrl"`
 	ImageUrl string `json:"imageUrl"`
 	Type  string `json:"type"`

@@ -248,6 +248,7 @@ function createStories(stories) {
 				storyId: media.StoryId,
 			},
 			type: media.MediaType === "VIDEO" ? "video" : "image",
+			tags: media.Tags,
 		});
 	});
 

@@ -7,6 +7,8 @@ import { postService } from "../services/PostService";
 import { postConstants } from "../constants/PostConstants";
 import SuccessAlert from "./SuccessAlert";
 import FailureAlert from "./FailureAlert";
+import AsyncSelect from "react-select/async";
+import { searchService } from "../services/SearchService";
 
 const CreatePostForm = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -16,6 +18,7 @@ const CreatePostForm = () => {
 	const [showedMedia, setShowedMedia] = useState([]);
 	const [tags, setTags] = useState([]);
 	const [tagInput, setTagInput] = useState("");
+	const [search, setSearch] = useState("");
 
 	const handleAddTag = () => {
 		let prom = [...tags];
@@ -32,24 +35,50 @@ const CreatePostForm = () => {
 		setTags(prom);
 	};
 
+	const loadOptions = (value, callback) => {
+		setTimeout(() => {
+			searchService.userSearchUsers(value, callback);
+		}, 1000);
+	};
+
+	const onInputChange = (inputValue, { action }) => {
+		switch (action) {
+			case "set-value":
+				return;
+			case "menu-close":
+				setSearch("");
+				return;
+			case "input-change":
+				setSearch(inputValue);
+				return;
+			default:
+				return;
+		}
+	};
+
+	const onChange = (option) => {
+		setTags(option);
+		return false;
+	};
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		let postMedia = [];
-		let tagNames = [];
+		let tagCollection = [];
 
 		showedMedia.forEach((media) => {
 			postMedia.push(media.content);
 		});
 
 		tags.forEach((tag) => {
-			tagNames.push(tag.EntityDTO.Name);
+			tagCollection.push({username: tag.value, id: tag.id});
 		});
 
 		let post = {
 			location,
 			description,
 			postMedia: postMedia,
-			tags: tagNames,
+			tags: tagCollection,
 		};
 
 		console.log(post);
@@ -96,7 +125,7 @@ const CreatePostForm = () => {
 							<div className="form-group">
 								<label for="tags">Tag people</label>
 
-								<TagsListInput list={tags} handleItemDelete={handleTagDelete} handleItemAdd={handleAddTag} itemInput={tagInput} setItemInput={setTagInput} />
+								<AsyncSelect isMulti defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
 							</div>
 
 							<div className="form-group">

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 time="2021-06-09T23:33:29+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/media-service/main.go:32" host=localhost port=465
 time="2021-06-09T23:48:26+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/media-service/main.go:32" host=localhost port=465
 time="2021-06-10T00:46:06+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/f742e76e-f7f7-4e52-8ef9-750145801d9e.jpg IMAGE} {/api/media/f411e0e6-35c2-4715-8fe5-a582a9ab050f.jpg IMAGE}]" request_ip="::1"
@@ -105,3 +106,6 @@ time="2021-06-18T01:03:55+02:00" level=info msg="Files saved" func=media-service
 >>>>>>> develop
 time="2021-06-18T12:40:16+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/media-service/main.go:34" host=localhost port=465
 time="2021-06-18T12:52:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/media-service/main.go:34" host=localhost port=465
+=======
+time="2021-06-19T04:04:39+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/media-service/main.go:34" host=localhost port=465
+>>>>>>> develop

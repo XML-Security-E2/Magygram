@@ -13,7 +13,7 @@ import (
 type UserClient interface {
 	GetUsersForPostNotification(userId string) ([]*model.UserInfo, error)
 	GetUsersForStoryNotification(userId string) ([]*model.UserInfo, error)
-	CheckIfPostInteractionNotificationEnabled(userId string, interactionType string) (bool, error)
+	CheckIfPostInteractionNotificationEnabled(userId string, userFromId string, interactionType string) (bool, error)
 }
 
 type userClient struct {}
@@ -77,8 +77,8 @@ func (u userClient) GetUsersForStoryNotification(userId string) ([]*model.UserIn
 	return userInfo, nil
 }
 
-func (u userClient) CheckIfPostInteractionNotificationEnabled(userId string, interactionType string) (bool, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/notify/%s", baseUsersUrl, userId, interactionType), nil)
+func (u userClient) CheckIfPostInteractionNotificationEnabled(userId string, userFromId string, interactionType string) (bool, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s/notify/%s", baseUsersUrl, userId, userFromId, interactionType), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 

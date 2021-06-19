@@ -67,6 +67,7 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
 		NotifyUrl: "TODO",
 		ImageUrl:  post.UserInfo.ImageURL,
 		Type:      intercomm.PublishedPost,
@@ -109,6 +110,19 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 	return retVal, nil
 }
 
+func (p postService) DeletePost(ctx context.Context, requestId string) error {
+	request, err := p.PostRepository.GetByID(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	request.IsDeleted=true
+
+	p.PostRepository.DeletePost(ctx,request)
+
+	return nil
+}
+
 func (p postService) LikePost(ctx context.Context, bearer string, postId string) error {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
@@ -142,6 +156,7 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    result.UserInfo.Id,
+		UserFromId:userInfo.Id,
 		NotifyUrl: "TODO",
 		ImageUrl:  userInfo.ImageURL,
 		Type:      intercomm.Liked,
@@ -219,6 +234,7 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    result.UserInfo.Id,
+		UserFromId:userInfo.Id,
 		NotifyUrl: "TODO",
 		ImageUrl:  userInfo.ImageURL,
 		Type:      intercomm.Disliked,
@@ -295,6 +311,7 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    result.UserInfo.Id,
+		UserFromId:userInfo.Id,
 		NotifyUrl: "TODO",
 		ImageUrl:  userInfo.ImageURL,
 		Type:      intercomm.Commented,
