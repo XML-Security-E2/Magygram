@@ -20,7 +20,7 @@ const AdminReportRequestTab = () => {
 	const { statePost,dispatchPost } = useContext(PostContext);
 
 	const handleVisitProfile = (userId) => {
-		window.location = "#/profile/" + userId;
+		window.location = "#/profile?userId=" + userId;
 	}
 
 	const approveVerificationRequest = (requestId)=>{
@@ -94,8 +94,7 @@ const AdminReportRequestTab = () => {
 							{state.reportRequests.requests.map(request => 
 								<tr id={request.Id} key={request.Id} >
 									<td >
-										<div><b>ID:</b> {request.ContentId}</div>
-										<div><b>TYPE:</b> {request.ContentType}</div>
+										<div><b>REPORT TYPE:</b> {request.ContentType}</div>
 									</td>
 									<td className="text-center">
 										<div>
