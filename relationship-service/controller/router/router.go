@@ -18,4 +18,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/relationship/follow-requests/:objectId", h.ReturnFollowRequestsForUser, h.LoggingMiddleware)
 	e.POST("/api/relationship/mute", h.Mute)
 	e.POST("/api/relationship/unmute", h.Unmute)
+	e.POST("/api/relationship/is-muted", h.IsMuted)
 }

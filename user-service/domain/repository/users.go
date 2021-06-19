@@ -13,4 +13,5 @@ type UserRepository interface {
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
+	IsBlocked(ctx context.Context, subjectId string, objectId string) (bool, error)
 }

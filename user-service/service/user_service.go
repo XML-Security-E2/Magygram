@@ -441,8 +441,12 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		following = doesUserFollow(followedUsers, loggedId)
 	}
 	sentReq := false
+	muted := false
+	blocked := false
 	if userId != loggedId {
 		sentReq, _ = u.RelationshipClient.ReturnFollowRequestsForUser(bearer, userId)
+		muted, _ = u.RelationshipClient.IsMuted(model.Mute{SubjectId: loggedId, ObjectId: userId})
+		blocked, _ = u.UserRepository.IsBlocked(ctx, loggedId, userId)
 	}
 
 	fmt.Println(sentReq)
@@ -457,6 +461,8 @@ func (u *userService) GetUserProfileById(ctx context.Context,bearer string, user
 		ImageUrl:        user.ImageUrl,
 		PostNumber:      postsCount,
 		Following: 		 following,
+		Muted:			 muted,
+		Blocked: 		 blocked,
 		Email:			 user.Email,
 		FollowersNumber: len(followedUsers.Users),
 		FollowingNumber: len(followingUsers.Users),

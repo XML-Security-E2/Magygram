@@ -25,6 +25,7 @@ type RelationshipClient interface {
 	ReturnFollowRequestsForUser(bearer string, objectId string) (bool, error)
 	ReturnFollowRequests(bearer string) (model.FollowedUsersResponse, error)
 	AcceptFollowRequest(bearer string, userId string) error
+	IsMuted(mute model.Mute) (bool, error)
 }
 
 type relationshipClient struct { }
@@ -311,4 +312,31 @@ func (r relationshipClient) AcceptFollowRequest(bearer string, userId string) er
 		return errors.New("user not found")
 	}
 	return nil
+}
+
+func (r relationshipClient) IsMuted(mute model.Mute) (bool, error) {
+	jsonMute, _ := json.Marshal(mute)
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/is-muted", baseRelationshipUrl), bytes.NewBuffer(jsonMute))
+	req.Header.Set("Content-Type", "application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil || resp == nil {
+		return false, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return false, err
+	}
+
+	var isMuted bool
+	_ = json.Unmarshal(bodyBytes, &isMuted)
+
+	return isMuted, err
 }

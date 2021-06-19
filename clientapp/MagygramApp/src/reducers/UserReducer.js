@@ -442,6 +442,8 @@ export const userReducer = (state, action) => {
 		case userConstants.BLOCK_USER_SUCCESS:
 			a = { ...state };
 			a.userProfile.user.blocked = true;
+			a.userProfile.user.muted = false;
+			a.userProfile.user.following = false;
 			return a;
 		case userConstants.UNBLOCK_USER_SUCCESS:
 			a = { ...state };

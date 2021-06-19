@@ -33,9 +33,8 @@ type privateFlag struct {
 }
 
 func (u userClient) IsPrivate(id string) (bool, error) {
-
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUrl, id),nil)
-	//resp, err := http.Get(fmt.Sprintf("%s/%s/is-private", baseUrl, id))
+
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 

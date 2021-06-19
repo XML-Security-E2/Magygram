@@ -162,7 +162,7 @@ func (f *followRepository) IsMuted(mute *model.Mute) (interface{}, error) {
 	defer unsafeClose(session)
 
 	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error){
-		query := "MATCH (subject:User)-[f:FOLLOW]->(object:User) WHERE subject.id = $subjectId AND object.id = $objectId RETURN f.mute"
+		query := "MATCH (subject:User)-[f:FOLLOW{muted:true}]->(object:User) WHERE subject.id = $subjectId AND object.id = $objectId RETURN f"
 		parameters := map[string]interface{}{
 			"subjectId": mute.SubjectId,
 			"objectId": mute.ObjectId,

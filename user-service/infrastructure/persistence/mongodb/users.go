@@ -61,7 +61,6 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 }
 
 func (r *userRepository) SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error) {
-	//Marko blokira Stefana Stefan trazi sve one gde nemaju blokiranog loggedId "blocked": { "$ne": loggedUserId }
 	var users []model.User
 	log.Println("param: " + username)
 	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}, "_id" : bson.M{ "$ne": loggedUserId}, "blocked_users": bson.M{"$ne": loggedUserId}})
@@ -114,4 +113,16 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.U
 	}
 
 	return &user, nil
+}
+
+func (r *userRepository) IsBlocked(ctx context.Context, subjectId string, objectId string) (bool, error) {
+	var user model.User
+	err := r.Col.FindOne(ctx, bson.M{"_id": subjectId, "blocked_users": objectId}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return false, err
+		}
+	}
+
+	return true, nil
 }

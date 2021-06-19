@@ -70,6 +70,8 @@ type UserProfileResponse struct {
 	Gender Gender `json:"gender"`
 	ImageUrl string `json:"imageUrl"`
 	Following bool `json:"following"`
+	Blocked bool `json:"blocked"`
+	Muted bool `json:"muted"`
 	PostNumber int `json:"postNumber"`
 	FollowersNumber int `json:"followersNumber"`
 	FollowingNumber int `json:"followingNumber"`
