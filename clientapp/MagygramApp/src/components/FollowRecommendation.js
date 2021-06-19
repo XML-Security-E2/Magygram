@@ -19,6 +19,10 @@ const FollowRecommendation = () =>{
         window.location = "#/profile?userId="+localStorage.getItem("userId");
     }
 
+    const handleSeeAll = () => {
+        window.location = "#/recommended-users"
+    }
+
     return (
 		<React.Fragment>
 			
@@ -37,7 +41,7 @@ const FollowRecommendation = () =>{
                 <div className="mt-4">
                     <div className="d-flex flex-row justify-content-between">
                         <small className="text-muted font-weight-normal">Suggestions For You</small>
-                        <small>See All</small>
+                        <small onClick={() => handleSeeAll()}>See All</small>
                     </div>
                 </div>  
 

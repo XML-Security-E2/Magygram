@@ -3,7 +3,7 @@ import { UserContext } from "../contexts/UserContext";
 import { userService } from "../services/UserService";
 
 const RecommendedUser = ({userInfo}) =>{
-    const { dispatch } = useContext(UserContext);
+    const { userState, dispatch } = useContext(UserContext);
     const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 
     const handleClickOnProfile = (userId) => {

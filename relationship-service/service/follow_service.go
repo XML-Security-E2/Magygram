@@ -222,5 +222,16 @@ func (f *followService) ReturnRecommendedUsers(user *model.User) (interface{}, e
 	if err != nil {
 		return retVal, err
 	}
+
+	len := len(retVal.Users)
+	if len<20{
+		retPopularUsers,err := f.FollowRepository.GetPopularUsers(user, 20-len)
+		if err != nil {
+			return retVal, err
+		}
+
+		retVal.Users = append(retVal.Users, retPopularUsers.Users...)
+	}
+
 	return retVal, err
 }

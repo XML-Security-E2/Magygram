@@ -1126,7 +1126,6 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	if err != nil {
 		return nil, err
 	}
-	log.Println("test2")
 
 	retVal := model.FollowRecommendationResponse{
 		Name: user.Name,
@@ -1141,7 +1140,7 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 		if err != nil {
 			return nil, errors.New("invalid user id")
 		}
-		log.Println("test4")
+
 		var newUserInfo = &model.RecommendUserInfo{
 			Id:       userId,
 			Username: user.Username,
