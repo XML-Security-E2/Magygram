@@ -8,6 +8,7 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	//users
 	e.POST("/api/users", h.RegisterUser, h.UserLoggingMiddleware)
+	e.POST("/api/users/agent", h.RegisterAgent, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId", h.EditUser, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/image", h.EditUserImage, h.UserLoggingMiddleware)
 	e.PUT("/api/users/:userId/notifications", h.EditUsersNotifications)

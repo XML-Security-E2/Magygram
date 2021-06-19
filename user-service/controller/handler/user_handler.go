@@ -57,6 +57,7 @@ type UserHandler interface {
 	ChangeUsersNotificationsSettings(c echo.Context) error
 	DeleteUser(c echo.Context) error
 	GetFollowRecommendation(c echo.Context) error
+	RegisterAgent(c echo.Context) error
 }
 
 var (
@@ -65,6 +66,7 @@ var (
 type userHandler struct {
 	UserService service_contracts.UserService
 }
+
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
@@ -863,4 +865,8 @@ func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+func (h *userHandler) RegisterAgent(c echo.Context) error {
+	return c.JSON(http.StatusCreated, "")
 }

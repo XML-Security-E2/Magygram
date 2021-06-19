@@ -13,6 +13,7 @@
 .register-photo .form-container {
   display: table;
   max-width: 900px;
+  height:700px;
   width: 90%;
   margin: 0 auto;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
@@ -20,11 +21,14 @@
 
 .register-photo form {
   display: table-cell;
-  width: 400px;
+  width: 440px;
   background-color: #ffffff;
   padding: 40px 60px;
   color: #505e6c;
 }
+
+
+
 
 @media (max-width:991px) {
   .register-photo form {

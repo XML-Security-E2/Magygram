@@ -80,3 +80,4 @@ time="2021-06-19T17:03:40+02:00" level=info msg="Story created" func=story-servi
 time="2021-06-19T17:58:50+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/story_service.go:80" request_ip=127.0.0.1 story_id=2b08f065-522e-42c8-ba98-9a785ea8446c user_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1
 time="2021-06-19T18:16:59+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 >>>>>>> develop
+time="2021-06-19T22:35:26+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464

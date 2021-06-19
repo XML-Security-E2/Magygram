@@ -7,6 +7,7 @@ export const userReducer = (state, action) => {
 	switch (action.type) {
 		case userConstants.REGISTER_REQUEST:
 			return {
+				...state,
 				registrationError: {
 					showError: false,
 					errorMessage: "",
@@ -16,6 +17,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.REGISTER_SUCCESS:
 			return {
+				...state,
 				registrationError: {
 					showError: false,
 					errorMessage: "",
@@ -24,8 +26,20 @@ export const userReducer = (state, action) => {
 					imageData: action.imageData,
 				},
 			};
+		case userConstants.REGISTER_AGENT_SUCCESS:
+			return {
+				...state,
+				registrationError: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					emailAddress: action.emailAddress,
+					imageData: '',
+				},
+			};
 		case userConstants.REGISTER_FAILURE:
 			return {
+				...state,
 				registrationError: {
 					showError: true,
 					errorMessage: action.errorMessage,
@@ -508,6 +522,33 @@ export const userReducer = (state, action) => {
 			return a;
 		case userConstants.RECOMMENDED_FOLLOW_USER_FAILURE:
 			return state;
+		case userConstants.SHOW_AGENT_REGISTRATION_TAB:
+			return{
+				...state,
+				registrationTab:{
+					showUserRegistrationTab: false,
+					showAgentRegistrationTab: true,
+				},
+				registrationError: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					emailAddress: "",
+				},
+			};		case userConstants.SHOW_USER_REGISTRATION_TAB:
+			return{
+				...state,
+				registrationTab:{
+					showUserRegistrationTab: true,
+					showAgentRegistrationTab: false,
+				},
+				registrationError: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					emailAddress: "",
+				},
+			};
 		default:
 			return state;
 	}

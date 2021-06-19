@@ -3,15 +3,20 @@
   <component name="ChangeListManager">
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/relationship-service/controller/handler/follow_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/controller/handler/follow_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/relationship-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/relationship-service/service/follow_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/service/follow_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/AdminReportRequestTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/AdminReportRequestTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/public/assets/css/Registration-Form-with-Photo.css" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/public/assets/css/Registration-Form-with-Photo.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/RegistrationForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/RegistrationForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/constants/UserConstants.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/constants/UserConstants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/UserContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/UserContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/UserReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/UserReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/UserService.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/UserService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/api_gateway.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/controller/handler/user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/controller/router/router.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

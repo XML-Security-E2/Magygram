@@ -15,11 +15,16 @@ const UserContextProvider = (props) => {
 		},
 		showTwoFactorAuth: false,
 		registrationError: {
+			isActiveRegistrationTab: false,
 			showError: false,
 			errorMessage: "",
 			showSuccessMessage: false,
 			emailAddress: "",
 			imageData: "",
+		},
+		registrationTab:{
+			showUserRegistrationTab: true,
+			showAgentRegistrationTab: false,
 		},
 		registrationShowQr: false,
 		forgotPasswordLinkError: {

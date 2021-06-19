@@ -125,3 +125,4 @@ time="2021-06-19T18:00:07+02:00" level=info msg="Files saved" func=media-service
 time="2021-06-19T18:07:51+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/962722ed-8534-414a-bb11-736a612c7be8.png IMAGE}]" request_ip="::1"
 time="2021-06-19T18:16:35+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/media-service/main.go:34" host=localhost port=465
 >>>>>>> develop
+time="2021-06-19T22:34:50+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/media-service/main.go:34" host=localhost port=465
