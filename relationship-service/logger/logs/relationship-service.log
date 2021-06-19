@@ -204,3 +204,5 @@ time="2021-06-19T23:56:21+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-19T23:57:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
 time="2021-06-20T00:02:50+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
 time="2021-06-20T00:03:29+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-06-20T00:03:39+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-06-20T00:03:55+02:00" level=info msg="Follow request created" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:74" object_id=a8cbd1ca-5282-4c2c-9a9f-1a2225ba93c1 request_ip="::1" subject_id=e548d242-bcab-4161-bee3-f6dba7c23a35

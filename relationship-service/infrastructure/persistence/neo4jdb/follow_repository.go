@@ -24,7 +24,7 @@ type FollowRepository interface {
 	IsMuted(mute *model.Mute) (interface{}, error)
 	Mute(mute *model.Mute) error
 	Unmute(mute *model.Mute) error
-	GetPopularUsers(user *model.User, number int) (model.Users, error)
+	GetPopularUsers(user *model.User, number int, recommendedUsers []string) (model.Users, error)
 }
 
 type followRepository struct {
@@ -400,19 +400,18 @@ func unsafeClose(closeable io.Closer) {
 	}
 }
 
-func (f *followRepository) GetPopularUsers(user *model.User, number int) (model.Users, error) {
+func (f *followRepository) GetPopularUsers(user *model.User, number int, recommendedUsers []string) (model.Users, error) {
 	session := f.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeRead,
 	})
 	defer unsafeClose(session)
 	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		query := "MATCH (p:User)<-[:FOLLOW]-(:User) WHERE p.id <> $sId AND NOT (:User{id:$sId})-[:FOLLOWREQUEST]->(p:User) AND NOT p.id IN $popularSlice AND NOT (:User{id:$sId})-[:FOLLOW]->(p:User) WITH p,count(*) as score return p.id as id, score ORDER BY score DESC LIMIT $number"
-		ret,err := f.ReturnRecommendedUsers(user)
 
 		parameters := map[string]interface{}{
 			"sId": user.Id,
 			"number": number,
-			"popularSlice": ret.Users,
+			"popularSlice": recommendedUsers,
 		}
 		records, err := tx.Run(query, parameters)
 		if err != nil {
