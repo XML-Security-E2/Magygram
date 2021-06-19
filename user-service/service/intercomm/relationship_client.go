@@ -26,6 +26,7 @@ type RelationshipClient interface {
 	ReturnFollowRequests(bearer string) (model.FollowedUsersResponse, error)
 	AcceptFollowRequest(bearer string, userId string) error
 	IsMuted(mute model.Mute) (bool, error)
+	GetRecommendedUsers(userId string) (model.RecommendedUsersResponse, error)
 }
 
 type relationshipClient struct { }
@@ -339,4 +340,34 @@ func (r relationshipClient) IsMuted(mute model.Mute) (bool, error) {
 	_ = json.Unmarshal(bodyBytes, &isMuted)
 
 	return isMuted, err
+}
+
+func (r relationshipClient) GetRecommendedUsers(userId string) (model.RecommendedUsersResponse, error) {
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/recommended-users/%s", baseRelationshipUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service not available")
+			return model.RecommendedUsersResponse{}, errors.New("post not found")
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Error("Relationship-service get followed users")
+		fmt.Println(resp.StatusCode)
+		return model.RecommendedUsersResponse{}, errors.New("post not found")
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return model.RecommendedUsersResponse{}, err
+	}
+
+	var users model.RecommendedUsersResponse
+	_ = json.Unmarshal(bodyBytes, &users)
+
+	return users, nil
 }

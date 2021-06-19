@@ -95,6 +95,7 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 			{"get_liked_posts"},
 			{"get_disliked_posts"},
 			{"check_if_verified"},
+			{"get_follow_recommendation"},
 		}}},
 		TotpToken: token}, err
 }

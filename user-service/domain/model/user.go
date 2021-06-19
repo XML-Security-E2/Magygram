@@ -272,3 +272,23 @@ type VerifyAccountDTO struct {
 	UserId   string
 	Category string
 }
+
+type RecommendedUsersResponse struct {
+	Users []string
+}
+
+type FollowRecommendationResponse struct {
+	Name string
+	Surname string
+	Username string
+	ImageURL string
+	RecommendedUsers []*RecommendUserInfo
+}
+
+type RecommendUserInfo struct {
+	Id       string
+	Username string
+	ImageURL string
+	SendedRequest bool
+	Followed bool
+}

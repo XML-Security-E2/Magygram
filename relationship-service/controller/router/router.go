@@ -19,4 +19,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/relationship/mute", h.Mute)
 	e.POST("/api/relationship/unmute", h.Unmute)
 	e.POST("/api/relationship/is-muted", h.IsMuted)
+	e.GET("/api/relationship/recommended-users/:userId", h.ReturnRecommendedUsers)
 }

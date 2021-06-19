@@ -56,6 +56,7 @@ type UserHandler interface {
 	GetUsersNotificationsSettings(c echo.Context) error
 	ChangeUsersNotificationsSettings(c echo.Context) error
 	DeleteUser(c echo.Context) error
+	GetFollowRecommendation(c echo.Context) error
 }
 
 var (
@@ -840,6 +841,23 @@ func (h *userHandler) CheckIfUserVerified(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	result,err := h.UserService.CheckIfUserVerified(ctx,bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+
+func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	result,err := h.UserService.GetFollowRecommendation(ctx,bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}

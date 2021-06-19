@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"user-service/domain/model"
@@ -1104,4 +1105,52 @@ func (u *userService) CheckIfUserVerified(ctx context.Context, bearer string) (b
 	}
 
 	return user.IsVerified, nil
+}
+
+func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string) (*model.FollowRecommendationResponse, error) {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("test")
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+	log.Println("test1")
+
+
+	var recommendedUsers model.RecommendedUsersResponse
+	recommendedUsers, err = u.RelationshipClient.GetRecommendedUsers(loggedId)
+	if err != nil {
+		return nil, err
+	}
+	log.Println("test2")
+
+	retVal := model.FollowRecommendationResponse{
+		Name: user.Name,
+		Surname: user.Surname,
+		ImageURL: user.ImageUrl,
+		Username: user.Username,
+		RecommendedUsers: []*model.RecommendUserInfo{},
+	}
+
+	for _, userId := range recommendedUsers.Users {
+		user, err := u.UserRepository.GetByID(ctx, userId)
+		if err != nil {
+			return nil, errors.New("invalid user id")
+		}
+		log.Println("test4")
+		var newUserInfo = &model.RecommendUserInfo{
+			Id:       userId,
+			Username: user.Username,
+			ImageURL: user.ImageUrl,
+			SendedRequest: false,
+			Followed:false,
+		}
+		retVal.RecommendedUsers=append(retVal.RecommendedUsers, newUserInfo)
+	}
+
+	return &retVal,nil
 }
