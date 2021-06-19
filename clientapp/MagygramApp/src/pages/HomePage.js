@@ -14,6 +14,7 @@ import NotificationContextProvider from "../contexts/NotificationContext";
 import AdminHomePageTabs from "../components/AdminHomePageTabs";
 import AdminVerificationRequestTabContent from "../components/AdminVerificationRequestTabContent";
 import AdminContextProvider from "../contexts/AdminContext";
+import FollowRecommendation from "../components/FollowRecommendation";
 
 const HomePage = () => {
 	return (
@@ -37,6 +38,7 @@ const HomePage = () => {
 														<Storyline />
 														<Timeline search={false} />
 													</div>
+													<FollowRecommendation/>
 												</div>
 											</div>
 										</div>
