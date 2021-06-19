@@ -218,6 +218,7 @@ func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer strin
 	}
 
 	user.PrivacySettings = *privacySettingsReq
+	user.IsPrivate = (*privacySettingsReq).IsPrivate
 	_, err = u.UserRepository.Update(ctx, user)
 
 	if err != nil {
