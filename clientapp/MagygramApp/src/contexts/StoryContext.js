@@ -15,6 +15,10 @@ const StoryContextProvider = (props) => {
 		storyline: {
 			stories: [],
 		},
+		userInfo: {},
+		postOptions: {
+			showModal: false,
+		},
 		highlights: {
 			showModal: false,
 			showError: false,

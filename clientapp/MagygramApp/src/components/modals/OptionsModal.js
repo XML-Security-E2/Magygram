@@ -6,6 +6,7 @@ import { UserContext } from "../../contexts/UserContext";
 import Axios from "axios";
 import { confirmAlert } from 'react-confirm-alert';
 import { authHeader } from "../../helpers/auth-header";
+import { hasRoles } from "../../helpers/auth-header";
 
 const OptionsModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -70,17 +71,17 @@ const OptionsModal = () => {
 			</Modal.Header>
 			<Modal.Body>
 				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleOpenPostEditModal}>
+					<button hidden={localStorage.getItem("userId") !== postState.editPost.post.userId } type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleOpenPostEditModal}>
 						Edit
 					</button>
 				</div>
 				<div className="row">
-					<button hidden={localStorage.getItem("userId") === null} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleReportModal}>
+					<button hidden={(localStorage.getItem("userId") === null) || (localStorage.getItem("userId") === postState.editPost.post.userId ) } type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleReportModal}>
 						Report
 					</button>
 				</div>
 				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-danger w-100 border-0"  onClick={handleDelete}>
+					<button hidden={!hasRoles(["admin"])} type="button" className="btn btn-link btn-fw text-danger w-100 border-0"  onClick={handleDelete}>
 						Delete?
 					</button>
 				</div>

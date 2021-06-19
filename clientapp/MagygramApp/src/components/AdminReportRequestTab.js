@@ -12,6 +12,8 @@ import SuccessAlert from "./SuccessAlert";
 import ViewPostModal from "./modals/ViewPostModal";
 import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
+import ReportedPost from "./ReportedPost";
+import ReportedStory from "./ReportedStory";
 
 const AdminReportRequestTab = () => {
 	const { state,dispatch } = useContext(AdminContext);
@@ -99,13 +101,13 @@ const AdminReportRequestTab = () => {
 										<div>
 											<a hidden={(request.ContentType === "POST") || (request.ContentType === "STORY")} onClick={() => handleVisitProfile(request.ContentId)} class="link-primary">Visit profile</a>
 										</div>
-                                        <div>
-											<a hidden={(request.ContentType === "POST") || (request.ContentType === "USER")} onClick={() => handleViewStory(request.ContentId)} class="link-primary">View story</a>
-										</div>
-                                        <div>
-											<a hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} onClick={() => handleViewPost(request.ContentId)} class="link-primary">View post</a>
-										</div>
-									</td>
+                                        <div  hidden={(request.ContentType === "USER") || (request.ContentType === "POST")}>
+                                            <ReportedStory  userId={"7ffa004c-f23c-4647-a830-271c3a000c77"}/>
+                                        </div>
+                                        <div hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} >
+                                            <ReportedPost  id={request.ContentId}/>
+                                        </div>
+                                	</td>
 									<td className="text-right">
 										<div className="mt-2">
 											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>approveVerificationRequest(request.Id)}><i className="icofont-subscribe mr-1"></i>Delete report</button>
@@ -115,7 +117,7 @@ const AdminReportRequestTab = () => {
 								</tr>
 							)}		
                             
-                			<ViewPostModal />					
+                			<ViewPostModal/>					
 						</tbody>
 					</table> : 
 					<div>

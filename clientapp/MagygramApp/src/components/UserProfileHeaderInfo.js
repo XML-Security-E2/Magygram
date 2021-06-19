@@ -6,6 +6,7 @@ import { userService } from "../services/UserService";
 import FollowingUsersModal from "./modals/FollowingUsersModal";
 import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
+import { hasRoles } from "../helpers/auth-header";
 import { notificationService } from "../services/NotificationService";
 import { NotificationContext } from "../contexts/NotificationContext";
 import NotificationSettingsModal from "./modals/NotificationSettingsModal";
@@ -185,7 +186,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 						</div>
 						<div>
 							<button
-								hidden={!(localStorage.getItem("userId") === userId)}
+								hidden={!hasRoles(["admin"])}
 								style={{ backgroundColor: "red", borderColor: "red" }}
 								type="button"
 								className="btn btn-primary ml-2"

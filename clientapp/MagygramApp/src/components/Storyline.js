@@ -32,8 +32,9 @@ const Storyline = () => {
 						{storyState.storyline.stories !== null &&
 							storyState.storyline.stories.map((story) => {
 								return <Story story={story} openStorySlider={openStorySlider} />;
-							})}
-						<StorySliderModal />
+						})}
+						<StorySliderModal/>
+						
 					</ul>
 				</div>
 			</div>

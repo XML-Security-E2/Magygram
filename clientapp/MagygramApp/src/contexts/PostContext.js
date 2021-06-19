@@ -15,6 +15,7 @@ const PostContextProvider = (props) => {
 			showModal: false,
 			post: {
 				id: "",
+				userId: "",
 				location: "",
 				tags: [],
 				description: "",

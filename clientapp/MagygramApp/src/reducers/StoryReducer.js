@@ -56,6 +56,35 @@ export const storyReducer = (state, action) => {
 					stories: [],
 				},
 			};
+		case modalConstants.SHOW_STORY_OPTIONS_MODAL:
+			console.log(action.story);
+			return {
+				...state,
+				editPost: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+				postOptions: {
+					showModal: true,
+				},
+			};
+		case modalConstants.HIDE_STORY_OPTIONS_MODAL:
+			return {
+				...state,
+				editPost: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+				postOptions: {
+					showModal: false,
+				},
+			};
 		case storyConstants.STORYLINE_STORY_SUCCESS:
 			return {
 				...state,

@@ -13,4 +13,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/story/user", h.GetAllUserStories, h.LoggingMiddleware)
 	e.PUT("/api/story/:storyId/visited", h.VisitedStoryByUser, h.LoggingMiddleware)
 	e.GET("/api/story/activestories", h.HaveActiveStoriesLoggedUser, h.LoggingMiddleware)
+	e.PUT("/api/story/:requestId/delete", h.DeleteStory, h.LoggingMiddleware)
 }

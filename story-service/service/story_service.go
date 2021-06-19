@@ -24,6 +24,19 @@ type storyService struct {
 	intercomm.MessageClient
 }
 
+func (p storyService) DeleteStory(ctx context.Context, requestId string) error {
+	request, err := p.StoryRepository.GetByID(ctx, requestId)
+		if err != nil {
+		return errors.New("Request not found")
+	}
+
+		request.IsDeleted = true
+
+		p.StoryRepository.DeleteStory(ctx, request)
+
+		return nil
+}
+
 func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient) service_contracts.StoryService {
 	return &storyService{r , ic, uc,ac,rc, mc}
 }

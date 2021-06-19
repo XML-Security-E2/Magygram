@@ -5,8 +5,9 @@ import { modalConstants } from "../../constants/ModalConstants";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import Stories from 'react-insta-stories';
 import { storyService } from "../../services/StoryService";
+import OptionsModalStory from "../modals/OptionsModalStory";
 
-const StorySliderModal = () => {
+const StorySliderModal = (userId) => {
 	const { storyState, dispatch } = useContext(StoryContext);
 	const [tags, setTags] = useState([]);
 
@@ -38,10 +39,19 @@ const StorySliderModal = () => {
 		}
 	}
 
+	const handleOpenOptionsModal = () => {
+		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL });
+	};
+
 
 	return (
 		<Modal  size="md" show={storyState.storySliderModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body className="modal-body-remove-margins modal-content-remove-margins">
+				<div className="d-flex justify-content-end">
+					<button className="btn p-0 mr-3" onClick={handleOpenOptionsModal} >
+						<i className="fa fa-ellipsis-h" aria-hidden="true"></i>
+					</button>
+				</div>
 				<Stories 
 					currentIndex={storyState.storySliderModal.firstUnvisitedStory}
 					width="100%" 
@@ -59,6 +69,7 @@ const StorySliderModal = () => {
 								);
 						})}
 					</div>
+				<OptionsModalStory userId={userId}/>
 			</Modal.Body>
 		</Modal>
 	);
