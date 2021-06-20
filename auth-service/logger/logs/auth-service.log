@@ -271,3 +271,4 @@ time="2021-06-19T18:07:45+02:00" level=info msg="Successful first stage of login
 time="2021-06-19T18:16:59+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/main.go:119" host=localhost port=461
 time="2021-06-19T18:17:29+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=admin2@admin.com
 >>>>>>> develop
+time="2021-06-19T20:39:52+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/auth-service/main.go:119" host=localhost port=461

@@ -94,7 +94,7 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 	}
 
 	var followedUsers model.FollowedUsersResponse
-	followedUsers, err = p.RelationshipClient.GetFollowedUsers(userInfo.Id)
+	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(userInfo.Id)
 	if err != nil {
 		return nil, err
 	}

@@ -147,6 +147,7 @@ type Comment struct {
 	CreatedBy UserInfo
 	Content string
 	TimeCreated time.Time
+	Tags []Tag
 }
 
 type PostResponse struct {
@@ -200,6 +201,7 @@ type PostId struct {
 type CommentRequest struct {
 	PostId string
 	Content string
+	Tags []Tag
 }
 
 type Location struct {

@@ -37,11 +37,12 @@ const ViewPostModal = () => {
 		dispatch({ type: modalConstants.HIDE_VIEW_POST_MODAL, post: postState.viewPostModal.post });
 	};
 
-	const postComment = (comment) => {
+	const postComment = (comment, tags) => {
 		if (comment.length >= 1) {
 			let postDTO = {
 				PostId: postState.viewPostModal.post.Id,
 				Content: comment,
+				Tags: tags
 			};
 
 			postService.commentPost(postDTO, dispatch);
@@ -108,6 +109,7 @@ const ViewPostModal = () => {
 								username={postState.viewPostModal.post.UserInfo.Username}
 								description={postState.viewPostModal.post.Description}
 								comments={postState.viewPostModal.post.Comments}
+								handleRedirect={handleRedirect}
 							/>
 							<hr></hr>
 							<div id="viewPostModalInteraction">
