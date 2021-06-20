@@ -3,11 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/relationship-service/controller/handler/follow_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/controller/handler/follow_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/relationship-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/controller/router/router.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/relationship-service/service/follow_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/service/follow_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/AdminReportRequestTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/AdminReportRequestTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModalStory.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModalStory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/StorySliderModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/StorySliderModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/StoryContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/StoryContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/StoryReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/StoryReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/StoryService.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/StoryService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" afterDir="false" />
