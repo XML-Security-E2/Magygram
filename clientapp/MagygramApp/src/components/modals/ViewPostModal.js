@@ -42,7 +42,7 @@ const ViewPostModal = () => {
 			let postDTO = {
 				PostId: postState.viewPostModal.post.Id,
 				Content: comment,
-				Tags: tags
+				Tags: tags,
 			};
 
 			postService.commentPost(postDTO, dispatch);
@@ -86,16 +86,15 @@ const ViewPostModal = () => {
 					<div className="p-2" style={style}>
 						<div className="align-top" style={style}>
 							<div>
-								<label className="m-1">Tagged users: </label>
 								{postState.viewPostModal.post.Tags !== null &&
-								postState.viewPostModal.post.Tags.map((tag) => {
-									return (
-										<button type="button" className="btn btn-light m-1" onClick={() => handleRedirect(tag.Id)}>
-											{tag.Username}
-										</button>
-									);
-								})}
-							</div>	
+									postState.viewPostModal.post.Tags.map((tag) => {
+										return (
+											<button type="button" className="btn btn-light mb-1 ml-1" onClick={() => handleRedirect(tag.Id)}>
+												@{tag.Username}
+											</button>
+										);
+									})}
+							</div>
 							<PostHeaderModalView
 								username={postState.viewPostModal.post.UserInfo.Username}
 								image={postState.viewPostModal.post.UserInfo.ImageURL}

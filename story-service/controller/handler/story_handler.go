@@ -22,6 +22,7 @@ type StoryHandler interface {
 	HaveActiveStoriesLoggedUser(c echo.Context) error
 	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 	DeleteStory(c echo.Context) error
+	UpdateUserInfo(c echo.Context) error
 }
 
 type storyHandler struct {
@@ -186,4 +187,25 @@ func (p storyHandler) HaveActiveStoriesLoggedUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, retVal)
+}
+
+func (p storyHandler) UpdateUserInfo(c echo.Context) error {
+	userInfo := &model.UserInfo{}
+	if err := c.Bind(userInfo); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.StoryService.EditStoryOwnerInfo(ctx, bearer, userInfo)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }

@@ -29,14 +29,15 @@ type userService struct {
 	intercomm.PostClient
 	intercomm.MediaClient
 	intercomm.MessageClient
+	intercomm.StoryClient
 }
 
 var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient) service_contracts.UserService {
-	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc}
+func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient, sclient intercomm.StoryClient) service_contracts.UserService {
+	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc,sclient}
 }
 
 func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error) {
@@ -226,6 +227,8 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 		return "", errors.New("invalid user id")
 	}
 
+	temp := user.Username
+
 	user.Username = userRequest.Username
 	user.Name = userRequest.Name
 	user.Surname = userRequest.Surname
@@ -254,6 +257,13 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 			"website":  userRequest.Website,
 			"bio":      userRequest.Bio}).Error("User database update failure")
 		return "", err
+	}
+	fmt.Println(temp)
+	if temp != userRequest.Username {
+		err = u.editSharedUserInfo(bearer, user, userRequest.Username, user.ImageUrl)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User information updated")
@@ -293,9 +303,79 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 		return "", err
 	}
 
+	err = u.editSharedUserInfo(bearer, user, user.Username, user.ImageUrl)
+
+	if err != nil {
+		return "", err
+	}
+
+
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User profile picture updated")
 
 	return media[0].Url, err
+}
+
+func (u *userService) editSharedUserInfo(bearer string, user *model.User, username string, imageUrl string) error {
+	err := u.PostClient.EditPostOwnerInfo(bearer, model.UserInfo{
+		Id:       user.Id,
+		Username: username,
+		ImageURL: imageUrl,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	err = u.StoryClient.EditStoryOwnerInfo(bearer, model.UserInfo{
+		Id:       user.Id,
+		Username: username,
+		ImageURL: imageUrl,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if len(user.LikedPosts) > 0 {
+		err = u.PostClient.EditLikedByInfo(bearer, model.UserInfoEdit{
+			Id:       user.Id,
+			Username: username,
+			ImageURL: imageUrl,
+			PostIds:  user.LikedPosts,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(user.DislikedPosts) > 0 {
+		err = u.PostClient.EditDislikedByInfo(bearer, model.UserInfoEdit{
+			Id:       user.Id,
+			Username: username,
+			ImageURL: imageUrl,
+			PostIds:  user.DislikedPosts,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(user.CommentedPosts) > 0 {
+		err = u.PostClient.EditCommentedByInfo(bearer, model.UserInfoEdit{
+			Id:       user.Id,
+			Username: username,
+			ImageURL: imageUrl,
+			PostIds:  user.CommentedPosts,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettingsUpdateReq) error {
@@ -975,6 +1055,39 @@ func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId
 	}
 
 	return nil
+}
+
+func (u *userService) AddComment(ctx context.Context, bearer string, postId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		errors.New("invalid user id")
+	}
+
+	commented := didUserCommentedPost(user, postId)
+
+	if !commented {
+		user.CommentedPosts = append(user.CommentedPosts, postId)
+		_, err = u.UserRepository.Update(ctx, user)
+		if err != nil {
+			errors.New("user not modified")
+		}
+	}
+
+	return nil
+}
+
+func didUserCommentedPost(user *model.User, postId string) bool {
+	for _, commentedPostId := range user.CommentedPosts {
+		if commentedPostId == postId {
+			return true
+		}
+	}
+	return false
 }
 
 func (u *userService) UpdateDislikedPost(ctx context.Context, bearer string, postId string) error {

@@ -142,6 +142,13 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type UserInfoEdit struct {
+	Id string
+	Username string
+	ImageURL string
+	PostIds []string
+}
+
 type Comment struct {
 	Id string
 	CreatedBy UserInfo

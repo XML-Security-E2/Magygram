@@ -29,4 +29,8 @@ type PostService interface {
 	GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 	GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 	DeletePost(ctx context.Context, requestId string) error
+	EditPostOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error
+	EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
+	EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
+	EditCommentedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
 }

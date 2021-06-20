@@ -54,6 +54,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/collections/check-favourites", h.CheckIfPostInFavourites, h.CollectionsLoggingMiddleware)
 
 	e.PUT("api/users/post/like/:postId", h.UpdateLikedPost)
+	e.PUT("api/users/post/comment/:postId", h.AddComment)
+
 	e.PUT("api/users/post/dislike/:postId", h.UpdateDislikedPost)
 	e.GET("api/users/post/liked", h.GetUserLikedPost)
 	e.GET("api/users/post/disliked", h.GetUserDislikedPost)

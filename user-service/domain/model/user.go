@@ -23,6 +23,7 @@ type User struct {
 	IsPrivate            bool                               `bson:"private_profile"`
 	LikedPosts           []string                           `bson:"liked_posts"`
 	DislikedPosts        []string                           `bson:"disliked_posts"`
+	CommentedPosts       []string                           `bson:"commented_posts"`
 	BlockedUsers         []string                           `bson:"blocked_users"`
 	NotificationSettings NotificationSettings               `bson:"notification_settings" json:"notificationSettings"`
 	PrivacySettings      PrivacySettings                    `bson:"privacy_settings" json:"privacySettings"`
@@ -131,6 +132,13 @@ type UserInfo struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 	ImageURL string `json:"imageUrl"`
+}
+
+type UserInfoEdit struct {
+	Id string
+	Username string
+	ImageURL string
+	PostIds []string
 }
 
 type FollowRequest struct {
