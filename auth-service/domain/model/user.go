@@ -100,6 +100,60 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 		TotpToken: token}, err
 }
 
+func NewAgent(userRequest *UserRequest, token string) (*User, error) {
+	return &User{Id: userRequest.Id,
+		Active:   false,
+		Email:    html.EscapeString(userRequest.Email),
+		Password: userRequest.Password,
+		Roles: []Role{{Name: "user", Permissions: []Permission{
+			{"create_post"},
+			{"edit_profile"},
+			{"edit_profile_photo"},
+			{"get_logged_info"},
+			{"view_user_profile"},
+			{"view_followers"},
+			{"view_following"},
+			{"get_follow_request"},
+			{"accept_follow_request"},
+			{"follow"},
+			{"unfollow"},
+			{"mute"},
+			{"unmute"},
+			{"search"},
+			{"create_highlights"},
+			{"get_profile_highlights"},
+			{"create_collection"},
+			{"add_post_to_collection"},
+			{"get_post_from_collection"},
+			{"detele_collection"},
+			{"get_user_collection"},
+			{"check_post_favourites"},
+			{"get_timeline_post"},
+			{"create_post"},
+			{"update_post"},
+			{"get_post"},
+			{"like_post"},
+			{"dislike_post"},
+			{"comment_post"},
+			{"search_posts"},
+			{"get_storyline_stories"},
+			{"create_story"},
+			{"get_story_highlights"},
+			{"get_user_stories"},
+			{"get_personal_stories"},
+			{"visit_user_story"},
+			{"get_liked_posts"},
+			{"get_disliked_posts"},
+			{"check_if_verified"},
+			{"get_follow_recommendation"},
+		}},{Name: "agent", Permissions: []Permission{
+			{"create_campaign"},
+		}}},
+		TotpToken: token}, nil
+}
+
+
+
 func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {
 	isMatching := password == repeatedPassword
 	if !isMatching {

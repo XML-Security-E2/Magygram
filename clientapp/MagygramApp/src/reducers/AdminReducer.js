@@ -139,6 +139,91 @@ export const adminReducer = (state, action) => {
             strCpy.verificationRequests.errorMessage=action.errorMessage
 			return strCpy;
         }
+        case adminConstants.GET_PENDING_AGENT_REGISTRATION_REQUEST_REQUEST:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.requests=[]
+			return strCpy;
+        }
+        case adminConstants.GET_PENDING_AGENT_REGISTRATION_REQUEST_SUCCESS:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.requests=action.requests
+			return strCpy;
+        }
+        case adminConstants.GET_PENDING_AGENT_REGISTRATION_REQUEST_FAILURE:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.requests=[]
+			return strCpy;
+        }
+        case adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_REQUEST:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.showSuccessMessage=false
+            strCpy.agentRegistrationRequests.successMessage=""
+            strCpy.agentRegistrationRequests.showError=false
+            strCpy.agentRegistrationRequests.errorMessage=""
+			return strCpy;
+        }
+        case adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_SUCCESS:{
+            let strCpy = {
+				...state,
+			};
+			var newListOfVerificationRequests = strCpy.agentRegistrationRequests.requests.filter((request) => request.Id !== action.requestId);
+			strCpy.agentRegistrationRequests.requests = newListOfVerificationRequests;
+            strCpy.agentRegistrationRequests.showSuccessMessage=true
+            strCpy.agentRegistrationRequests.successMessage=action.successMessage
+            strCpy.agentRegistrationRequests.showError=false
+            strCpy.agentRegistrationRequests.errorMessage=""
+			return strCpy;
+        }
+        case adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_FAILURE:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.showSuccessMessage=false
+            strCpy.agentRegistrationRequests.successMessage=""
+            strCpy.agentRegistrationRequests.showError=true
+            strCpy.agentRegistrationRequests.errorMessage=action.errorMessage
+			return strCpy;
+        }
+        case adminConstants.REJECT_AGENT_REGISTRATION_REQUEST_REQUEST:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.showSuccessMessage=false
+            strCpy.agentRegistrationRequests.successMessage=""
+            strCpy.agentRegistrationRequests.showError=false
+            strCpy.agentRegistrationRequests.errorMessage=""
+			return strCpy;
+        }
+        case adminConstants.REJECT_AGENT_REGISTRATION_REQUEST_SUCCESS:{
+            let strCpy = {
+				...state,
+			};
+			var newListOfVerificationRequests = strCpy.agentRegistrationRequests.requests.filter((request) => request.Id !== action.requestId);
+			strCpy.agentRegistrationRequests.requests = newListOfVerificationRequests;
+            strCpy.agentRegistrationRequests.showSuccessMessage=true
+            strCpy.agentRegistrationRequests.successMessage=action.successMessage
+            strCpy.agentRegistrationRequests.showError=false
+            strCpy.agentRegistrationRequests.errorMessage=""
+			return strCpy;
+        }
+        case adminConstants.REJECT_AGENT_REGISTRATION_REQUEST_FAILURE:{
+            let strCpy = {
+				...state,
+			};
+            strCpy.agentRegistrationRequests.showSuccessMessage=false
+            strCpy.agentRegistrationRequests.successMessage=""
+            strCpy.agentRegistrationRequests.showError=true
+            strCpy.agentRegistrationRequests.errorMessage=action.errorMessage
+			return strCpy;
+        }
 		default:
 			return state;
 	}

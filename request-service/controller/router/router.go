@@ -14,4 +14,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/requests/verification/:requestId/approve", h.ApproveVerificationRequest)
 	e.PUT("/api/requests/verification/:requestId/reject", h.RejectVerificationRequest)
 	e.GET("/api/requests/verification/has-pending-request", h.HasUserPendingRequest)
+	e.POST("/api/requests/agent-registration", h.CreateAgentRegistrationRequest)
+	e.GET("/api/requests/agent-registration", h.GetAgentRegistrationRequests)
+	e.PUT("/api/requests/agent-registration/:requestId/approve", h.ApproveAgentRegistrationRequest)
+	e.PUT("/api/requests/agent-registration/:requestId/reject", h.RejectAgentRegistrationRequest)
 }

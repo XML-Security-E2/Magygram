@@ -18,12 +18,13 @@ type FollowRepository interface {
 	ReturnFollowingUsers(user *model.User) (interface{}, error)
 	ReturnFollowRequests(user *model.User) (interface{}, error)
 	ReturnFollowRequestsForUser(user *model.User, loggedId string) (interface{}, error)
-	ReturnRecommendedUsers(user *model.User) (interface{}, error)
+	ReturnRecommendedUsers(user *model.User) (model.Users, error)
 	AcceptFollowRequest(followRequest *model.FollowRequest) error
 	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
 	IsMuted(mute *model.Mute) (interface{}, error)
 	Mute(mute *model.Mute) error
 	Unmute(mute *model.Mute) error
+	GetPopularUsers(user *model.User, number int, recommendedUsers []string) (model.Users, error)
 }
 
 type followRepository struct {
@@ -309,19 +310,19 @@ func (f *followRepository) ReturnFollowingUsers(user *model.User) (interface{}, 
 	return result, nil
 }
 
-func (f *followRepository) ReturnRecommendedUsers(user *model.User) (interface{}, error) {
+func (f *followRepository) ReturnRecommendedUsers(user *model.User) (model.Users, error) {
 	session := f.Driver.NewSession(neo4j.SessionConfig{
 		AccessMode: neo4j.AccessModeRead,
 	})
 	defer unsafeClose(session)
 	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-		query := "MATCH (s:User)-[:FOLLOW]->(o:User)-[:FOLLOW]-(r:User) WHERE s.id = $sId WITH r,count(*) as score return r.id as id ORDER BY score DESC LIMIT 10"
+		query := "MATCH (s:User)-[:FOLLOW]->(o:User)-[:FOLLOW]-(r:User) WHERE s.id = $sId AND NOT (s:User)-[:FOLLOW]->(r:User) AND NOT (:User{id:$sId})-[:FOLLOWREQUEST]->(r:User) AND r.id <> $sId WITH r,count(*) as score return r.id as id ORDER BY score DESC LIMIT 20"
 		parameters := map[string]interface{}{
 			"sId": user.Id,
 		}
 		records, err := tx.Run(query, parameters)
 		if err != nil {
-			return nil, err
+			return model.Users{}, err
 		}
 		users := model.Users{}
 		for records.Next() {
@@ -333,9 +334,10 @@ func (f *followRepository) ReturnRecommendedUsers(user *model.User) (interface{}
 	})
 	if err != nil {
 		log.Println("error querying graph:", err)
-		return nil, err
+		return model.Users{}, err
 	}
-	return result, nil
+
+	return result.(model.Users), nil
 }
 
 func (f *followRepository) ReturnFollowRequests(user *model.User) (interface{}, error) {
@@ -396,4 +398,37 @@ func unsafeClose(closeable io.Closer) {
 	if err := closeable.Close(); err != nil {
 		log.Fatal(fmt.Errorf("could not close resource: %w", err))
 	}
+}
+
+func (f *followRepository) GetPopularUsers(user *model.User, number int, recommendedUsers []string) (model.Users, error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeRead,
+	})
+	defer unsafeClose(session)
+	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "MATCH (p:User)<-[:FOLLOW]-(:User) WHERE p.id <> $sId AND NOT (:User{id:$sId})-[:FOLLOWREQUEST]->(p:User) AND NOT p.id IN $popularSlice AND NOT (:User{id:$sId})-[:FOLLOW]->(p:User) WITH p,count(*) as score return p.id as id, score ORDER BY score DESC LIMIT $number"
+
+		parameters := map[string]interface{}{
+			"sId": user.Id,
+			"number": number,
+			"popularSlice": recommendedUsers,
+		}
+		records, err := tx.Run(query, parameters)
+		if err != nil {
+			return model.Users{}, err
+		}
+		users := model.Users{}
+		for records.Next() {
+			record := records.Record()
+			id, _ := record.Get("id")
+			users.Users = append(users.Users, id.(string))
+		}
+		return users, nil
+	})
+	if err != nil {
+		log.Println("error querying graph:", err)
+		return model.Users{}, err
+	}
+
+	return result.(model.Users), nil
 }

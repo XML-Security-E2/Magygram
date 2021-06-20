@@ -15,6 +15,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import SearchPostPage from "./pages/SearchedPostPage";
 import LikedPostPage from "./pages/LikedPostPage";
 import DislikedPostPage from "./pages/DislikedPostPage";
+import RecommendedUsersPage from "./pages/RecommendedUsersPage";
 
 function App() {
 	return (
@@ -35,6 +36,7 @@ function App() {
 				<ProtectedRoute roles={["user","admin"]} redirectTo="/unauthorized" path="/search/location/:id" component={SearchPostPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/liked" component={LikedPostPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/disliked" component={DislikedPostPage} />
+				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/recommended-users" component={RecommendedUsersPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 

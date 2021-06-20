@@ -21,6 +21,7 @@ type AuthClient interface {
 	GetLoggedUserId(bearer string) (string,error)
 	ChangePassword(userId string, password string, passwordRepeat string) error
 	HasRole(bearer string, role string) (bool,error)
+	RegisterAgent(user *model.User, password string) error
 }
 
 type userAuthRequest struct {
@@ -41,6 +42,7 @@ type errMessage struct {
 }
 
 type authClient struct {}
+
 
 func NewAuthClient() AuthClient {
 	baseUrl = fmt.Sprintf("%s%s:%s/api/auth", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port)
@@ -126,6 +128,34 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 	}
 
 	return resp,nil
+}
+
+func (a authClient) RegisterAgent(user *model.User, password string) error {
+	userRequest := &userAuthRequest{Id: user.Id, Email: user.Email, Password: password, RepeatedPassword: password}
+	jsonUserRequest, _ := json.Marshal(userRequest)
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s:%s/api/users/agent", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+		bytes.NewBuffer(jsonUserRequest))
+	req.Header.Add("Content-Type","application/json")
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil || resp.StatusCode != 201 {
+		if resp == nil {
+			return err
+		}
+
+		message, err := getErrorMessageFromRequestBody(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(message)
+	}
+
+	return nil
 }
 
 func (a authClient) ActivateUser(userId string) error {

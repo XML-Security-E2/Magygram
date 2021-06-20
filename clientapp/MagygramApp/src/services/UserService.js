@@ -31,6 +31,7 @@ export const userService = {
 	editUserPrivacySettings,
 	getFollowRecommendationHandler,
 	followRecommendedUser,
+	registerAgent,
 };
 
 async function findAllFollowedUsers(userId, dispatch) {
@@ -753,4 +754,53 @@ function followRecommendedUser(userId,dispatch){
 	function failure() {
 		return { type: userConstants.RECOMMENDED_FOLLOW_USER_FAILURE };
 	}
+}
+
+function registerAgent(agent, dispatch) {
+	if (validateAgent(agent, dispatch)) {
+		dispatch(request());
+		Axios.post(`/api/requests/agent-registration`, agent, { validateStatus: () => true })
+			.then((res) => {
+				if (res.status === 201) {
+					dispatch(success(agent.email));
+				} else {
+					dispatch(failure(res.data.message));
+				}
+			})
+			.catch((err) => {});
+	}
+
+	function request() {
+		return { type: userConstants.REGISTER_REQUEST };
+	}
+	function success(emailAddress, imageData) {
+		return { type: userConstants.REGISTER_AGENT_SUCCESS, emailAddress, imageData };
+	}
+	function failure(error) {
+		return { type: userConstants.REGISTER_FAILURE, errorMessage: error };
+	}
+}
+
+function validateAgent(user, dispatch) {
+	const [passwordValid, passwordErrorMessage] = validatePasswords(user.password, user.repeatedPassword);
+
+	if (user.name.length < 2) {
+		dispatch(validatioFailure("Name must contain minimum two letters"));
+		return false;
+	} else if (user.surname.length < 2) {
+		dispatch(validatioFailure("Surname must contain minimum two letters"));
+		return false;
+	} else if (passwordValid === false) {
+		dispatch(validatioFailure(passwordErrorMessage));
+		return false;
+	} else if (user.webSite.length < 5) {
+		dispatch(validatioFailure("Web site must contain minimum five letters"));
+		return false;
+	}
+
+	function validatioFailure(message) {
+		return { type: userConstants.REGISTER_VALIDATION_FAILURE, errorMessage: message };
+	}
+
+	return true;
 }

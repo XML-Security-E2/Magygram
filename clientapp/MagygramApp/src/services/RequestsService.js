@@ -11,6 +11,9 @@ export const requestsService = {
 	hasUserPendingRequest,
 	getAllReportRequest,
 	deleteReportRequest,
+	getAllPendingAgentRegistrationRequest,
+	approveAgentRegistrationRequest,
+	rejectAgentRegistrationRequest,
 };
 
 function createVerificationRequest(formData,dispatch){
@@ -194,5 +197,86 @@ function hasUserPendingRequest(dispatch) {
 	}
 	function failure(error) {
 		return { type: profileSettingsConstants.CHECK_IF_USER_HAS_PENDING_REQUEST_FAILURE, error };
+	}
+}
+
+async function getAllPendingAgentRegistrationRequest(dispatch){
+	dispatch(request());
+	await Axios.get(`/api/requests/agent-registration`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: adminConstants.GET_PENDING_AGENT_REGISTRATION_REQUEST_REQUEST };
+	}
+
+	function success(data) {
+		return { type: adminConstants.GET_PENDING_AGENT_REGISTRATION_REQUEST_SUCCESS, requests: data };
+	}
+	function failure() {
+		return { type: adminConstants.GET_PENDING_AGENT_REGISTRATION_REQUEST_FAILURE };
+	}
+}
+
+function approveAgentRegistrationRequest(requestId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/requests/agent-registration/${requestId}/approve`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(requestId,"Agent registration has been approved"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_REQUEST };
+	}
+	function success(requestId,successMessage) {
+		return { type: adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_SUCCESS, requestId,successMessage };
+	}
+	function failure(message) {
+		return { type: adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_FAILURE, errorMessage: message };
+	}
+}
+
+function rejectAgentRegistrationRequest(requestId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/requests/agent-registration/${requestId}/reject`, {}, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(requestId,"Agent registration request has been rejected"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: adminConstants.REJECT_AGENT_REGISTRATION_REQUEST_REQUEST };
+	}
+	function success(requestId,successMessage) {
+		return { type: adminConstants.REJECT_AGENT_REGISTRATION_REQUEST_SUCCESS, requestId,successMessage };
+	}
+	function failure(message) {
+		return { type: adminConstants.REJECT_AGENT_REGISTRATION_REQUEST_FAILURE, errorMessage: message };
 	}
 }

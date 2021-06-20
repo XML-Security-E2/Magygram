@@ -32,6 +32,7 @@ type userService struct {
 	intercomm.StoryClient
 }
 
+
 var (
 	MaxUnsuccessfulLogins = 3
 )
@@ -1213,7 +1214,6 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	if err != nil {
 		return nil, err
 	}
-	log.Println("test2")
 
 	retVal := model.FollowRecommendationResponse{
 		Name: user.Name,
@@ -1228,7 +1228,7 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 		if err != nil {
 			return nil, errors.New("invalid user id")
 		}
-		log.Println("test4")
+
 		var newUserInfo = &model.RecommendUserInfo{
 			Id:       userId,
 			Username: user.Username,
@@ -1240,4 +1240,36 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	}
 
 	return &retVal,nil
+}
+
+func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *model.AgentRegistrationDTO) (string, error) {
+	user, _ := model.NewAgent(agentRegistrationDTO)
+	if err := validator.New().Struct(user); err != nil {
+		return "", err
+	}
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+
+	err = u.AuthClient.RegisterAgent(user, agentRegistrationDTO.Password)
+	if err != nil {
+		return "", err
+	}
+
+	err = u.RelationshipClient.CreateUser(user)
+	if err != nil {
+		return "", err
+	}
+
+	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
+
+	go SendActivationMail(agentRegistrationDTO.Email, agentRegistrationDTO.Name, accActivationId)
+
+	if userId, ok := result.InsertedID.(string); ok {
+		return userId, nil
+	}
+
+	return user.Id, err
 }

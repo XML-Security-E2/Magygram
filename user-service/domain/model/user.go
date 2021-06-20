@@ -260,6 +260,38 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 	}, nil
 }
 
+func NewAgent(agentRegistrationDTO *AgentRegistrationDTO) (*User, error) {
+	return &User{Id: guid.New().String(),
+		Name:            html.EscapeString(agentRegistrationDTO.Name),
+		Surname:         html.EscapeString(agentRegistrationDTO.Surname),
+		Username:        html.EscapeString(agentRegistrationDTO.Username),
+		Email:           html.EscapeString(agentRegistrationDTO.Email),
+		Website: 		 html.EscapeString(agentRegistrationDTO.Website),
+		FavouritePosts:  map[string][]IdWithMedia{},
+		HighlightsStory: map[string]HighlightImageWithMedia{},
+		IsPrivate:       true,
+		LikedPosts:      []string{},
+		DislikedPosts:   []string{},
+		BlockedUsers:    []string{},
+		IsDeleted:       false,
+		NotificationSettings: NotificationSettings{
+			NotifyLike:                FromEveryOne,
+			NotifyDislike:             FromEveryOne,
+			NotifyFollow:              true,
+			NotifyFollowRequest:       true,
+			NotifyComment:             FromEveryOne,
+			NotifyAcceptFollowRequest: true,
+		},
+		PrivacySettings: PrivacySettings{
+			IsPrivate:       false,
+			ReceiveMessages: true,
+			IsTaggable:      true,
+		},
+		IsVerified: false,
+	}, nil
+}
+
+
 func validateGenderEnums(pt Gender) error {
 	switch pt {
 	case "MALE", "FEMALE":
@@ -300,4 +332,13 @@ type RecommendUserInfo struct {
 	ImageURL string
 	SendedRequest bool
 	Followed bool
+}
+
+type AgentRegistrationDTO struct {
+	Username 	string
+	Name	string
+	Email	 string
+	Surname	 string
+	Website	string
+	Password string
 }

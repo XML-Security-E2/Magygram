@@ -3,6 +3,9 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"golang.org/x/crypto/bcrypt"
+	"log"
+	"regexp"
 )
 
 type VerificationRequest struct {
@@ -140,3 +143,83 @@ type VerifyAccountDTO struct{
 	Category string
 }
 
+
+type AgentRegistrationRequest struct {
+	Id	string	`bson:"_id,omitempty"`
+	Username	string	`bson:"username" validate:"required,min=1"`
+	Name	string 	`bson:"name" validate:"required,min=2"`
+	Email	 string	`bson:"email" validate:"required,email"`
+	Surname	 string	`bson:"surname" validate:"required,min=2"`
+	Website	string	`bson:"website" `
+	Status RequestStatus `bson:"request_status"`
+	Password string `bson:"password"`
+}
+
+type AgentRegistrationRequestDTO struct {
+	Username string
+	Name string
+	Email string
+	Surname string
+	Website string
+	Password string
+	RepeatedPassword string
+}
+
+type AgentRegistrationDTO struct {
+	Username 	string
+	Name	string
+	Email	 string
+	Surname	 string
+	Website	string
+	Password string
+}
+
+func NewAgentRegistrationRequest(registrationRequest *AgentRegistrationRequestDTO, requestStatus RequestStatus) (*AgentRegistrationRequest, error) {
+	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching(registrationRequest.Password, registrationRequest.RepeatedPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	err = validateRequestStatusTypeEnums(requestStatus)
+	if err != nil {
+		return nil, err
+	}
+
+
+	return &AgentRegistrationRequest{Id: guid.New().String(),
+		Name:   registrationRequest.Name,
+		Surname:    registrationRequest.Surname,
+		Email: registrationRequest.Email,
+		Username: registrationRequest.Username,
+		Website: registrationRequest.Website,
+		Status: requestStatus,
+		Password: hashAndSalt,
+	}, nil
+}
+
+func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {
+	isMatching := password == repeatedPassword
+	if !isMatching {
+		return "", errors.New("passwords are not matching")
+	}
+	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
+
+	if isWeak {
+		return "", errors.New("password must contain minimum eight characters, at least one capital letter, one number and one special character")
+	}
+	pwd := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash), err
+}
+
+type AgentRegistrationRequestResponseDTO struct {
+	Id string
+	Name string
+	Surname string
+	Username string
+	Email string
+	WebSite string
+}

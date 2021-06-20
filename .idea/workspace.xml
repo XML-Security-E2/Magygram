@@ -2,18 +2,70 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/media-service/files/0b3cd951-15ff-494c-a5e3-6aa7ae4b5cda.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/0e8d27a7-df77-4ec6-b1bc-746525233620.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/39c3fd66-91a0-4f9b-9f41-fc923e7cdb9c.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/43bf04e1-3f91-40a1-8011-5ab52975726f.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/5fe7321f-68e3-4411-91b5-ea4a49b6c5cd.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/60897a91-2b30-4942-af90-53893960fe4b.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/73b91e96-733b-46ee-99d6-6a1f100c791e.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/8d780d26-034d-4da7-9faf-4faf210227f7.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/9069d43b-2e65-4fb9-a506-1387b51313eb.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/940de862-257d-43d6-acbf-8382a2968259.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/b96a2450-da4d-435e-ac9b-20bb9f4ab29d.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/d853ccdf-9ac4-4528-b26e-9fbfc320aeeb.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/dc82cb72-3c12-4ec0-ade2-1f23afbafdd2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/de0ff58b-dba2-4987-8adb-9f005bb49987.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/f87897cc-c306-4a78-b026-51950fbf9887.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/media-service/files/fae75218-a439-489f-8eb3-70bbb1160a76.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/CreatePostForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/CreatePostForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/EditNotificationsForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/EditNotificationsForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/NotificationSettingsForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/NotificationSettingsForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/Post.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/Post.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostCommentInputModalView.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostCommentInputModalView.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostCommentsModalView.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostCommentsModalView.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostHeader.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/PostHeader.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/Story.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/Story.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/CreateStoryModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/CreateStoryModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModalStory.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModalStory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/PostDislikesModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/PostDislikesModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/PostLikesModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/PostLikesModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/StorySliderModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/StorySliderModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/ViewPostModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/ViewPostModal.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/StoryContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/StoryContext.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/StoryReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/StoryReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/SearchService.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/SearchService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/StoryService.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/StoryService.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/controller/handler/post_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/controller/handler/post_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/domain/model/post.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/domain/model/post.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/domain/service-contracts/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/domain/service-contracts/post_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/service/intercomm/relationship_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/service/intercomm/user_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/service/post_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/service/post_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/relationship-service/infrastructure/persistence/neo4jdb/follow_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/infrastructure/persistence/neo4jdb/follow_repository.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/controller/handler/story_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/controller/handler/story_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/domain/service-contracts/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/domain/service-contracts/story_service.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/service/intercomm/relationship_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/service/intercomm/relationship_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/service/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/service/story_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/controller/handler/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/controller/handler/user_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/domain/model/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/domain/model/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/domain/service-contracts/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/domain/service-contracts/user_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/infrastructure/persistence/mongodb/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/infrastructure/persistence/mongodb/users.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/interactor/interactor.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/interactor/interactor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/service/intercomm/post_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/service/intercomm/post_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/service/intercomm/story_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/service/intercomm/story_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/service/user_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/service/user_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,9 +83,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GoLibraries">
-    <option name="indexEntireGoPath" value="false" />
-  </component>
   <component name="ProjectId" id="1tDxFhQ3g7HzmyqFjDakfqQkQoW" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -47,7 +96,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/user-service" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/request-service" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />

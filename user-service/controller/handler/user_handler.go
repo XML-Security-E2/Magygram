@@ -57,6 +57,7 @@ type UserHandler interface {
 	ChangeUsersNotificationsSettings(c echo.Context) error
 	DeleteUser(c echo.Context) error
 	GetFollowRecommendation(c echo.Context) error
+	RegisterAgent(c echo.Context) error
 	AddComment(c echo.Context) error
 }
 
@@ -66,6 +67,7 @@ var (
 type userHandler struct {
 	UserService service_contracts.UserService
 }
+
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
@@ -864,6 +866,25 @@ func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+func (h *userHandler) RegisterAgent(c echo.Context) error {
+	agentRegistrationDTO := &model.AgentRegistrationDTO{}
+	if err := c.Bind(agentRegistrationDTO); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	result,err := h.UserService.RegisterAgent(ctx,agentRegistrationDTO)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, result)
 }
 
 func (h *userHandler) AddComment(c echo.Context) error {
