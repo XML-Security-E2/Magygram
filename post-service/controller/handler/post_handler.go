@@ -39,6 +39,10 @@ type PostHandler interface {
 	GetLikedPosts(c echo.Context) error
 	GetDislikedPosts(c echo.Context) error
 	DeletePost(c echo.Context) error
+	EditPostOwnerInfo(c echo.Context) error
+	EditLikedByInfo(c echo.Context) error
+	EditDislikedByInfo(c echo.Context) error
+	EditCommentedByInfo(c echo.Context) error
 }
 
 type postHandler struct {
@@ -224,7 +228,7 @@ func (p postHandler) AddComment(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 
-	retVal, err := p.PostService.AddComment(ctx, commentRequest.PostId, commentRequest.Content, bearer)
+	retVal, err := p.PostService.AddComment(ctx, commentRequest.PostId, commentRequest.Content, bearer, commentRequest.Tags)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
@@ -486,4 +490,90 @@ func (p postHandler) GetDislikedPosts(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, posts)
+}
+
+func (p postHandler) EditPostOwnerInfo(c echo.Context) error {
+	userInfo := &model.UserInfo{}
+	if err := c.Bind(userInfo); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.EditPostOwnerInfo(ctx, bearer, userInfo)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) EditLikedByInfo(c echo.Context) error {
+
+	userInfo := &model.UserInfoEdit{}
+	if err := c.Bind(userInfo); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.EditLikedByInfo(ctx, bearer, userInfo)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) EditDislikedByInfo(c echo.Context) error {
+
+	userInfo := &model.UserInfoEdit{}
+	if err := c.Bind(userInfo); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.EditDislikedByInfo(ctx, bearer, userInfo)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) EditCommentedByInfo(c echo.Context) error {
+	userInfo := &model.UserInfoEdit{}
+	if err := c.Bind(userInfo); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.EditCommentedByInfo(ctx, bearer, userInfo)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }

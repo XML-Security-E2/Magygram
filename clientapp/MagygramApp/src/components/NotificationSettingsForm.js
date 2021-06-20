@@ -32,18 +32,14 @@ const NotificationSettingsForm = () => {
 				<div>
 					<div className="form-group row d-flex align-items-center">
 						<label className="col-sm-6 col-form-label">Notify when user publish post</label>
-						<div className="col-sm-4">
-							<label>
-								<input type="checkbox" className="mr-1" checked={notifyPost} onChange={() => setNotifyPost(!notifyPost)} />
-							</label>
+						<div className="col-sm-4 d-flex align-items-center">
+							<input type="checkbox" className="mr-1" checked={notifyPost} onChange={() => setNotifyPost(!notifyPost)} />
 						</div>
 					</div>
 					<div className="form-group row d-flex align-items-center">
 						<label className="col-sm-6 col-form-label">Notify when user publish story</label>
-						<div className="col-sm-4">
-							<label>
-								<input type="checkbox" className="mr-1" checked={notifyStory} onChange={() => setNotifyStory(!notifyStory)} />
-							</label>
+						<div className="col-sm-4 d-flex align-items-center">
+							<input type="checkbox" className="mr-1" checked={notifyStory} onChange={() => setNotifyStory(!notifyStory)} />
 						</div>
 					</div>
 

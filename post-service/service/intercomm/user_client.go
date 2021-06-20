@@ -19,13 +19,13 @@ type UserClient interface {
 	MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
 	IsUserPrivate(userId string) (bool, error)
 	UpdateLikedPosts(bearer string, postId string) error
+	AddComment(bearer string, postId string) error
 	UpdateDislikedPosts(bearer string, postId string) error
 	GetLikedPosts(bearer string) ([]string, error)
 	GetDislikedPosts(bearer string) ([]string, error)
 }
 
 type userClient struct {}
-
 
 func NewUserClient() UserClient {
 	baseUsersUrl = fmt.Sprintf("%s%s:%s/api/users", conf.Current.Userservice.Protocol, conf.Current.Userservice.Domain, conf.Current.Userservice.Port)
@@ -35,6 +35,22 @@ func NewUserClient() UserClient {
 var (
 	baseUsersUrl = ""
 )
+
+
+func (u userClient) AddComment(bearer string, postId string) error {
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/comment/%s", baseUsersUrl, postId), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return err
+	}
+
+	return nil
+}
 
 func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 

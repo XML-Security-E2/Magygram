@@ -37,7 +37,8 @@ const StoryContextProvider = (props) => {
 			showModal: false,
 			stories: [],
 			firstUnvisitedStory: 0,
-			visited: false
+			visited: false,
+			userId: "",
 		},
 		iHaveAStory: false,
 	});

@@ -23,6 +23,7 @@ type User struct {
 	IsPrivate            bool                               `bson:"private_profile"`
 	LikedPosts           []string                           `bson:"liked_posts"`
 	DislikedPosts        []string                           `bson:"disliked_posts"`
+	CommentedPosts       []string                           `bson:"commented_posts"`
 	BlockedUsers         []string                           `bson:"blocked_users"`
 	NotificationSettings NotificationSettings               `bson:"notification_settings" json:"notificationSettings"`
 	PrivacySettings      PrivacySettings                    `bson:"privacy_settings" json:"privacySettings"`
@@ -133,6 +134,13 @@ type UserInfo struct {
 	ImageURL string `json:"imageUrl"`
 }
 
+type UserInfoEdit struct {
+	Id string
+	Username string
+	ImageURL string
+	PostIds []string
+}
+
 type FollowRequest struct {
 	SubjectId string `json:"subjectId"`
 	ObjectId  string `json:"objectId"`
@@ -232,6 +240,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		IsPrivate:       true,
 		LikedPosts:      []string{},
 		DislikedPosts:   []string{},
+		CommentedPosts:   []string{},
 		BlockedUsers:    []string{},
 		IsDeleted:       false,
 		NotificationSettings: NotificationSettings{
@@ -243,7 +252,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 			NotifyAcceptFollowRequest: true,
 		},
 		PrivacySettings: PrivacySettings{
-			IsPrivate:       false,
+			IsPrivate:       true,
 			ReceiveMessages: true,
 			IsTaggable:      true,
 		},

@@ -50,7 +50,7 @@ const CreateStoryModal = () => {
 
 	const loadOptions = (value, callback) => {
 		setTimeout(() => {
-			searchService.userSearchUsers(value, callback);
+			searchService.userSearchTags(value, callback);
 		}, 1000);
 	};
 

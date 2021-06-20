@@ -29,6 +29,7 @@ type userService struct {
 	intercomm.PostClient
 	intercomm.MediaClient
 	intercomm.MessageClient
+	intercomm.StoryClient
 }
 
 
@@ -36,8 +37,8 @@ var (
 	MaxUnsuccessfulLogins = 3
 )
 
-func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient) service_contracts.UserService {
-	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc}
+func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient, sclient intercomm.StoryClient) service_contracts.UserService {
+	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc,sclient}
 }
 
 func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error) {
@@ -61,6 +62,15 @@ func (u *userService) ChangeUsersNotificationsSettings(ctx context.Context, bear
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
 		return err
+	}
+
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	if err != nil {
+		return err
+	}
+
+	if !doesUserFollow(followedUsers, loggedId) {
+		return errors.New("cannot edit notification settings for not followed user")
 	}
 
 	notificationRule, err := u.NotificationRulesRepository.GetRuleForUser(ctx, loggedId, userId)
@@ -99,24 +109,7 @@ func (u *userService) GetUsersForPostNotification(ctx context.Context, userId st
 			})
 		}
 	}
-	//followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-	//if err != nil {
-	//	return []*model.UserInfo{}, err
-	//}
-	//
-	//var retVal []*model.UserInfo
-	//
-	//for _, followingUserId := range followingUsers.Users {
-	//	followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
-	//	if err == nil && followingUser.NotificationSettings.NotifyPost {
-	//		retVal = append(retVal, &model.UserInfo{
-	//			Id:       followingUserId,
-	//			Username: followingUser.Username,
-	//			ImageURL: followingUser.ImageUrl,
-	//		})
-	//	}
-	//}
-	//
+
 	return retVal, nil
 }
 
@@ -138,24 +131,6 @@ func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId s
 			})
 		}
 	}
-
-	//followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-	//if err != nil {
-	//	return []*model.UserInfo{}, err
-	//}
-	//
-	//var retVal []*model.UserInfo
-	//
-	//for _, followingUserId := range followingUsers.Users {
-	//	followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
-	//	if err == nil && followingUser.NotificationSettings.NotifyStory {
-	//		retVal = append(retVal, &model.UserInfo{
-	//			Id:       followingUserId,
-	//			Username: followingUser.Username,
-	//			ImageURL: followingUser.ImageUrl,
-	//		})
-	//	}
-	//}
 
 	return retVal, nil
 }
@@ -253,6 +228,8 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 		return "", errors.New("invalid user id")
 	}
 
+	temp := user.Username
+
 	user.Username = userRequest.Username
 	user.Name = userRequest.Name
 	user.Surname = userRequest.Surname
@@ -281,6 +258,13 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 			"website":  userRequest.Website,
 			"bio":      userRequest.Bio}).Error("User database update failure")
 		return "", err
+	}
+	fmt.Println(temp)
+	if temp != userRequest.Username {
+		err = u.editSharedUserInfo(bearer, user, userRequest.Username, user.ImageUrl)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User information updated")
@@ -320,9 +304,79 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 		return "", err
 	}
 
+	err = u.editSharedUserInfo(bearer, user, user.Username, user.ImageUrl)
+
+	if err != nil {
+		return "", err
+	}
+
+
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User profile picture updated")
 
 	return media[0].Url, err
+}
+
+func (u *userService) editSharedUserInfo(bearer string, user *model.User, username string, imageUrl string) error {
+	err := u.PostClient.EditPostOwnerInfo(bearer, model.UserInfo{
+		Id:       user.Id,
+		Username: username,
+		ImageURL: imageUrl,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	err = u.StoryClient.EditStoryOwnerInfo(bearer, model.UserInfo{
+		Id:       user.Id,
+		Username: username,
+		ImageURL: imageUrl,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if len(user.LikedPosts) > 0 {
+		err = u.PostClient.EditLikedByInfo(bearer, model.UserInfoEdit{
+			Id:       user.Id,
+			Username: username,
+			ImageURL: imageUrl,
+			PostIds:  user.LikedPosts,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(user.DislikedPosts) > 0 {
+		err = u.PostClient.EditDislikedByInfo(bearer, model.UserInfoEdit{
+			Id:       user.Id,
+			Username: username,
+			ImageURL: imageUrl,
+			PostIds:  user.DislikedPosts,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(user.CommentedPosts) > 0 {
+		err = u.PostClient.EditCommentedByInfo(bearer, model.UserInfoEdit{
+			Id:       user.Id,
+			Username: username,
+			ImageURL: imageUrl,
+			PostIds:  user.CommentedPosts,
+		})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettingsUpdateReq) error {
@@ -1004,6 +1058,39 @@ func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId
 	return nil
 }
 
+func (u *userService) AddComment(ctx context.Context, bearer string, postId string) error {
+	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, loggedId)
+	if err != nil {
+		errors.New("invalid user id")
+	}
+
+	commented := didUserCommentedPost(user, postId)
+
+	if !commented {
+		user.CommentedPosts = append(user.CommentedPosts, postId)
+		_, err = u.UserRepository.Update(ctx, user)
+		if err != nil {
+			errors.New("user not modified")
+		}
+	}
+
+	return nil
+}
+
+func didUserCommentedPost(user *model.User, postId string) bool {
+	for _, commentedPostId := range user.CommentedPosts {
+		if commentedPostId == postId {
+			return true
+		}
+	}
+	return false
+}
+
 func (u *userService) UpdateDislikedPost(ctx context.Context, bearer string, postId string) error {
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
@@ -1156,41 +1243,29 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 }
 
 func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *model.AgentRegistrationDTO) (string, error) {
-	fmt.Println(agentRegistrationDTO.Name)
-	fmt.Println(agentRegistrationDTO.Email)
-	fmt.Println(agentRegistrationDTO.Surname)
-	fmt.Println(agentRegistrationDTO.Website)
-	fmt.Println(agentRegistrationDTO.Password)
-
 	user, _ := model.NewAgent(agentRegistrationDTO)
 	if err := validator.New().Struct(user); err != nil {
 		return "", err
 	}
-	fmt.Println("test123")
 	result, err := u.UserRepository.Create(ctx, user)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
 	}
-	fmt.Println("test1234")
 
 	err = u.AuthClient.RegisterAgent(user, agentRegistrationDTO.Password)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("tes5t123")
 
 	err = u.RelationshipClient.CreateUser(user)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("test1236")
 
 	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
-	fmt.Println("test1238")
 
 	go SendActivationMail(agentRegistrationDTO.Email, agentRegistrationDTO.Name, accActivationId)
-	fmt.Println("test1237")
 
 	if userId, ok := result.InsertedID.(string); ok {
 		return userId, nil

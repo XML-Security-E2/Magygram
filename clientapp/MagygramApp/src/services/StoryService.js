@@ -221,7 +221,7 @@ function GetStoriesForUser(userId, visited, dispatch) {
 		});
 
 	function success(data, visited) {
-		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data, visited };
+		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data, visited, userId };
 	}
 	//function failure() {
 	//	return { type: storyConstants.STORYLINE_STORY_FAILURE };

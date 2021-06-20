@@ -37,11 +37,12 @@ const ViewPostModal = () => {
 		dispatch({ type: modalConstants.HIDE_VIEW_POST_MODAL, post: postState.viewPostModal.post });
 	};
 
-	const postComment = (comment) => {
+	const postComment = (comment, tags) => {
 		if (comment.length >= 1) {
 			let postDTO = {
 				PostId: postState.viewPostModal.post.Id,
 				Content: comment,
+				Tags: tags,
 			};
 
 			postService.commentPost(postDTO, dispatch);
@@ -85,16 +86,15 @@ const ViewPostModal = () => {
 					<div className="p-2" style={style}>
 						<div className="align-top" style={style}>
 							<div>
-								<label className="m-1">Tagged users: </label>
 								{postState.viewPostModal.post.Tags !== null &&
-								postState.viewPostModal.post.Tags.map((tag) => {
-									return (
-										<button type="button" className="btn btn-light m-1" onClick={() => handleRedirect(tag.Id)}>
-											{tag.Username}
-										</button>
-									);
-								})}
-							</div>	
+									postState.viewPostModal.post.Tags.map((tag) => {
+										return (
+											<button type="button" className="btn btn-light mb-1 ml-1" onClick={() => handleRedirect(tag.Id)}>
+												@{tag.Username}
+											</button>
+										);
+									})}
+							</div>
 							<PostHeaderModalView
 								username={postState.viewPostModal.post.UserInfo.Username}
 								image={postState.viewPostModal.post.UserInfo.ImageURL}
@@ -108,6 +108,7 @@ const ViewPostModal = () => {
 								username={postState.viewPostModal.post.UserInfo.Username}
 								description={postState.viewPostModal.post.Description}
 								comments={postState.viewPostModal.post.Comments}
+								handleRedirect={handleRedirect}
 							/>
 							<hr></hr>
 							<div id="viewPostModalInteraction">

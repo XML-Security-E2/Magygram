@@ -15,7 +15,7 @@ type PostService interface {
 	DislikePost(ctx context.Context, bearer string,  postId string) error
 	UndislikePost(ctx context.Context, bearer string,  postId string) error
 	GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error)
-	AddComment(ctx context.Context,  postId string,  content string, bearer string) (*model.Comment, error)
+	AddComment(ctx context.Context,  postId string,  content string, bearer string, tags []model.Tag) (*model.Comment, error)
 	CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error)
 	GetUsersPosts(ctx context.Context, bearer string, postOwnerId string) ([]*model.PostProfileResponse, error)
 	GetUsersPostsCount(ctx context.Context, postOwnerId string) (int, error)
@@ -29,4 +29,8 @@ type PostService interface {
 	GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 	GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 	DeletePost(ctx context.Context, requestId string) error
+	EditPostOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error
+	EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
+	EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
+	EditCommentedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
 }

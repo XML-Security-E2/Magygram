@@ -142,11 +142,19 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type UserInfoEdit struct {
+	Id string
+	Username string
+	ImageURL string
+	PostIds []string
+}
+
 type Comment struct {
 	Id string
 	CreatedBy UserInfo
 	Content string
 	TimeCreated time.Time
+	Tags []Tag
 }
 
 type PostResponse struct {
@@ -200,6 +208,7 @@ type PostId struct {
 type CommentRequest struct {
 	PostId string
 	Content string
+	Tags []Tag
 }
 
 type Location struct {

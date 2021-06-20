@@ -107,7 +107,7 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(),i.NewNotificationRulesRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient())
+	return service.NewAuthService(i.NewUserRepository(),i.NewNotificationRulesRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient(), i.NewStoryClient())
 }
 
 

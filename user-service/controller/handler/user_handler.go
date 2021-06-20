@@ -58,6 +58,7 @@ type UserHandler interface {
 	DeleteUser(c echo.Context) error
 	GetFollowRecommendation(c echo.Context) error
 	RegisterAgent(c echo.Context) error
+	AddComment(c echo.Context) error
 }
 
 var (
@@ -868,7 +869,6 @@ func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
 }
 
 func (h *userHandler) RegisterAgent(c echo.Context) error {
-	fmt.Println("TEST")
 	agentRegistrationDTO := &model.AgentRegistrationDTO{}
 	if err := c.Bind(agentRegistrationDTO); err != nil {
 		return err
@@ -878,13 +878,33 @@ func (h *userHandler) RegisterAgent(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	fmt.Println("TEST1")
 
 	result,err := h.UserService.RegisterAgent(ctx,agentRegistrationDTO)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
-	fmt.Println("1111")
 
 	return c.JSON(http.StatusCreated, result)
+}
+
+func (h *userHandler) AddComment(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	err := h.UserService.AddComment(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }

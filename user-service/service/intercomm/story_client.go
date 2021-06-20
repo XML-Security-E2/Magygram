@@ -16,6 +16,7 @@ import (
 
 type StoryClient interface {
 	GetStoryHighlightIfValid(bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error)
+	EditStoryOwnerInfo(bearer string, userInfo model.UserInfo) error
 }
 
 type storyClient struct {}
@@ -28,6 +29,28 @@ func NewStoryClient() StoryClient {
 var (
 	baseStorytUrl = ""
 )
+
+
+func (s storyClient) EditStoryOwnerInfo(bearer string, userInfo model.UserInfo) error {
+	jsonRequest, _ := json.Marshal(userInfo)
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/user-info", baseStorytUrl), bytes.NewBuffer(jsonRequest))
+	req.Header.Add("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return err
+	}
+
+	return nil
+}
+
 
 func (s storyClient) GetStoryHighlightIfValid(bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error) {
 	jsonRequest, _ := json.Marshal(request)

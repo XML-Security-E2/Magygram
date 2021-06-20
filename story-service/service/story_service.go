@@ -94,7 +94,7 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 	}
 
 	var followedUsers model.FollowedUsersResponse
-	followedUsers, err = p.RelationshipClient.GetFollowedUsers(userInfo.Id)
+	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(userInfo.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -316,4 +316,32 @@ func (p storyService) HaveActiveStoriesLoggedUser(ctx context.Context, bearer st
 	}
 
 	return true, nil
+}
+
+func (p storyService) EditStoryOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+	fmt.Println(userId)
+
+
+	if userId != userInfo.Id {
+		return errors.New("unauthorized edit")
+	}
+
+	stories, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userId)
+	if err != nil {
+		return errors.New("invalid user id")
+	}
+
+	for _, userStory := range stories {
+		userStory.UserInfo = *userInfo
+
+		_, err = p.StoryRepository.Update(ctx, userStory)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
