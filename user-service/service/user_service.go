@@ -62,6 +62,15 @@ func (u *userService) ChangeUsersNotificationsSettings(ctx context.Context, bear
 		return err
 	}
 
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	if err != nil {
+		return err
+	}
+
+	if !doesUserFollow(followedUsers, loggedId) {
+		return errors.New("cannot edit notification settings for not followed user")
+	}
+
 	notificationRule, err := u.NotificationRulesRepository.GetRuleForUser(ctx, loggedId, userId)
 	if err != nil {
 		u.NotificationRulesRepository.Create(ctx, &model.PostStoryNotifications{
@@ -98,24 +107,7 @@ func (u *userService) GetUsersForPostNotification(ctx context.Context, userId st
 			})
 		}
 	}
-	//followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-	//if err != nil {
-	//	return []*model.UserInfo{}, err
-	//}
-	//
-	//var retVal []*model.UserInfo
-	//
-	//for _, followingUserId := range followingUsers.Users {
-	//	followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
-	//	if err == nil && followingUser.NotificationSettings.NotifyPost {
-	//		retVal = append(retVal, &model.UserInfo{
-	//			Id:       followingUserId,
-	//			Username: followingUser.Username,
-	//			ImageURL: followingUser.ImageUrl,
-	//		})
-	//	}
-	//}
-	//
+
 	return retVal, nil
 }
 
@@ -137,24 +129,6 @@ func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId s
 			})
 		}
 	}
-
-	//followingUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
-	//if err != nil {
-	//	return []*model.UserInfo{}, err
-	//}
-	//
-	//var retVal []*model.UserInfo
-	//
-	//for _, followingUserId := range followingUsers.Users {
-	//	followingUser, err := u.UserRepository.GetByID(ctx, followingUserId)
-	//	if err == nil && followingUser.NotificationSettings.NotifyStory {
-	//		retVal = append(retVal, &model.UserInfo{
-	//			Id:       followingUserId,
-	//			Username: followingUser.Username,
-	//			ImageURL: followingUser.ImageUrl,
-	//		})
-	//	}
-	//}
 
 	return retVal, nil
 }

@@ -91,3 +91,4 @@ time="2021-06-20T00:27:50+02:00" level=error msg="User-service get logged user i
 time="2021-06-20T00:27:50+02:00" level=error msg="User-service get logged user info" func=story-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/zindo/Desktop/Magygram/story-service/service/intercomm/user_client.go:45" request_ip=127.0.0.1
 time="2021-06-20T14:26:33+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-20T16:14:35+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-06-20T19:11:08+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464

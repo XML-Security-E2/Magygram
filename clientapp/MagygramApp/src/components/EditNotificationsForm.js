@@ -45,17 +45,17 @@ const EditNotificationsForm = ({ show }) => {
 					<div className="col-sm-2">
 						<label>Mute </label>
 
-						<input type="checkbox" className="mr-1" checked={notifyLike == 0} onChange={() => setNotifyLike(0)} />
+						<input type="checkbox" className="ml-2" checked={notifyLike == 0} onChange={() => setNotifyLike(0)} />
 					</div>
 					<div className="col-sm-3">
 						<label>People I follow </label>
 
-						<input type="checkbox" className="mr-1" checked={notifyLike == 1} onChange={() => setNotifyLike(1)} />
+						<input type="checkbox" className="ml-2" checked={notifyLike == 1} onChange={() => setNotifyLike(1)} />
 					</div>
 					<div className="col-sm-3">
 						<label>Everyone </label>
 
-						<input type="checkbox" className="mr-1" checked={notifyLike == 2} onChange={() => setNotifyLike(2)} />
+						<input type="checkbox" className="ml-2" checked={notifyLike == 2} onChange={() => setNotifyLike(2)} />
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
@@ -63,35 +63,35 @@ const EditNotificationsForm = ({ show }) => {
 					<div className="col-sm-2">
 						<label>Mute </label>
 
-						<input type="checkbox" className="mr-1" checked={notifyDislike == 0} onChange={() => setNotifyDislike(0)} />
+						<input type="checkbox" className="ml-2" checked={notifyDislike == 0} onChange={() => setNotifyDislike(0)} />
 					</div>
 					<div className="col-sm-3">
 						<label>People I follow </label>
 
-						<input type="checkbox" className="mr-1" checked={notifyDislike == 1} onChange={() => setNotifyDislike(1)} />
+						<input type="checkbox" className="ml-2" checked={notifyDislike == 1} onChange={() => setNotifyDislike(1)} />
 					</div>
 					<div className="col-sm-3">
 						<label>Everyone</label>
 
-						<input type="checkbox" className="mr-1" checked={notifyDislike == 2} onChange={() => setNotifyDislike(2)} />
+						<input type="checkbox" className="ml-2" checked={notifyDislike == 2} onChange={() => setNotifyDislike(2)} />
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
 					<label className="col-sm-4 col-form-label">Comment notifications</label>
-					<div className="col-sm-2 -flex align-items-center">
+					<div className="col-sm-2">
 						<label>Mute</label>
 
-						<input type="checkbox" className="mr-1" checked={notifyComments == 0} onChange={() => setNotifyComments(0)} />
+						<input type="checkbox" className="ml-2" checked={notifyComments == 0} onChange={() => setNotifyComments(0)} />
 					</div>
-					<div className="col-sm-3 -flex align-items-center">
+					<div className="col-sm-3 ">
 						<label>People I follow</label>
 
-						<input type="checkbox" className="mr-1" checked={notifyComments == 1} onChange={() => setNotifyComments(1)} />
+						<input type="checkbox" className="ml-2" checked={notifyComments == 1} onChange={() => setNotifyComments(1)} />
 					</div>
-					<div className="col-sm-3 -flex align-items-center">
+					<div className="col-sm-3">
 						<label>Everyone</label>
 
-						<input type="checkbox" className="mr-1" checked={notifyComments == 2} onChange={() => setNotifyComments(2)} />
+						<input type="checkbox" className="ml-2" checked={notifyComments == 2} onChange={() => setNotifyComments(2)} />
 					</div>
 				</div>
 				<div className="form-group row d-flex align-items-center">
