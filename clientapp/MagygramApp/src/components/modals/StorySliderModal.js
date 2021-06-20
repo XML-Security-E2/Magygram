@@ -7,7 +7,7 @@ import Stories from 'react-insta-stories';
 import { storyService } from "../../services/StoryService";
 import OptionsModalStory from "../modals/OptionsModalStory";
 
-const StorySliderModal = (userId) => {
+const StorySliderModal = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 	const [tags, setTags] = useState([]);
 
@@ -27,6 +27,7 @@ const StorySliderModal = (userId) => {
 	const onStoryStart =(index,story)=>{
 		console.log(index);
 		console.log(story);
+		console.log(storyState.storySliderModal.userId);
 		setTags(story.tags);
 		if(!storyState.storySliderModal.visited){
 			if((index+1)===storyState.storySliderModal.stories.length){
@@ -40,7 +41,7 @@ const StorySliderModal = (userId) => {
 	}
 
 	const handleOpenOptionsModal = () => {
-		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL });
+		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL, userId: storyState.storySliderModal.userId });
 	};
 
 
@@ -69,7 +70,7 @@ const StorySliderModal = (userId) => {
 								);
 						})}
 					</div>
-				<OptionsModalStory userId={userId}/>
+				<OptionsModalStory />
 			</Modal.Body>
 		</Modal>
 	);

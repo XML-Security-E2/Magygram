@@ -5,7 +5,7 @@ import { StoryContext } from "../../contexts/StoryContext";
 import Axios from "axios";
 import { authHeader } from "../../helpers/auth-header";
 
-const OptionsModalStory = (userId) => {
+const OptionsModalStory = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
 	const handleModalClose = () => {
@@ -15,10 +15,10 @@ const OptionsModalStory = (userId) => {
 	const handleReportModal = () => {
 
 		let reportDTO = {
-			contentId: userId,
+			contentId: storyState.storySliderModal.userId,
 			contentType: "STORY",
 		};
-		console.log(userId)
+
 		Axios.post(`/api/report`, reportDTO , { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
