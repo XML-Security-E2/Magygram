@@ -13,7 +13,10 @@ import (
 type Interactor interface {
 	NewVerificationRequestRepository() repository.VerificationRequestsRepository
 	NewVerificationRequestService() service_contracts.VerificationRequestService
+	NewAgentRegistrationRequestService() service_contracts.AgentRegistrationRequestService
 	NewVerificationRequestHandler() handler.VerificationRequestHandler
+	NewAgentRegistrationRequestHandler() handler.AgentRegistrationRequestHandler
+	NewAgentRegistrationRequestRepository() repository.AgentRegistrationRequests
 	NewAppHandler() handler.AppHandler
 	NewMediaClient() intercomm.MediaClient
 	NewAuthClient() intercomm.AuthClient
@@ -23,14 +26,17 @@ type Interactor interface {
 type interactor struct {
 	VerificationRequestCol *mongo.Collection
 	ReportRequestCol *mongo.Collection
+	AgentRegistrationRequestCol *mongo.Collection
 }
 
-func NewInteractor(VerificationRequestCol *mongo.Collection, ReportRequestCol *mongo.Collection) Interactor {
-	return &interactor{VerificationRequestCol, ReportRequestCol}
+
+func NewInteractor(VerificationRequestCol *mongo.Collection, ReportRequestCol *mongo.Collection, AgentRegistrationRequestCol *mongo.Collection) Interactor {
+	return &interactor{VerificationRequestCol, ReportRequestCol, AgentRegistrationRequestCol}
 }
 
 type appHandler struct {
 	handler.VerificationRequestHandler
+	handler.AgentRegistrationRequestHandler
 }
 
 func (i *interactor) NewMediaClient() intercomm.MediaClient {
@@ -48,6 +54,7 @@ func (i *interactor) NewUserClient() intercomm.UserClient {
 func (i interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.VerificationRequestHandler = i.NewVerificationRequestHandler()
+	appHandler.AgentRegistrationRequestHandler = i.NewAgentRegistrationRequestHandler()
 	return appHandler
 }
 
@@ -59,13 +66,24 @@ func (i interactor) NewReportRequestRepository() repository.ReportRequestsReposi
 	return mongodb.NewReportRequestsRepository(i.ReportRequestCol)
 }
 
+func (i interactor) NewAgentRegistrationRequestRepository() repository.AgentRegistrationRequests {
+	return mongodb.NewAgentRegistrationRequestsRepository(i.AgentRegistrationRequestCol)
+}
+
 func (i interactor) NewVerificationRequestService() service_contracts.VerificationRequestService {
 	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewMediaClient(),i.NewAuthClient(),i.NewUserClient())
+}
+
+func (i *interactor) NewAgentRegistrationRequestService() service_contracts.AgentRegistrationRequestService {
+	return service.NewAgentRegistrationRequestService(i.NewAgentRegistrationRequestRepository(),i.NewAuthClient(),i.NewUserClient())
 }
 
 func (i interactor) NewVerificationRequestHandler() handler.VerificationRequestHandler {
 	return handler.NewVerificationRequestHandler(i.NewVerificationRequestService())
 }
 
+func (i interactor) NewAgentRegistrationRequestHandler() handler.AgentRegistrationRequestHandler {
+	return handler.NewAgentRegistrationRequestHandler(i.NewAgentRegistrationRequestService())
+}
 
 

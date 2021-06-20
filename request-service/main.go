@@ -55,9 +55,10 @@ func main() {
 
 	verificationRequestCol := client.Database(*mongoDatabase).Collection("verification-requests")
 	reportContentCol := client.Database(*mongoDatabase).Collection("reports")
+	agentRegistrationRequestCol := client.Database(*mongoDatabase).Collection("agent-registration-requests")
 
 	e := echo.New()
-	i := interactor.NewInteractor(verificationRequestCol,reportContentCol)
+	i := interactor.NewInteractor(verificationRequestCol,reportContentCol,agentRegistrationRequestCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

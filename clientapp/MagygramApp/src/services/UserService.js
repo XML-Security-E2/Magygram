@@ -759,12 +759,12 @@ function followRecommendedUser(userId,dispatch){
 function registerAgent(agent, dispatch) {
 	if (validateAgent(agent, dispatch)) {
 		dispatch(request());
-		Axios.post(`/api/users/agent`, agent, { responseType: "arraybuffer", validateStatus: () => true })
+		Axios.post(`/api/requests/agent-registration`, agent, { validateStatus: () => true })
 			.then((res) => {
 				if (res.status === 201) {
 					dispatch(success(agent.email));
 				} else {
-					dispatch(failure("Email adress and username must be unique"));
+					dispatch(failure(res.data.message));
 				}
 			})
 			.catch((err) => {});
