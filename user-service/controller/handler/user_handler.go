@@ -57,6 +57,7 @@ type UserHandler interface {
 	ChangeUsersNotificationsSettings(c echo.Context) error
 	DeleteUser(c echo.Context) error
 	GetFollowRecommendation(c echo.Context) error
+	AddComment(c echo.Context) error
 }
 
 var (
@@ -863,4 +864,26 @@ func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+func (h *userHandler) AddComment(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	if bearer == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	err := h.UserService.AddComment(ctx, bearer, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }

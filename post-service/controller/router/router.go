@@ -28,4 +28,10 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/posts/likedposts", h.GetLikedPosts)
 	e.GET("/api/posts/dislikedposts", h.GetDislikedPosts)
 	e.PUT("/api/posts/:requestId/delete", h.DeletePost)
+
+	e.PUT("/api/posts/user-info", h.EditPostOwnerInfo)
+	e.PUT("/api/posts/liked-by/user-info", h.EditLikedByInfo)
+	e.PUT("/api/posts/disliked-by/user-info", h.EditDislikedByInfo)
+	e.PUT("/api/posts/commented/user-info", h.EditCommentedByInfo)
+
 }

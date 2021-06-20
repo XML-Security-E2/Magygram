@@ -302,6 +302,11 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 
 	result.Comments = append(result.Comments, res)
 
+	err = p.UserClient.AddComment(bearer, postId)
+	if err != nil {
+		return nil, err
+	}
+
 	_, err = p.PostRepository.Update(ctx,result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
@@ -890,3 +895,117 @@ func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([
 
 	return userPostsResponse, nil
 }
+
+func (p postService) EditPostOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+	fmt.Println(userId)
+
+
+	if userId != userInfo.Id {
+		return errors.New("unauthorized edit")
+	}
+
+	userPosts, err := p.PostRepository.GetPostsForUser(ctx, userId)
+	if err != nil {
+		return errors.New("invalid user id")
+	}
+
+	for _, userPost := range userPosts {
+		userPost.UserInfo = *userInfo
+
+		_, err = p.PostRepository.Update(ctx, userPost)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p postService) EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	for _, postId := range userInfoEdit.PostIds {
+		fmt.Println(postId)
+		post, err := p.PostRepository.GetByID(ctx, postId)
+		if err == nil {
+			for idx, likedBy := range post.LikedBy {
+				if userId == likedBy.Id{
+					post.LikedBy[idx] = model.UserInfo{
+						Id:       userId,
+						Username: userInfoEdit.Username,
+						ImageURL: userInfoEdit.ImageURL,
+					}
+					break
+				}
+			}
+			_, err = p.PostRepository.Update(ctx, post)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (p postService) EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	for _, postId := range userInfoEdit.PostIds {
+		post, err := p.PostRepository.GetByID(ctx, postId)
+		if err == nil {
+			for idx, dislikedBy := range post.DislikedBy {
+				if userId == dislikedBy.Id {
+					post.DislikedBy[idx] = model.UserInfo{
+						Id:       userId,
+						Username: userInfoEdit.Username,
+						ImageURL: userInfoEdit.ImageURL,
+					}
+					break
+				}
+			}
+			_, err = p.PostRepository.Update(ctx, post)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (p postService) EditCommentedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	for _, postId := range userInfoEdit.PostIds {
+		post, err := p.PostRepository.GetByID(ctx, postId)
+		if err == nil {
+			for idx, comment := range post.Comments {
+				if userId == comment.CreatedBy.Id {
+					post.Comments[idx].CreatedBy = model.UserInfo{
+						Id:       userId,
+						Username: userInfoEdit.Username,
+						ImageURL: userInfoEdit.ImageURL,
+					}
+				}
+			}
+			_, err = p.PostRepository.Update(ctx, post)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil}

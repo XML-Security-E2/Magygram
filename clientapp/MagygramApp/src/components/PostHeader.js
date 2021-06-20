@@ -11,7 +11,7 @@ const PostHeader = ({ username, image, id }) => {
 					<ul className="list-inline d-flex flex-row align-items-center m-0">
 						<li className="list-inline-item">
 							<div className="rounded-circle overflow-hidden d-flex justify-content-center align-items-center border border-danger post-profile-photo ">
-								<img src={image} alt="" style={imgStyle} />
+								<img src={image !== "" ? image : "assets/img/profile.jpg"} alt="" style={imgStyle} />
 							</div>
 						</li>
 						<li className="list-inline-item">
