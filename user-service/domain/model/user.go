@@ -240,6 +240,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 		IsPrivate:       true,
 		LikedPosts:      []string{},
 		DislikedPosts:   []string{},
+		CommentedPosts:   []string{},
 		BlockedUsers:    []string{},
 		IsDeleted:       false,
 		NotificationSettings: NotificationSettings{
