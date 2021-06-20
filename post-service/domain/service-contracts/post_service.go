@@ -15,7 +15,7 @@ type PostService interface {
 	DislikePost(ctx context.Context, bearer string,  postId string) error
 	UndislikePost(ctx context.Context, bearer string,  postId string) error
 	GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error)
-	AddComment(ctx context.Context,  postId string,  content string, bearer string) (*model.Comment, error)
+	AddComment(ctx context.Context,  postId string,  content string, bearer string, tags []model.Tag) (*model.Comment, error)
 	CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error)
 	GetUsersPosts(ctx context.Context, bearer string, postOwnerId string) ([]*model.PostProfileResponse, error)
 	GetUsersPostsCount(ctx context.Context, postOwnerId string) (int, error)

@@ -224,7 +224,7 @@ func (p postHandler) AddComment(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 
-	retVal, err := p.PostService.AddComment(ctx, commentRequest.PostId, commentRequest.Content, bearer)
+	retVal, err := p.PostService.AddComment(ctx, commentRequest.PostId, commentRequest.Content, bearer, commentRequest.Tags)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}

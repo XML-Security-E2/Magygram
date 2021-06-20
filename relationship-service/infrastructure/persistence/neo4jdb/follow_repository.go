@@ -228,7 +228,7 @@ func (f *followRepository) ReturnUnmutedFollowedUsers(user *model.User) (interfa
 	})
 	defer unsafeClose(session)
 	result, err := session.ReadTransaction(func(tx neo4j.Transaction) (interface{}, error) {
-		query := "MATCH (s:User)-[f:FOLLOW {muted: true}]->(o:User) WHERE s.id = $sId return o.id as id"
+		query := "MATCH (s:User)-[f:FOLLOW]->(o:User) WHERE s.id = $sId AND NOT EXISTS(f.muted) return o.id as id"
 		parameters := map[string]interface{}{
 			"sId": user.Id,
 		}

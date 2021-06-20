@@ -243,7 +243,7 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 			NotifyAcceptFollowRequest: true,
 		},
 		PrivacySettings: PrivacySettings{
-			IsPrivate:       false,
+			IsPrivate:       true,
 			ReceiveMessages: true,
 			IsTaggable:      true,
 		},

@@ -94,7 +94,7 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 	}
 
 	var followedUsers model.FollowedUsersResponse
-	followedUsers, err = p.RelationshipClient.GetFollowedUsers(userInfo.Id)
+	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(userInfo.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +281,7 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 	return nil
 }
 
-func (p postService) AddComment(ctx context.Context, postId string, content string, bearer string) (*model.Comment, error) {
+func (p postService) AddComment(ctx context.Context, postId string, content string, bearer string, tags []model.Tag) (*model.Comment, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
 		return nil, err
@@ -298,6 +298,7 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 	res.Content= content
 	res.CreatedBy= *userInfo
 	res.TimeCreated = time.Now()
+	res.Tags = tags
 
 	result.Comments = append(result.Comments, res)
 
