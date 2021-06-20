@@ -73,5 +73,4 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/users/:requestId/delete", h.DeleteUser)
 
 	e.GET("/api/users/follow-recommendation", h.GetFollowRecommendation)
-
 }

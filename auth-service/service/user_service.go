@@ -164,6 +164,48 @@ func (u userService) GetAllRolesByUserId(ctx context.Context, userId string) ([]
 	return u.UserRepository.GetAllRolesByUserId(ctx, userId)
 }
 
+func (u userService) RegisterAgent(ctx context.Context, userRequest *model.UserRequest) (string,[]byte, error) {
+	key, err := totp.Generate(totp.GenerateOpts{
+		Issuer:      "Magygram",
+		AccountName: userRequest.Email,
+	})
 
+	img, err := key.Image(200, 200)
+	if err != nil {
+		panic(err)
+	}
 
+	buffer := new(bytes.Buffer)
+	err = jpeg.Encode(buffer, img, nil)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Error("TOTP QR code not created")
+		return "",[]byte{}, err
+	}
 
+	imageInBytes := buffer.Bytes()
+
+	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Info("TOTP QR code created")
+
+	user, err := model.NewAgent(userRequest,key.Secret())
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return "",[]byte{}, err
+	}
+
+	if err := validator.New().Struct(user); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
+		return "",[]byte{}, err
+	}
+
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Error("User database create failure")
+		return "",[]byte{}, err
+	}
+
+	if userId, ok := result.InsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
+		return userId,imageInBytes, nil
+	}
+	return "",imageInBytes, err
+}

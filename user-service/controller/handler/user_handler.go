@@ -868,5 +868,23 @@ func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
 }
 
 func (h *userHandler) RegisterAgent(c echo.Context) error {
-	return c.JSON(http.StatusCreated, "")
+	fmt.Println("TEST")
+	agentRegistrationDTO := &model.AgentRegistrationDTO{}
+	if err := c.Bind(agentRegistrationDTO); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	fmt.Println("TEST1")
+
+	result,err := h.UserService.RegisterAgent(ctx,agentRegistrationDTO)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	fmt.Println("1111")
+
+	return c.JSON(http.StatusCreated, result)
 }

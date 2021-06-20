@@ -16,6 +16,7 @@ import AdminVerificationRequestTabContent from "../components/AdminVerificationR
 import AdminContextProvider from "../contexts/AdminContext";
 import FollowRecommendation from "../components/FollowRecommendation";
 import AdminReportRequestTab from "../components/AdminReportRequestTab";
+import AgentRegistrationRequestTabContent from "../components/AgentRegistrationRequestTabContent";
 
 const HomePage = () => {
 	return (
@@ -68,6 +69,7 @@ const HomePage = () => {
 																<AdminHomePageTabs />
 																<AdminVerificationRequestTabContent />
 																<AdminReportRequestTab />
+																<AgentRegistrationRequestTabContent/>
 															</div>
 														</div>
 													</div>

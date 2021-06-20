@@ -31,6 +31,7 @@ type userService struct {
 	intercomm.MessageClient
 }
 
+
 var (
 	MaxUnsuccessfulLogins = 3
 )
@@ -1152,4 +1153,48 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	}
 
 	return &retVal,nil
+}
+
+func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *model.AgentRegistrationDTO) (string, error) {
+	fmt.Println(agentRegistrationDTO.Name)
+	fmt.Println(agentRegistrationDTO.Email)
+	fmt.Println(agentRegistrationDTO.Surname)
+	fmt.Println(agentRegistrationDTO.Website)
+	fmt.Println(agentRegistrationDTO.Password)
+
+	user, _ := model.NewAgent(agentRegistrationDTO)
+	if err := validator.New().Struct(user); err != nil {
+		return "", err
+	}
+	fmt.Println("test123")
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	fmt.Println("test1234")
+
+	err = u.AuthClient.RegisterAgent(user, agentRegistrationDTO.Password)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println("tes5t123")
+
+	err = u.RelationshipClient.CreateUser(user)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println("test1236")
+
+	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
+	fmt.Println("test1238")
+
+	go SendActivationMail(agentRegistrationDTO.Email, agentRegistrationDTO.Name, accActivationId)
+	fmt.Println("test1237")
+
+	if userId, ok := result.InsertedID.(string); ok {
+		return userId, nil
+	}
+
+	return user.Id, err
 }

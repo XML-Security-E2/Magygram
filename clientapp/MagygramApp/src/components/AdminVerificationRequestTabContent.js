@@ -5,7 +5,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import ImageViewer from 'react-simple-image-viewer';
 import { adminConstants } from "../constants/AdminConstants";
-import EditProfileSidebar from "./EditProfileSidebar";
 import FailureAlert from "./FailureAlert";
 import SuccessAlert from "./SuccessAlert";
 

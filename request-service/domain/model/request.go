@@ -165,6 +165,15 @@ type AgentRegistrationRequestDTO struct {
 	RepeatedPassword string
 }
 
+type AgentRegistrationDTO struct {
+	Username 	string
+	Name	string
+	Email	 string
+	Surname	 string
+	Website	string
+	Password string
+}
+
 func NewAgentRegistrationRequest(registrationRequest *AgentRegistrationRequestDTO, requestStatus RequestStatus) (*AgentRegistrationRequest, error) {
 	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching(registrationRequest.Password, registrationRequest.RepeatedPassword)
 	if err != nil {
@@ -204,4 +213,13 @@ func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword st
 		log.Println(err)
 	}
 	return string(hash), err
+}
+
+type AgentRegistrationRequestResponseDTO struct {
+	Id string
+	Name string
+	Surname string
+	Username string
+	Email string
+	WebSite string
 }

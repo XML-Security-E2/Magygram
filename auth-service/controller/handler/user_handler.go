@@ -18,6 +18,7 @@ type UserHandler interface {
 	ActivateUser(c echo.Context) error
 	ResetPassword(c echo.Context) error
 	UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
+	RegisterAgent(c echo.Context) error
 }
 
 var (
@@ -29,6 +30,7 @@ var (
 type userHandler struct {
 	UserService service_contracts.UserService
 }
+
 
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
@@ -98,3 +100,24 @@ func (u userHandler) ResetPassword(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Password has been changed")
 }
 
+
+func (u userHandler) RegisterAgent(c echo.Context) error {
+	userRequest := &model.UserRequest{}
+	if err := c.Bind(userRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	_, bufer, err := u.UserService.RegisterAgent(ctx, userRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	yter := bytes.NewReader(bufer)
+
+	return c.Stream(http.StatusCreated,"image/png",yter)
+}

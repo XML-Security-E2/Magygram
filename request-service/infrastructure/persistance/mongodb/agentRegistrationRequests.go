@@ -22,11 +22,32 @@ func (a agentRegistrationRequest) Create(ctx context.Context, request *model.Age
 }
 
 func (a agentRegistrationRequest) GetAllPendingRequests(ctx context.Context) ([]*model.AgentRegistrationRequest, error) {
-	panic("implement me")
+	cursor, err := a.Col.Find(ctx, bson.M{"request_status": "PENDING"})
+	var results []*model.AgentRegistrationRequest
+
+	if err != nil {
+		defer cursor.Close(ctx)
+		return nil, err
+	} else {
+		for cursor.Next(ctx) {
+			var result model.AgentRegistrationRequest
+
+			_ = cursor.Decode(&result)
+			results = append(results, &result)
+
+		}
+	}
+	return results, nil
 }
 
-func (a agentRegistrationRequest) UpdateVerificationRequest(ctx context.Context, request *model.AgentRegistrationRequest) (*mongo.UpdateResult, error) {
-	panic("implement me")
+func (a agentRegistrationRequest) Update(ctx context.Context, request *model.AgentRegistrationRequest) (*mongo.UpdateResult, error) {
+	return a.Col.UpdateOne(ctx, bson.M{"_id":  request.Id},bson.D{{"$set", bson.D{
+		{"username" , request.Username},
+		{"name" , request.Name},
+		{"email" , request.Email},
+		{"surname" , request.Surname},
+		{"website" , request.Website},
+		{"request_status" , request.Status}}}})
 }
 
 func (a agentRegistrationRequest) GetByUsernamePendingRequest(ctx context.Context, username string) (*model.AgentRegistrationRequest, error) {
@@ -54,4 +75,19 @@ func (a agentRegistrationRequest) GetByEmailPendingRequest(ctx context.Context, 
 		return nil, err
 	}
 
-	return &agentRegistrationRequest, nil}
+	return &agentRegistrationRequest, nil
+}
+
+func (a agentRegistrationRequest) GetById(ctx context.Context, requestId string) (*model.AgentRegistrationRequest, error) {
+	var agentRegistrationRequest = model.AgentRegistrationRequest{}
+	err := a.Col.FindOne(ctx, bson.M{"_id": requestId}).Decode(&agentRegistrationRequest)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("ErrNoDocuments")
+		}
+		return nil, err
+	}
+
+	return &agentRegistrationRequest, nil
+}

@@ -47,3 +47,82 @@ func (a agentRegistrationRequestService) CreateVerificationRequest(ctx context.C
 	return "",err
 }
 
+func (a agentRegistrationRequestService) GetAgentRegistrationRequests(ctx context.Context) ([]*model.AgentRegistrationRequestResponseDTO, error) {
+	var agentRegistrationRequest []*model.AgentRegistrationRequest
+
+	agentRegistrationRequest, err := a.AgentRegistrationRequests.GetAllPendingRequests(ctx)
+	if err != nil {
+		return []*model.AgentRegistrationRequestResponseDTO{}, err
+	}
+
+	retVal := mapAgentRegistrationRequestToAgentRegistrationRequestResponseDTO(agentRegistrationRequest)
+
+	return retVal, nil
+}
+
+func mapAgentRegistrationRequestToAgentRegistrationRequestResponseDTO(requests []*model.AgentRegistrationRequest) []*model.AgentRegistrationRequestResponseDTO {
+	var retVal []*model.AgentRegistrationRequestResponseDTO
+
+	for _, request := range requests{
+		var result = model.AgentRegistrationRequestResponseDTO{ Id: request.Id,
+			Name:      request.Name,
+			Surname:   request.Surname,
+			Username :   request.Username,
+			Email : request.Email,
+			WebSite: request.Website,
+		}
+		retVal = append(retVal, &result)
+	}
+
+	return retVal
+}
+
+func (a agentRegistrationRequestService) ApproveAgentRegistrationRequest(ctx context.Context, requestId string) error {
+	result, err := a.AgentRegistrationRequests.GetById(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	if result.Status=="REJECTED" || result.Status=="APPROVED" {
+		return errors.New("The request has already been processed.")
+	}
+
+	result.Status="APPROVED"
+
+	//TODO: pozvati userClient da verifikuje u userServicu i eventualno poslati mail useru
+	agentRegistrationDTO := model.AgentRegistrationDTO{
+		Username:   result.Username,
+		Password: result.Password,
+		Email: result.Email,
+		Name: result.Name,
+		Surname : result.Surname,
+		Website: result.Website,
+	}
+
+	err = a.UserClient.RegisterAgent(agentRegistrationDTO)
+	if err!=nil{
+		return err
+	}
+
+	a.AgentRegistrationRequests.Update(ctx,result)
+
+	return nil
+}
+
+func (a agentRegistrationRequestService) RejectAgentRegistrationRequest(ctx context.Context, requestId string) error {
+	result, err := a.AgentRegistrationRequests.GetById(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	if result.Status=="REJECTED" || result.Status=="APPROVED" {
+		return errors.New("The request has already been processed.")
+	}
+
+	result.Status="REJECTED"
+
+	//TODO: pozvati userClient da verifikuje u userServicu i eventualno poslati mail useru
+	a.AgentRegistrationRequests.Update(ctx,result)
+
+	return nil
+}

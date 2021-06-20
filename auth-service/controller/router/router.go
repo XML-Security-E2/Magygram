@@ -14,4 +14,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/auth/logged-user", h.GetLoggedUserId, h.AuthLoggingMiddleware)
 	e.GET("/api/auth/admin-check", h.AdminCheck, h.AuthLoggingMiddleware)
 	e.GET("/api/auth/has-role", h.AuthorizationSuccess, h.AuthorizationMiddleware())
+	e.POST("/api/users/agent", h.RegisterAgent, h.UserLoggingMiddleware)
+
 }
