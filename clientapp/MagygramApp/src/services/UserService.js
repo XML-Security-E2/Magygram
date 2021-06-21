@@ -32,6 +32,7 @@ export const userService = {
 	getFollowRecommendationHandler,
 	followRecommendedUser,
 	registerAgent,
+	IsUserVerifiedById,
 	reportUser,
 };
 
@@ -833,3 +834,28 @@ function validateAgent(user, dispatch) {
 
 	return true;
 }
+
+function IsUserVerifiedById(userId,dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/users/isverified/`+ userId, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.CHECK_IF_USER_VERIFIED_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.CHECK_IF_USER_VERIFIED_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.CHECK_IF_USER_VERIFIED_FAILURE, error };
+	}
+}
+

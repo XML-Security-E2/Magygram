@@ -24,7 +24,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 	useEffect(() => {
 		const getProfileHandler = async () => {
 			await userService.getUserProfileByUserId(userId, dispatch);
-			userService.IsUserVerified(profileSettingsDispatch);
+			userService.IsUserVerifiedById(userId, profileSettingsDispatch);
 		};
 		getProfileHandler();
 	}, [userId, dispatch]);

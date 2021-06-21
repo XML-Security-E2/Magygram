@@ -640,6 +640,8 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 
 func (u *userService) GetUserProfileById(ctx context.Context, bearer string, userId string) (*model.UserProfileResponse, error) {
 
+	log.Println(userId)
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
@@ -1194,6 +1196,17 @@ func (u *userService) CheckIfUserVerified(ctx context.Context, bearer string) (b
 
 	return user.IsVerified, nil
 }
+
+func (u *userService) CheckIfUserVerifiedById(ctx context.Context, userId string) (bool, error) {
+	log.Println(userId)
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return false, errors.New("invalid user id")
+	}
+
+	return user.IsVerified, nil
+}
+
 
 func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string) (*model.FollowRecommendationResponse, error) {
 	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)

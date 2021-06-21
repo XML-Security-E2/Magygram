@@ -243,4 +243,9 @@ time="2021-06-21T22:48:32+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-21T22:57:17+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:140" request_ip="::1" user_id=8d382c38-d907-460c-b4d2-46ba3b9f63b9
 time="2021-06-21T23:10:16+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:140" request_ip="::1" user_id=ce3d89e7-deb9-4cfd-ba4f-0083cd7f0393
 time="2021-06-21T23:15:24+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:140" request_ip="::1" user_id=aca408bd-2498-4435-9246-b5b408898eec
+<<<<<<< HEAD
+time="2021-06-22T01:14:47+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-06-22T01:32:22+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
+=======
 time="2021-06-22T00:26:49+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
+>>>>>>> develop
