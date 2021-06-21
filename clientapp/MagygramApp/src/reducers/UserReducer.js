@@ -550,6 +550,55 @@ export const userReducer = (state, action) => {
 					emailAddress: "",
 				},
 			};
+
+		case modalConstants.SHOW_USER_REPORT_MODAL:
+			return {
+				...state,
+				userReport: {
+					showModal: true,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+		case modalConstants.HIDE_USER_REPORT_MODAL:
+			return {
+				...state,
+				userReport: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case userConstants.REPORT_USER_REQUEST:
+			a = { ...state };
+			a.userReport.showError = false;
+			a.userReport.errorMessage = "";
+			a.userReport.showSuccessMessage = false;
+			a.userReport.successMessage = "";
+
+			return a;
+		case userConstants.REPORT_USER_SUCCESS:
+			a = { ...state };
+			a.userReport.showError = false;
+			a.userReport.errorMessage = "";
+			a.userReport.showSuccessMessage = true;
+			a.userReport.successMessage = action.successMessage;
+
+			return a;
+
+		case userConstants.REPORT_USER_FAILURE:
+			a = { ...state };
+			a.userReport.showError = true;
+			a.userReport.errorMessage = action.errorMessage;
+			a.userReport.showSuccessMessage = false;
+			a.userReport.successMessage = "";
+
+			return a;
 		default:
 			return state;
 	}
