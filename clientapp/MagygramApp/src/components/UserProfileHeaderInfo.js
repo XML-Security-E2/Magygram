@@ -10,9 +10,12 @@ import { hasRoles } from "../helpers/auth-header";
 import { notificationService } from "../services/NotificationService";
 import { NotificationContext } from "../contexts/NotificationContext";
 import NotificationSettingsModal from "./modals/NotificationSettingsModal";
+import { ProfileSettingsContext } from "../contexts/ProfileSettingsContext";
 
 const UserProfileHeaderInfo = ({ userId }) => {
 	const { userState, dispatch } = useContext(UserContext);
+	const { profileSettingsState, profileSettingsDispatch } = useContext(ProfileSettingsContext);
+
 	const ntfxCtx = useContext(NotificationContext);
 
 	const imgProfileStyle = { left: "20", width: "150px", height: "150px", marginLeft: "100px", borderWidth: "1px", borderStyle: "solid" };
@@ -20,6 +23,7 @@ const UserProfileHeaderInfo = ({ userId }) => {
 	useEffect(() => {
 		const getProfileHandler = async () => {
 			await userService.getUserProfileByUserId(userId, dispatch);
+			userService.IsUserVerified(profileSettingsDispatch);
 		};
 		getProfileHandler();
 	}, [userId, dispatch]);
@@ -113,6 +117,10 @@ const UserProfileHeaderInfo = ({ userId }) => {
 					<div className="flexbox-container d-flex align-items-center">
 						<div>
 							<h2>{userState.userProfile.user.username}</h2>
+						</div>
+						<div className="ml-2" hidden={!profileSettingsState.isUserVerified}>
+							<i class="bi bi-patch-check"></i>
+							<label className="ml-1">Verified</label>
 						</div>
 						<div>
 							{localStorage.getItem("userId") !== null && userState.userProfile.user.blocked === false &&
