@@ -11,6 +11,7 @@ import { notificationService } from "../services/NotificationService";
 import { NotificationContext } from "../contexts/NotificationContext";
 import NotificationSettingsModal from "./modals/NotificationSettingsModal";
 import { ProfileSettingsContext } from "../contexts/ProfileSettingsContext";
+import { modalConstants } from "../constants/ModalConstants";
 
 const UserProfileHeaderInfo = ({ userId }) => {
 	const { userState, dispatch } = useContext(UserContext);
@@ -61,42 +62,26 @@ const UserProfileHeaderInfo = ({ userId }) => {
 	};
 
 	const reportUser = () => {
-		let reportDTO = {
-			contentId: userId,
-			contentType: "USER",
-		};
+		dispatch({ type: modalConstants.SHOW_USER_REPORT_MODAL });
+	};
 
-		Axios.post(`/api/report`, reportDTO, { validateStatus: () => true, headers: authHeader() })
+	const deleteUser = () => {
+		console.log(localStorage.getItem("roles"));
+		let requestId = userId;
+		Axios.put(`/api/users/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
-				console.log(res.data);
+				console.log(res);
 				if (res.status === 200) {
-					alert("You have reported this user successfully");
+					console.log("User has been deleted");
+					alert("You have successfully deleted this user!");
 				} else {
-					console.log("err");
+					console.log("ERROR");
 				}
 			})
 			.catch((err) => {
-				console.log("err");
+				console.log("ERROR");
 			});
 	};
-	
-	const deleteUser = () => {
-		console.log(localStorage.getItem("roles"))
-		let requestId =  userId;
-		Axios.put(`/api/users/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
-		.then((res) => {
-			console.log(res);
-			if (res.status === 200) {
-				console.log("User has been deleted");
-				alert("You have successfully deleted this user!")
-			} else {
-				console.log("ERROR")
-			}
-		})
-		.catch((err) => {
-			console.log("ERROR")
-		});
-	}
 
 	const handleNotificationsSetttings = async () => {
 		await notificationService.getProfileNotificationsSettings(userId, ntfxCtx.dispatch);
@@ -123,7 +108,8 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							<label className="ml-1">Verified</label>
 						</div>
 						<div>
-							{localStorage.getItem("userId") !== null && userState.userProfile.user.blocked === false &&
+							{localStorage.getItem("userId") !== null &&
+								userState.userProfile.user.blocked === false &&
 								(userState.userProfile.user.sentFollowRequest ? (
 									<h5 className="text-secondary ml-2">Following request sent</h5>
 								) : (
@@ -155,37 +141,38 @@ const UserProfileHeaderInfo = ({ userId }) => {
 							</Link>
 						</div>
 						<div>
-						{localStorage.getItem("userId") !== null && userId !== localStorage.getItem("userId") && userState.userProfile.user.following && userState.userProfile.user.blocked === false &&
-									(userState.userProfile.user.muted ? (
-										<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnmute}>
-											Unmute
-										</button>
-									) : (
-										<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserMute}>
-											Mute
-										</button>
-									))
-								}
+							{localStorage.getItem("userId") !== null &&
+								userId !== localStorage.getItem("userId") &&
+								userState.userProfile.user.following &&
+								userState.userProfile.user.blocked === false &&
+								(userState.userProfile.user.muted ? (
+									<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnmute}>
+										Unmute
+									</button>
+								) : (
+									<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserMute}>
+										Mute
+									</button>
+								))}
 						</div>
 						<div>
-						{localStorage.getItem("userId") !== null && userId !== localStorage.getItem("userId") && 
-									(userState.userProfile.user.blocked ? (
-										<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnblock}>
-											Unblock
-										</button>
-									) : (
-										<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserBlock}>
-											Block
-										</button>
-									))
-								}
+							{localStorage.getItem("userId") !== null &&
+								userId !== localStorage.getItem("userId") &&
+								(userState.userProfile.user.blocked ? (
+									<button type="button" className="btn btn-outline-secondary ml-2" tabindex="0" onClick={handleUserUnblock}>
+										Unblock
+									</button>
+								) : (
+									<button type="button" className="btn btn-primary ml-2" tabindex="0" onClick={handleUserBlock}>
+										Block
+									</button>
+								))}
 						</div>
 						<div>
 							<button
 								hidden={localStorage.getItem("userId") === userId || localStorage.getItem("userId") === null}
-								style={{ backgroundColor: "red", borderColor: "red" }}
 								type="button"
-								className="btn btn-primary ml-2"
+								className="btn btn-outline-secondary ml-2"
 								tabindex="0"
 								onClick={reportUser}
 							>

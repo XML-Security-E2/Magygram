@@ -33,7 +33,36 @@ export const userService = {
 	followRecommendedUser,
 	registerAgent,
 	IsUserVerifiedById,
+	reportUser,
 };
+
+function reportUser(reportDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/report`, reportDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Report sent successfully"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: userConstants.REPORT_USER_REQUEST };
+	}
+	function success(message) {
+		return { type: userConstants.REPORT_USER_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: userConstants.REPORT_USER_FAILURE, errorMessage: message };
+	}
+}
 
 async function findAllFollowedUsers(userId, dispatch) {
 	dispatch(request());
@@ -498,7 +527,7 @@ function muteUser(userId, dispatch) {
 		});
 
 	function success() {
-		return { type: userConstants.MUTE_USER_SUCCESS};
+		return { type: userConstants.MUTE_USER_SUCCESS };
 	}
 }
 
@@ -517,14 +546,14 @@ function unmuteUser(userId, dispatch) {
 		});
 
 	function success() {
-		return { type: userConstants.UNMUTE_USER_SUCCESS};
+		return { type: userConstants.UNMUTE_USER_SUCCESS };
 	}
 }
 
 function blockUser(userId, dispatch) {
 	let formData = new FormData();
 	formData.append("userId", userId);
-	dispatch(request())
+	dispatch(request());
 
 	Axios.post(`/api/users/block`, formData, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
@@ -537,7 +566,7 @@ function blockUser(userId, dispatch) {
 		});
 
 	function success() {
-		return { type: userConstants.BLOCK_USER_SUCCESS};
+		return { type: userConstants.BLOCK_USER_SUCCESS };
 	}
 	function request() {
 		return { type: userConstants.BLOCK_USER_REQUEST };
@@ -547,7 +576,7 @@ function blockUser(userId, dispatch) {
 function unblockUser(userId, dispatch) {
 	let formData = new FormData();
 	formData.append("userId", userId);
-	dispatch(request())
+	dispatch(request());
 
 	Axios.post(`/api/users/unblock`, formData, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
@@ -560,7 +589,7 @@ function unblockUser(userId, dispatch) {
 		});
 
 	function success() {
-		return { type: userConstants.UNBLOCK_USER_SUCCESS};
+		return { type: userConstants.UNBLOCK_USER_SUCCESS };
 	}
 	function request() {
 		return { type: userConstants.UNBLOCK_USER_REQUEST };
@@ -698,7 +727,7 @@ function IsUserVerified(dispatch) {
 }
 
 async function getFollowRecommendationHandler(dispatch) {
-	dispatch(request())
+	dispatch(request());
 	await Axios.get(`/api/users/follow-recommendation`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
@@ -724,7 +753,7 @@ async function getFollowRecommendationHandler(dispatch) {
 	}
 }
 
-function followRecommendedUser(userId,dispatch){
+function followRecommendedUser(userId, dispatch) {
 	let formData = new FormData();
 	formData.append("userId", userId);
 	dispatch(request());
@@ -750,7 +779,7 @@ function followRecommendedUser(userId,dispatch){
 		return { type: userConstants.RECOMMENDED_FOLLOW_USER_SUCCESS, userId };
 	}
 	function followRequestSuccess(userId) {
-		return { type: userConstants.RECOMMENDED_FOLLOW_USER_SEND_REQUEST_SUCCESS,userId };
+		return { type: userConstants.RECOMMENDED_FOLLOW_USER_SEND_REQUEST_SUCCESS, userId };
 	}
 	function failure() {
 		return { type: userConstants.RECOMMENDED_FOLLOW_USER_FAILURE };
@@ -829,3 +858,4 @@ function IsUserVerifiedById(userId,dispatch) {
 		return { type: userConstants.CHECK_IF_USER_VERIFIED_FAILURE, error };
 	}
 }
+

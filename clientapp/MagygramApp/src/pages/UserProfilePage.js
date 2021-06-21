@@ -9,6 +9,7 @@ import HeaderWrapper from "../components/HeaderWrapper";
 import EditPostModal from "../components/modals/EditPostModal";
 import NotificationContextProvider from "../contexts/NotificationContext";
 import ProfileSettingsContextProvider from "../contexts/ProfileSettingsContext";
+import ReportUserModal from "../components/modals/ReportUserModal";
 
 const UserProfilePage = (props) => {
 	const search = props.location.search;
@@ -29,6 +30,7 @@ const UserProfilePage = (props) => {
 												<NotificationContextProvider>
 													<ProfileSettingsContextProvider>
 														<UserProfileHeaderInfo userId={userId} />
+														<ReportUserModal userId={userId} />
 													</ProfileSettingsContextProvider>
 												</NotificationContextProvider>
 											</UserContextProvider>
