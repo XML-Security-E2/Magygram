@@ -38,7 +38,7 @@ const OptionsModal = () => {
 		if (a.find((col) => col === reason) === undefined) {
 			a.push(reason);
 		} else {
-			a = a.filter((reas) => reas !== reason);
+			a = reportReasons.filter((reas) => reas !== reason);
 		}
 		setReportReasons(a);
 		console.log(a);
@@ -47,6 +47,7 @@ const OptionsModal = () => {
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
 		setHiddenForm(true);
+		setReportReasons([]);
 	};
 
 	const handleOpenPostEditModal = () => {

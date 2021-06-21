@@ -14,6 +14,7 @@ const ReportUserModal = ({ userId }) => {
 
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_USER_REPORT_MODAL });
+		setReportReasons([]);
 	};
 
 	const handleSubmit = (e) => {
@@ -34,7 +35,7 @@ const ReportUserModal = ({ userId }) => {
 		if (a.find((col) => col === reason) === undefined) {
 			a.push(reason);
 		} else {
-			a = a.filter((reas) => reas !== reason);
+			a = reportReasons.filter((reas) => reas !== reason);
 		}
 		setReportReasons(a);
 		console.log(a);

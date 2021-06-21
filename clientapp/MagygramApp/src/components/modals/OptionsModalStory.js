@@ -16,6 +16,7 @@ const OptionsModalStory = () => {
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_STORY_OPTIONS_MODAL });
 		setHiddenForm(true);
+		setReportReasons([]);
 	};
 
 	const handleShowForm = () => {
@@ -40,7 +41,7 @@ const OptionsModalStory = () => {
 		if (a.find((col) => col === reason) === undefined) {
 			a.push(reason);
 		} else {
-			a = a.filter((reas) => reas !== reason);
+			a = reportReasons.filter((reas) => reas !== reason);
 		}
 		setReportReasons(a);
 		console.log(a);
