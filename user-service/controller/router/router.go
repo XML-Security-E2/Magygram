@@ -63,6 +63,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.PUT("/api/users/verify", h.VerifyUser)
 	e.GET("/api/users/isverified", h.CheckIfUserVerified)
+	e.GET("/api/users/isverified/:userId", h.CheckIfUserVerifiedById)
 
 	e.GET("api/users/:userId/notify/post", h.GetUsersForPostNotification)
 	e.GET("api/users/:userId/notify/story", h.GetUsersForStoryNotification)

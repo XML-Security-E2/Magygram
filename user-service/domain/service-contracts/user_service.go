@@ -51,4 +51,6 @@ type UserService interface {
 	DeleteUser(ctx context.Context, requestId string) error
 	GetFollowRecommendation(ctx context.Context, bearer string) (*model.FollowRecommendationResponse, error)
 	RegisterAgent(ctx context.Context, agentRegistrationDTO *model.AgentRegistrationDTO) (string, error)
+
+	CheckIfUserVerifiedById(ctx context.Context, userId string) (bool, error)
 }
