@@ -572,10 +572,16 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 
-			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			if(strcpy.viewPostModal.showModal){
+				if (strcpy.viewPostModal.post.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
+					strcpy.viewPostModal.post.Comments.push(action.comment);
+				}
+			}else{
+				postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 
-			if (postCopy.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
-				postCopy.Comments.push(action.comment);
+				if (postCopy.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
+					postCopy.Comments.push(action.comment);
+				}
 			}
 
 			return strcpy;

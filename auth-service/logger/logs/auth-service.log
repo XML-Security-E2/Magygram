@@ -314,3 +314,6 @@ time="2021-06-20T21:23:46+02:00" level=info msg="Successful first stage of login
 >>>>>>> develop
 time="2021-06-21T20:27:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/auth-service/main.go:119" host=localhost port=461
 time="2021-06-21T20:32:08+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Dusan/Desktop/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=dule_srb@hotmail.rs
+time="2021-06-21T22:48:53+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/auth-service/main.go:119" host=localhost port=461
+time="2021-06-21T22:50:45+02:00" level=warning msg="Wrong password" func=auth-service/service.authService.AuthenticateUser file="C:/Users/zindo/Desktop/Magygram/auth-service/service/auth_service.go:40" request_ip=127.0.0.1 user_id=11abfda0-2c4c-4a8e-bd0b-3f76f1202700
+time="2021-06-21T22:50:49+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/zindo/Desktop/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=example2@example.com
