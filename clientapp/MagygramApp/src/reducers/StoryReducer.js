@@ -107,7 +107,7 @@ export const storyReducer = (state, action) => {
 					stories: createStories(action.stories),
 					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
 					visited: action.visited,
-					userId: action.userId
+					userId: action.userId,
 				},
 			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
@@ -261,6 +261,32 @@ export const storyReducer = (state, action) => {
 				iHaveAStory: false,
 			};
 		}
+
+		case storyConstants.REPORT_STORY_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.storyReport.showError = false;
+			storyCopy.storyReport.errorMessage = "";
+			storyCopy.storyReport.showSuccessMessage = false;
+			storyCopy.storyReport.successMessage = "";
+
+			return storyCopy;
+		case storyConstants.REPORT_STORY_SUCCESS:
+			storyCopy = { ...state };
+			storyCopy.storyReport.showError = false;
+			storyCopy.storyReport.errorMessage = "";
+			storyCopy.storyReport.showSuccessMessage = true;
+			storyCopy.storyReport.successMessage = action.successMessage;
+
+			return storyCopy;
+
+		case storyConstants.REPORT_STORY_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.storyReport.showError = true;
+			storyCopy.storyReport.errorMessage = action.errorMessage;
+			storyCopy.storyReport.showSuccessMessage = false;
+			storyCopy.storyReport.successMessage = "";
+
+			return storyCopy;
 		default:
 			return state;
 	}

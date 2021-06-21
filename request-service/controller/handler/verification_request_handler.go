@@ -69,8 +69,9 @@ func (v verificationRequestHandler) CreateReportRequest(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	bearer := c.Request().Header.Get("Authorization")
 
-	request, err := v.VerificationRequestService.CreateReportRequest(ctx, reportRequest)
+	request, err := v.VerificationRequestService.CreateReportRequest(ctx, bearer, reportRequest)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

@@ -14,6 +14,20 @@ type reportRequestsRepository struct {
 	Col *mongo.Collection
 }
 
+func (v *reportRequestsRepository) GetReportByContentIdAndUserWhoReported(ctx context.Context, whoReported string, contentId string) (*model.ReportRequest, error) {
+	var report = model.ReportRequest{}
+	err := v.Col.FindOne(ctx, bson.M{"user_who_reported_id": whoReported, "content_id": contentId}).Decode(&report)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &report, nil
+}
+
 func (v *reportRequestsRepository) GetAllReports(ctx context.Context) ([]*model.ReportRequest, error) {
 	cursor, err := v.Col.Find(context.TODO(), bson.M{"deleted": false})
 	var results []*model.ReportRequest

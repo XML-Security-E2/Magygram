@@ -22,7 +22,7 @@ const UserContextProvider = (props) => {
 			emailAddress: "",
 			imageData: "",
 		},
-		registrationTab:{
+		registrationTab: {
 			showUserRegistrationTab: true,
 			showAgentRegistrationTab: false,
 		},
@@ -90,15 +90,22 @@ const UserContextProvider = (props) => {
 					isPrivate: false,
 					receiveMessages: true,
 					isTaggable: true,
-				}
+				},
 			},
 		},
 		followRecommendationInfo: {
-			imageUrl:'',
-			name:'',
-			surname:'',
-			username:'',
+			imageUrl: "",
+			name: "",
+			surname: "",
+			username: "",
 			recommendUserInfo: [],
+		},
+		userReport: {
+			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
 		},
 	});
 
