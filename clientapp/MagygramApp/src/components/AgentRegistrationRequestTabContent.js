@@ -73,7 +73,7 @@ const AgentRegistrationRequestTabContent = () => {
 										<div><b>Name:</b> {request.Name}</div>
 										<div><b>Surname:</b> {request.Surname}</div>
 										<div><b>Username:</b> {request.Username}</div>
-                                        <div><b>Website:</b> <a href={request.WebSite} target="_blank">{request.WebSite}</a></div>
+                                        <div><b>Website:</b> <a href={"https://"+ request.WebSite} target="_blank">{request.WebSite}</a></div>
 
 									</td>
 									<td className="text-right">
