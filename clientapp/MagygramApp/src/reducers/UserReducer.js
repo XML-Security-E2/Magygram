@@ -34,7 +34,7 @@ export const userReducer = (state, action) => {
 					errorMessage: "",
 					showSuccessMessage: true,
 					emailAddress: action.emailAddress,
-					imageData: '',
+					imageData: "",
 				},
 			};
 		case userConstants.REGISTER_FAILURE:
@@ -471,35 +471,35 @@ export const userReducer = (state, action) => {
 			return {
 				...state,
 				followRecommendationInfo: {
-					imageUrl:'',
-					name:'',
-					surname:'',
-					username:'',
+					imageUrl: "",
+					name: "",
+					surname: "",
+					username: "",
 					recommendUserInfo: [],
-				}
-			}
+				},
+			};
 		case userConstants.GET_FOLLOW_RECOMMENDATION_FAILURE:
 			return {
 				...state,
 				followRecommendationInfo: {
-				imageUrl:'',
-				name:'',
-				surname:'',
-				username:'',
-				recommendUserInfo: [],
-			}
-		}
+					imageUrl: "",
+					name: "",
+					surname: "",
+					username: "",
+					recommendUserInfo: [],
+				},
+			};
 		case userConstants.GET_FOLLOW_RECOMMENDATION_SUCCESS:
 			return {
 				...state,
-					followRecommendationInfo: {
-					imageUrl:action.data.ImageURL,
-					name:action.data.Name,
-					surname:action.data.Surname,
-					username:action.data.Username,
+				followRecommendationInfo: {
+					imageUrl: action.data.ImageURL,
+					name: action.data.Name,
+					surname: action.data.Surname,
+					username: action.data.Username,
 					recommendUserInfo: action.data.RecommendedUsers,
-				}
-			}
+				},
+			};
 
 		case userConstants.RECOMMENDED_FOLLOW_USER_REQUEST:
 			return state;
@@ -523,9 +523,9 @@ export const userReducer = (state, action) => {
 		case userConstants.RECOMMENDED_FOLLOW_USER_FAILURE:
 			return state;
 		case userConstants.SHOW_AGENT_REGISTRATION_TAB:
-			return{
+			return {
 				...state,
-				registrationTab:{
+				registrationTab: {
 					showUserRegistrationTab: false,
 					showAgentRegistrationTab: true,
 				},
@@ -535,10 +535,11 @@ export const userReducer = (state, action) => {
 					showSuccessMessage: false,
 					emailAddress: "",
 				},
-			};		case userConstants.SHOW_USER_REGISTRATION_TAB:
-			return{
+			};
+		case userConstants.SHOW_USER_REGISTRATION_TAB:
+			return {
 				...state,
-				registrationTab:{
+				registrationTab: {
 					showUserRegistrationTab: true,
 					showAgentRegistrationTab: false,
 				},

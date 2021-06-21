@@ -81,6 +81,28 @@ services:
         environment:
             IS_PRODUCTION: "true"
 
+    message-service:
+        image: message-service
+        ports:
+            - 467:467
+        build:
+            context: ./message-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
+    request-service:
+        image: request-service
+        build:
+            context: ./request-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            IS_PRODUCTION: "true"
+
     mongo-db:
         image: mongo
         restart: always
@@ -96,6 +118,11 @@ services:
             - backend
         environment:
             NEO4J_AUTH: neo4j/neo4jdb
+
+    redis-db:
+        image: redis
+        networks:
+            - backend
 
 volumes:
     mongodbdata:
