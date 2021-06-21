@@ -25,7 +25,10 @@ const Header = () => {
 	const ws = useRef(null);
 
 	useEffect(() => {
-		ws.current = new WebSocket("wss://localhost:467/ws/notify/" + localStorage.getItem("userId"));
+		console.log(process.env);
+		ws.current = new WebSocket(
+			process.env.REACT_APP_STAGE === "prod" ? "ws://localhost:467/ws/notify/" + localStorage.getItem("userId") : "wss://localhost:467/ws/notify/" + localStorage.getItem("userId")
+		);
 		ws.current.onopen = () => console.log("ws opened");
 		ws.current.onclose = () => console.log("ws closed");
 	}, []);
