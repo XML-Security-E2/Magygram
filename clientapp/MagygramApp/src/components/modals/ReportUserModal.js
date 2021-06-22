@@ -1,35 +1,32 @@
 import { useContext, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
-import { PostContext } from "../../contexts/PostContext";
-import Axios from "axios";
-import { authHeader } from "../../helpers/auth-header";
-import { hasRoles } from "../../helpers/auth-header";
-import { postService } from "../../services/PostService";
-import { postConstants } from "../../constants/PostConstants";
-import SuccessAlert from "../SuccessAlert";
+import { userConstants } from "../../constants/UserConstants";
+import { UserContext } from "../../contexts/UserContext";
+import { userService } from "../../services/UserService";
 import FailureAlert from "../FailureAlert";
+import SuccessAlert from "../SuccessAlert";
 
-const OptionsModal = () => {
-	const { postState, dispatch } = useContext(PostContext);
+const ReportUserModal = ({ userId }) => {
+	const { userState, dispatch } = useContext(UserContext);
 
 	const [reportReasons, setReportReasons] = useState([]);
-	const [hiddenForm, setHiddenForm] = useState(true);
 
-	const handleShowForm = () => {
-		setHiddenForm(false);
+	const handleModalClose = () => {
+		dispatch({ type: modalConstants.HIDE_USER_REPORT_MODAL });
+		setReportReasons([]);
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
 		let reportDTO = {
-			contentId: postState.editPost.post.id,
-			contentType: "POST",
+			contentId: userId,
+			contentType: "USER",
 			reportReasons,
 		};
 
-		postService.reportPost(reportDTO, dispatch);
+		userService.reportUser(reportDTO, dispatch);
 	};
 
 	const toggleReportReason = (reason) => {
@@ -44,80 +41,25 @@ const OptionsModal = () => {
 		console.log(a);
 	};
 
-	const handleModalClose = () => {
-		dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
-		setHiddenForm(true);
-		setReportReasons([]);
-	};
-
-	const handleOpenPostEditModal = () => {
-		dispatch({ type: modalConstants.SHOW_POST_EDIT_MODAL });
-	};
-
-	const handleDelete = () => {
-		let requestId = postState.editPost.post.id;
-		Axios.put(`/api/posts/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res);
-				if (res.status === 200) {
-					console.log("Post has been deleted");
-					alert("You have successfully deleted this post!");
-					dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
-				} else {
-					console.log("ERROR");
-				}
-			})
-			.catch((err) => {
-				console.log("ERROR");
-			});
-	};
-
 	return (
-		<Modal show={postState.postOptions.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
+		<Modal show={userState.userReport.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Header closeButton>
-				<Modal.Title id="contained-modal-title-vcenter">{hiddenForm ? "Options" : "Report"}</Modal.Title>
+				<Modal.Title id="contained-modal-title-vcenter">Report</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<SuccessAlert
-					hidden={!postState.postReport.showSuccessMessage}
+					hidden={!userState.userReport.showSuccessMessage}
 					header="Success"
-					message={postState.postReport.successMessage}
-					handleCloseAlert={() => dispatch({ type: postConstants.REPORT_POST_REQUEST })}
+					message={userState.userReport.successMessage}
+					handleCloseAlert={() => dispatch({ type: userConstants.REPORT_USER_REQUEST })}
 				/>
 				<FailureAlert
-					hidden={!postState.postReport.showError}
+					hidden={!userState.userReport.showError}
 					header="Error"
-					message={postState.postReport.errorMessage}
-					handleCloseAlert={() => dispatch({ type: postConstants.REPORT_POST_REQUEST })}
+					message={userState.userReport.errorMessage}
+					handleCloseAlert={() => dispatch({ type: userConstants.REPORT_USER_REQUEST })}
 				/>
-				<div hidden={!hiddenForm}>
-					<div className="row">
-						<button
-							hidden={localStorage.getItem("userId") !== postState.editPost.post.userId}
-							type="button"
-							className="btn btn-link btn-fw text-secondary w-100 border-0"
-							onClick={handleOpenPostEditModal}
-						>
-							Edit
-						</button>
-					</div>
-					<div className="row">
-						<button
-							hidden={localStorage.getItem("userId") === null || localStorage.getItem("userId") === postState.editPost.post.userId}
-							type="button"
-							className="btn btn-link btn-fw text-secondary w-100 border-0"
-							onClick={handleShowForm}
-						>
-							Report
-						</button>
-					</div>
-					<div className="row">
-						<button hidden={!hasRoles(["admin"])} type="button" className="btn btn-link btn-fw text-danger w-100 border-0" onClick={handleDelete}>
-							Delete?
-						</button>
-					</div>
-				</div>
-				<form hidden={hiddenForm} method="post" onSubmit={handleSubmit}>
+				<form method="post" onSubmit={handleSubmit}>
 					<div>
 						<div className="form-group row d-flex align-items-center">
 							<div className="col-sm-12 text-center">
@@ -191,4 +133,4 @@ const OptionsModal = () => {
 	);
 };
 
-export default OptionsModal;
+export default ReportUserModal;

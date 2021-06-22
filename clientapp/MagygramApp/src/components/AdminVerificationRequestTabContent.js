@@ -14,7 +14,7 @@ const AdminVerificationRequestTabContent = () => {
 	const [images, setImages]= useState("")
 
 	const handleVisitProfile = (userId) => {
-		window.location = "#/profile/" + userId;
+		window.location = "#/profile?userId=" + userId;
 	}
 
 	const openImageViewer = useCallback((document) => {

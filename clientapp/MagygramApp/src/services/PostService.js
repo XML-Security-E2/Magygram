@@ -26,7 +26,36 @@ export const postService = {
 	findPostByIdForGuest,
 	findAllLikedPosts,
 	findAllDislikedPosts,
+	reportPost,
 };
+
+function reportPost(reportDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/report`, reportDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Report sent successfully"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.REPORT_POST_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.REPORT_POST_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.REPORT_POST_FAILURE, errorMessage: message };
+	}
+}
 
 async function findPostsForTimeline(dispatch) {
 	dispatch(request());
@@ -656,7 +685,6 @@ async function findAllLikedPosts(dispatch) {
 	function failure(error) {
 		return { type: postConstants.LIKED_POSTS_FAILURE, errorMessage: error };
 	}
-
 }
 
 async function findAllDislikedPosts(dispatch) {
@@ -686,5 +714,4 @@ async function findAllDislikedPosts(dispatch) {
 	function failure(error) {
 		return { type: postConstants.DISLIKED_POSTS_FAILURE, errorMessage: error };
 	}
-
 }

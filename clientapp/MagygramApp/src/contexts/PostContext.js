@@ -97,7 +97,13 @@ const PostContextProvider = (props) => {
 			},
 		},
 		userLikedPosts: null,
-		userDislikedPosts:null,
+		userDislikedPosts: null,
+		postReport: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
 	});
 
 	return <PostContext.Provider value={{ postState, dispatch }}>{props.children}</PostContext.Provider>;

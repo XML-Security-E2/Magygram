@@ -25,7 +25,10 @@ const Header = () => {
 	const ws = useRef(null);
 
 	useEffect(() => {
-		ws.current = new WebSocket("wss://localhost:467/ws/notify/" + localStorage.getItem("userId"));
+		console.log(process.env);
+		ws.current = new WebSocket(
+			process.env.REACT_APP_STAGE === "prod" ? "ws://localhost:467/ws/notify/" + localStorage.getItem("userId") : "wss://localhost:467/ws/notify/" + localStorage.getItem("userId")
+		);
 		ws.current.onopen = () => console.log("ws opened");
 		ws.current.onclose = () => console.log("ws closed");
 	}, []);
@@ -139,7 +142,7 @@ const Header = () => {
 					<i hidden={hasRoles(["admin"])} className="la la-wechat ml-3" style={iconStyle} />
 					<i hidden={hasRoles(["admin"])} className="la la-compass ml-3" style={iconStyle} />
 
-					<div>
+					<div hidden={hasRoles(["admin"])}>
 						<div className="count-indicator ml-3" id="dropdownMenu3" data-toggle="dropdown" onClickCapture={handleLoadActivity}>
 							<i className="la la-bell" style={{ fontSize: "30px", cursor: "pointer", color: "black" }}></i>
 							{notifyCtx.notificationState.notificationsNumber > 0 && <span className="count count-varient1">{notifyCtx.notificationState.notificationsNumber}</span>}
@@ -153,7 +156,7 @@ const Header = () => {
 						</ul>
 					</div>
 
-					<div hidden={hasRoles(["admin"])}>
+					<div>
 						<img
 							className="rounded-circle overflow-hidden border border-danger header-image-photo dropdown-toggle ml-3"
 							style={{ cursor: "pointer" }}
@@ -164,27 +167,27 @@ const Header = () => {
 							aria-haspopup="true"
 						/>
 						<ul style={{ width: "200px", marginLeft: "15px" }} className="dropdown-menu" aria-labelledby="dropdownMenu1">
-							<li>
+							<li hidden={hasRoles(["admin"])}>
 								<Link className="la la-user btn shadow-none" to={"/profile?userId=" + localStorage.getItem("userId")}>
 									Profile
 								</Link>
 							</li>
-							<li>
+							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-cog btn shadow-none" onClick={handleSettings}>
 									Settings
 								</button>
 							</li>
-							<li>
+							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-thumbs-up btn shadow-none" onClick={handleLikedPosts}>
 									Liked posts
 								</button>
 							</li>
-							<li>
+							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-thumbs-down btn shadow-none" onClick={handleDisikedPosts}>
 									Disiked posts
 								</button>
 							</li>
-							<hr className="solid" />
+							<hr hidden={hasRoles(["admin"])} className="solid" />
 							<li>
 								<button className=" btn shadow-none" onClick={handleLogout}>
 									Logout

@@ -59,6 +59,7 @@ type UserHandler interface {
 	GetFollowRecommendation(c echo.Context) error
 	RegisterAgent(c echo.Context) error
 	AddComment(c echo.Context) error
+	CheckIfUserVerifiedById(c echo.Context) error
 }
 
 var (
@@ -907,4 +908,20 @@ func (h *userHandler) AddComment(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (h *userHandler) CheckIfUserVerifiedById(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	result,err := h.UserService.CheckIfUserVerifiedById(ctx,userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, result)
 }

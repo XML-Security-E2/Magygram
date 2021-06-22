@@ -54,11 +54,24 @@ func (v verificationService) CreateVerificationRequest(ctx context.Context, veri
 	return "",err
 }
 
-func (v verificationService) CreateReportRequest(ctx context.Context, reportRequestDTO *model.ReportRequestDTO) (string, error) {
-	reportRequest, err := model.NewReportRequest(reportRequestDTO)
-
+func (v verificationService) CreateReportRequest(ctx context.Context, bearer string, reportRequestDTO *model.ReportRequestDTO) (string, error) {
+	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
 		return "", err
+	}
+
+	reportRequest, err := model.NewReportRequest(reportRequestDTO, loggedId)
+	if err != nil {
+		return "", err
+	}
+
+	request, err := v.ReportRequestsRepository.GetReportByContentIdAndUserWhoReported(ctx, loggedId, reportRequest.ContentId)
+	if err != nil {
+		return "", err
+	}
+
+	if request != nil {
+		return "", errors.New("content already reported")
 	}
 
 	result, err := v.ReportRequestsRepository.CreateReport(ctx, reportRequest)

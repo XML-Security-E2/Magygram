@@ -1,22 +1,22 @@
-server :
-  port : "467"
-  host : "message-service"
-  secret : "MagyGram"
-  name: "message-service"
-  handshake : "ms-handshake"
+server:
+    port: "467"
+    host: "message-service"
+    secret: "MagyGram"
+    name: "message-service"
+    handshake: "ms-handshake"
 
-database :
-  host : "redisdb-db"
-  port : "6379"
-  password : ""
-  database : 0
+database:
+    host: "redis-db"
+    port: "6379"
+    password: ""
+    database: 0
 
 authservice:
-  protocol: "http://"
-  domain: "auth-service"
-  port: "461"
+    protocol: "http://"
+    domain: "auth-service"
+    port: "461"
 
 userservice:
-  protocol: "http://"
-  domain: "user-service"
-  port: "460"
+    protocol: "http://"
+    domain: "user-service"
+    port: "460"
