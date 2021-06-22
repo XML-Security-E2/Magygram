@@ -35,6 +35,8 @@ type ReportRequestResponseDTO struct {
 
 type ReportRequest struct {
 	Id string `bson:"_id,omitempty"`
+	ReportReasons []string `json:"report_reasons"`
+	UserWhoReportedId string `bson:"user_who_reported_id"`
 	ContentId string `bson:"content_id"`
 	ContentType ContentType `bson:"content_type"`
 	IsDeleted bool `bson:"deleted"`
@@ -83,6 +85,7 @@ type VerificationRequestDTO struct {
 
 
 type ReportRequestDTO struct {
+	ReportReasons []string `json:"reportReasons"`
 	ContentId string `json:"contentId"`
 	ContentType ContentType `json:"contentType"`
 }
@@ -130,10 +133,12 @@ type Media struct {
 	MediaType string `json:"mediaType"`
 }
 
-func NewReportRequest(reportRequest *ReportRequestDTO) (*ReportRequest, error) {
+func NewReportRequest(reportRequest *ReportRequestDTO, whoReported string) (*ReportRequest, error) {
 	return &ReportRequest{Id: guid.New().String(),
 		ContentId:   reportRequest.ContentId,
 		ContentType:    reportRequest.ContentType,
+		UserWhoReportedId: whoReported,
+		ReportReasons: reportRequest.ReportReasons,
 		IsDeleted: false,
 	}, nil
 }

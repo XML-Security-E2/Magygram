@@ -750,33 +750,59 @@ export const postReducer = (state, action) => {
 		case postConstants.LIKED_POSTS_REQUEST:
 			return {
 				...state,
-				userLikedPosts:null
+				userLikedPosts: null,
 			};
 		case postConstants.LIKED_POSTS_SUCCESS:
 			return {
 				...state,
-				userLikedPosts: action.posts
+				userLikedPosts: action.posts,
 			};
 		case postConstants.LIKED_POSTS_FAILURE:
 			return {
 				...state,
-				userLikedPosts:null
+				userLikedPosts: null,
 			};
 		case postConstants.DISLIKED_POSTS_REQUEST:
 			return {
 				...state,
-				userDislikedPosts:null
+				userDislikedPosts: null,
 			};
 		case postConstants.DISLIKED_POSTS_SUCCESS:
 			return {
 				...state,
-				userDislikedPosts: action.posts
+				userDislikedPosts: action.posts,
 			};
 		case postConstants.DISLIKED_POSTS_FAILURE:
 			return {
 				...state,
-				userDislikedPosts:null
+				userDislikedPosts: null,
 			};
+
+		case postConstants.REPORT_POST_REQUEST:
+			postCopy = { ...state };
+			postCopy.postReport.showError = false;
+			postCopy.postReport.errorMessage = "";
+			postCopy.postReport.showSuccessMessage = false;
+			postCopy.postReport.successMessage = "";
+
+			return postCopy;
+		case postConstants.REPORT_POST_SUCCESS:
+			postCopy = { ...state };
+			postCopy.postReport.showError = false;
+			postCopy.postReport.errorMessage = "";
+			postCopy.postReport.showSuccessMessage = true;
+			postCopy.postReport.successMessage = action.successMessage;
+
+			return postCopy;
+
+		case postConstants.REPORT_POST_FAILURE:
+			postCopy = { ...state };
+			postCopy.postReport.showError = true;
+			postCopy.postReport.errorMessage = action.errorMessage;
+			postCopy.postReport.showSuccessMessage = false;
+			postCopy.postReport.successMessage = "";
+
+			return postCopy;
 		default:
 			return state;
 	}

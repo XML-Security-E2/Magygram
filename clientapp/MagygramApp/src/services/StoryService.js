@@ -13,7 +13,36 @@ export const storyService = {
 	GetStoriesForUser,
 	visitedByUser,
 	HaveActiveStoriesLoggedUser,
+	reportStory,
 };
+
+function reportStory(reportDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/report`, reportDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Report sent successfully"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.REPORT_STORY_REQUEST };
+	}
+	function success(message) {
+		return { type: storyConstants.REPORT_STORY_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: storyConstants.REPORT_STORY_FAILURE, errorMessage: message };
+	}
+}
 
 function createStory(storyDTO, dispatch) {
 	const formData = fetchFormData(storyDTO);
