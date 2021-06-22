@@ -646,7 +646,6 @@ func (u *userService) GetUserProfileById(ctx context.Context, bearer string, use
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
-
 	followingUsers, err := u.RelationshipClient.GetFollowedUsers(userId)
 	if err != nil {
 		return nil, err
@@ -666,6 +665,13 @@ func (u *userService) GetUserProfileById(ctx context.Context, bearer string, use
 	following := false
 	if loggedId != "" {
 		following = doesUserFollow(followedUsers, loggedId)
+	}
+	if loggedId != "" {
+		for _, blockedUser := range user.BlockedUsers {
+			if blockedUser == loggedId {
+				return nil, errors.New("invalid user id")
+			}
+		}
 	}
 	sentReq := false
 	muted := false
