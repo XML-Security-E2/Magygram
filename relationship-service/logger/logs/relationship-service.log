@@ -221,3 +221,6 @@ time="2021-06-20T19:33:54+02:00" level=info msg="Follow request accepted" func="
 time="2021-06-20T20:20:31+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Dusan/Desktop/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
 time="2021-06-20T21:23:40+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Dusan/Desktop/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
 >>>>>>> develop
+time="2021-06-21T15:19:26+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-06-21T16:15:28+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
+time="2021-06-21T16:23:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463

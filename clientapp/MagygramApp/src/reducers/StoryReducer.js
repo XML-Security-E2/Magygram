@@ -70,6 +70,7 @@ export const storyReducer = (state, action) => {
 				postOptions: {
 					showModal: true,
 				},
+				storyId: action.storyId,
 			};
 		case modalConstants.HIDE_STORY_OPTIONS_MODAL:
 			return {
@@ -107,7 +108,7 @@ export const storyReducer = (state, action) => {
 					stories: createStories(action.stories),
 					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
 					visited: action.visited,
-					userId: action.userId
+					userId: action.userId,
 				},
 			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:

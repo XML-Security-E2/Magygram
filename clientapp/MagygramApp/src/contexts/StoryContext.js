@@ -40,6 +40,7 @@ const StoryContextProvider = (props) => {
 			visited: false,
 			userId: "",
 		},
+		storyId: "",
 		iHaveAStory: false,
 	});
 

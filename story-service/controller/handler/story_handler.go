@@ -15,6 +15,7 @@ import (
 type StoryHandler interface {
 	CreateStory(c echo.Context) error
 	GetStoriesForStoryline(c echo.Context) error
+	GetStoryForAdmin(c echo.Context) error
 	GetStoriesForUser(c echo.Context) error
 	GetAllUserStories(c echo.Context) error
 	VisitedStoryByUser(c echo.Context) error
@@ -29,6 +30,21 @@ type storyHandler struct {
 	StoryService service_contracts.StoryService
 }
 
+func (p storyHandler) GetStoryForAdmin(c echo.Context) error {
+
+		storyId := c.Param("storyId")
+
+		ctx := c.Request().Context()
+			if ctx == nil {
+			ctx = context.Background()
+		}
+		post, err := p.StoryService.GetStoryForAdmin(ctx, storyId)
+		if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+		return c.JSON(http.StatusOK, post)
+}
 func (p storyHandler) DeleteStory(c echo.Context) error {
 	postId := c.Param("requestId")
 
