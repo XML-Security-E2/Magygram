@@ -25,7 +25,7 @@ func (n notificationRepository) Create(ctx context.Context, notification *model.
 		fmt.Println(err.Error())
 		return err
 	}
-	err = n.Db.Set(ctx, notification.Id, jsonString, 0).Err()
+	err = n.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/false", model.Prefix, notification.UserId, notification.Id), jsonString, 0).Err()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
