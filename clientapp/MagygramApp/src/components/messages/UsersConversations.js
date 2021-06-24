@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import Chat from "./Chat";
 import ConversationsSidebar from "./ConversationsSidebar";
-import autosize from "autosize";
 import ChatForm from "./ChatForm";
 import { getUserInfo } from "../../helpers/auth-header";
 import { MessageContext } from "../../contexts/MessageContext";
@@ -18,8 +17,6 @@ const UsersConversations = () => {
 	};
 
 	useEffect(() => {
-		autosize(document.querySelectorAll("textarea"));
-
 		const getUserConversations = async () => {
 			await messageService.getUserConversations(dispatch);
 		};

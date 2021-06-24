@@ -55,7 +55,7 @@ const MessageUserSearchModal = () => {
 			</Modal.Header>
 			<Modal.Body>
 				<div className="row" style={{ overflowX: "hidden", minHeight: "500px", maxHeight: "500px" }}>
-					<div className="w-100">
+					<div className="w-100 mr-3 ml-3">
 						<AsyncSelect defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
 					</div>
 				</div>

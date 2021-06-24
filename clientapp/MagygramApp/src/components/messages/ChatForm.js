@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+import autosize from "autosize";
+import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "../../contexts/MessageContext";
 import { messageService } from "../../services/MessageService";
 
@@ -18,10 +19,6 @@ const ChatForm = () => {
 	};
 
 	const sendMessage = () => {
-		//     MessageTo string `json:"messageTo"`
-		// MessageType MessageType `json:"messageType"`
-		// Text string `json:"text"`
-		// ContentUrl string `json:"contentUrl"`
 		let message = {
 			messageTo: messageState.selectUserModal.selectedUser.Id,
 			messageType: "TEXT",
@@ -33,6 +30,10 @@ const ChatForm = () => {
 		setMessageText("");
 		setShowSendButton(false);
 	};
+
+	useEffect(() => {
+		autosize(document.querySelectorAll("textarea"));
+	}, []);
 
 	return (
 		<div className="row mt-auto d-flex align-items-center border m-1" style={{ borderRadius: "10px" }}>
