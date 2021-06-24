@@ -60,6 +60,7 @@ type UserHandler interface {
 	RegisterAgent(c echo.Context) error
 	AddComment(c echo.Context) error
 	CheckIfUserVerifiedById(c echo.Context) error
+	GetUsersInfo(c echo.Context) error
 }
 
 var (
@@ -69,9 +70,26 @@ type userHandler struct {
 	UserService service_contracts.UserService
 }
 
-
 func NewUserHandler(u service_contracts.UserService) UserHandler {
 	return &userHandler{u}
+}
+
+
+
+func (h *userHandler) GetUsersInfo(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	user, err := h.UserService.GetUsersInfo(ctx, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *userHandler) GetUsersNotificationsSettings(c echo.Context) error {

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math"
 	"message-service/domain/model"
 	"message-service/domain/repository"
 	"message-service/domain/service-contracts"
@@ -10,7 +11,7 @@ import (
 )
 
 var (
-	limit int64 = 100
+	limit int64 = math.MaxInt64
 )
 
 type notificationService struct {

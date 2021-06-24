@@ -255,3 +255,4 @@ time="2021-06-22T01:32:22+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-22T00:26:49+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
 >>>>>>> develop
 >>>>>>> develop
+time="2021-06-24T17:52:33+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463

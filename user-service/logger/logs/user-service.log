@@ -459,3 +459,4 @@ time="2021-06-22T01:44:41+02:00" level=warning msg="Unauthorized access" func=us
 time="2021-06-22T00:27:33+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:98" host=localhost port=460
 >>>>>>> develop
 >>>>>>> develop
+time="2021-06-24T17:52:49+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:98" host=localhost port=460

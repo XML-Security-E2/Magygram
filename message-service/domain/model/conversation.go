@@ -8,17 +8,24 @@ import (
 
 type Conversation struct {
 	Id string `json:"id"`
-	ParticipantOneId string `json:"participantOneId"`
-	ParticipantTwoId string `json:"participantTwoId"`
+	ParticipantOne UserInfo `json:"participantOneId"`
+	ParticipantTwo UserInfo `json:"participantTwoId"`
 	Messages []Message `json:"messages"`
 	LastMessage Message `json:"lastMessage"`
-	LastMessageUserInfo UserInfo `json:"lastMessageUserInfo"`
+	LastMessageUserId string `json:"lastMessageUserId"`
+}
+
+type ConversationResponse struct {
+	Id string `json:"id"`
+	Participant UserInfo `json:"participant"`
+	LastMessage Message `json:"lastMessage"`
+	LastMessageUserId string `json:"lastMessageUserId"`
 }
 
 type Message struct {
-	MessageTo UserInfo `json:"messageTo"`
-	MessageFrom UserInfo `json:"messageFrom"`
-	MessageType string `json:"messageType"`
+	MessageToId string `json:"messageToId"`
+	MessageFromId string `json:"messageFromId"`
+	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
 	ContentUrl string `json:"contentUrl"`
 	Timestamp time.Time `json:"timestamp"`
@@ -26,9 +33,14 @@ type Message struct {
 	ViewedMedia  bool `json:"viewedMedia"`
 }
 
+type MessagesResponse struct {
+	UserInfo UserInfo `json:"userInfo"`
+	Messages []Message `json:"messages"`
+}
+
 type MessageSentRequest struct {
 	MessageTo string `json:"messageTo"`
-	MessageType string `json:"messageType"`
+	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
 	ContentUrl string `json:"contentUrl"`
 }
@@ -68,32 +80,32 @@ const(
 	STORY
 )
 
-func NewConversation(message *Message) *Conversation {
+func NewConversation(message *Message, participantOne UserInfo, participantTwo UserInfo) *Conversation {
 	return &Conversation{
 		Id:                  guid.New().String(),
-		ParticipantOneId:    message.MessageFrom.Id,
-		ParticipantTwoId:    message.MessageTo.Id,
+		ParticipantOne:    	 participantOne,
+		ParticipantTwo:    	 participantTwo,
 		Messages:            []Message{*message},
 		LastMessage:         *message,
-		LastMessageUserInfo: message.MessageFrom,
+		LastMessageUserId:   message.MessageFromId,
 	}
 }
 
-func NewMessage(messageRequest *MessageSentRequest, messageType MessageType, messageFrom UserInfo, messageTo UserInfo) (*Message, error) {
-	err := validateMessageTypeEnums(messageType)
+func NewMessage(messageRequest *MessageSentRequest, messageFrom string) (*Message, error) {
+	err := validateMessageTypeEnums(messageRequest.MessageType)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Message{
-		MessageTo:   messageTo,
-		MessageFrom: messageFrom,
-		MessageType: messageRequest.MessageType,
-		Text:        messageRequest.Text,
-		ContentUrl:  messageRequest.ContentUrl,
-		Timestamp:   time.Now(),
-		Viewed:      false,
-		ViewedMedia: false,
+		MessageToId:   messageRequest.MessageTo,
+		MessageFromId: messageFrom,
+		MessageType:   messageRequest.MessageType,
+		Text:          messageRequest.Text,
+		ContentUrl:    messageRequest.ContentUrl,
+		Timestamp:     time.Now(),
+		Viewed:        false,
+		ViewedMedia:   false,
 	}, nil
 }
 

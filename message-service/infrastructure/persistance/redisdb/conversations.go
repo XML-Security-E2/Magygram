@@ -3,8 +3,10 @@ package redisdb
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"math"
 	"message-service/domain/model"
 	"message-service/domain/repository"
 	"sort"
@@ -24,11 +26,47 @@ func (c conversationRepository) CreateConversation(ctx context.Context, conversa
 		fmt.Println(err.Error())
 		return err
 	}
-	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.ConvPrefix, conversation.ParticipantOneId, conversation.ParticipantTwoId, conversation.Id), jsonString, 0).Err()
+	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.ConvPrefix, conversation.ParticipantOne.Id, conversation.ParticipantTwo.Id, conversation.Id), jsonString, 0).Err()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	return err
+}
+
+func (c conversationRepository) GetConversationForUser(ctx context.Context, loggedId string, userId string, limit int64) (*model.Conversation, error) {
+	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/%s/*", model.ConvPrefix, loggedId, userId), limit).Result()
+
+	if err != nil || keys == nil {
+		return nil, nil
+	}
+
+	if len(keys) > 0 {
+		val, err := c.Db.Get(ctx, keys[0]).Bytes()
+		if err != nil {
+			return nil, nil
+		}
+		var temp *model.Conversation
+		json.Unmarshal(val, &temp)
+
+		return temp, nil
+	} else {
+		keys, _, err = c.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/%s/*", model.ConvPrefix, userId, loggedId), limit).Result()
+		if err != nil || keys == nil {
+			return nil, nil
+		}
+		if len(keys) > 0 {
+			val, err := c.Db.Get(ctx, keys[0]).Bytes()
+			if err != nil {
+				return nil, nil
+			}
+			var temp *model.Conversation
+			json.Unmarshal(val, &temp)
+
+			return temp, nil
+		}
+	}
+
+	return nil, nil
 }
 
 func (c conversationRepository) GetAllForUser(ctx context.Context, userId string, limit int64) ([]*model.Conversation, error) {
@@ -65,10 +103,45 @@ func (c conversationRepository) GetAllForUser(ctx context.Context, userId string
 	return conversations, err
 }
 
+func (c conversationRepository) ViewUsersMessages(ctx context.Context, userId string, conversationId string) error {
+	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/*/*/%s", model.ConvPrefix, conversationId), math.MaxInt64).Result()
+	if err != nil || keys == nil {
+		return err
+	}
+	if len(keys) > 0 {
+		val, err := c.Db.Get(ctx, keys[0]).Bytes()
+		if err != nil {
+			return err
+		}
+		var temp *model.Conversation
+		json.Unmarshal(val, &temp)
+
+		if temp.ParticipantOne.Id != userId && temp.ParticipantTwo.Id != userId {
+			return errors.New("unauthorized access")
+		}
+
+		temp.LastMessage.Viewed = true
+		for _, message := range temp.Messages {
+			message.Viewed = true
+		}
+
+		err = c.Update(ctx, temp)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return errors.New("invalid conversation id")
+}
+
+
 func (c conversationRepository) GetAllMessagesFromUser(ctx context.Context, loggedId string, userId string, limit int64) ([]model.Message, error) {
 	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/%s/*", model.ConvPrefix, loggedId, userId), limit).Result()
+
 	if err != nil || keys == nil {
-		return nil, nil
+		return []model.Message{}, nil
 	}
 
 	if len(keys) > 0 {
@@ -80,14 +153,14 @@ func (c conversationRepository) GetAllMessagesFromUser(ctx context.Context, logg
 		json.Unmarshal(val, &temp)
 		messages := temp.Messages
 		sort.Slice(messages, func(i, j int) bool {
-			return messages[i].Timestamp.After(messages[j].Timestamp)
+			return messages[i].Timestamp.Before(messages[j].Timestamp)
 		})
 
 		return messages, nil
 	} else {
 		keys, _, err = c.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/%s/*", model.ConvPrefix, userId , loggedId), limit).Result()
 		if err != nil || keys == nil {
-			return nil, nil
+			return []model.Message{}, nil
 		}
 		if len(keys) > 0 {
 			val, err := c.Db.Get(ctx, keys[0]).Bytes()
@@ -98,23 +171,28 @@ func (c conversationRepository) GetAllMessagesFromUser(ctx context.Context, logg
 			json.Unmarshal(val, &temp)
 			messages := temp.Messages
 			sort.Slice(messages, func(i, j int) bool {
-				return messages[i].Timestamp.After(messages[j].Timestamp)
+				return messages[i].Timestamp.Before(messages[j].Timestamp)
 			})
 
 			return messages, nil
 		}
 	}
 
-	return nil, nil
+	return []model.Message{}, nil
 }
 
 func (c conversationRepository) Update(ctx context.Context, conversation *model.Conversation) error {
 	jsonString, err := json.Marshal(conversation)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
-	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.ConvPrefix, conversation.ParticipantOneId, conversation.ParticipantTwoId, conversation.Id), jsonString, 0).Err()
+
+	err = c.Db.Del(ctx, fmt.Sprintf("%s/%s/%s/%s", model.ConvPrefix, conversation.ParticipantOne.Id, conversation.ParticipantTwo.Id, conversation.Id)).Err()
+	if err != nil {
+		return err
+	}
+
+	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.ConvPrefix, conversation.ParticipantOne.Id, conversation.ParticipantTwo.Id, conversation.Id), jsonString, 0).Err()
 	if err != nil {
 		fmt.Println(err.Error())
 	}

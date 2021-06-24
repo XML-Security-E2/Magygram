@@ -7,7 +7,6 @@ import (
 	"message-service/controller/hub"
 	"message-service/domain/model"
 	"message-service/domain/service-contracts"
-	"message-service/service/intercomm"
 	"net/http"
 )
 
@@ -23,11 +22,10 @@ type NotificationHandler interface {
 type notificationHandler struct {
 	NotificationService service_contracts.NotificationService
 	Hub *hub.NotifyHub
-	intercomm.AuthClient
 }
 
-func NewNotificationHandler(p service_contracts.NotificationService, h *hub.NotifyHub, ac intercomm.AuthClient) NotificationHandler {
-	return &notificationHandler{p, h, ac}
+func NewNotificationHandler(p service_contracts.NotificationService, h *hub.NotifyHub) NotificationHandler {
+	return &notificationHandler{p, h}
 }
 
 func (n notificationHandler) CreateNotification(c echo.Context) error {

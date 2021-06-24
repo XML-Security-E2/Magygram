@@ -139,8 +139,8 @@ const Header = () => {
 				</div>
 				<div className="d-flex align-items-center dropdown">
 					<i hidden={hasRoles(["admin"])} className="fa fa-home ml-3" style={iconStyle} />
-					<i hidden={hasRoles(["admin"])} className="la la-wechat ml-3" style={iconStyle} />
-					<i hidden={hasRoles(["admin"])} className="la la-compass ml-3" style={iconStyle} />
+					<Link hidden={hasRoles(["admin"])} className="la la-wechat btn shadow-none" style={iconStyle} to="/chat"></Link>
+					<i hidden={hasRoles(["admin"])} className="la la-compass " style={iconStyle} />
 
 					<div hidden={hasRoles(["admin"])}>
 						<div className="count-indicator ml-3" id="dropdownMenu3" data-toggle="dropdown" onClickCapture={handleLoadActivity}>
