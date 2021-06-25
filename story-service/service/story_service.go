@@ -198,6 +198,29 @@ func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bear
 	return res, nil
 }
 
+func (p storyService) GetStoryForAdmin(ctx context.Context, storyId string) (*model.StoryResponseForAdmin, error) {
+	result, err := p.StoryRepository.GetByID(ctx, storyId)
+	if err != nil {
+		return nil, errors.New("invalid story id")
+	}
+
+	var media []model.MediaContent
+	mediaContent := model.MediaContent{
+		Url: result.Media.Url,
+		MediaType: result.Media.MediaType,
+		StoryId: result.Id,
+		Tags: result.Tags,
+	}
+	media = append(media, mediaContent)
+
+	res, err := model.NewStoryResponseForAdmin(result, media, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 
 func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*model.UsersStoryResponse, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)

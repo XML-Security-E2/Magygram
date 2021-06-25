@@ -3,6 +3,31 @@
   <component name="ChangeListManager">
     <list default="true" id="41d06d7a-50f3-4f60-8c61-a8f106a62611" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/auth-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/logger/logs/auth-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/AdminReportRequestTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/AdminReportRequestTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/ReportedStory.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/ReportedStory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModalStory.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/OptionsModalStory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/StorySliderModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/components/modals/StorySliderModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/StoryContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/contexts/StoryContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/StoryReducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/reducers/StoryReducer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/StoryService.js" beforeDir="false" afterPath="$PROJECT_DIR$/clientapp/MagygramApp/src/services/StoryService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway/api_gateway.conf" beforeDir="false" afterPath="$PROJECT_DIR$/gateway/api_gateway.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/media-service/logger/logs/media-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/post-service/logger/logs/post-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/relationship-service/logger/logs/relationship-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/controller/handler/story_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/controller/handler/story_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/controller/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/controller/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/domain/model/story.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/domain/model/story.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/domain/service-contracts/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/domain/service-contracts/story_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/logger/logs/story-service.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/service/intercomm/user_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/service/intercomm/user_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/story-service/service/story_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/story-service/service/story_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/logger/logs/user-service.log" afterDir="false" />
+=======
+>>>>>>> develop
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,13 +65,21 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go">
+  <component name="RunManager" selected="Go Build.go build main.go (1)">
     <configuration name="go build auth-service" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="Magygram" />
       <working_directory value="$PROJECT_DIR$/auth-service" />
       <kind value="PACKAGE" />
       <package value="auth-service" />
       <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="Magygram" />
+      <working_directory value="$PROJECT_DIR$/story-service" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/story-service/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -75,6 +108,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build main.go (1)" />
         <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Build.go build user-service" />
         <item itemvalue="Go Build.go build user_service.go" />
@@ -100,5 +134,16 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/story-service/controller/handler/story_handler.go</url>
+          <line>34</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

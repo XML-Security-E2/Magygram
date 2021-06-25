@@ -10,6 +10,7 @@ import OptionsModalStory from "../modals/OptionsModalStory";
 const StorySliderModal = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 	const [tags, setTags] = useState([]);
+	const [storyId, setStoryId] = useState("");
 
     const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_STORY_SLIDER_MODAL, stories: storyState.storySliderModal.stories });
@@ -27,6 +28,7 @@ const StorySliderModal = () => {
 	const onStoryStart =(index,story)=>{
 		console.log(index);
 		console.log(story);
+		setStoryId(story.header.storyId)
 		console.log(storyState.storySliderModal.userId);
 		setTags(story.tags);
 		if(!storyState.storySliderModal.visited){
@@ -41,7 +43,7 @@ const StorySliderModal = () => {
 	}
 
 	const handleOpenOptionsModal = () => {
-		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL, userId: storyState.storySliderModal.userId });
+		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL, storyId: storyId });
 	};
 
 

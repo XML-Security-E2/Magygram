@@ -10,6 +10,7 @@ import { postService } from "../../services/PostService";
 import PostCommentInputModalView from "../PostCommentInputModalView";
 import PostLikesAndDislikesModalView from "../PostLikesAndDislikesModalView";
 import OptionsModal from "./OptionsModal";
+import SearchInfluencerModal from "./SearchInfluencerModal";
 import { getUserInfo } from "../../helpers/auth-header";
 import { postConstants } from "../../constants/PostConstants";
 
@@ -48,6 +49,7 @@ const ViewPostModal = () => {
 			postService.commentPost(postDTO, dispatch);
 		}
 	};
+	
 
 	const addToDefaultCollection = (postId) => {
 		let collectionDTO = {
@@ -71,6 +73,10 @@ const ViewPostModal = () => {
 
 	const handleOpenOptionsModal = () => {
 		dispatch({ type: modalConstants.SHOW_POST_OPTIONS_MODAL, post: postState.viewPostModal.post });
+	};
+	
+	const searchInfluencer = () => {
+		dispatch({ type: modalConstants.SHOW_SEARCH_INFLUENCER_MODAL, post: postState.viewPostModal.post });
 	};
 
 	const handleRedirect = (userId) => {
@@ -103,6 +109,9 @@ const ViewPostModal = () => {
 								location={postState.viewPostModal.post.Location}
 							/>
 							<hr></hr>
+							<div>
+								<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>searchInfluencer()}><i className="icofont-subscribe mr-1"></i>Product placement</button>
+							</div>
 							<PostCommentsModalView
 								imageUrl={postState.viewPostModal.post.UserInfo.ImageURL}
 								username={postState.viewPostModal.post.UserInfo.Username}
@@ -133,6 +142,7 @@ const ViewPostModal = () => {
 					</div>
 				</div>
 				<OptionsModal />
+				<SearchInfluencerModal/>
 			</Modal.Body>
 		</Modal>
 	);

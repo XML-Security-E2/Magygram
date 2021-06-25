@@ -613,6 +613,30 @@ export const postReducer = (state, action) => {
 					post: action.post,
 				},
 			};
+		case modalConstants.SHOW_SEARCH_INFLUENCER_MODAL:
+		return {
+			...state,
+			searchInfluencer: {
+				post: {
+					id: action.post.Id,
+					userId: action.post.UserInfo.Id,
+					location: action.post.Location,
+					tags: action.post.Tags,
+					description: action.post.Description,
+					media: action.post.Media,
+				},
+			},
+			campaignOptions: {
+				showModal: true,
+			},
+		};
+		case modalConstants.HIDE_SEARCH_INFLUENCER_MODAL:
+			return {
+				...state,
+				campaignOptions: {
+					showModal: false,
+				},
+			};
 		case modalConstants.SHOW_POST_OPTIONS_MODAL:
 			console.log(action.post);
 			return {

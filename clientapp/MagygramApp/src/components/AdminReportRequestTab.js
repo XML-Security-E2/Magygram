@@ -101,7 +101,7 @@ const AdminReportRequestTab = () => {
 											<a hidden={(request.ContentType === "POST") || (request.ContentType === "STORY")} onClick={() => handleVisitProfile(request.ContentId)} class="link-primary">Visit profile</a>
 										</div>
                                         <div  hidden={(request.ContentType === "USER") || (request.ContentType === "POST")}>
-                                            <ReportedStory  userId={"7ffa004c-f23c-4647-a830-271c3a000c77"}/>
+                                            <ReportedStory  storyId={request.ContentId}/>
                                         </div>
                                         <div hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} >
                                             <ReportedPost  id={request.ContentId}/>

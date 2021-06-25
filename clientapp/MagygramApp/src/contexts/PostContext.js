@@ -11,6 +11,17 @@ const PostContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		
+		searchInfluencer: {
+			post: {
+				id: "",
+				userId: "",
+				location: "",
+				tags: [],
+				description: "",
+				media: [],
+			},
+		},
 		editPost: {
 			showModal: false,
 			post: {
@@ -25,6 +36,9 @@ const PostContextProvider = (props) => {
 			errorMessage: "",
 			showSuccessMessage: false,
 			successMessage: "",
+		},
+		campaignOptions: {
+			showModal: false,
 		},
 		postOptions: {
 			showModal: false,
