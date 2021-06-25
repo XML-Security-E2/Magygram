@@ -8,7 +8,41 @@ export const messageService = {
 	sendMessage,
 	viewMessages,
 	viewMediaMessages,
+	findPostById,
 };
+
+async function findPostById(postId, dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/messages/id/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else if (res.status === 401) {
+				dispatch(unauthorized(res.data, postId));
+			} else {
+				dispatch(failure("Error while loading collections"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: messageConstants.SET_POST_MESSAGE_REQUEST };
+	}
+
+	function success(data) {
+		return { type: messageConstants.SET_POST_MESSAGE_SUCCESS, post: data };
+	}
+	function failure(message) {
+		return { type: messageConstants.SET_POST_MESSAGE_FAILURE, errorMessage: message };
+	}
+
+	function unauthorized(userInfo, postId) {
+		return { type: messageConstants.SET_POST_MESSAGE_UNAUTHORIZED, userInfo, postId };
+	}
+}
 
 function viewMessages(conversationId, dispatch) {
 	dispatch(request());
@@ -99,7 +133,7 @@ function fetchFormData(messageDTO) {
 	formData.append("messageTo", messageDTO.messageTo);
 	formData.append("messageType", messageDTO.messageType);
 	formData.append("text", messageDTO.text);
-	formData.append("contentUrl", messageDTO.contentUrl);
+	formData.append("contentId", messageDTO.contentId);
 
 	return formData;
 }

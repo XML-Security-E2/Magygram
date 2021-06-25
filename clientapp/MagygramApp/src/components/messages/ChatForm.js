@@ -32,7 +32,7 @@ const ChatForm = () => {
 			messageType: "TEXT",
 			media: "",
 			text: messageText,
-			contentUrl: "",
+			contentId: "",
 		};
 		console.log(message);
 		messageService.sendMessage(message, dispatch);
@@ -50,7 +50,7 @@ const ChatForm = () => {
 				messageType: "MEDIA",
 				media: image,
 				text: messageText,
-				contentUrl: "",
+				contentId: "",
 			};
 			console.log(message);
 			messageService.sendMessage(message, dispatch);

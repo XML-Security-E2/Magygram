@@ -43,6 +43,7 @@ type PostHandler interface {
 	EditLikedByInfo(c echo.Context) error
 	EditDislikedByInfo(c echo.Context) error
 	EditCommentedByInfo(c echo.Context) error
+	GetPostForMessagesById(c echo.Context) error
 }
 
 type postHandler struct {
@@ -319,6 +320,26 @@ func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
 		return c.JSON(http.StatusOK, hashTagsPosts)
 }
 
+func (p postHandler) GetPostForMessagesById(c echo.Context) error {
+	postId := c.Param("postId")
+	fmt.Println(postId)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	post, userInfo, err := p.PostService.GetPostForMessagesById(ctx, bearer, postId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *exceptions.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, userInfo)
+		}
+	}
+
+	return c.JSON(http.StatusOK, post)}
+
 func (p postHandler) GetPostById(c echo.Context) error {
 	postId := c.Param("postId")
 	fmt.Println(postId)
@@ -327,6 +348,7 @@ func (p postHandler) GetPostById(c echo.Context) error {
 		ctx = context.Background()
 	}
 	bearer := c.Request().Header.Get("Authorization")
+
 	post, err := p.PostService.GetPostById(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

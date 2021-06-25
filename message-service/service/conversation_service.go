@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math"
 	"message-service/domain/model"
 	"message-service/domain/repository"
@@ -35,11 +34,6 @@ func (c conversationService) SendMessage(ctx context.Context, bearer string, mes
 		return nil, err
 	}
 
-	followers, err := c.RelationshipClient.GetFollowingUsers(loggedId)
-	if err != nil {
-		return nil, err
-	}
-
 	var message *model.Message
 	if messageRequest.MessageType == "MEDIA" {
 		media, err := c.MediaClient.SaveMedia([]*multipart.FileHeader{messageRequest.Media})
@@ -50,30 +44,39 @@ func (c conversationService) SendMessage(ctx context.Context, bearer string, mes
 		if len(media) == 0 {
 			return nil, errors.New("error while saving file")
 		}
-		fmt.Println("PROSAO MEDIALEN")
 
 		message, err = model.NewMessage(messageRequest, loggedId, &media[0])
 	} else {
 		message, err = model.NewMessage(messageRequest, loggedId, nil)
 	}
-
-	fmt.Println("USAO OVDE")
-
 	if err != nil {
 		return nil, err
 	}
 
-	if !isInFollowers(followers, messageRequest.MessageTo){
-		request, err := c.sendMessageRequest(ctx, loggedId, messageRequest.MessageTo, message)
+	isPrivate, err := c.UserClient.IsUserPrivate(messageRequest.MessageTo)
+	if err != nil {
+		return nil, err
+	}
+
+	if isPrivate {
+		followers, err := c.RelationshipClient.GetFollowedUsers(loggedId)
 		if err != nil {
 			return nil, err
 		}
-		return &model.MessageSendResponse{
-			MessageRequest: request,
-			Conversation:   nil,
-			IsMessageRequest: true,
-		}, nil
+
+		if !isInFollowers(followers, messageRequest.MessageTo){
+			request, err := c.sendMessageRequest(ctx, loggedId, messageRequest.MessageTo, message)
+			if err != nil {
+				return nil, err
+			}
+			return &model.MessageSendResponse{
+				MessageRequest: request,
+				Conversation:   nil,
+				IsMessageRequest: true,
+			}, nil
+		}
 	}
+
 
 	conversation, err := c.ConversationRepository.GetConversationForUser(ctx, loggedId, messageRequest.MessageTo, limitConv)
 	if err == nil && conversation == nil {

@@ -35,7 +35,7 @@ type Message struct {
 	MessageFromId string `json:"messageFromId"`
 	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
-	ContentUrl string `json:"contentUrl"`
+	ContentId string `json:"contentId"`
 	Media *Media `json:"media"`
 	Timestamp time.Time `json:"timestamp"`
 	Viewed  bool `json:"viewed"`
@@ -61,7 +61,7 @@ type MessageSentRequest struct {
 	MessageType MessageType `json:"messageType"`
 	Media *multipart.FileHeader `json:"media"`
 	Text string `json:"text"`
-	ContentUrl string `json:"contentUrl"`
+	ContentId string `json:"contentId"`
 }
 
 type MessageRequest struct {
@@ -70,7 +70,7 @@ type MessageRequest struct {
 	MessageFrom UserInfo `json:"messageFrom"`
 	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
-	ContentUrl string `json:"contentUrl"`
+	ContentId string `json:"contentId"`
 	Timestamp time.Time `json:"timestamp"`
 	MessageRequestStatus  MessageRequestStatus `json:"messageRequestStatus"`
 }
@@ -105,7 +105,7 @@ func NewMessageRequest(message *Message, messageFrom UserInfo, messageTo UserInf
 		MessageFrom:          messageTo,
 		MessageType:          message.MessageType,
 		Text:                 message.Text,
-		ContentUrl:           message.ContentUrl,
+		ContentId:            message.ContentId,
 		Timestamp:            time.Now(),
 		MessageRequestStatus: "PENDING",
 	}
@@ -134,7 +134,7 @@ func NewMessage(messageRequest *MessageSentRequest, messageFrom string, media *M
 		MessageFromId: messageFrom,
 		MessageType:   messageRequest.MessageType,
 		Text:          messageRequest.Text,
-		ContentUrl:    messageRequest.ContentUrl,
+		ContentId:     messageRequest.ContentId,
 		Timestamp:     time.Now(),
 		Media: 		   media,
 		Viewed:        false,

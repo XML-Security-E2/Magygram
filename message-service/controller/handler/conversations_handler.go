@@ -66,7 +66,7 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 	messageTo := c.FormValue("messageTo")
 	messageType := c.FormValue("messageType")
 	text := c.FormValue("text")
-	contentUrl := c.FormValue("contentUrl")
+	contentId := c.FormValue("contentId")
 
 	media, _ := c.FormFile("media")
 
@@ -75,7 +75,7 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 		MessageType: model.MessageType(messageType),
 		Media:       media,
 		Text:        text,
-		ContentUrl:  contentUrl,
+		ContentId:   contentId,
 	}
 
 	ctx := c.Request().Context()

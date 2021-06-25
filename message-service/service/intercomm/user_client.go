@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
@@ -16,6 +17,7 @@ type UserClient interface {
 	GetLoggedUserInfo(bearer string) (*model.UserInfo, error)
 	GetUsersInfo(userId string) (*model.UserInfo, error)
 	CheckIfPostInteractionNotificationEnabled(userId string, userFromId string, interactionType string) (bool, error)
+	IsUserPrivate(userId string) (bool, error)
 }
 
 type userClient struct {}
@@ -28,6 +30,27 @@ func NewUserClient() UserClient {
 var (
 	baseUsersUrl = ""
 )
+
+func (u userClient) IsUserPrivate(userId string) (bool, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return false, errors.New("user not found")
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+	var isPrivate bool
+	json.Unmarshal(bodyBytes, &isPrivate)
+
+	return isPrivate, nil
+}
 
 func (u userClient) GetUsersInfo(userId string) (*model.UserInfo, error) {
 

@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { modalConstants } from "../constants/ModalConstants";
+import { MessageContext } from "../contexts/MessageContext";
 import { hasRoles } from "../helpers/auth-header";
 
 const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePost, showCollectionModal, addToDefaultCollection, deleteFromCollections }) => {
+	const { dispatch } = useContext(MessageContext);
 	const [showAddToCollection, setShowAddToCollection] = useState(false);
 	const iconStyle = { fontSize: "35px", margin: "0px" };
 
@@ -48,12 +51,12 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 							</button>
 						</li>
 						<li hidden={hasRoles(["admin"])} className="list-inline-item">
-							<button className="btn p-0">
-								<i width="1.6em" height="1.6em" fill="currentColor" className="la la-comments" style={iconStyle} />
+							<button className="btn p-0" onClick={() => dispatch({ type: modalConstants.SHOW_SEND_POST_TO_USER_MODAL })}>
+								<i width="1.6em" height="1.6em" fill="currentColor" className="fa fa-paper-plane-o" style={iconStyle} />
 							</button>
 						</li>
 					</ul>
-					<div >
+					<div>
 						<button hidden={hasRoles(["admin"])} className="btn p-0" onClick={() => (!post.Favourites ? handleAddToCollection(post.Id) : handleDeleteFromToCollection(post.Id))}>
 							<i width="1.6em" height="1.6em" fill="black" className={post.Favourites ? "fa fa-bookmark" : "fa fa-bookmark-o"} style={iconStyle} />
 						</button>

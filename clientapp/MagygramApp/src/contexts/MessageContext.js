@@ -13,6 +13,14 @@ const MessageContextProvider = (props) => {
 				ImageURL: "",
 			},
 		},
+		sendPostModal: {
+			showModal: false,
+			selectedUser: {
+				Id: "",
+				Username: "",
+				ImageURL: "",
+			},
+		},
 		conversations: [],
 		messageRequests: [],
 		showedMessages: [],

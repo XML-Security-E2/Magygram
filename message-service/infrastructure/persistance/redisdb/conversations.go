@@ -250,7 +250,7 @@ func (c conversationRepository) CreateMessageRequest(ctx context.Context, reques
 		fmt.Println(err.Error())
 		return err
 	}
-	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.MessageRequestPrefix, request.MessageFrom.Id, request.MessageTo, request.Id), jsonString, 0).Err()
+	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.MessageRequestPrefix, request.MessageFrom.Id, request.MessageTo.Id, request.Id), jsonString, 0).Err()
 	if err != nil {
 		fmt.Println(err.Error())
 	}

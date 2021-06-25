@@ -8,6 +8,7 @@ import (
 type PostService interface {
 	GetPostsForTimeline(ctx context.Context, bearer string) ([]*model.PostResponse , error)
 	GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse , error)
+	GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error)
 	CreatePost(ctx context.Context, bearer string,  post *model.PostRequest) (string, error)
 	EditPost(ctx context.Context, bearer string,  post *model.PostEditRequest) error
 	LikePost(ctx context.Context, bearer string,  postId string) error
