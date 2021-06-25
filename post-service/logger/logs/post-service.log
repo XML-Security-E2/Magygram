@@ -472,3 +472,4 @@ time="2021-06-22T13:26:15+02:00" level=warning msg="Unauthorized access" func=po
 >>>>>>> develop
 time="2021-06-25T16:05:18+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
 time="2021-06-25T17:02:49+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:81" post_id=557b4eb6-9adf-44b5-8f43-16ba578ea245 request_ip=127.0.0.1 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
+time="2021-06-25T17:57:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
