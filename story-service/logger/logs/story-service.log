@@ -151,9 +151,14 @@ time="2021-06-22T13:14:58+02:00" level=error msg="User-service get logged user i
 time="2021-06-21T20:28:31+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-21T20:32:47+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/story-service/service/intercomm/relationship_client.go:76" request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-21T20:33:09+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/story-service/service/intercomm/relationship_client.go:76" request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
+<<<<<<< HEAD
+time="2021-06-21T22:48:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+=======
 time="2021-06-21T22:33:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-21T22:39:02+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/service/intercomm/relationship_client.go:76" request_ip=127.0.0.1 user_id=e4d7c6a7-ef87-494e-9c41-b00c3b9feb34
 time="2021-06-21T22:48:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
+<<<<<<< HEAD
+=======
 <<<<<<< HEAD
 time="2021-06-22T01:15:02+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
 =======
@@ -161,7 +166,11 @@ time="2021-06-22T00:27:16+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-22T00:40:50+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/story-service/service/story_service.go:80" request_ip=127.0.0.1 story_id=98ea6b2d-0a16-4d58-83e1-5b364efeeb3c user_id=5ceea0b9-f951-488a-9ec7-731300eee802
 >>>>>>> develop
 >>>>>>> develop
+<<<<<<< HEAD
 time="2021-06-22T13:23:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-22T13:26:03+02:00" level=error msg="User-service get logged user info" func=story-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/user_client.go:45" request_ip=127.0.0.1
 time="2021-06-22T13:26:04+02:00" level=error msg="User-service get logged user info" func=story-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/user_client.go:45" request_ip=127.0.0.1
 time="2021-06-22T13:26:22+02:00" level=error msg="User-service get logged user info" func=story-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/user_client.go:45" request_ip=127.0.0.1
+=======
+>>>>>>> develop
+time="2021-06-25T16:05:19+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464

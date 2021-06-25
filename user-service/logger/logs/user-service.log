@@ -446,6 +446,9 @@ time="2021-06-21T20:32:57+02:00" level=error msg="Relationship-service get follo
 time="2021-06-21T20:33:29+02:00" level=error msg="Relationship-service get follow requests" func=user-service/service/intercomm.relationshipClient.ReturnFollowRequests file="C:/Users/Dusan/Desktop/Magygram/user-service/service/intercomm/relationship_client.go:281" request_ip=127.0.0.1
 time="2021-06-21T20:33:35+02:00" level=error msg="Relationship-service get follow requests" func=user-service/service/intercomm.relationshipClient.ReturnFollowRequests file="C:/Users/Dusan/Desktop/Magygram/user-service/service/intercomm/relationship_client.go:281" request_ip=127.0.0.1
 time="2021-06-21T20:34:24+02:00" level=error msg="Relationship-service get follow requests" func=user-service/service/intercomm.relationshipClient.ReturnFollowRequests file="C:/Users/Dusan/Desktop/Magygram/user-service/service/intercomm/relationship_client.go:281" request_ip=127.0.0.1
+<<<<<<< HEAD
+time="2021-06-21T22:49:01+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/user-service/main.go:98" host=localhost port=460
+=======
 time="2021-06-21T22:33:15+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:98" host=localhost port=460
 time="2021-06-21T22:35:01+02:00" level=error msg="Relationship-service user registration" func=user-service/service/intercomm.relationshipClient.CreateUser file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/intercomm/relationship_client.go:69" email=nikoladskv@hotmail.rs name=Nikola request_ip=127.0.0.1 surname=Kolovic username=nikoladskv
 time="2021-06-21T22:35:36+02:00" level=error msg="User database create failure" func="user-service/service.(*userService).RegisterUser" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/user_service.go:466" email=nikoladskv@hotmail.rs name=Nikola request_ip=127.0.0.1 surname=Kolovic username=nikoladskv
@@ -466,6 +469,8 @@ time="2021-06-21T23:12:05+02:00" level=warning msg="Invalid user id" func="user-
 time="2021-06-21T23:12:05+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/infrastructure/persistence/mongodb/users.go:55" request_ip=127.0.0.1 user_id=null
 time="2021-06-21T23:15:29+02:00" level=info msg="Activation e-mail sent" func=user-service/service.SendActivationMail file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/email_service.go:41" activation_id=da94ba46-4e7c-454a-99be-f16e119f1345
 time="2021-06-21T23:16:26+02:00" level=info msg="User activated" func="user-service/service.(*userService).ActivateUser" file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/service/user_service.go:508" activation_id=da94ba46-4e7c-454a-99be-f16e119f1345 request_ip=127.0.0.1 user_id=aca408bd-2498-4435-9246-b5b408898eec
+<<<<<<< HEAD
+=======
 <<<<<<< HEAD
 time="2021-06-22T01:15:13+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:98" host=localhost port=460
 time="2021-06-22T01:35:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/user-service/main.go:98" host=localhost port=460
@@ -489,7 +494,23 @@ time="2021-06-22T01:44:41+02:00" level=warning msg="Unauthorized access" func=us
 time="2021-06-22T00:27:33+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/user-service/main.go:98" host=localhost port=460
 >>>>>>> develop
 >>>>>>> develop
+<<<<<<< HEAD
 time="2021-06-22T13:23:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/main.go:98" host=localhost port=460
 time="2021-06-22T13:26:03+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/infrastructure/persistence/mongodb/users.go:55" request_ip="::1" user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
 time="2021-06-22T13:26:04+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/infrastructure/persistence/mongodb/users.go:55" request_ip="::1" user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
 time="2021-06-22T13:26:22+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/infrastructure/persistence/mongodb/users.go:55" request_ip="::1" user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+=======
+>>>>>>> develop
+time="2021-06-25T16:05:24+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/main.go:98" host=localhost port=460
+time="2021-06-25T16:58:06+02:00" level=info msg="User registered" func="user-service/service.(*userService).RegisterUser" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/user_service.go:485" request_ip=127.0.0.1 user_id=6aea61df-8956-43c6-8a2f-c89d128d866d
+time="2021-06-25T16:58:07+02:00" level=info msg="Activation e-mail sent" func=user-service/service.SendActivationMail file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/email_service.go:41" activation_id=ffd2eb87-f73e-4755-a7c5-9d8b6490e3ad
+time="2021-06-25T17:00:40+02:00" level=error msg="Auth-service user activation" func=user-service/service/intercomm.authClient.ActivateUser file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/intercomm/auth_client.go:180" request_ip=127.0.0.1 user_id=6aea61df-8956-43c6-8a2f-c89d128d866d
+time="2021-06-25T17:01:22+02:00" level=info msg="Activation e-mail sent" func=user-service/service.SendActivationMail file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/email_service.go:41" activation_id=84435f58-38dd-4fdf-91d5-bf5afcf19b1a
+time="2021-06-25T17:01:25+02:00" level=error msg="Auth-service user activation" func=user-service/service/intercomm.authClient.ActivateUser file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/intercomm/auth_client.go:180" request_ip=127.0.0.1 user_id=6aea61df-8956-43c6-8a2f-c89d128d866d
+time="2021-06-25T17:01:27+02:00" level=error msg="Auth-service user activation" func=user-service/service/intercomm.authClient.ActivateUser file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/intercomm/auth_client.go:180" request_ip=127.0.0.1 user_id=6aea61df-8956-43c6-8a2f-c89d128d866d
+time="2021-06-25T17:01:51+02:00" level=error msg="Auth-service user activation" func=user-service/service/intercomm.authClient.ActivateUser file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/intercomm/auth_client.go:180" request_ip=127.0.0.1 user_id=6aea61df-8956-43c6-8a2f-c89d128d866d
+time="2021-06-25T17:01:54+02:00" level=error msg="Auth-service user activation" func=user-service/service/intercomm.authClient.ActivateUser file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/intercomm/auth_client.go:180" request_ip=127.0.0.1 user_id=6aea61df-8956-43c6-8a2f-c89d128d866d
+time="2021-06-25T17:02:15+02:00" level=info msg="User activated" func="user-service/service.(*userService).ActivateUser" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/service/user_service.go:508" activation_id=84435f58-38dd-4fdf-91d5-bf5afcf19b1a request_ip=127.0.0.1 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
+time="2021-06-25T17:02:36+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/infrastructure/persistence/mongodb/users.go:56" request_ip="::1" user_id=c1ea55d5-43bd-4a18-89f7-9de09b4dc465
+time="2021-06-25T17:02:41+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/infrastructure/persistence/mongodb/users.go:56" request_ip="::1" user_id=c1ea55d5-43bd-4a18-89f7-9de09b4dc465
+time="2021-06-25T17:50:03+02:00" level=warning msg="Invalid user id" func="user-service/infrastructure/persistence/mongodb.(*userRepository).GetByID" file="C:/Users/Jel/Desktop/magigram/Magygram/user-service/infrastructure/persistence/mongodb/users.go:56" request_ip="::1" user_id=c1ea55d5-43bd-4a18-89f7-9de09b4dc465

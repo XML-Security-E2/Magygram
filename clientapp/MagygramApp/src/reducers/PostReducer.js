@@ -572,10 +572,16 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 
-			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
+			if(strcpy.viewPostModal.showModal){
+				if (strcpy.viewPostModal.post.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
+					strcpy.viewPostModal.post.Comments.push(action.comment);
+				}
+			}else{
+				postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 
-			if (postCopy.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
-				postCopy.Comments.push(action.comment);
+				if (postCopy.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
+					postCopy.Comments.push(action.comment);
+				}
 			}
 
 			return strcpy;
@@ -605,6 +611,30 @@ export const postReducer = (state, action) => {
 				viewPostModalForGuest: {
 					showModal: false,
 					post: action.post,
+				},
+			};
+		case modalConstants.SHOW_SEARCH_INFLUENCER_MODAL:
+		return {
+			...state,
+			searchInfluencer: {
+				post: {
+					id: action.post.Id,
+					userId: action.post.UserInfo.Id,
+					location: action.post.Location,
+					tags: action.post.Tags,
+					description: action.post.Description,
+					media: action.post.Media,
+				},
+			},
+			campaignOptions: {
+				showModal: true,
+			},
+		};
+		case modalConstants.HIDE_SEARCH_INFLUENCER_MODAL:
+			return {
+				...state,
+				campaignOptions: {
+					showModal: false,
 				},
 			};
 		case modalConstants.SHOW_POST_OPTIONS_MODAL:

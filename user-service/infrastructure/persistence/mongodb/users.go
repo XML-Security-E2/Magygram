@@ -44,6 +44,7 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"privacy_settings" , user.PrivacySettings},
 																{"verified_profile" , user.IsVerified},
 																{"category" , user.Category},
+																{"private_profile", user.IsPrivate},
 	}}})
 }
 
