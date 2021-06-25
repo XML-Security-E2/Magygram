@@ -14,6 +14,7 @@ type ConversationHandler interface {
 	GetAllConversationsForUser(c echo.Context) error
 	GetAllMessagesFromUser(c echo.Context) error
 	ViewMessages(c echo.Context) error
+	ViewMediaMessages(c echo.Context) error
 }
 
 type conversationHandler struct {
@@ -24,6 +25,24 @@ type conversationHandler struct {
 func NewConversationHandler(p service_contracts.ConversationService, h *hub.MessageHub) ConversationHandler {
 	return &conversationHandler{p, h}
 }
+
+func (ch conversationHandler) ViewMediaMessages(c echo.Context) error {
+	conversationId := c.Param("conversationId")
+	messageId := c.Param("messageId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := ch.ConversationService.ViewUserMediaMessages(ctx, bearer, conversationId, messageId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")}
 
 func (ch conversationHandler) ViewMessages(c echo.Context) error {
 	conversationId := c.Param("conversationId")
@@ -44,9 +63,19 @@ func (ch conversationHandler) ViewMessages(c echo.Context) error {
 }
 
 func (ch conversationHandler) SendMessage(c echo.Context) error {
-	messageRequest := &model.MessageSentRequest{}
-	if err := c.Bind(messageRequest); err != nil {
-		return err
+	messageTo := c.FormValue("messageTo")
+	messageType := c.FormValue("messageType")
+	text := c.FormValue("text")
+	contentUrl := c.FormValue("contentUrl")
+
+	media, _ := c.FormFile("media")
+
+	messageRequest := &model.MessageSentRequest{
+		MessageTo:   messageTo,
+		MessageType: model.MessageType(messageType),
+		Media:       media,
+		Text:        text,
+		ContentUrl:  contentUrl,
 	}
 
 	ctx := c.Request().Context()

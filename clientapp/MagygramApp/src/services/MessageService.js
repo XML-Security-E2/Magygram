@@ -7,6 +7,7 @@ export const messageService = {
 	getMessagesFromUser,
 	sendMessage,
 	viewMessages,
+	viewMediaMessages,
 };
 
 function viewMessages(conversationId, dispatch) {
@@ -34,10 +35,37 @@ function viewMessages(conversationId, dispatch) {
 	}
 }
 
-function sendMessage(messageDTO, dispatch) {
+function viewMediaMessages(conversationId, messageId, dispatch) {
 	dispatch(request());
 
-	Axios.post(`/api/messages`, messageDTO, { validateStatus: () => true, headers: authHeader() })
+	Axios.put(`/api/messages/${conversationId}/${messageId}/view`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(messageId));
+			} else {
+				dispatch(failure("Sorry, we have some internal problem."));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: messageConstants.VIEW_MEDIA_MESSAGE_REQUEST };
+	}
+	function success(messageId) {
+		return { type: messageConstants.VIEW_MEDIA_MESSAGE_SUCCESS, messageId };
+	}
+	function failure(error) {
+		return { type: messageConstants.VIEW_MEDIA_MESSAGE_FAILURE, errorMessage: error };
+	}
+}
+
+function sendMessage(messageDTO, dispatch) {
+	const formData = fetchFormData(messageDTO);
+
+	dispatch(request());
+
+	Axios.post(`/api/messages`, formData, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 201) {
@@ -51,12 +79,29 @@ function sendMessage(messageDTO, dispatch) {
 	function request() {
 		return { type: messageConstants.SEND_MESSAGE_REQUEST };
 	}
-	function success(conversation) {
-		return { type: messageConstants.SEND_MESSAGE_SUCCESS, conversation };
+	function success(response) {
+		return { type: messageConstants.SEND_MESSAGE_SUCCESS, response };
 	}
 	function failure(error) {
 		return { type: messageConstants.SEND_MESSAGE_FAILURE, errorMessage: error };
 	}
+}
+
+function fetchFormData(messageDTO) {
+	let formData = new FormData();
+
+	if (messageDTO.media !== "") {
+		formData.append("media", messageDTO.media);
+	} else {
+		formData.append("media", null);
+	}
+
+	formData.append("messageTo", messageDTO.messageTo);
+	formData.append("messageType", messageDTO.messageType);
+	formData.append("text", messageDTO.text);
+	formData.append("contentUrl", messageDTO.contentUrl);
+
+	return formData;
 }
 
 async function getUserConversations(dispatch) {

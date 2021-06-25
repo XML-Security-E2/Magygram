@@ -120,10 +120,17 @@ func (c conversationRepository) ViewUsersMessages(ctx context.Context, userId st
 			return errors.New("unauthorized access")
 		}
 
-		temp.LastMessage.Viewed = true
-		for _, message := range temp.Messages {
-			message.Viewed = true
+		if userId != temp.LastMessageUserId {
+			temp.LastMessage.Viewed = true
 		}
+		var mess []model.Message
+		for _, message := range temp.Messages {
+			if userId != message.MessageFromId {
+				message.Viewed = true
+			}
+			mess = append(mess, message)
+		}
+		temp.Messages = mess
 
 		err = c.Update(ctx, temp)
 		if err != nil {
@@ -136,6 +143,44 @@ func (c conversationRepository) ViewUsersMessages(ctx context.Context, userId st
 	return errors.New("invalid conversation id")
 }
 
+func (c conversationRepository) ViewUserMediaMessage(ctx context.Context, userId string, conversationId string, messageId string) error {
+	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/*/*/%s", model.ConvPrefix, conversationId), math.MaxInt64).Result()
+	if err != nil || keys == nil {
+		return err
+	}
+	if len(keys) > 0 {
+		val, err := c.Db.Get(ctx, keys[0]).Bytes()
+		if err != nil {
+			return err
+		}
+		var temp *model.Conversation
+		json.Unmarshal(val, &temp)
+
+		if temp.ParticipantOne.Id != userId && temp.ParticipantTwo.Id != userId {
+			return errors.New("unauthorized access")
+		}
+
+		var mess []model.Message
+		for _, message := range temp.Messages {
+			if message.Id == messageId {
+				if userId != message.MessageFromId {
+					message.ViewedMedia = true
+				}
+			}
+			mess = append(mess, message)
+		}
+		temp.Messages = mess
+
+		err = c.Update(ctx, temp)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return errors.New("invalid conversation id")
+}
 
 func (c conversationRepository) GetAllMessagesFromUser(ctx context.Context, loggedId string, userId string, limit int64) ([]model.Message, error) {
 	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/%s/*", model.ConvPrefix, loggedId, userId), limit).Result()

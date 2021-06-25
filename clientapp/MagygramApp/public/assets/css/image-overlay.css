@@ -154,6 +154,11 @@
 	color: #000;
 }
 
+.video_modal .modal-content {
+	background-color: rgb(31, 31, 31);
+	color: #000;
+}
+
 .count-indicator {
 	position: relative;
 	border-radius: 100%;

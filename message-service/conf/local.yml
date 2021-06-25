@@ -20,3 +20,13 @@ userservice:
   protocol: "https://"
   domain: "localhost"
   port: "460"
+
+relationshipservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "463"
+
+mediaservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "465"

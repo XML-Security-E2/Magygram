@@ -163,3 +163,10 @@ time="2021-06-22T00:40:50+02:00" level=info msg="Files saved" func=media-service
 >>>>>>> develop
 >>>>>>> develop
 time="2021-06-24T17:52:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/media-service/main.go:34" host=localhost port=465
+time="2021-06-25T12:41:32+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/media-service/main.go:34" host=localhost port=465
+time="2021-06-25T14:51:06+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/f27568b4-0779-4021-bd6c-c04851b0bf4e.jpg IMAGE}]" request_ip="::1"
+time="2021-06-25T14:54:25+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/2812b6bb-45d5-4818-8ae0-c9653c0cd916.jpg IMAGE}]" request_ip="::1"
+time="2021-06-25T15:58:04+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/3c4f24e1-529c-4028-ae21-527225ed5823.jpg IMAGE}]" request_ip="::1"
+time="2021-06-25T16:15:31+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/37d2a6a4-488a-4c59-8aeb-73746939b98a.mp4 VIDEO}]" request_ip="::1"
+time="2021-06-25T17:26:59+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/60222d42-8c56-48bb-8736-403a32a882f0.jpg IMAGE}]" request_ip="::1"
+time="2021-06-25T17:27:21+02:00" level=info msg="Files saved" func=media-service/service.mediaService.SaveMedia file="C:/Users/Dusan/Desktop/Magygram/media-service/service/media_service.go:47" file_paths="[{/api/media/c8c4202b-d5de-485b-bcb6-e70b3f28bfd3.mp4 VIDEO}]" request_ip="::1"

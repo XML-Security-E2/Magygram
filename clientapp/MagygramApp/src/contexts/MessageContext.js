@@ -14,7 +14,9 @@ const MessageContextProvider = (props) => {
 			},
 		},
 		conversations: [],
+		messageRequests: [],
 		showedMessages: [],
+		selectedConversationId: "",
 	});
 
 	return <MessageContext.Provider value={{ messageState, dispatch }}>{props.children}</MessageContext.Provider>;

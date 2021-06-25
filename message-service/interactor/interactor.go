@@ -20,6 +20,8 @@ type Interactor interface {
 	NewConversationHandler() handler.ConversationHandler
 	NewAuthClient() intercomm.AuthClient
 	NewUserClient() intercomm.UserClient
+	NewMediaClient() intercomm.MediaClient
+	NewRelationshipClient() intercomm.RelationshipClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -45,12 +47,20 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	return appHandler
 }
 
+func (i *interactor) NewMediaClient() intercomm.MediaClient {
+	return intercomm.NewMediaClient()
+}
+
+func (i *interactor) NewRelationshipClient() intercomm.RelationshipClient {
+	return intercomm.NewRelationshipClient()
+}
+
 func (i *interactor) NewConversationRepository() repository.ConversationRepository {
 	return redisdb.NewConversationRepository(i.Db)
 }
 
 func (i *interactor) NewConversationService() service_contracts.ConversationService {
-	return service.NewConversationService(i.NewConversationRepository(), i.NewAuthClient(), i.NewUserClient())
+	return service.NewConversationService(i.NewConversationRepository(), i.NewAuthClient(), i.NewUserClient(), i.NewMediaClient(), i.NewRelationshipClient())
 }
 
 func (i *interactor) NewConversationHandler() handler.ConversationHandler {

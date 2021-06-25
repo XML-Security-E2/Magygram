@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { MessageContext } from "../../contexts/MessageContext";
 
 const UserChatHeader = () => {
@@ -14,7 +15,9 @@ const UserChatHeader = () => {
 				<img style={imgStyle} src={messageState.selectUserModal.selectedUser.ImageURL === "" ? "assets/img/profile.jpg" : messageState.selectUserModal.selectedUser.ImageURL} alt="" />
 			</div>
 			<div className="profile-info ml-2">
-				<span className="profile-info-username">{messageState.selectUserModal.selectedUser.Username}</span>
+				<Link className="profile-info-username text-dark" to={"/profile?userId=" + messageState.selectUserModal.selectedUser.Id}>
+					{messageState.selectUserModal.selectedUser.Username}
+				</Link>
 			</div>
 		</div>
 	);

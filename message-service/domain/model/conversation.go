@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"mime/multipart"
 	"time"
 )
 
@@ -15,6 +16,12 @@ type Conversation struct {
 	LastMessageUserId string `json:"lastMessageUserId"`
 }
 
+type MessageSendResponse struct {
+	IsMessageRequest bool `json:"isMessageRequest"`
+	Conversation *ConversationResponse `json:"conversation"`
+	MessageRequest *MessageRequest `json:"messageRequest"`
+}
+
 type ConversationResponse struct {
 	Id string `json:"id"`
 	Participant UserInfo `json:"participant"`
@@ -23,14 +30,25 @@ type ConversationResponse struct {
 }
 
 type Message struct {
+	Id string `json:"id"`
 	MessageToId string `json:"messageToId"`
 	MessageFromId string `json:"messageFromId"`
 	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
 	ContentUrl string `json:"contentUrl"`
+	Media *Media `json:"media"`
 	Timestamp time.Time `json:"timestamp"`
 	Viewed  bool `json:"viewed"`
 	ViewedMedia  bool `json:"viewedMedia"`
+}
+
+type Media struct {
+	Url       string `json:"url"`
+	MediaType string `json:"mediaType"`
+}
+
+type FollowedUsersResponse struct {
+	Users []string
 }
 
 type MessagesResponse struct {
@@ -41,15 +59,16 @@ type MessagesResponse struct {
 type MessageSentRequest struct {
 	MessageTo string `json:"messageTo"`
 	MessageType MessageType `json:"messageType"`
+	Media *multipart.FileHeader `json:"media"`
 	Text string `json:"text"`
 	ContentUrl string `json:"contentUrl"`
 }
 
 type MessageRequest struct {
 	Id string `json:"id"`
-	MessageTo string `json:"messageTo"`
+	MessageTo UserInfo `json:"messageTo"`
 	MessageFrom UserInfo `json:"messageFrom"`
-	MessageType string `json:"messageType"`
+	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
 	ContentUrl string `json:"contentUrl"`
 	Timestamp time.Time `json:"timestamp"`
@@ -74,11 +93,23 @@ type MessageType string
 
 const(
 	TEXT = iota
-	PHOTO
-	VIDEO
+	MEDIA
 	POST
 	STORY
 )
+
+func NewMessageRequest(message *Message, messageFrom UserInfo, messageTo UserInfo) *MessageRequest {
+	return &MessageRequest{
+		Id:                   guid.New().String(),
+		MessageTo:            messageFrom,
+		MessageFrom:          messageTo,
+		MessageType:          message.MessageType,
+		Text:                 message.Text,
+		ContentUrl:           message.ContentUrl,
+		Timestamp:            time.Now(),
+		MessageRequestStatus: "PENDING",
+	}
+}
 
 func NewConversation(message *Message, participantOne UserInfo, participantTwo UserInfo) *Conversation {
 	return &Conversation{
@@ -91,19 +122,21 @@ func NewConversation(message *Message, participantOne UserInfo, participantTwo U
 	}
 }
 
-func NewMessage(messageRequest *MessageSentRequest, messageFrom string) (*Message, error) {
+func NewMessage(messageRequest *MessageSentRequest, messageFrom string, media *Media) (*Message, error) {
 	err := validateMessageTypeEnums(messageRequest.MessageType)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Message{
+		Id: 		   guid.New().String(),
 		MessageToId:   messageRequest.MessageTo,
 		MessageFromId: messageFrom,
 		MessageType:   messageRequest.MessageType,
 		Text:          messageRequest.Text,
 		ContentUrl:    messageRequest.ContentUrl,
 		Timestamp:     time.Now(),
+		Media: 		   media,
 		Viewed:        false,
 		ViewedMedia:   false,
 	}, nil
@@ -111,7 +144,7 @@ func NewMessage(messageRequest *MessageSentRequest, messageFrom string) (*Messag
 
 func validateMessageTypeEnums(messageType MessageType) error {
 	switch messageType {
-	case "TEXT", "PHOTO", "VIDEO", "POST", "STORY":
+	case "TEXT", "MEDIA", "POST", "STORY":
 		return nil
 	}
 	return errors.New("invalid message type")

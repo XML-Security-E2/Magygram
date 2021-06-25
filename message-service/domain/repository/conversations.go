@@ -13,5 +13,5 @@ type ConversationRepository interface {
 	Update(ctx context.Context, conversation *model.Conversation) error
 	CreateMessageRequest(ctx context.Context, request *model.MessageRequest) error
 	ViewUsersMessages(ctx context.Context, userId string,  conversationId string) error
-
+	ViewUserMediaMessage(ctx context.Context, userId string, conversationId string, messageId string) error
 }

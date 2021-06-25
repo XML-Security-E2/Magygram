@@ -36,7 +36,7 @@ export const messageReducer = (state, action) => {
 		case messageConstants.SET_USERS_CONVERSATIONS_SUCCESS:
 			stateCpy = { ...state };
 
-			stateCpy.conversations = action.conversations;
+			stateCpy.conversations = action.conversations !== null ? action.conversations : [];
 			return stateCpy;
 
 		case messageConstants.SET_USERS_CONVERSATIONS_FAILURE:
@@ -49,14 +49,21 @@ export const messageReducer = (state, action) => {
 			stateCpy = { ...state };
 			console.log(stateCpy);
 
-			if (stateCpy.conversations.find((conversation) => conversation.id === action.conversation.id) === undefined) {
-				stateCpy.conversations.unshift(action.conversation);
+			if (!action.response.isMessageRequest) {
+				if (stateCpy.conversations.find((conversation) => conversation.id === action.response.conversation.id) === undefined) {
+					stateCpy.conversations.unshift(action.response.conversation);
+				} else {
+					let convCpy = stateCpy.conversations.find((conversation) => conversation.id === action.response.conversation.id);
+					convCpy.lastMessage = action.response.conversation.lastMessage;
+					convCpy.lastMessageUserId = action.response.conversation.lastMessageUserId;
+				}
 			} else {
-				let convCpy = stateCpy.conversations.find((conversation) => conversation.id === action.conversation.id);
-				convCpy.lastMessage = action.conversation.lastMessage;
-				convCpy.lastMessageUserId = action.conversation.lastMessageUserId;
+				if (stateCpy.messageRequests.find((request) => request.id === action.response.messageRequest.id) === undefined) {
+					stateCpy.messageRequests.unshift(action.response.messageRequest);
+				}
 			}
-			stateCpy.showedMessages.push(action.conversation.lastMessage);
+
+			stateCpy.showedMessages.push(action.response.conversation.lastMessage);
 
 			console.log(stateCpy);
 			return stateCpy;
@@ -69,13 +76,28 @@ export const messageReducer = (state, action) => {
 
 		case messageConstants.VIEW_MESSAGES_SUCCESS:
 			stateCpy = { ...state };
+			stateCpy.selectedConversationId = action.conversationId;
 
 			let convCpy = stateCpy.conversations.find((conversation) => conversation.id === action.conversationId);
 			convCpy.lastMessage.viewed = true;
-
 			return stateCpy;
 
 		case messageConstants.VIEW_MESSAGES_FAILURE:
+			return state;
+
+		case messageConstants.VIEW_MEDIA_MESSAGE_REQUEST:
+			return state;
+
+		case messageConstants.VIEW_MEDIA_MESSAGE_SUCCESS:
+			stateCpy = { ...state };
+
+			let convvCpy = stateCpy.showedMessages.find((message) => message.id === action.messageId);
+
+			convvCpy.viewedMedia = true;
+
+			return stateCpy;
+
+		case messageConstants.VIEW_MEDIA_MESSAGE_FAILURE:
 			return state;
 		default:
 			return state;

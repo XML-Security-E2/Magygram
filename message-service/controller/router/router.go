@@ -18,5 +18,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/messages/:userId", h.GetAllMessagesFromUser)
 	e.GET("/api/conversations", h.GetAllConversationsForUser)
 	e.PUT("/api/messages/:conversationId/view", h.ViewMessages)
+	e.PUT("/api/messages/:conversationId/:messageId/view", h.ViewMediaMessages)
 
 }
