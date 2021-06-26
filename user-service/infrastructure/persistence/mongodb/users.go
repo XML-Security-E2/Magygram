@@ -65,6 +65,27 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 func (r *userRepository) SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error) {
 	var users []model.User
 	log.Println("param: " + username)
+	cursor, err := r.Col.Find(ctx,bson.M{"username": bson.M{"$regex": username, "$options": "i"},"category": "INFLUENCER", "_id" : bson.M{ "$ne": loggedUserId}, "blocked_users": bson.M{"$ne": loggedUserId}})
+	if err != nil {
+		return nil, err
+	} else {
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			var record model.User
+			err := cursor.Decode(&record)
+			users = append(users, record)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return users, nil
+}
+
+func (r *userRepository) SearchForInfluencerByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error) {
+	var users []model.User
+	log.Println("param: " + username)
 	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}, "_id" : bson.M{ "$ne": loggedUserId}, "blocked_users": bson.M{"$ne": loggedUserId}})
 	if err != nil {
 		return nil, err

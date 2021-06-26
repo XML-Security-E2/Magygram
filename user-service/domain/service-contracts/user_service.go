@@ -30,6 +30,7 @@ type UserService interface {
 	BlockUser(ctx context.Context, bearer string, userId string) error
 	UnblockUser(ctx context.Context, bearer string, userId string) error
 	SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error)
+	SearchForInfluencerByUsername(ctx context.Context, username string, bearer string) ([]model.User, error)
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
 	AcceptFollowRequest(ctx context.Context, bearer string, userId string) error
 	UpdateLikedPost(ctx context.Context, bearer string, postId string) error

@@ -39,6 +39,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.GET("/api/users/search/:username", h.SearchForUsersByUsername, h.UserLoggingMiddleware)
 	e.GET("/api/users/search/:username/user", h.SearchForUsersByUsername, h.UserLoggingMiddleware)
+	e.GET("/api/users/search/:username/influencer", h.SearchForInfluencerByUsername, h.UserLoggingMiddleware)
 	e.GET("/api/users/search/:username/guest", h.SearchForUsersByUsernameByGuest, h.UserLoggingMiddleware)
 
 	e.POST("/api/users/highlights", h.CreateHighlights, h.HighlightsLoggingMiddleware)

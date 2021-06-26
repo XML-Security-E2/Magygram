@@ -25,7 +25,7 @@ const SearchInfluencerModal = () => {
 
 	const loadOptions = (value, callback) => {
 		setTimeout(() => {
-			searchService.userSearchTags(value, callback);
+			searchService.influencerSearchTags(value, callback);
 		}, 1000);
 	};
 

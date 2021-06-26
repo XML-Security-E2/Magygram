@@ -609,6 +609,21 @@ func (u *userService) SearchForUsersByUsername(ctx context.Context, username str
 	return users, err
 }
 
+func (u *userService) SearchForInfluencerByUsername(ctx context.Context, username string, bearer string) ([]model.User, error) {
+	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := u.UserRepository.SearchForInfluencerByUsername(ctx, username, userId)
+
+	if err != nil {
+		return nil, errors.New("Couldn't find any users")
+	}
+
+	return users, err
+}
+
 func (u *userService) SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error) {
 	users, err := u.UserRepository.SearchForUsersByUsernameByGuest(ctx, username)
 
