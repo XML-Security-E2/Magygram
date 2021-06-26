@@ -52,6 +52,9 @@ const UserContextProvider = (props) => {
 		userFollowRequests: {
 			userInfos: [],
 		},
+		campaignOptions: {
+			showModal: false,
+		},
 		editProfile: {
 			showError: false,
 			errorMessage: "",

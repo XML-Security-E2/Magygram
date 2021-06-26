@@ -2,17 +2,17 @@ import React, { useState, useContext } from "react";
 import { storyService } from "../services/StoryService";
 import { StoryContext } from "../contexts/StoryContext";
 
-const ReportedPost = ({userId}) => {
+const ReportedPost = ({storyId}) => {
 
 	const { state,dispatch } = useContext(StoryContext);
 
-    const handleViewPost = async (userId) => {
+    const handleViewPost = async (storyId) => {
 	
-		await storyService.GetStoriesForUser(userId, 0, dispatch);
+		await storyService.findStoryById(storyId, dispatch);
 	};
 
     return (
-            <a onClick={() => handleViewPost(userId)} class="link-primary">View story</a>
+            <a onClick={() => handleViewPost(storyId)} class="link-primary">View story</a>
         
 	);
     

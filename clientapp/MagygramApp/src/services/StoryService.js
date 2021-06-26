@@ -13,6 +13,7 @@ export const storyService = {
 	GetStoriesForUser,
 	visitedByUser,
 	HaveActiveStoriesLoggedUser,
+	findStoryById,
 	reportStory,
 };
 
@@ -234,6 +235,25 @@ function fetchFormData(storyDTO) {
 	}
 	formData.append("tags", JSON.stringify(storyDTO.tags));
 	return formData;
+}
+
+function findStoryById(storyId, dispatch) {
+	 Axios.get(`/api/story/${storyId}/getForAdmin`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data)
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				//failure()
+			}
+		})
+		.catch((err) => {
+			//failure()
+		});
+
+	function success(data) {
+		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data, };
+	}
 }
 
 function GetStoriesForUser(userId, visited, dispatch) {

@@ -127,12 +127,24 @@ type HighlightRequest struct {
 	Name  string `json:"name"`
 	StoryIds  []string `json:"storyIds"`
 }
-
+type StoryResponseForAdmin struct {
+	ContentType ContentType
+	Media []MediaContent
+	FirstUnvisitedStory int
+}
 
 func NewStoryResponse(story *Story, media []MediaContent,firstUnvisitedStory int) (*StoryResponse, error) {
 	return &StoryResponse{
 		Media: media,
 		UserInfo: story.UserInfo,
+		ContentType: story.ContentType,
+		FirstUnvisitedStory: firstUnvisitedStory,
+	}, nil
+}
+
+func NewStoryResponseForAdmin(story *Story, media []MediaContent,firstUnvisitedStory int) (*StoryResponseForAdmin, error) {
+	return &StoryResponseForAdmin{
+		Media: media,
 		ContentType: story.ContentType,
 		FirstUnvisitedStory: firstUnvisitedStory,
 	}, nil

@@ -430,6 +430,17 @@ time="2021-06-20T21:23:22+02:00" level=error msg="User-service not available" fu
 time="2021-06-20T21:23:40+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:538" post_owner_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921 request_ip=127.0.0.1
 time="2021-06-20T21:23:57+02:00" level=warning msg="Invalid post id" func="post-service/infrastracture/persistance/mongodb.(*postRepository).GetByID" file="C:/Users/Dusan/Desktop/Magygram/post-service/infrastracture/persistance/mongodb/posts.go:72" post_id= request_ip="::1"
 >>>>>>> develop
+<<<<<<< HEAD
+time="2021-06-21T15:19:16+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-21T15:22:31+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip=127.0.0.1 user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+time="2021-06-21T15:42:27+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip=127.0.0.1 user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+time="2021-06-21T15:48:11+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip="::1" user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+time="2021-06-21T16:15:12+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip=127.0.0.1 user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+time="2021-06-21T16:15:28+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:538" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip=127.0.0.1
+time="2021-06-21T16:22:58+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-22T13:05:28+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=c80e6460-2441-4e2a-bb5d-d834b0afd9d5 request_ip=127.0.0.1 user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+time="2021-06-22T13:14:47+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip=127.0.0.1 user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+=======
 time="2021-06-21T20:27:59+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
 time="2021-06-21T20:32:52+02:00" level=error msg="Relationship-service get followed users" func=post-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/post-service/service/intercomm/relationship_client.go:78" request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-21T20:33:11+02:00" level=error msg="Relationship-service get followed users" func=post-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/post-service/service/intercomm/relationship_client.go:78" request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
@@ -454,6 +465,7 @@ time="2021-06-22T01:44:41+02:00" level=warning msg="Unauthorized access" func=po
 time="2021-06-22T00:26:40+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
 >>>>>>> develop
 >>>>>>> develop
+<<<<<<< HEAD
 time="2021-06-25T23:24:34+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
 time="2021-06-25T23:26:42+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:81" post_id=98dc97f9-4ce0-4bdf-a8f9-b6a9c1fda827 request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-25T23:26:43+02:00" level=error msg="Relationship-service get followed users" func=post-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Dusan/Desktop/Magygram/post-service/service/intercomm/relationship_client.go:78" request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
@@ -493,3 +505,14 @@ time="2021-06-26T20:37:17+02:00" level=warning msg="Unauthorized access" func=po
 time="2021-06-26T20:37:23+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:560" post_owner_id=5ceea0b9-f951-488a-9ec7-731300eee802 request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-26T20:37:49+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:560" post_owner_id=5ceea0b9-f951-488a-9ec7-731300eee802 request_ip=127.0.0.1 user_id=3d1f6097-c5ca-4890-84ff-e99caf0a9921
 time="2021-06-27T01:30:34+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+=======
+<<<<<<< HEAD
+time="2021-06-22T13:23:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-22T13:26:15+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:560" post_owner_id=bfca4097-6a5e-4514-b11c-e9bf9f2113a1 request_ip=127.0.0.1 user_id=37f66e74-71cd-45b5-8070-daeb01323a3b
+=======
+>>>>>>> develop
+time="2021-06-25T16:05:18+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-25T17:02:49+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:81" post_id=557b4eb6-9adf-44b5-8f43-16ba578ea245 request_ip=127.0.0.1 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
+time="2021-06-25T17:57:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-06-26T15:48:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/main.go:74" host=localhost port=462
+>>>>>>> develop

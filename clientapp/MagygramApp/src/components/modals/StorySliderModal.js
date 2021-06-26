@@ -32,6 +32,7 @@ const StorySliderModal = () => {
 	const onStoryStart = (index, story) => {
 		console.log(index);
 		console.log(story);
+		setStoryId(story.header.storyId)
 		console.log(storyState.storySliderModal.userId);
 		setTags(story.tags);
 		setStoryId(story.header.storyId);
@@ -46,7 +47,7 @@ const StorySliderModal = () => {
 	};
 
 	const handleOpenOptionsModal = () => {
-		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL, userId: storyState.storySliderModal.userId });
+		dispatch({ type: modalConstants.SHOW_STORY_OPTIONS_MODAL, storyId: storyId });
 	};
 
 	const handleOpenStorySendModal = () => {
