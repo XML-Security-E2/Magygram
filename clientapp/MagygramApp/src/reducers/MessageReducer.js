@@ -27,6 +27,28 @@ export const messageReducer = (state, action) => {
 
 			return stateCpy;
 
+		case modalConstants.SHOW_SEND_STORY_TO_USER_MODAL:
+			stateCpy = { ...state };
+			stateCpy.sendStoryModal.showModal = true;
+
+			return stateCpy;
+		case modalConstants.HIDE_SEND_STORY_TO_USER_MODAL:
+			stateCpy = { ...state };
+			stateCpy.sendStoryModal.showModal = false;
+
+			return stateCpy;
+
+		case modalConstants.SHOW_STORY_MESSAGE_MODAL:
+			stateCpy = { ...state };
+			stateCpy.storyModal.showModal = true;
+
+			return stateCpy;
+		case modalConstants.HIDE_STORY_MESSAGE_MODAL:
+			stateCpy = { ...state };
+			stateCpy.storyModal.showModal = false;
+
+			return stateCpy;
+
 		case messageConstants.SET_USER_MESSAGES_REQUEST:
 			return state;
 
@@ -47,6 +69,17 @@ export const messageReducer = (state, action) => {
 						UserImageUrl: "",
 						Username: "",
 						Unauthorized: true,
+					};
+				} else if (message.messageType === "STORY") {
+					message.story = {
+						Id: "",
+						MediaType: "",
+						Url: "",
+						UserId: "",
+						UserImageUrl: "",
+						Username: "",
+						Unauthorized: true,
+						Expired: true,
 					};
 				}
 			});
@@ -101,7 +134,78 @@ export const messageReducer = (state, action) => {
 
 			console.log(stateCpy);
 			return stateCpy;
+
 		case messageConstants.SET_POST_MESSAGE_FAILURE:
+			return state;
+
+		case messageConstants.SET_STORY_MESSAGE_REQUEST:
+			return state;
+
+		case messageConstants.SET_STORY_MESSAGE_SUCCESS:
+			stateCpy = { ...state };
+
+			stateCpy.showedMessages.forEach((message) => {
+				if (message.contentId === action.story.id) {
+					message.story = {
+						Id: action.story.Id,
+						MediaType: action.story.media.MediaType,
+						Url: action.story.media.Url,
+						UserId: action.story.userInfo.Id,
+						UserImageUrl: action.story.userInfo.ImageURL,
+						Username: action.story.userInfo.Username,
+						Unauthorized: false,
+						Expired: false,
+					};
+				}
+			});
+
+			stateCpy.storyModal.stories = createStory(action.story);
+			console.log(stateCpy);
+			return stateCpy;
+
+		case messageConstants.SET_STORY_MESSAGE_UNAUTHORIZED:
+			stateCpy = { ...state };
+
+			stateCpy.showedMessages.forEach((message) => {
+				if (message.contentId === action.storyId) {
+					message.story = {
+						Id: "",
+						MediaType: "",
+						Url: "",
+						UserId: action.userInfo.Id,
+						UserImageUrl: "",
+						Username: action.userInfo.Username,
+						Unauthorized: true,
+						Expired: false,
+					};
+				}
+			});
+
+			console.log(stateCpy);
+			return stateCpy;
+
+		case messageConstants.SET_STORY_MESSAGE_EXPIRED:
+			stateCpy = { ...state };
+
+			stateCpy.showedMessages.forEach((message) => {
+				if (message.contentId === action.storyId) {
+					message.story = {
+						Id: "",
+						MediaType: "",
+						Url: "",
+						UserId: action.userInfo.Id,
+						UserImageUrl: "",
+						Username: action.userInfo.Username,
+						Unauthorized: false,
+						Expired: true,
+					};
+				}
+			});
+
+			console.log(stateCpy);
+			return stateCpy;
+
+		case messageConstants.SET_STORY_MESSAGE_FAILURE:
 			return state;
 
 		case messageConstants.SET_USERS_CONVERSATIONS_REQUEST:
@@ -135,6 +239,7 @@ export const messageReducer = (state, action) => {
 					stateCpy.messageRequests.unshift(action.response.messageRequest);
 				}
 			}
+			stateCpy.sendStoryModal.showModal = false;
 			stateCpy.sendPostModal.showModal = false;
 			stateCpy.showedMessages.push(action.response.conversation.lastMessage);
 
@@ -176,3 +281,20 @@ export const messageReducer = (state, action) => {
 			return state;
 	}
 };
+
+function createStory(story) {
+	var retVal = [];
+
+	retVal.push({
+		url: story.media.Url,
+		header: {
+			heading: story.userInfo.Username,
+			profileImage: story.userInfo.ImageURL,
+			storyId: story.media.StoryId,
+		},
+		type: story.media.MediaType === "VIDEO" ? "video" : "image",
+		tags: story.media.Tags,
+	});
+
+	return retVal;
+}

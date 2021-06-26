@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"story-service/domain/model"
 	"story-service/domain/service-contracts"
+	"story-service/domain/service-contracts/exceptions/expired"
+	"story-service/domain/service-contracts/exceptions/unauthorized"
 	"story-service/logger"
 )
 
@@ -23,6 +25,7 @@ type StoryHandler interface {
 	LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 	DeleteStory(c echo.Context) error
 	UpdateUserInfo(c echo.Context) error
+	GetStoryForUserMessage(c echo.Context) error
 }
 
 type storyHandler struct {
@@ -132,6 +135,30 @@ func (p storyHandler) VisitedStoryByUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (p storyHandler) GetStoryForUserMessage(c echo.Context) error {
+	storyId := c.Param("storyId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	story, userInfo, err := p.StoryService.GetStoryForUserMessage(ctx, bearer, storyId)
+	if err != nil{
+		switch t := err.(type) {
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
+		case *unauthorized.UnauthorizedAccessError:
+			return echo.NewHTTPError(http.StatusUnauthorized, userInfo)
+		case *expired.StoryError:
+			return echo.NewHTTPError(http.StatusForbidden, userInfo)
+		}
+	}
+
+	return c.JSON(http.StatusOK, story)
 }
 
 func (p storyHandler) GetAllUserStories(c echo.Context) error {

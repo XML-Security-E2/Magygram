@@ -7,6 +7,7 @@ import ImageViewer from "react-simple-image-viewer";
 import VideoViewerModal from "../modals/VideoViewerModal";
 import { messageService } from "../../services/MessageService";
 import PostPreview from "./PostPreview";
+import StoryPreview from "./StoryPreview";
 
 const Chat = () => {
 	const { messageState, dispatch } = useContext(MessageContext);
@@ -96,6 +97,12 @@ const Chat = () => {
 												</div>
 											)}
 
+											{message.messageType === "STORY" && (
+												<div className="col-12 ml-auto" style={{ maxWidth: "50%" }}>
+													<StoryPreview storyId={message.contentId} story={message.story} />
+												</div>
+											)}
+
 											<div className="col-12">
 												<span className="float-right" style={{ fontSize: "0.8em" }}>
 													{getDateTime(message.timestamp)}
@@ -131,6 +138,13 @@ const Chat = () => {
 													<PostPreview postId={message.contentId} post={message.post} />
 												</div>
 											)}
+
+											{message.messageType === "STORY" && (
+												<div className="col-12 mr-auto" style={{ maxWidth: "50%" }}>
+													<StoryPreview storyId={message.contentId} story={message.story} />
+												</div>
+											)}
+
 											<div className="col-12">
 												<span className="float-left" style={{ fontSize: "0.8em" }}>
 													{getDateTime(message.timestamp)}

@@ -9,6 +9,7 @@ export const messageService = {
 	viewMessages,
 	viewMediaMessages,
 	findPostById,
+	findStoryById,
 };
 
 async function findPostById(postId, dispatch) {
@@ -41,6 +42,44 @@ async function findPostById(postId, dispatch) {
 
 	function unauthorized(userInfo, postId) {
 		return { type: messageConstants.SET_POST_MESSAGE_UNAUTHORIZED, userInfo, postId };
+	}
+}
+
+async function findStoryById(storyId, dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/story/id/${storyId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else if (res.status === 401) {
+				dispatch(unauthorized(res.data, storyId));
+			} else if (res.status === 403) {
+				dispatch(expired(res.data, storyId));
+			} else {
+				dispatch(failure("Error while loading collections"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: messageConstants.SET_STORY_MESSAGE_REQUEST };
+	}
+
+	function success(data) {
+		return { type: messageConstants.SET_STORY_MESSAGE_SUCCESS, story: data };
+	}
+	function failure(message) {
+		return { type: messageConstants.SET_STORY_MESSAGE_FAILURE, errorMessage: message };
+	}
+	function unauthorized(userInfo, storyId) {
+		return { type: messageConstants.SET_STORY_MESSAGE_UNAUTHORIZED, userInfo, storyId };
+	}
+	function expired(userInfo, storyId) {
+		return { type: messageConstants.SET_STORY_MESSAGE_EXPIRED, userInfo, storyId };
 	}
 }
 

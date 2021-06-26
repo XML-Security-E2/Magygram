@@ -16,4 +16,5 @@ type StoryService interface {
 	HaveActiveStoriesLoggedUser(ctx context.Context, bearer string) (bool, error)
 	DeleteStory(ctx context.Context, requestId string) error
 	EditStoryOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error
+	GetStoryForUserMessage(ctx context.Context, bearer string, storyId string) (*model.UsersStoryResponseWithUserInfo, *model.UserInfo, error)
 }

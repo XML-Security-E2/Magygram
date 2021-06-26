@@ -9,6 +9,7 @@ import NotificationContextProvider from "../contexts/NotificationContext";
 import UsersConversations from "../components/messages/UsersConversations";
 import MessageContextProvider from "../contexts/MessageContext";
 import MessageUserSearchModal from "../components/modals/MessageUserSearchModal";
+import StoryMessageModal from "../components/modals/StoryMessageModal";
 
 const MessagesPage = () => {
 	return (
@@ -32,6 +33,7 @@ const MessagesPage = () => {
 										</div>
 									</div>
 								</div>
+								<StoryMessageModal />
 								<MessageUserSearchModal />
 							</MessageContextProvider>
 						</PostContextProvider>

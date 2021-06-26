@@ -11,8 +11,11 @@ import (
 	"story-service/domain/model"
 	"story-service/domain/repository"
 	"story-service/domain/service-contracts"
+	"story-service/domain/service-contracts/exceptions/expired"
+	"story-service/domain/service-contracts/exceptions/unauthorized"
 	"story-service/logger"
 	"story-service/service/intercomm"
+	"time"
 )
 
 type storyService struct {
@@ -112,6 +115,62 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 	retVal = sortFirstUnvisited(retVal)
 
 	return retVal, nil
+}
+
+func (p storyService) GetStoryForUserMessage(ctx context.Context, bearer string, storyId string) (*model.UsersStoryResponseWithUserInfo, *model.UserInfo, error) {
+
+	story, err := p.StoryRepository.GetByID(ctx, storyId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !p.checkIfUserContentIsAccessible(bearer, story.UserInfo.Id) {
+		return nil, &story.UserInfo, &unauthorized.UnauthorizedAccessError{Msg: "User not authorized"}
+	}
+
+	if story.CreatedTime.AddDate(0,0,1).Before(time.Now()) {
+		return nil, &story.UserInfo, &expired.StoryError{Msg: "Story expired"}
+	}
+
+	resp := &model.UsersStoryResponseWithUserInfo{
+		Id: story.Id,
+		ContentType: story.ContentType,
+		Media:      story.Media,
+		DateTime:    "",
+		UserInfo:   story.UserInfo,
+	}
+	return resp, nil, nil
+}
+
+func (p storyService) checkIfUserContentIsAccessible(bearer string, storyOwnerId string) bool {
+	isPrivate, err := p.UserClient.IsUserPrivate(storyOwnerId)
+	if err != nil {
+		return false
+	}
+
+	if isPrivate {
+		if bearer == "" {
+			return false
+		}
+		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		if err != nil {
+			return false
+		}
+		if userId != storyOwnerId {
+			followedUsers, err := p.RelationshipClient.GetFollowedUsers(userId)
+			if err != nil {
+				return false
+			}
+			for _, usrId := range followedUsers.Users {
+				if storyOwnerId == usrId {
+					return true
+				}
+			}
+			return false
+		}
+	}
+
+	return true
 }
 
 func sortFirstUnvisited(stories []*model.StoryInfoResponse) []*model.StoryInfoResponse {

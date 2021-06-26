@@ -21,6 +21,13 @@ const MessageContextProvider = (props) => {
 				ImageURL: "",
 			},
 		},
+		sendStoryModal: {
+			showModal: false,
+		},
+		storyModal: {
+			showModal: false,
+			stories: "",
+		},
 		conversations: [],
 		messageRequests: [],
 		showedMessages: [],
