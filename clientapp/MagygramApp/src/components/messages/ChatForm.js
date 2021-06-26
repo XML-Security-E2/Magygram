@@ -68,13 +68,29 @@ const ChatForm = () => {
 		<div className="row mt-auto d-flex align-items-center border m-1" style={{ borderRadius: "10px" }}>
 			<input type="file" ref={imgRef} style={{ display: "none" }} name="image" accept="image/png, image/jpeg" onChange={onImageChange} />
 
-			<textarea id="textarea" className="form-control border-0 col-10" placeholder="Message..." rows="1" value={messageText} onChange={(e) => onTextInputChange(e)} />
+			<textarea
+				disabled={messageState.loadedConversationRequests}
+				id="textarea"
+				className="form-control border-0 col-10"
+				placeholder="Message..."
+				rows="1"
+				value={messageText}
+				onChange={(e) => onTextInputChange(e)}
+			/>
 			{showSendButton ? (
-				<button type="button" className="btn btn-link  text-primary col-2" onClick={sendMessage}>
+				<button disabled={messageState.loadedConversationRequests} type="button" className="btn btn-link  text-primary col-2" onClick={sendMessage}>
 					Send
 				</button>
 			) : (
-				<i className="fa fa-picture-o col-2" style={{ fontSize: "30px", cursor: "pointer" }} onClick={() => imgRef.current.click()} />
+				<i
+					className="fa fa-picture-o col-2"
+					style={{ fontSize: "30px", cursor: "pointer" }}
+					onClick={() => {
+						if (!messageState.loadedConversationRequests) {
+							imgRef.current.click();
+						}
+					}}
+				/>
 			)}
 		</div>
 	);

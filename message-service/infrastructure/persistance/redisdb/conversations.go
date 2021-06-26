@@ -256,3 +256,103 @@ func (c conversationRepository) CreateMessageRequest(ctx context.Context, reques
 	}
 	return err
 }
+
+func (c conversationRepository) CreateConversationRequest(ctx context.Context, request *model.ConversationRequest) error {
+	jsonString, err := json.Marshal(request)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s", model.MessageRequestPrefix, request.RequestFrom.Id, request.RequestTo.Id, request.Id), jsonString, 0).Err()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return err
+}
+
+func (c conversationRepository) GetConversationRequestFromUser(ctx context.Context, loggedId string, userId string, limit int64) (*model.ConversationRequest, error) {
+	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/%s/*", model.MessageRequestPrefix, loggedId, userId), limit).Result()
+
+	if err != nil || keys == nil {
+		return nil, nil
+	}
+
+	if len(keys) > 0 {
+		val, err := c.Db.Get(ctx, keys[0]).Bytes()
+		if err != nil {
+			return nil, nil
+		}
+		var temp *model.ConversationRequest
+		json.Unmarshal(val, &temp)
+
+		return temp, nil
+	}
+
+	return nil, nil
+}
+
+func (c conversationRepository) UpdateConversationRequest(ctx context.Context, conversation *model.ConversationRequest) error {
+	jsonString, err := json.Marshal(conversation)
+	if err != nil {
+		return err
+	}
+
+	err = c.Db.Del(ctx, fmt.Sprintf("%s/%s/%s/%s", model.MessageRequestPrefix, conversation.RequestFrom.Id, conversation.RequestTo.Id, conversation.Id)).Err()
+	if err != nil {
+		return err
+	}
+
+	err = c.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/%s",  model.MessageRequestPrefix, conversation.RequestFrom.Id, conversation.RequestTo.Id, conversation.Id), jsonString, 0).Err()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return err
+}
+
+func (c conversationRepository) GetAllConversationRequestsForUser(ctx context.Context, loggedId string, limit int64) ([]*model.ConversationRequest, error) {
+	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/*/%s/*", model.MessageRequestPrefix, loggedId), limit).Result()
+
+	var conversations []*model.ConversationRequest
+	for _, key := range keys {
+		val, err := c.Db.Get(ctx, key).Bytes()
+		if err != nil {
+			return nil, err
+		}
+
+		var temp *model.ConversationRequest
+		json.Unmarshal(val, &temp)
+		conversations = append(conversations, temp)
+	}
+
+
+	sort.Slice(conversations, func(i, j int) bool {
+		return conversations[i].LastMessage.Timestamp.After(conversations[j].LastMessage.Timestamp)
+	})
+
+	return conversations, err
+}
+
+func (c conversationRepository) DeleteConversationRequest(ctx context.Context, fromId string, toId string, requestId string) error {
+	return c.Db.Del(ctx, fmt.Sprintf("%s/%s/%s/%s", model.MessageRequestPrefix, fromId, toId,  requestId)).Err()
+}
+
+func (c conversationRepository) GetConversationRequestById(ctx context.Context, requestId string) (*model.ConversationRequest, error) {
+	keys, _, err := c.Db.Scan(ctx, 0, fmt.Sprintf("%s/*/*/%s", model.MessageRequestPrefix, requestId), math.MaxInt64).Result()
+
+	if err != nil || keys == nil {
+		return nil, nil
+	}
+
+	if len(keys) > 0 {
+		val, err := c.Db.Get(ctx, keys[0]).Bytes()
+		if err != nil {
+			return nil, nil
+		}
+		var temp *model.ConversationRequest
+		json.Unmarshal(val, &temp)
+
+		return temp, nil
+	}
+
+	return nil, nil
+}

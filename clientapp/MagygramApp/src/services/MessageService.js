@@ -10,7 +10,87 @@ export const messageService = {
 	viewMediaMessages,
 	findPostById,
 	findStoryById,
+	getUserConversationRequests,
+	getUserConversationRequestMessages,
+	acceptRequest,
+	denyRequest,
+	deleteRequest,
 };
+
+function acceptRequest(requestId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/conversations/request/${requestId}/accept`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(requestId));
+			} else {
+				dispatch(failure("Sorry, we have some internal problem."));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: messageConstants.ACCEPT_MESSAGE_REQUEST_REQUEST };
+	}
+	function success(requestId) {
+		return { type: messageConstants.ACCEPT_MESSAGE_REQUEST_SUCCESS, requestId };
+	}
+	function failure(error) {
+		return { type: messageConstants.ACCEPT_MESSAGE_REQUEST_FAILURE, errorMessage: error };
+	}
+}
+
+function denyRequest(requestId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/conversations/request/${requestId}/deny`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(requestId));
+			} else {
+				dispatch(failure("Sorry, we have some internal problem."));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: messageConstants.DENY_MESSAGE_REQUEST_REQUEST };
+	}
+	function success(requestId) {
+		return { type: messageConstants.DENY_MESSAGE_REQUEST_SUCCESS, requestId };
+	}
+	function failure(error) {
+		return { type: messageConstants.DENY_MESSAGE_REQUEST_FAILURE, errorMessage: error };
+	}
+}
+
+function deleteRequest(requestId, dispatch) {
+	dispatch(request());
+
+	Axios.delete(`/api/conversations/request/${requestId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(requestId));
+			} else {
+				dispatch(failure("Sorry, we have some internal problem."));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: messageConstants.DELETE_MESSAGE_REQUEST_REQUEST };
+	}
+	function success(requestId) {
+		return { type: messageConstants.DELETE_MESSAGE_REQUEST_SUCCESS, requestId };
+	}
+	function failure(error) {
+		return { type: messageConstants.DELETE_MESSAGE_REQUEST_FAILURE, errorMessage: error };
+	}
+}
 
 async function findPostById(postId, dispatch) {
 	dispatch(request());
@@ -202,6 +282,31 @@ async function getUserConversations(dispatch) {
 	}
 }
 
+async function getUserConversationRequests(dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/messages/requests`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Sorry, we have some internal problem."));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: messageConstants.SET_USER_REQUESTS_REQUEST };
+	}
+	function success(conversationRequests) {
+		return { type: messageConstants.SET_USER_REQUESTS_SUCCESS, conversationRequests };
+	}
+	function failure(error) {
+		return { type: messageConstants.SET_USER_REQUESTS_FAILURE, errorMessage: error };
+	}
+}
+
 async function getMessagesFromUser(userId, dispatch) {
 	dispatch(request());
 
@@ -224,5 +329,30 @@ async function getMessagesFromUser(userId, dispatch) {
 	}
 	function failure(error) {
 		return { type: messageConstants.SET_USER_MESSAGES_FAILURE, errorMessage: error };
+	}
+}
+
+async function getUserConversationRequestMessages(userId, dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/messages/${userId}/requests`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Sorry, we have some internal problem."));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_REQUEST };
+	}
+	function success(messages) {
+		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_SUCCESS, messages };
+	}
+	function failure(error) {
+		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_FAILURE, errorMessage: error };
 	}
 }

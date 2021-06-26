@@ -19,7 +19,7 @@ type Conversation struct {
 type MessageSendResponse struct {
 	IsMessageRequest bool `json:"isMessageRequest"`
 	Conversation *ConversationResponse `json:"conversation"`
-	MessageRequest *MessageRequest `json:"messageRequest"`
+	ConversationRequest *ConversationRequest `json:"conversationRequest"`
 }
 
 type ConversationResponse struct {
@@ -64,12 +64,23 @@ type MessageSentRequest struct {
 	ContentId string `json:"contentId"`
 }
 
+type ConversationRequest struct {
+	Id string `json:"id"`
+	RequestFrom UserInfo `json:"participantOne"`
+	RequestTo UserInfo `json:"participantTwo"`
+	Messages []Message `json:"messages"`
+	RequestStatus  MessageRequestStatus `json:"requestStatus"`
+	LastMessage Message `json:"lastMessage"`
+	LastMessageUserId string `json:"lastMessageUserId"`
+}
+
 type MessageRequest struct {
 	Id string `json:"id"`
 	MessageTo UserInfo `json:"messageTo"`
 	MessageFrom UserInfo `json:"messageFrom"`
 	MessageType MessageType `json:"messageType"`
 	Text string `json:"text"`
+	Media *Media `json:"media"`
 	ContentId string `json:"contentId"`
 	Timestamp time.Time `json:"timestamp"`
 	MessageRequestStatus  MessageRequestStatus `json:"messageRequestStatus"`
@@ -84,9 +95,7 @@ var (
 
 const(
 	PENDING = iota
-	ACCEPTED
 	DENIED
-	DELETED
 )
 
 type MessageType string
@@ -105,9 +114,22 @@ func NewMessageRequest(message *Message, messageFrom UserInfo, messageTo UserInf
 		MessageFrom:          messageTo,
 		MessageType:          message.MessageType,
 		Text:                 message.Text,
+		Media:                message.Media,
 		ContentId:            message.ContentId,
 		Timestamp:            time.Now(),
 		MessageRequestStatus: "PENDING",
+	}
+}
+
+func NewConversationRequest(message *Message, requestFrom UserInfo, requestTo UserInfo) *ConversationRequest {
+	return &ConversationRequest{
+		Id:                  guid.New().String(),
+		RequestFrom:    	 requestFrom,
+		RequestTo:    	     requestTo,
+		Messages:            []Message{*message},
+		LastMessage:         *message,
+		LastMessageUserId:   message.MessageFromId,
+		RequestStatus:       "PENDING",
 	}
 }
 

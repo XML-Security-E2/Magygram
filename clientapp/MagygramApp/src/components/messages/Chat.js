@@ -45,6 +45,18 @@ const Chat = () => {
 		setShowImageViewer(false);
 	};
 
+	const acceptMessageRequest = () => {
+		messageService.acceptRequest(messageState.selectedConversationId, dispatch);
+	};
+
+	const denyMessageRequest = () => {
+		messageService.denyRequest(messageState.selectedConversationId, dispatch);
+	};
+
+	const deleteMessageRequest = () => {
+		messageService.deleteRequest(messageState.selectedConversationId, dispatch);
+	};
+
 	useEffect(() => {
 		var a = document.querySelector("#conversation");
 		console.log(a);
@@ -155,6 +167,21 @@ const Chat = () => {
 								);
 							}
 						})}
+						<div hidden={!messageState.loadedConversationRequests} className="col-12 mt-2">
+							<div className="row">
+								<div className="col-12 text-center">
+									<button type="button" className="btn btn-outline-secondary border-0" onClick={acceptMessageRequest}>
+										Accept request
+									</button>
+									<button type="button" className="btn btn-outline-secondary border-0" onClick={denyMessageRequest}>
+										Deny request
+									</button>
+									<button type="button" className="btn btn-outline-danger border-0" onClick={deleteMessageRequest}>
+										Delete request
+									</button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

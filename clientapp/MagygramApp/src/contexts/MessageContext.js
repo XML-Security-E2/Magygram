@@ -28,8 +28,10 @@ const MessageContextProvider = (props) => {
 			showModal: false,
 			stories: "",
 		},
+		showedConversations: true,
+		loadedConversationRequests: false,
 		conversations: [],
-		messageRequests: [],
+		conversationRequests: [],
 		showedMessages: [],
 		selectedConversationId: "",
 	});

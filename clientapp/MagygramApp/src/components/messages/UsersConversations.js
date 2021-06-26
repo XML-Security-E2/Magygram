@@ -20,7 +20,11 @@ const UsersConversations = () => {
 		const getUserConversations = async () => {
 			await messageService.getUserConversations(dispatch);
 		};
+		const getUserConversationRequests = async () => {
+			await messageService.getUserConversationRequests(dispatch);
+		};
 		getUserConversations();
+		getUserConversationRequests();
 	}, []);
 
 	return (

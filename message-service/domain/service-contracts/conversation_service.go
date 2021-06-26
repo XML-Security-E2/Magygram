@@ -11,4 +11,10 @@ type ConversationService interface {
 	GetAllMessagesFromUser(ctx context.Context, bearer string, userId string) (*model.MessagesResponse, error)
 	ViewUsersMessages(ctx context.Context, bearer string, userId string) error
 	ViewUserMediaMessages(ctx context.Context, bearer string, conversationId string, messageId string) error
+	AcceptConversationRequest(ctx context.Context, bearer string, requestId string) error
+	DenyConversationRequest(ctx context.Context, bearer string, requestId string) error
+	DeleteConversationRequest(ctx context.Context, bearer string, requestId string) error
+
+	GetAllMessageRequestsForUser(ctx context.Context, bearer string) ([]*model.ConversationResponse, error)
+	GetAllMessagesFromUserFromRequest(ctx context.Context, bearer string, userId string) (*model.MessagesResponse, error)
 }
