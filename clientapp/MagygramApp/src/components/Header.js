@@ -21,8 +21,10 @@ const Header = () => {
 	const [loadData, setLoadData] = useState(true);
 
 	const [rmessages, setRmessages] = useState([]);
+	const [notifyMessages, setNotifyMessages] = useState([]);
 
 	const ws = useRef(null);
+	const messagesWs = useRef(null);
 
 	useEffect(() => {
 		console.log(process.env);
@@ -31,6 +33,14 @@ const Header = () => {
 		);
 		ws.current.onopen = () => console.log("ws opened");
 		ws.current.onclose = () => console.log("ws closed");
+
+		messagesWs.current = new WebSocket(
+			process.env.REACT_APP_STAGE === "prod"
+				? "ws://localhost:467/ws/notify/messages/" + localStorage.getItem("userId")
+				: "wss://localhost:467/ws/notify/messages/" + localStorage.getItem("userId")
+		);
+		messagesWs.current.onopen = () => console.log("ws opened");
+		messagesWs.current.onclose = () => console.log("ws closed");
 	}, []);
 
 	useEffect(() => {
@@ -45,6 +55,19 @@ const Header = () => {
 			notifyCtx.dispatch({ type: notificationConstants.NOTIFICATION_RECEIVED, count: JSON.parse(evt.data).count });
 		};
 	}, [rmessages]);
+
+	useEffect(() => {
+		if (!messagesWs.current) return;
+
+		messagesWs.current.onmessage = (evt) => {
+			console.log(evt.data);
+			let a = [...notifyMessages];
+			a.push(evt.data);
+
+			setNotifyMessages(a);
+			notifyCtx.dispatch({ type: notificationConstants.MESSAGE_NOTIFICATION_RECEIVED, count: JSON.parse(evt.data).count });
+		};
+	}, [notifyMessages]);
 
 	const loadOptions = (value, callback) => {
 		if (value.startsWith("#") && value.length >= 2) {
@@ -139,7 +162,10 @@ const Header = () => {
 				</div>
 				<div className="d-flex align-items-center dropdown">
 					<i hidden={hasRoles(["admin"])} className="fa fa-home ml-3" style={iconStyle} />
-					<i hidden={hasRoles(["admin"])} className="la la-wechat ml-3" style={iconStyle} />
+					<Link hidden={hasRoles(["admin"])} className="count-indicator ml-3" to="/chat">
+						<i className="la la-wechat shadow-none" style={{ fontSize: "30px", cursor: "pointer", color: "black" }}></i>
+						{notifyCtx.notificationState.messageNotificationsNumber > 0 && <span className="count count-varient1">{notifyCtx.notificationState.messageNotificationsNumber}</span>}
+					</Link>
 					<i hidden={hasRoles(["admin"])} className="la la-compass ml-3" style={iconStyle} />
 
 					<div hidden={hasRoles(["admin"])}>

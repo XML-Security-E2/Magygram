@@ -46,7 +46,7 @@ var (
 
 func NewNotification(notificationReq *NotificationRequest) *Notification {
 	return &Notification{
-		Id:        fmt.Sprintf("%s/%s/%s/false", Prefix, notificationReq.UserId, guid.New().String()),
+		Id:        guid.New().String(),
 		Username:  notificationReq.Username,
 		UserId:    notificationReq.UserId,
 		NotifyUrl: notificationReq.NotifyUrl,

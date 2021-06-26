@@ -17,6 +17,7 @@ import AdminContextProvider from "../contexts/AdminContext";
 import FollowRecommendation from "../components/FollowRecommendation";
 import AdminReportRequestTab from "../components/AdminReportRequestTab";
 import AgentRegistrationRequestTabContent from "../components/AgentRegistrationRequestTabContent";
+import MessageContextProvider from "../contexts/MessageContext";
 
 const HomePage = () => {
 	return (
@@ -31,21 +32,23 @@ const HomePage = () => {
 								</NotificationContextProvider>
 								<CreateStoryModal />
 								<AddPostToFavouritesModal />
-								<div>
-									<div class="mt-4">
-										<div class="container d-flex justify-content-center">
-											<div class="col-9">
-												<div class="row">
-													<div class="col-8">
-														<Storyline />
-														<Timeline search={false} />
+								<MessageContextProvider>
+									<div>
+										<div class="mt-4">
+											<div class="container d-flex justify-content-center">
+												<div class="col-9">
+													<div class="row">
+														<div class="col-8">
+															<Storyline />
+															<Timeline search={false} />
+														</div>
+														<FollowRecommendation />
 													</div>
-													<FollowRecommendation/>
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
+								</MessageContextProvider>
 							</PostContextProvider>
 						</StoryContextProvider>
 					</UserContextProvider>
@@ -69,7 +72,7 @@ const HomePage = () => {
 																<AdminHomePageTabs />
 																<AdminVerificationRequestTabContent />
 																<AdminReportRequestTab />
-																<AgentRegistrationRequestTabContent/>
+																<AgentRegistrationRequestTabContent />
 															</div>
 														</div>
 													</div>

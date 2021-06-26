@@ -13,30 +13,59 @@ import (
 
 type Interactor interface {
 	NewNotificationRepository() repository.NotificationRepository
+	NewConversationRepository() repository.ConversationRepository
 	NewNotificationService() service_contracts.NotificationService
+	NewConversationService() service_contracts.ConversationService
 	NewNotificationHandler() handler.NotificationHandler
+	NewConversationHandler() handler.ConversationHandler
 	NewAuthClient() intercomm.AuthClient
 	NewUserClient() intercomm.UserClient
+	NewMediaClient() intercomm.MediaClient
+	NewRelationshipClient() intercomm.RelationshipClient
 	NewAppHandler() handler.AppHandler
 }
 
 type interactor struct {
 	Db *redis.Client
 	Hub *hub.NotifyHub
+	MHub *hub.MessageHub
+	MNHub *hub.MessageNotificationsHub
 }
 
-func NewInteractor(db *redis.Client, hub *hub.NotifyHub) Interactor {
-	return &interactor{db, hub}
+func NewInteractor(db *redis.Client, hub *hub.NotifyHub, mhub *hub.MessageHub, mnhub *hub.MessageNotificationsHub) Interactor {
+	return &interactor{db, hub, mhub, mnhub}
 }
 
 type appHandler struct {
 	handler.NotificationHandler
+	handler.ConversationHandler
 }
 
 func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.NotificationHandler = i.NewNotificationHandler()
+	appHandler.ConversationHandler = i.NewConversationHandler()
 	return appHandler
+}
+
+func (i *interactor) NewMediaClient() intercomm.MediaClient {
+	return intercomm.NewMediaClient()
+}
+
+func (i *interactor) NewRelationshipClient() intercomm.RelationshipClient {
+	return intercomm.NewRelationshipClient()
+}
+
+func (i *interactor) NewConversationRepository() repository.ConversationRepository {
+	return redisdb.NewConversationRepository(i.Db)
+}
+
+func (i *interactor) NewConversationService() service_contracts.ConversationService {
+	return service.NewConversationService(i.NewConversationRepository(), i.NewAuthClient(), i.NewUserClient(), i.NewMediaClient(), i.NewRelationshipClient())
+}
+
+func (i *interactor) NewConversationHandler() handler.ConversationHandler {
+	return handler.NewConversationHandler(i.NewConversationService(), i.MHub, i.MNHub)
 }
 
 func (i *interactor) NewUserClient() intercomm.UserClient {
@@ -56,5 +85,5 @@ func (i *interactor) NewNotificationService() service_contracts.NotificationServ
 }
 
 func (i *interactor) NewNotificationHandler() handler.NotificationHandler {
-	return handler.NewNotificationHandler(i.NewNotificationService(), i.Hub, i.NewAuthClient())
+	return handler.NewNotificationHandler(i.NewNotificationService(), i.Hub)
 }

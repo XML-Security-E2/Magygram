@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/beevik/guid"
 	"github.com/go-redis/redis/v8"
+	"math"
 	"message-service/domain/model"
 	"message-service/domain/repository"
 	"sort"
@@ -25,7 +26,7 @@ func (n notificationRepository) Create(ctx context.Context, notification *model.
 		fmt.Println(err.Error())
 		return err
 	}
-	err = n.Db.Set(ctx, notification.Id, jsonString, 0).Err()
+	err = n.Db.Set(ctx, fmt.Sprintf("%s/%s/%s/false", model.Prefix, notification.UserId, notification.Id), jsonString, 0).Err()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -91,7 +92,7 @@ func (n notificationRepository) GetAllNotViewedForUser(ctx context.Context, user
 }
 
 func (n notificationRepository) ViewNotifications(ctx context.Context, userId string) error {
-	keys, _, err := n.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/*/false", model.Prefix, userId), 1000).Result()
+	keys, _, err := n.Db.Scan(ctx, 0, fmt.Sprintf("%s/%s/*/false", model.Prefix, userId), math.MaxInt64).Result()
 
 	for _, key := range keys {
 		fmt.Println(key)

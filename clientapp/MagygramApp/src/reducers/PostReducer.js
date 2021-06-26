@@ -572,11 +572,11 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 
-			if(strcpy.viewPostModal.showModal){
+			if (strcpy.viewPostModal.showModal) {
 				if (strcpy.viewPostModal.post.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
 					strcpy.viewPostModal.post.Comments.push(action.comment);
 				}
-			}else{
+			} else {
 				postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
 
 				if (postCopy.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
@@ -827,6 +827,16 @@ export const postReducer = (state, action) => {
 			postCopy.postReport.successMessage = "";
 
 			return postCopy;
+
+		case postConstants.SET_POST_FOR_PAGE_REQUEST:
+			return state;
+		case postConstants.SET_POST_FOR_PAGE_SUCCESS:
+			postCopy = { ...state };
+			postCopy.postDetailsPage.post = action.post;
+			return postCopy;
+
+		case postConstants.SET_POST_FOR_PAGE_FAILURE:
+			return state;
 		default:
 			return state;
 	}

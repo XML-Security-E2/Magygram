@@ -1,16 +1,14 @@
 package hub
 
-type Message struct {
-	Text     string `json:"text"`
-	Receiver string `json:"receiver"`
-}
-
+import (
+	"message-service/domain/model"
+)
 
 type MessageHub struct {
 	// Registered clients.
 	clients map[*MessageClient]bool
 	// Inbound messages from the clients.
-	Broadcast chan *Message
+	Broadcast chan *model.MessageSendResponse
 	// Register requests from the clients.
 	Register chan *MessageClient
 	// Unregister requests from clients.
@@ -19,7 +17,7 @@ type MessageHub struct {
 }
 func NewHub() *MessageHub {
 	return &MessageHub{
-		Broadcast:  make(chan *Message),
+		Broadcast:  make(chan *model.MessageSendResponse),
 		Register:   make(chan *MessageClient),
 		Unregister: make(chan *MessageClient),
 		clients:    make(map[*MessageClient]bool),
@@ -37,15 +35,28 @@ func (h *MessageHub) Run() {
 			}
 		case message := <-h.Broadcast:
 			for client := range h.clients {
-				if client.Id == message.Receiver {
-					select {
-					case client.Send <- message:
-					default:
-						close(client.Send)
-						delete(h.clients, client)
+				if message.IsMessageRequest {
+					if client.Id == message.ConversationRequest.LastMessage.MessageToId {
+						select {
+						case client.Send <- message:
+						default:
+							close(client.Send)
+							delete(h.clients, client)
+						}
+					}
+				} else {
+					if client.Id == message.Conversation.LastMessage.MessageToId {
+						select {
+						case client.Send <- message:
+						default:
+							close(client.Send)
+							delete(h.clients, client)
+						}
 					}
 				}
+
 			}
 		}
+
 	}
 }

@@ -32,7 +32,6 @@ type userService struct {
 	intercomm.StoryClient
 }
 
-
 var (
 	MaxUnsuccessfulLogins = 3
 )
@@ -633,6 +632,19 @@ func (u *userService) SearchForUsersByUsernameByGuest(ctx context.Context, usern
 
 	return users, err
 }
+
+func (u *userService) GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error) {
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return &model.UserInfo{
+		Id:       userId,
+		Username: user.Username,
+		ImageURL: user.ImageUrl,
+	}, nil}
+
 
 func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
 

@@ -46,6 +46,24 @@ const PostContextProvider = (props) => {
 		timeline: {
 			posts: [],
 		},
+		postDetailsPage: {
+			post: {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [],
+				UserInfo: {},
+				LikedBy: [],
+				DislikedBy: [],
+				Comments: [],
+				Liked: false,
+				Disliked: false,
+				Favourites: false,
+			},
+		},
 		guestTimeline: {
 			posts: [],
 		},

@@ -85,6 +85,14 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type UsersStoryResponseWithUserInfo struct {
+	Id string `json:"id"`
+	UserInfo UserInfo `json:"userInfo"`
+	ContentType ContentType `json:"contentType"`
+	Media Media `json:"media"`
+	DateTime string `json:"dateTime"`
+}
+
 type UsersStoryResponse struct {
 	Id string `json:"id"`
 	ContentType ContentType `json:"contentType"`

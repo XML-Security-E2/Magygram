@@ -10,6 +10,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/posts", h.EditPost, h.LoggingMiddleware)
 	e.GET("/api/posts", h.GetPostsForTimeline, h.LoggingMiddleware)
 	e.GET("/api/posts/id/:postId", h.GetPostById, h.LoggingMiddleware)
+	e.GET("/api/posts/messages/id/:postId", h.GetPostForMessagesById, h.LoggingMiddleware)
+
 	e.GET("/api/posts/:userId/count", h.GetUsersPostsCount, h.LoggingMiddleware) // iz ms
 	e.GET("/api/posts/:userId", h.GetUsersPosts, h.LoggingMiddleware)
 	e.PUT("/api/posts/:postId/like", h.LikePost, h.LoggingMiddleware)

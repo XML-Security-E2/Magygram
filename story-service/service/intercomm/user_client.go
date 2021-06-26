@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 type UserClient interface {
 	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
+	IsUserPrivate(userId string) (bool, error)
 }
 
 type userClient struct {}
@@ -26,6 +28,33 @@ func NewUserClient() UserClient {
 var (
 	baseUsersUrl = ""
 )
+
+func (u userClient) IsUserPrivate(userId string) (bool, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("User-service not available")
+			return false, err
+		}
+
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Error("User-service check user privacy")
+		return false, errors.New("user not found")
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+	var isPrivate bool
+	json.Unmarshal(bodyBytes, &isPrivate)
+
+	return isPrivate, nil
+}
 
 func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 

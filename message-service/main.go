@@ -14,6 +14,9 @@ import (
 
 var Db *redis.Client
 var NotifyHub *hub.NotifyHub
+var MessageHub *hub.MessageHub
+var MessageNotifyHub *hub.MessageNotificationsHub
+
 var runServer = flag.Bool("message-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
 func main()  {
@@ -57,8 +60,14 @@ func main()  {
 	NotifyHub = hub.NewNotifyHub()
 	go NotifyHub.Run()
 
+	MessageHub = hub.NewHub()
+	go MessageHub.Run()
+
+	MessageNotifyHub = hub.NewMessageNotificationsHub()
+	go MessageNotifyHub.Run()
+
 	e := echo.New()
-	i := interactor.NewInteractor(Db, NotifyHub)
+	i := interactor.NewInteractor(Db, NotifyHub, MessageHub, MessageNotifyHub)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

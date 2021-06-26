@@ -15,6 +15,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/users/:userId/privacy-settings", h.EditUsersPrivacySettings)
 
 	e.GET("/api/users/logged", h.GetLoggedUserInfo, h.UserLoggingMiddleware)
+	e.GET("/api/users/info/:userId", h.GetUsersInfo)
+
 	e.GET("/api/users/activate/:activationId", h.ActivateUser, h.UserLoggingMiddleware)
 	e.POST("/api/users/reset-password-link-request", h.ResetPasswordRequest, h.UserLoggingMiddleware)
 	e.GET("/api/users/reset-password/:resetPasswordId", h.ResetPasswordActivation, h.UserLoggingMiddleware)

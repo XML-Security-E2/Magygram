@@ -574,6 +574,48 @@ func (p postService) GetUsersPostsCount(ctx context.Context, postOwnerId string)
 	return len(userPosts), nil
 }
 
+func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error) {
+	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	post, err := p.PostRepository.GetByID(ctx, postId)
+	if err != nil {
+		return nil, nil, errors.New("invalid post id")
+	}
+
+	retVal, err := p.AuthClient.HasRole(bearer,"visit_private_profiles")
+	if err!=nil{
+		return nil, nil, errors.New("auth service not found")
+	}
+
+	if !retVal {
+		if !p.checkIfUserContentIsAccessible(bearer, post.UserInfo.Id) {
+			return nil, &post.UserInfo, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
+		}
+
+		postIdFavourite, err := p.UserClient.MapPostsToFavourites(bearer, []string{post.Id})
+		if err != nil {
+			return nil, nil, err
+		}
+
+		res, err := model.NewPostResponse(post, hasUserLikedPost(post, userId), hasUserDislikedPost(post, userId), isInFavourites(post, postIdFavourite))
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return res, nil, nil
+	}
+
+	res, err := model.NewPostResponse(post, false, false, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return res, nil, nil
+}
+
 func (p postService) GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse, error) {
 	userId, err := p.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
