@@ -29,10 +29,11 @@ type interactor struct {
 	Db *redis.Client
 	Hub *hub.NotifyHub
 	MHub *hub.MessageHub
+	MNHub *hub.MessageNotificationsHub
 }
 
-func NewInteractor(db *redis.Client, hub *hub.NotifyHub, mhub *hub.MessageHub) Interactor {
-	return &interactor{db, hub, mhub}
+func NewInteractor(db *redis.Client, hub *hub.NotifyHub, mhub *hub.MessageHub, mnhub *hub.MessageNotificationsHub) Interactor {
+	return &interactor{db, hub, mhub, mnhub}
 }
 
 type appHandler struct {
@@ -64,7 +65,7 @@ func (i *interactor) NewConversationService() service_contracts.ConversationServ
 }
 
 func (i *interactor) NewConversationHandler() handler.ConversationHandler {
-	return handler.NewConversationHandler(i.NewConversationService(), i.MHub)
+	return handler.NewConversationHandler(i.NewConversationService(), i.MHub, i.MNHub)
 }
 
 func (i *interactor) NewUserClient() intercomm.UserClient {

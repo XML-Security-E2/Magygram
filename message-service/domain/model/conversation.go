@@ -19,7 +19,7 @@ type Conversation struct {
 type MessageSendResponse struct {
 	IsMessageRequest bool `json:"isMessageRequest"`
 	Conversation *ConversationResponse `json:"conversation"`
-	ConversationRequest *ConversationRequest `json:"conversationRequest"`
+	ConversationRequest *ConversationResponse `json:"conversationRequest"`
 }
 
 type ConversationResponse struct {

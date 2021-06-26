@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Chat from "./Chat";
 import ConversationsSidebar from "./ConversationsSidebar";
 import ChatForm from "./ChatForm";
@@ -8,15 +8,24 @@ import { modalConstants } from "../../constants/ModalConstants";
 import UserChatHeader from "./UserChatHeader";
 import { messageService } from "../../services/MessageService";
 import FrontPageChat from "./FrontPageChat";
+import { messageConstants } from "../../constants/MessageConstants";
 
 const UsersConversations = () => {
 	const { messageState, dispatch } = useContext(MessageContext);
+	const [rrmessages, setRrmessages] = useState([]);
+
+	const wss = useRef(null);
 
 	const openUserSelectModal = () => {
 		dispatch({ type: modalConstants.SHOW_MESSAGE_SELECT_USER_MODAL });
 	};
-
 	useEffect(() => {
+		wss.current = new WebSocket(
+			process.env.REACT_APP_STAGE === "prod" ? "ws://localhost:467/ws/messages/" + localStorage.getItem("userId") : "wss://localhost:467/ws/messages/" + localStorage.getItem("userId")
+		);
+		wss.current.onopen = () => console.log("ws je ovdeeeeee opened");
+		wss.current.onclose = () => console.log("ws closed");
+
 		const getUserConversations = async () => {
 			await messageService.getUserConversations(dispatch);
 		};
@@ -26,6 +35,20 @@ const UsersConversations = () => {
 		getUserConversations();
 		getUserConversationRequests();
 	}, []);
+
+	useEffect(() => {
+		if (!wss.current) return;
+
+		wss.current.onmessage = (evt) => {
+			console.log("LALLALLALAL");
+			console.log(evt.data);
+			let a = [...rrmessages];
+			a.push(evt.data);
+
+			setRrmessages(a);
+			dispatch({ type: messageConstants.SET_MESSAGE_FOR_NOTIFICATION, response: JSON.parse(evt.data) });
+		};
+	}, [rrmessages]);
 
 	return (
 		<React.Fragment>

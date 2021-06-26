@@ -1,10 +1,12 @@
 package hub
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/beevik/guid"
 	"github.com/gorilla/websocket"
 	"log"
+	"message-service/domain/model"
 	"net/http"
 	"time"
 )
@@ -32,7 +34,9 @@ type MessageClient struct {
 	// The websocket connection.
 	conn *websocket.Conn
 	// Buffered channel of outbound messages.
-	Send chan *Message
+	Send chan *model.MessageSendResponse
+
+	SendNotification chan *Notification
 
 	Id string
 }
@@ -50,25 +54,16 @@ func (c *MessageClient) readPump() {
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		message := Message{}
+		message := model.MessageSendResponse{}
 		err := c.conn.ReadJSON(&message)
 
-		fmt.Println("Message ", message.Text)
-		fmt.Println("Receiver ", message.Receiver)
 
-		//		err := conn.ReadJSON(&mm)
-		//
-		//		if err != nil {
-		//			fmt.Println("Error reading json.", err)
-		//		}
-		//_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-		//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 		c.hub.Broadcast <- &message
 	}
 }
@@ -92,21 +87,28 @@ func (c *MessageClient) writePump() {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
-			w.Write([]byte(message.Text))
-			fmt.Println("Write text ", message.Text)
+
+			messageBytes, err := json.Marshal(message)
+			if err != nil {
+				return
+			}
+
+			w.Write(messageBytes)
 			// Add queued chat messages to the current websocket message.
 			n := len(c.Send)
 			for i := 0; i < n; i++ {
 				w.Write(newline)
-				w.Write([]byte((<-c.Send).Text))
+				w.Write(messageBytes)
 			}
 			if err := w.Close(); err != nil {
 				return
 			}
+
 		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
@@ -115,17 +117,16 @@ func (c *MessageClient) writePump() {
 		}
 	}
 }
+
 // serveWs handles websocket requests from the peer.
-func ServeWs(hub *MessageHub, w http.ResponseWriter, r *http.Request) {
+func ServeMessageWs(hub *MessageHub, w http.ResponseWriter, r *http.Request, userId string) {
 	conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
 	if err != nil {
-		fmt.Println("odje")
-		log.Println(err)
 		return
 	}
 	id := guid.New().String()
 	fmt.Println("Id ", id)
-	client := &MessageClient{hub: hub, conn: conn, Send: make(chan *Message), Id: id}
+	client := &MessageClient{hub: hub, conn: conn, Send: make(chan *model.MessageSendResponse), SendNotification: make(chan *Notification), Id: userId}
 	client.hub.Register <- client
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

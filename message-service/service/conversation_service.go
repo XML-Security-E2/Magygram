@@ -157,7 +157,12 @@ func (c conversationService) SendMessage(ctx context.Context, bearer string, mes
 					return nil, err
 				}
 				return &model.MessageSendResponse{
-					ConversationRequest: request,
+					ConversationRequest:  &model.ConversationResponse{
+						Id:                request.Id,
+						Participant:       request.RequestFrom,
+						LastMessage:       *message,
+						LastMessageUserId: loggedId,
+					},
 					Conversation:   nil,
 					IsMessageRequest: true,
 				}, nil
@@ -350,14 +355,49 @@ func (c conversationService) GetAllMessagesFromUser(ctx context.Context, bearer 
 	}, nil
 }
 
-func (c conversationService) ViewUsersMessages(ctx context.Context, bearer string, conversationId string) error {
+func (c conversationService) GetAllNotViewedConversationsForUser(ctx context.Context, userId string) ([]*model.ConversationResponse, error) {
+
+	var convResp []*model.ConversationResponse
+	conversations, err := c.ConversationRepository.GetAllForUser(ctx, userId, limitConv)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, conversation := range conversations {
+		if conversation.LastMessageUserId == userId {
+			continue
+		} else {
+			if conversation.LastMessage.Viewed == false {
+				if userId == conversation.ParticipantOne.Id {
+					convResp = append(convResp, &model.ConversationResponse{
+						Id:                conversation.Id,
+						Participant:       conversation.ParticipantTwo,
+						LastMessage:       conversation.LastMessage,
+						LastMessageUserId: conversation.LastMessage.MessageFromId,
+					})
+				} else {
+					convResp = append(convResp, &model.ConversationResponse{
+						Id:                conversation.Id,
+						Participant:       conversation.ParticipantOne,
+						LastMessage:       conversation.LastMessage,
+						LastMessageUserId: conversation.LastMessage.MessageFromId,
+					})
+				}
+			}
+		}
+	}
+
+	return convResp, nil
+}
+
+func (c conversationService) ViewUsersMessages(ctx context.Context, bearer string, conversationId string) (string ,error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 
-	return c.ConversationRepository.ViewUsersMessages(ctx, loggedId, conversationId)
+	return loggedId, c.ConversationRepository.ViewUsersMessages(ctx, loggedId, conversationId)
 }
 
 func (c conversationService) ViewUserMediaMessages(ctx context.Context, bearer string, conversationId string, messageId string) error {

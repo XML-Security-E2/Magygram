@@ -12,7 +12,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/notifications/view", h.ViewNotifications)
 
 	e.Any("/ws/notify/:userId", h.HandleNotifyWs)
-	e.Any("/ws/messages/:userId", h.HandleNotifyWs)
+	e.Any("/ws/notify/messages/:userId", h.HandleNotifyMessagesWs)
+	e.Any("/ws/messages/:userId", h.HandleMessagesWs)
 
 	e.POST("/api/messages", h.SendMessage)
 	e.GET("/api/messages/:userId", h.GetAllMessagesFromUser)

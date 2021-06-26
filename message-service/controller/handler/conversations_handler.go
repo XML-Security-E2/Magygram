@@ -21,16 +21,19 @@ type ConversationHandler interface {
 	AcceptConversationRequest(c echo.Context) error
 	DenyConversationRequest(c echo.Context) error
 	DeleteConversationRequest(c echo.Context) error
-
+	HandleNotifyMessagesWs(c echo.Context) error
+	HandleMessagesWs(c echo.Context) error
 }
 
 type conversationHandler struct {
 	ConversationService service_contracts.ConversationService
 	Hub *hub.MessageHub
+	NotifyHub *hub.MessageNotificationsHub
+
 }
 
-func NewConversationHandler(p service_contracts.ConversationService, h *hub.MessageHub) ConversationHandler {
-	return &conversationHandler{p, h}
+func NewConversationHandler(p service_contracts.ConversationService, h *hub.MessageHub, nh *hub.MessageNotificationsHub) ConversationHandler {
+	return &conversationHandler{p, h, nh}
 }
 
 func (ch conversationHandler) ViewMediaMessages(c echo.Context) error {
@@ -61,9 +64,16 @@ func (ch conversationHandler) ViewMessages(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 
-	err := ch.ConversationService.ViewUsersMessages(ctx, bearer, conversationId)
+	userId, err := ch.ConversationService.ViewUsersMessages(ctx, bearer, conversationId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	notifications, _ := ch.ConversationService.GetAllNotViewedConversationsForUser(ctx, userId)
+
+	ch.NotifyHub.Notify <- &hub.Notification{
+		Count:    len(notifications),
+		Receiver: userId,
 	}
 
 	return c.JSON(http.StatusOK, "")
@@ -96,6 +106,15 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+
+	notifications, _ := ch.ConversationService.GetAllNotViewedConversationsForUser(ctx, messageTo)
+
+	ch.NotifyHub.Notify <- &hub.Notification{
+		Count:    len(notifications),
+		Receiver: messageTo,
+	}
+
+	ch.Hub.Broadcast <-message
 
 	return c.JSON(http.StatusCreated, message)
 }
@@ -235,4 +254,35 @@ func (ch conversationHandler) DeleteConversationRequest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (ch conversationHandler) HandleNotifyMessagesWs(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	notifications, _ := ch.ConversationService.GetAllNotViewedConversationsForUser(ctx, userId)
+	a := 0
+	if notifications != nil {
+		a = len(notifications)
+	}
+	hub.ServeMessageNotificationWs(ch.NotifyHub, c.Response().Writer, c.Request(), userId, a)
+
+	return nil
+}
+
+func (ch conversationHandler) HandleMessagesWs(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	hub.ServeMessageWs(ch.Hub, c.Response().Writer, c.Request(), userId)
+
+	return nil
 }

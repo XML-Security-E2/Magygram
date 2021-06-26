@@ -110,6 +110,12 @@ export const notificationReducer = (state, action) => {
 				...state,
 				notificationsNumber: action.count,
 			};
+
+		case notificationConstants.MESSAGE_NOTIFICATION_RECEIVED:
+			return {
+				...state,
+				messageNotificationsNumber: action.count,
+			};
 		default:
 			return state;
 	}

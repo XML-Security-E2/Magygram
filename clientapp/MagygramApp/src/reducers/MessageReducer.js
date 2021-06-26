@@ -55,6 +55,7 @@ export const messageReducer = (state, action) => {
 
 		case messageConstants.SET_USER_MESSAGES_SUCCESS:
 			stateCpy = { ...state };
+			stateCpy.conversationWithId = action.userId;
 			stateCpy.selectUserModal.showModal = false;
 			stateCpy.selectUserModal.selectedUser = action.messages.userInfo;
 			stateCpy.showedMessages = action.messages.messages;
@@ -97,6 +98,7 @@ export const messageReducer = (state, action) => {
 
 		case messageConstants.SET_USER_REQUEST_MESSAGES_SUCCESS:
 			stateCpy = { ...state };
+			stateCpy.conversationWithId = action.userId;
 			stateCpy.selectUserModal.showModal = false;
 			stateCpy.selectUserModal.selectedUser = action.messages.userInfo;
 			stateCpy.showedMessages = action.messages.messages;
@@ -385,6 +387,7 @@ export const messageReducer = (state, action) => {
 			if (stateCpy.conversationRequests.length === 0) {
 				stateCpy.loadedConversationRequests = false;
 				stateCpy.showedConversations = true;
+				stateCpy.conversationWithId = "";
 			}
 			console.log(stateCpy);
 			return stateCpy;
@@ -412,6 +415,7 @@ export const messageReducer = (state, action) => {
 			if (stateCpy.conversationRequests.length === 0) {
 				stateCpy.loadedConversationRequests = false;
 				stateCpy.showedConversations = true;
+				stateCpy.conversationWithId = "";
 			}
 			return stateCpy;
 
@@ -438,11 +442,50 @@ export const messageReducer = (state, action) => {
 			if (stateCpy.conversationRequests.length === 0) {
 				stateCpy.loadedConversationRequests = false;
 				stateCpy.showedConversations = true;
+				stateCpy.conversationWithId = "";
 			}
 			return stateCpy;
 
 		case messageConstants.DELETE_MESSAGE_REQUEST_FAILURE:
 			return state;
+
+		case messageConstants.SET_MESSAGE_FOR_NOTIFICATION:
+			stateCpy = { ...state };
+
+			if (!action.response.isMessageRequest) {
+				if (stateCpy.conversations.find((conversation) => conversation.id === action.response.conversation.id) === undefined) {
+					stateCpy.conversations.unshift(action.response.conversation);
+				} else {
+					let convCpy = stateCpy.conversations.find((conversation) => conversation.id === action.response.conversation.id);
+					convCpy.lastMessage = action.response.conversation.lastMessage;
+					convCpy.lastMessageUserId = action.response.conversation.lastMessageUserId;
+				}
+			} else {
+				if (action.response.conversationRequest.lastMessage.messageFromId !== getUserInfo().Id) {
+					if (stateCpy.conversationRequests.find((request) => request.id === action.response.conversationRequest.id) === undefined) {
+						stateCpy.conversationRequests.unshift(action.response.conversationRequest);
+					} else {
+						let convCpy = stateCpy.conversationRequests.find((conversation) => conversation.id === action.response.conversationRequest.id);
+						convCpy.lastMessage = action.response.conversationRequest.lastMessage;
+						convCpy.lastMessageUserId = action.response.conversationRequest.lastMessageUserId;
+					}
+				}
+			}
+			stateCpy.sendStoryModal.showModal = false;
+			stateCpy.sendPostModal.showModal = false;
+
+			if (!action.response.isMessageRequest) {
+				if (state.conversationWithId === action.response.conversation.lastMessage.messageFromId) {
+					stateCpy.showedMessages.push(action.response.conversation.lastMessage);
+				}
+			} else {
+				if (state.conversationWithId === action.response.conversationRequest.lastMessage.messageFromId) {
+					stateCpy.showedMessages.push(action.response.conversationRequest.lastMessage);
+				}
+			}
+
+			console.log(stateCpy);
+			return stateCpy;
 		default:
 			return state;
 	}

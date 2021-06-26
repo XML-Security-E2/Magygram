@@ -10,6 +10,8 @@ const NotificationContextProvider = (props) => {
 		},
 		notifications: [],
 		notificationsNumber: 0,
+		messageNotificationsNumber: 0,
+
 		notificationSettingsModal: {
 			showModal: false,
 			showSuccessMessage: false,

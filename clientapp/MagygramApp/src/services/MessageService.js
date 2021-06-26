@@ -314,7 +314,7 @@ async function getMessagesFromUser(userId, dispatch) {
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
-				dispatch(success(res.data));
+				dispatch(success(res.data, userId));
 			} else {
 				dispatch(failure("Sorry, we have some internal problem."));
 			}
@@ -324,8 +324,8 @@ async function getMessagesFromUser(userId, dispatch) {
 	function request() {
 		return { type: messageConstants.SET_USER_MESSAGES_REQUEST };
 	}
-	function success(messages) {
-		return { type: messageConstants.SET_USER_MESSAGES_SUCCESS, messages };
+	function success(messages, userId) {
+		return { type: messageConstants.SET_USER_MESSAGES_SUCCESS, messages, userId };
 	}
 	function failure(error) {
 		return { type: messageConstants.SET_USER_MESSAGES_FAILURE, errorMessage: error };
@@ -339,7 +339,7 @@ async function getUserConversationRequestMessages(userId, dispatch) {
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
-				dispatch(success(res.data));
+				dispatch(success(res.data, userId));
 			} else {
 				dispatch(failure("Sorry, we have some internal problem."));
 			}
@@ -349,8 +349,8 @@ async function getUserConversationRequestMessages(userId, dispatch) {
 	function request() {
 		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_REQUEST };
 	}
-	function success(messages) {
-		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_SUCCESS, messages };
+	function success(messages, userId) {
+		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_SUCCESS, messages, userId };
 	}
 	function failure(error) {
 		return { type: messageConstants.SET_USER_REQUEST_MESSAGES_FAILURE, errorMessage: error };
