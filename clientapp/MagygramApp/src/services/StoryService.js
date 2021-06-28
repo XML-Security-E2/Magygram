@@ -237,12 +237,12 @@ function fetchFormData(storyDTO) {
 	return formData;
 }
 
-function findStoryById(storyId, dispatch) {
+function findStoryById(storyId,userId, dispatch) {
 	 Axios.get(`/api/story/${storyId}/getForAdmin`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data)
 			if (res.status === 200) {
-				dispatch(success(res.data));
+				dispatch(success(res.data,1));
 			} else {
 				//failure()
 			}
@@ -251,9 +251,9 @@ function findStoryById(storyId, dispatch) {
 			//failure()
 		});
 
-	function success(data) {
-		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL, stories: data, };
-	}
+		function success(data, visited) {
+			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN, stories: data, visited,userId };
+		}
 }
 
 function GetStoriesForUser(userId, visited, dispatch) {

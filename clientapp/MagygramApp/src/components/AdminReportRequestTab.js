@@ -10,6 +10,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import FailureAlert from "./FailureAlert";
 import SuccessAlert from "./SuccessAlert";
 import ViewPostModal from "./modals/ViewPostModal";
+import StorySliderForAdmin from "./modals/StorySliderForAdmin";
 import Axios from "axios";
 import { authHeader } from "../helpers/auth-header";
 import ReportedPost from "./ReportedPost";
@@ -101,7 +102,7 @@ const AdminReportRequestTab = () => {
 											<a hidden={(request.ContentType === "POST") || (request.ContentType === "STORY")} onClick={() => handleVisitProfile(request.ContentId)} class="link-primary">Visit profile</a>
 										</div>
                                         <div  hidden={(request.ContentType === "USER") || (request.ContentType === "POST")}>
-                                            <ReportedStory  storyId={request.ContentId}/>
+                                            <ReportedStory  storyId={request.ContentId} userId={request.UserWhoReportedId}/>
                                         </div>
                                         <div hidden={(request.ContentType === "USER") || (request.ContentType === "STORY")} >
                                             <ReportedPost  id={request.ContentId}/>
@@ -116,6 +117,7 @@ const AdminReportRequestTab = () => {
 								</tr>
 							)}		
                             
+                			<StorySliderForAdmin/>	
                 			<ViewPostModal/>					
 						</tbody>
 					</table> : 

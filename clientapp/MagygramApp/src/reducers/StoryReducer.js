@@ -111,6 +111,26 @@ export const storyReducer = (state, action) => {
 					userId: action.userId,
 				},
 			};
+			case modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN:
+				return {
+					...state,
+					storySliderModal: {
+						showModal: true,
+						stories: createStoriesAdmin(action.stories),
+						firstUnvisitedStory: action.stories.FirstUnvisitedStory,
+						visited: action.visited,
+						userId: action.userId,
+					},
+				};
+			case modalConstants.HIDE_STORY_SLIDER_MODAL_ADMIN:
+				return {
+					...state,
+					storySliderModal: {
+						showModal: false,
+						stories: action.stories,
+						firstUnvisitedStory: 0,
+					},
+				};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
 			return {
 				...state,
@@ -276,6 +296,22 @@ function createStories(stories) {
 			header: {
 				heading: stories.UserInfo.Username,
 				profileImage: stories.UserInfo.ImageURL,
+				storyId: media.StoryId,
+			},
+			type: media.MediaType === "VIDEO" ? "video" : "image",
+			tags: media.Tags,
+		});
+	});
+
+	return retVal;
+}
+function createStoriesAdmin(stories) {
+	var retVal = [];
+
+	stories.Media.forEach((media) => {
+		retVal.push({
+			url: media.Url,
+			header: {
 				storyId: media.StoryId,
 			},
 			type: media.MediaType === "VIDEO" ? "video" : "image",

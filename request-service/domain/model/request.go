@@ -31,6 +31,7 @@ type ReportRequestResponseDTO struct {
 	Id string
 	ContentId string
 	ContentType ContentType
+	UserWhoReportedId string
 }
 
 type ReportRequest struct {

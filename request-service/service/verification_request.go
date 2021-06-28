@@ -106,6 +106,7 @@ func mapReportRequestToReportRequestDTO(requests []*model.ReportRequest) []*mode
 		var result = model.ReportRequestResponseDTO{ Id: request.Id,
 			ContentId:      request.ContentId,
 			ContentType:   request.ContentType,
+			UserWhoReportedId: request.UserWhoReportedId,
 		}
 		retVal = append(retVal, &result)
 	}
