@@ -15,4 +15,7 @@ type VerificationRequestService interface {
 	DeleteReportRequest(ctx context.Context, requestId string) error
 	RejectVerificationRequest(ctx context.Context, requestId string) error
 	HasUserPendingRequest(ctx context.Context, bearer string) (bool, error)
+	CreateCampaignRequest(ctx context.Context, bearer string,  report *model.CampaignRequestDTO)  (string, error)
+	DeleteCampaignRequest(ctx context.Context, requestId string) error
+	GetCampaignRequests(ctx context.Context) ([]*model.CampaignRequestResponseDTO, error)
 }

@@ -12,6 +12,7 @@ import (
 
 type Interactor interface {
 	NewVerificationRequestRepository() repository.VerificationRequestsRepository
+	NewCampaignRequestsRepository() repository.CampaignRequestsRepository
 	NewVerificationRequestService() service_contracts.VerificationRequestService
 	NewAgentRegistrationRequestService() service_contracts.AgentRegistrationRequestService
 	NewVerificationRequestHandler() handler.VerificationRequestHandler
@@ -27,11 +28,12 @@ type interactor struct {
 	VerificationRequestCol *mongo.Collection
 	ReportRequestCol *mongo.Collection
 	AgentRegistrationRequestCol *mongo.Collection
+	CampaignContentCol *mongo.Collection
 }
 
 
-func NewInteractor(VerificationRequestCol *mongo.Collection, ReportRequestCol *mongo.Collection, AgentRegistrationRequestCol *mongo.Collection) Interactor {
-	return &interactor{VerificationRequestCol, ReportRequestCol, AgentRegistrationRequestCol}
+func NewInteractor(VerificationRequestCol *mongo.Collection, ReportRequestCol *mongo.Collection, AgentRegistrationRequestCol *mongo.Collection,CampaignContentCol *mongo.Collection) Interactor {
+	return &interactor{VerificationRequestCol, ReportRequestCol, AgentRegistrationRequestCol,CampaignContentCol}
 }
 
 type appHandler struct {
@@ -61,6 +63,9 @@ func (i interactor) NewAppHandler() handler.AppHandler {
 func (i interactor) NewVerificationRequestRepository() repository.VerificationRequestsRepository {
 	return mongodb.NewVerificatioRequestsRepository(i.VerificationRequestCol)
 }
+func (i interactor) NewCampaignRequestsRepository() repository.CampaignRequestsRepository {
+	return mongodb.NewCampaignRequestsRepository(i.CampaignContentCol)
+}
 
 func (i interactor) NewReportRequestRepository() repository.ReportRequestsRepository {
 	return mongodb.NewReportRequestsRepository(i.ReportRequestCol)
@@ -71,7 +76,7 @@ func (i interactor) NewAgentRegistrationRequestRepository() repository.AgentRegi
 }
 
 func (i interactor) NewVerificationRequestService() service_contracts.VerificationRequestService {
-	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewMediaClient(),i.NewAuthClient(),i.NewUserClient())
+	return service.NewVerificationServiceService(i.NewVerificationRequestRepository(),i.NewReportRequestRepository(),i.NewCampaignRequestsRepository(),i.NewMediaClient(),i.NewAuthClient(),i.NewUserClient())
 }
 
 func (i *interactor) NewAgentRegistrationRequestService() service_contracts.AgentRegistrationRequestService {

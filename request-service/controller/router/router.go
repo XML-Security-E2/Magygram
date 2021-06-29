@@ -8,9 +8,12 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/requests/verification", h.CreateVerificationRequest)
 	e.POST("/api/report", h.CreateReportRequest)
+	e.POST("/api/requests/campaign", h.CreateCampaignRequest)
 	e.GET("/api/report", h.GetReportRequests)
+	e.GET("/api/requests/campaign", h.GetCampaignRequests)
 	e.GET("/api/requests/verification", h.GetVerificationRequests)
 	e.PUT("/api/report/:requestId/delete", h.DeleteReportRequest)
+	e.PUT("/api/requests/campaign/:requestId/delete", h.DeleteCampaignRequest)
 	e.PUT("/api/requests/verification/:requestId/approve", h.ApproveVerificationRequest)
 	e.PUT("/api/requests/verification/:requestId/reject", h.RejectVerificationRequest)
 	e.GET("/api/requests/verification/has-pending-request", h.HasUserPendingRequest)
