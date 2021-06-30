@@ -30,6 +30,13 @@ const AdminContextProvider = (props) => {
 			errorMessage: "",
 			showSuccessMessage: false,
 			successMessage: "",
+        },
+        registerNewAgent:{
+            showModal:false,
+            showError:false,
+            errorMessage:"",
+            showSuccessMessage: false,
+			successMessage: "",
         }
 	});
 

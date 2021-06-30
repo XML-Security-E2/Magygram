@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"regexp"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	service_contracts "user-service/domain/service-contracts"
@@ -486,6 +488,53 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	}
 	return resp, err
 }
+
+func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error) {
+	agentRegistrationDTO := model.AgentRegistrationDTO{
+		Name: agentRequest.Name,
+		Surname: agentRequest.Surname,
+		Email: agentRequest.Email,
+		Website: agentRequest.WebSite,
+		Username: agentRequest.Username,
+		Password: "",
+	}
+
+	user, _ := model.NewAgent(&agentRegistrationDTO)
+	if err := validator.New().Struct(user); err != nil {
+		return "", err
+	}
+
+	result, err := u.UserRepository.Create(ctx, user)
+	if err != nil {
+		return "", err
+	}
+
+	hashAndSalt, err := HashAndSaltPasswordIfStrongAndMatching(agentRequest.Password, agentRequest.RepeatedPassword)
+	if err != nil {
+		return "", err
+	}
+
+	err = u.AuthClient.RegisterAgent(user, hashAndSalt)
+	if err != nil {
+		return "", err
+	}
+
+	err = u.RelationshipClient.CreateUser(user)
+	if err != nil {
+		return "", err
+	}
+
+	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
+
+	go SendActivationMail(agentRequest.Email, agentRequest.Name, accActivationId)
+
+	if userId, ok := result.InsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User registered")
+		return userId, nil
+	}
+	return user.Id, err
+}
+
 
 func (u *userService) ActivateUser(ctx context.Context, activationId string) (bool, error) {
 
@@ -1319,3 +1368,22 @@ func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *m
 
 	return user.Id, err
 }
+
+func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword string) (string, error) {
+	isMatching := password == repeatedPassword
+	if !isMatching {
+		return "", errors.New("passwords are not matching")
+	}
+	isWeak, _ := regexp.MatchString("^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[^!@#$%^&*(),.?\":{}|<>~'_+=]*)$", password)
+
+	if isWeak {
+		return "", errors.New("password must contain minimum eight characters, at least one capital letter, one number and one special character")
+	}
+	pwd := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash), err
+}
+

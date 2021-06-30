@@ -164,6 +164,16 @@ type UserRequest struct {
 	RepeatedPassword string `json:"repeatedPassword"`
 }
 
+type AgentRequest struct {
+	Name             string `json:"name"`
+	Surname          string `json:"surname"`
+	Username         string `json:"username"`
+	Email            string `json:"email"`
+	Password         string `json:"password"`
+	RepeatedPassword string `json:"repeatedPassword"`
+	WebSite            string `json:"webSite"`
+}
+
 type EditUserRequest struct {
 	Name     string `json:"name"`
 	Surname  string `json:"surname"`
@@ -342,3 +352,4 @@ type AgentRegistrationDTO struct {
 	Website	string
 	Password string
 }
+

@@ -306,3 +306,6 @@ time="2021-06-26T15:47:58+02:00" level=info msg="Server started" func=main.main 
 >>>>>>> develop
 time="2021-06-28T22:40:23+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463
 time="2021-06-28T23:54:44+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
+time="2021-06-30T13:28:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-06-30T13:32:05+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:140" request_ip="::1" user_id=af982f53-908f-4772-995e-dc097719ec23
+time="2021-06-30T13:34:54+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:140" request_ip="::1" user_id=ca803351-a595-4a6d-be36-78e326198124
