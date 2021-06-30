@@ -495,6 +495,7 @@ time="2021-06-28T22:40:30+02:00" level=info msg="Server started" func=main.main 
 time="2021-06-28T22:48:49+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=jelenaksipypetkovic@gmail.com
 time="2021-06-28T22:51:55+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=admin1@admin.com
 time="2021-06-28T23:54:55+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=admin1@admin.com
+<<<<<<< HEAD
 time="2021-06-29T18:20:41+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:127" host=localhost port=461
 time="2021-06-29T18:33:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:127" host=localhost port=461
 time="2021-06-29T18:34:15+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=admin1@admin.com
@@ -508,3 +509,7 @@ time="2021-06-30T13:34:54+02:00" level=info msg="User registered" func=auth-serv
 time="2021-06-30T13:36:01+02:00" level=info msg="User activated" func=auth-service/service.userService.ActivateUser file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/service/user_service.go:86" request_ip="::1" user_id=ca803351-a595-4a6d-be36-78e326198124
 time="2021-06-30T13:36:10+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=nikolakolovic7@gmail.com
 time="2021-06-30T13:36:18+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=nikolakolovic7@gmail.com
+=======
+time="2021-06-29T17:57:38+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/main.go:127" host=localhost port=461
+time="2021-06-29T18:06:02+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=22jel3001@gmail.com
+>>>>>>> develop

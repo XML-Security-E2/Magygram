@@ -17,11 +17,12 @@ type verificationService struct {
 	intercomm.MediaClient
 	intercomm.AuthClient
 	repository.ReportRequestsRepository
+	repository.CampaignRequestsRepository
 	intercomm.UserClient
 }
 
-func NewVerificationServiceService(vr repository.VerificationRequestsRepository,r repository.ReportRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.VerificationRequestService {
-	return &verificationService{vr,mc, ac,r ,uc}
+func NewVerificationServiceService(vr repository.VerificationRequestsRepository,r repository.ReportRequestsRepository, cr repository.CampaignRequestsRepository, mc intercomm.MediaClient, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.VerificationRequestService {
+	return &verificationService{vr,mc, ac,r ,cr,uc}
 }
 
 func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequsetDTO model.VerificationRequestDTO, bearer string, documentImage []*multipart.FileHeader) (string, error) {
@@ -53,6 +54,24 @@ func (v verificationService) CreateVerificationRequest(ctx context.Context, veri
 
 	return "",err
 }
+func (v verificationService) CreateCampaignRequest(ctx context.Context, bearer string,  campaignRequestDTO *model.CampaignRequestDTO)  (string, error) {
+
+	campaignRequest, err := model.NewCampaignRequest(campaignRequestDTO)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := v.CampaignRequestsRepository.CreateRequest(ctx, campaignRequest)
+	if err != nil {
+		return "", err
+	}
+	if requestId, ok := result.InsertedID.(string); ok {
+		return requestId, nil
+	}
+
+	return "",err
+}
+
 
 func (v verificationService) CreateReportRequest(ctx context.Context, bearer string, reportRequestDTO *model.ReportRequestDTO) (string, error) {
 	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
@@ -85,6 +104,34 @@ func (v verificationService) CreateReportRequest(ctx context.Context, bearer str
 
 	return "",err
 }
+func (v verificationService) GetCampaignRequests(ctx context.Context) ([]*model.CampaignRequestResponseDTO, error) {
+	var campaignRequest []*model.CampaignRequest
+
+	campaignRequest, err := v.CampaignRequestsRepository.GetAllRequests(ctx)
+	if err != nil {
+		return []*model.CampaignRequestResponseDTO{}, err
+	}
+
+	retVal := mapCampaignRequestToCampaignRequestDTO(campaignRequest)
+
+	return retVal, nil
+}
+
+func mapCampaignRequestToCampaignRequestDTO(requests []*model.CampaignRequest) []*model.CampaignRequestResponseDTO {
+	var retVal []*model.CampaignRequestResponseDTO
+
+	for _, request := range requests{
+		var result = model.CampaignRequestResponseDTO{ Id: request.Id,
+			ContentId:      request.ContentId,
+			Influencer:   request.Influencer,
+			Status: request.Status,
+		}
+		retVal = append(retVal, &result)
+	}
+
+	return retVal
+}
+
 
 func (v verificationService) GetReportRequests(ctx context.Context) ([]*model.ReportRequestResponseDTO, error) {
 	var reportRequest []*model.ReportRequest
@@ -186,6 +233,18 @@ func (v verificationService) RejectVerificationRequest(ctx context.Context, requ
 
 	//TODO: pozvati userClient da verifikuje u userServicu i eventualno poslati mail useru
 	v.VerificationRequestsRepository.UpdateVerificationRequest(ctx,request)
+
+	return nil
+}
+func (v verificationService) DeleteCampaignRequest(ctx context.Context, requestId string) error {
+	request, err := v.CampaignRequestsRepository.GetRequestById(ctx, requestId)
+	if err!=nil {
+		return errors.New("Request not found")
+	}
+
+	request.IsDeleted=true
+
+	v.CampaignRequestsRepository.CreateRequest(ctx,request)
 
 	return nil
 }

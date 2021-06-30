@@ -18,6 +18,9 @@ type VerificationRequestHandler interface {
 	HasUserPendingRequest(c echo.Context) error
 	GetReportRequests(c echo.Context) error
 	DeleteReportRequest(c echo.Context) error
+	GetCampaignRequests(c echo.Context) error
+	DeleteCampaignRequest(c echo.Context) error
+	CreateCampaignRequest(c echo.Context) error
 }
 
 type verificationRequestHandler struct {
@@ -51,6 +54,27 @@ func (v verificationRequestHandler) CreateVerificationRequest(c echo.Context) er
 	bearer := c.Request().Header.Get("Authorization")
 
 	request, err := v.VerificationRequestService.CreateVerificationRequest(ctx, verificationRequestDTO, bearer ,headers)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, request)
+}
+
+func (v verificationRequestHandler) CreateCampaignRequest(c echo.Context) error {
+	campaignRequest := &model.CampaignRequestDTO{}
+	if err := c.Bind(campaignRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	request, err := v.VerificationRequestService.CreateCampaignRequest(ctx, bearer, campaignRequest)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -94,6 +118,20 @@ func (v verificationRequestHandler) GetVerificationRequests(c echo.Context) erro
 	return c.JSON(http.StatusOK, retVal)
 }
 
+func (v verificationRequestHandler) GetCampaignRequests(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := v.VerificationRequestService.GetCampaignRequests(ctx)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, retVal)
+}
+
 func (v verificationRequestHandler) GetReportRequests(c echo.Context) error {
 	ctx := c.Request().Context()
 	if ctx == nil {
@@ -106,6 +144,22 @@ func (v verificationRequestHandler) GetReportRequests(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, retVal)
+}
+
+func (v verificationRequestHandler) DeleteCampaignRequest(c echo.Context) error {
+	postId := c.Param("requestId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := v.VerificationRequestService.DeleteCampaignRequest(ctx, postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
 
 func (v verificationRequestHandler) DeleteReportRequest(c echo.Context) error {

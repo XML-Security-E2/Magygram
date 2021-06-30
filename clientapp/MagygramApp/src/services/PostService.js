@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { postConstants } from "../constants/PostConstants";
 import { authHeader } from "../helpers/auth-header";
+import { modalConstants } from "../constants/ModalConstants";
 
 export const postService = {
 	findPostsForTimeline,
@@ -28,7 +29,37 @@ export const postService = {
 	findAllDislikedPosts,
 	reportPost,
 	findPostByIdForPage,
+	sendCampaign,
 };
+
+
+function sendCampaign(requestDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/requests/campaign`, requestDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Campaigne sent successfully"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.REPORT_POST_REQUEST };
+	}
+	function success(message) {
+		return { type: modalConstants.HIDE_SEARCH_INFLUENCER_MODAL, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.REPORT_POST_FAILURE, errorMessage: message };
+	}
+}
 
 function reportPost(reportDTO, dispatch) {
 	dispatch(request());

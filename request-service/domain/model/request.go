@@ -34,12 +34,27 @@ type ReportRequestResponseDTO struct {
 	UserWhoReportedId string
 }
 
+type CampaignRequestResponseDTO struct {
+	Id string
+	ContentId string
+	Influencer string
+	Status RequestStatus
+}
+
 type ReportRequest struct {
 	Id string `bson:"_id,omitempty"`
 	ReportReasons []string `json:"report_reasons"`
 	UserWhoReportedId string `bson:"user_who_reported_id"`
 	ContentId string `bson:"content_id"`
 	ContentType ContentType `bson:"content_type"`
+	IsDeleted bool `bson:"deleted"`
+}
+
+type CampaignRequest struct {
+	Id string `bson:"_id,omitempty"`
+	Influencer string `bson:"username"`
+	ContentId string `bson:"content_id"`
+	Status RequestStatus `bson:"request_status"`
 	IsDeleted bool `bson:"deleted"`
 }
 
@@ -140,6 +155,22 @@ func NewReportRequest(reportRequest *ReportRequestDTO, whoReported string) (*Rep
 		ContentType:    reportRequest.ContentType,
 		UserWhoReportedId: whoReported,
 		ReportReasons: reportRequest.ReportReasons,
+		IsDeleted: false,
+	}, nil
+}
+
+
+type CampaignRequestDTO struct {
+	ContentId string `json:"contentId"`
+	Influencer string `json:"username"`
+	Status RequestStatus `json:"status"`
+}
+
+func NewCampaignRequest(campaignRequest *CampaignRequestDTO) (*CampaignRequest, error) {
+	return &CampaignRequest{Id: guid.New().String(),
+		ContentId:   campaignRequest.ContentId,
+		Influencer:    campaignRequest.Influencer,
+		Status: campaignRequest.Status,
 		IsDeleted: false,
 	}, nil
 }

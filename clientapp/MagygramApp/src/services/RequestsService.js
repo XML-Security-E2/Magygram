@@ -16,6 +16,8 @@ export const requestsService = {
 	rejectAgentRegistrationRequest,
 };
 
+
+
 function createVerificationRequest(formData,dispatch){
     dispatch(request());
 

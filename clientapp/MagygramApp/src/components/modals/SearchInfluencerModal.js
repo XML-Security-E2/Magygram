@@ -6,6 +6,7 @@ import Axios from "axios";
 import { authHeader } from "../../helpers/auth-header";
 import { hasRoles } from "../../helpers/auth-header";
 import { searchService } from "../../services/SearchService";
+import { postService } from "../../services/PostService";
 import AsyncSelect from "react-select/async";
 
 const SearchInfluencerModal = () => {
@@ -22,6 +23,7 @@ const SearchInfluencerModal = () => {
 	const [tags, setTags] = useState([]);
 	const [tagInput, setTagInput] = useState("");
 	const [search, setSearch] = useState("");
+	const [usernameSearch, setUsername] = useState("");
 
 	const loadOptions = (value, callback) => {
 		setTimeout(() => {
@@ -30,6 +32,7 @@ const SearchInfluencerModal = () => {
 	};
 
 	const onInputChange = (inputValue, { action }) => {
+		
 		switch (action) {
 			case "set-value":
 				return;
@@ -46,10 +49,20 @@ const SearchInfluencerModal = () => {
 
 	const onChange = (option) => {
 		setTags(option);
+		setUsername(option.value)
 		return false;
 	};
-	const handleSearch = () => {
+	const handleSend = () => {
 		
+		let username = search
+		console.log(search)
+		let requestDTO = {
+			contentId: postState.viewPostModal.post.Id,
+			username: usernameSearch,
+			status: "PENDING",
+		};
+		console.log(requestDTO)
+		postService.sendCampaign(requestDTO,dispatch)
 	};
 
 	return (
@@ -70,7 +83,7 @@ const SearchInfluencerModal = () => {
 						<button
 							type="button"
 							className="btn btn-link btn-fw text-secondary w-100 border-0"
-							onClick={handleSearch}
+							onClick={handleSend}
 						>
 							Send request
 						</button>
