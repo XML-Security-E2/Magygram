@@ -62,6 +62,7 @@ type UserHandler interface {
 	AddComment(c echo.Context) error
 	CheckIfUserVerifiedById(c echo.Context) error
 	GetUsersInfo(c echo.Context) error
+	RegisterAgentByAdmin(c echo.Context) error
 }
 
 var (
@@ -962,4 +963,26 @@ func (h *userHandler) CheckIfUserVerifiedById(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+func (h *userHandler) RegisterAgentByAdmin(c echo.Context) error {
+	agentRequest := &model.AgentRequest{}
+	if err := c.Bind(agentRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	resp, err := h.UserService.RegisterAgentByAdmin(ctx, agentRequest)
+
+	if err != nil {
+		fmt.Println(err)
+
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, resp)
 }

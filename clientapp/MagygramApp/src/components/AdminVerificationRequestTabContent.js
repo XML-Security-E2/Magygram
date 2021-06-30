@@ -99,7 +99,7 @@ const AdminVerificationRequestTabContent = () => {
 						handleCloseAlert={() => dispatch({ type: adminConstants.APPROVE_VERIFICATION_REQUEST_REQUEST })}
 					/>
 				</div>
-				{state.verificationRequests.requests!==null ?
+				{state.verificationRequests.requests!==null && state.verificationRequests.requests.length !==0?
 					<table hidden={state.verificationRequests.requests===null} className="table mt-5" style={{width:"100%"}}>
 						<tbody>
 							{state.verificationRequests.requests.map(request => 

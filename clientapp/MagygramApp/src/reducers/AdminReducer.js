@@ -224,6 +224,78 @@ export const adminReducer = (state, action) => {
             strCpy.agentRegistrationRequests.errorMessage=action.errorMessage
 			return strCpy;
         }
+        case modalConstants.SHOW_REGISTER_AGENT_MODAL:{
+            return{
+                ...state,
+                registerNewAgent:{
+                    showModal: true,
+                    showError:false,
+                    errorMessage:"",
+                    showSuccessMessage: false,
+			        successMessage: "",
+                },
+            }
+        }
+        case modalConstants.HIDE_REGISTER_AGENT_MODAL:{
+            return{
+                ...state,
+                registerNewAgent:{
+                    showModal: false,
+                    showError:false,
+                    errorMessage:"",
+                    showSuccessMessage: false,
+			        successMessage: "",
+                },
+            }
+        }
+        case adminConstants.AGENT_REGISTRATION_VALIDATION_FAILURE:{
+            return{
+                ...state,
+                registerNewAgent:{
+                    showModal: true,
+                    showError:true,
+                    errorMessage:action.errorMessage,
+                    showSuccessMessage: false,
+			        successMessage: "",
+                },
+            }
+        }
+        case adminConstants.AGENT_REGISTRATION_REQUEST:{
+            return{
+                ...state,
+                registerNewAgent:{
+                    showModal: true,
+                    showError:false,
+                    errorMessage:"",
+                    showSuccessMessage: false,
+			        successMessage: "",
+                },
+            }
+        }
+        case adminConstants.AGENT_REGISTRATION_SUCCESS:{
+            return{
+                ...state,
+                registerNewAgent:{
+                    showModal: false,
+                    showError:false,
+                    errorMessage:"",
+                    showSuccessMessage: true,
+			        successMessage: action.message,
+                },
+            }
+        }
+        case adminConstants.AGENT_REGISTRATION_FAILURE:{
+            return{
+                ...state,
+                registerNewAgent:{
+                    showModal: true,
+                    showError:true,
+                    errorMessage:action.errorMessage,
+                    showSuccessMessage: false,
+			        successMessage: "",
+                },
+            }
+        }
 		default:
 			return state;
 	}

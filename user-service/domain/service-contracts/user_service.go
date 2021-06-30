@@ -56,4 +56,5 @@ type UserService interface {
 	CheckIfUserVerifiedById(ctx context.Context, userId string) (bool, error)
 
 	GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error)
+	RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error)
 }

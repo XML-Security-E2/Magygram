@@ -194,8 +194,12 @@ time="2021-06-28T22:57:35+02:00" level=error msg="User-service get logged user i
 time="2021-06-28T23:09:35+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-28T23:09:44+02:00" level=error msg="User-service get logged user info" func=story-service/service/intercomm.userClient.GetLoggedUserInfo file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/user_client.go:74" request_ip=127.0.0.1
 time="2021-06-28T23:22:22+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
+<<<<<<< HEAD
+time="2021-06-30T13:29:04+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/story-service/main.go:73" host=localhost port=464
+=======
 time="2021-06-29T17:57:49+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-06-29T18:06:45+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/relationship_client.go:76" request_ip=127.0.0.1 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
 time="2021-06-29T18:07:11+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/story_service.go:83" request_ip=127.0.0.1 story_id=009dc557-1699-417f-8241-daeaa1e85168 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
 time="2021-06-29T18:07:57+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/relationship_client.go:76" request_ip=127.0.0.1 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
 time="2021-06-29T18:08:04+02:00" level=error msg="Relationship-service get followed users" func=story-service/service/intercomm.relationshipClient.GetUnmutedFollowedUsers file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/service/intercomm/relationship_client.go:76" request_ip=127.0.0.1 user_id=60f42acc-60fd-4da8-92d0-0d5fca782ae8
+>>>>>>> develop

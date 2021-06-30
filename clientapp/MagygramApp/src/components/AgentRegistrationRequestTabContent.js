@@ -6,6 +6,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import { adminConstants } from "../constants/AdminConstants";
 import FailureAlert from "./FailureAlert";
 import SuccessAlert from "./SuccessAlert";
+import AddNewAgentModal from "./modals/AddNewAgentModal";
+import { modalConstants } from "../constants/ModalConstants";
 
 const AgentRegistrationRequestTabContent = () => {
 	const { state,dispatch } = useContext(AdminContext);
@@ -40,6 +42,10 @@ const AgentRegistrationRequestTabContent = () => {
 		  });
 	}
 
+	const addNewAgentHandler = () => {
+		dispatch({ type: modalConstants.SHOW_REGISTER_AGENT_MODAL });
+	}
+
 	useEffect(() => {
 		const getAgentRegistrationRequestsHandler = async () => {
 			await requestsService.getAllPendingAgentRegistrationRequest(dispatch)
@@ -57,12 +63,25 @@ const AgentRegistrationRequestTabContent = () => {
 						message={state.agentRegistrationRequests.successMessage}
 						handleCloseAlert={() => dispatch({ type: adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_REQUEST })}
 					/>
+					<SuccessAlert
+						hidden={!state.registerNewAgent.showSuccessMessage}
+						header="Success"
+						message={state.registerNewAgent.successMessage}
+						handleCloseAlert={() => dispatch({ type: adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_REQUEST })}
+					/>
 					<FailureAlert
 						hidden={!state.agentRegistrationRequests.showError}
 						header="Error"
 						message={state.agentRegistrationRequests.errorMessage}
 						handleCloseAlert={() => dispatch({ type: adminConstants.APPROVE_AGENT_REGISTRATION_REQUEST_REQUEST })}
 					/>
+				</div>
+				<div className="d-flex flex-column mt-4 mb-4">
+					<div className="card">
+						<div type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={addNewAgentHandler}>
+							Add new agent
+						</div>
+					</div>
 				</div>
 				{state.agentRegistrationRequests.requests!==null ?
 					<table hidden={state.agentRegistrationRequests.requests===null} className="table mt-5" style={{width:"100%"}}>
@@ -95,7 +114,7 @@ const AgentRegistrationRequestTabContent = () => {
 					</div>
 				}
 			</div>
-            
+            <AddNewAgentModal/>
 		</React.Fragment>
 
 	);

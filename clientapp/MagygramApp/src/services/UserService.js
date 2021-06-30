@@ -1,4 +1,5 @@
 import Axios from "axios";
+import { adminConstants } from "../constants/AdminConstants";
 import { userConstants } from "../constants/UserConstants";
 import { deleteLocalStorage, setAuthInLocalStorage } from "../helpers/auth-header";
 import { authHeader } from "../helpers/auth-header";
@@ -34,6 +35,7 @@ export const userService = {
 	registerAgent,
 	IsUserVerifiedById,
 	reportUser,
+	registerAgentByAdmin,
 };
 
 function reportUser(reportDTO, dispatch) {
@@ -859,3 +861,51 @@ function IsUserVerifiedById(userId,dispatch) {
 	}
 }
 
+function registerAgentByAdmin(agent, dispatch) {
+	if (validateAgentByAdmin(agent, dispatch)) {
+		dispatch(request());
+		Axios.post(`/api/users/register-agent-by-admin`, agent, { validateStatus: () => true })
+			.then((res) => {
+				if (res.status === 201) {
+					dispatch(success("New agent successfuly registered"));
+				} else {
+					dispatch(failure(res.data.message));
+				}
+			})
+			.catch((err) => {});
+	}
+
+	function request() {
+		return { type: adminConstants.AGENT_REGISTRATION_REQUEST };
+	}
+	function success(message) {
+		return { type: adminConstants.AGENT_REGISTRATION_SUCCESS, message };
+	}
+	function failure(error) {
+		return { type: adminConstants.AGENT_REGISTRATION_FAILURE, errorMessage: error };
+	}
+}
+
+function validateAgentByAdmin(user, dispatch) {
+	const [passwordValid, passwordErrorMessage] = validatePasswords(user.password, user.repeatedPassword);
+
+	if (user.name.length < 2) {
+		dispatch(validatioFailure("Name must contain minimum two letters"));
+		return false;
+	} else if (user.surname.length < 2) {
+		dispatch(validatioFailure("Surname must contain minimum two letters"));
+		return false;
+	} else if (passwordValid === false) {
+		dispatch(validatioFailure(passwordErrorMessage));
+		return false;
+	} else if (user.webSite.length < 5) {
+		dispatch(validatioFailure("Web site must contain minimum five letters"));
+		return false;
+	}
+
+	function validatioFailure(message) {
+		return { type: adminConstants.AGENT_REGISTRATION_VALIDATION_FAILURE, errorMessage: message };
+	}
+
+	return true;
+}
