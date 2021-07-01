@@ -17,4 +17,5 @@ type UserRepository interface {
 	SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error)
 	IsBlocked(ctx context.Context, subjectId string, objectId string) (bool, error)
 	DeleteUser(ctx context.Context, request *model.User) (*mongo.UpdateResult, error)
+	PhysicalDelete(ctx context.Context, userId string) (*mongo.DeleteResult,error)
 }

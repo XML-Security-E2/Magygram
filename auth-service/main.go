@@ -118,6 +118,9 @@ func main() {
 	i := interactor.NewInteractor(usersCol, loginEventsCol)
 	h := i.NewAppHandler()
 
+	userService := i.NewUserService()
+	go userService.RedisConnection()
+
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 

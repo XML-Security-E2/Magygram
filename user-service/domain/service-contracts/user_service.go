@@ -3,12 +3,11 @@ package service_contracts
 import (
 	"context"
 	"mime/multipart"
-	"net/http"
 	"user-service/domain/model"
 )
 
 type UserService interface {
-	RegisterUser(ctx context.Context, user *model.UserRequest) (*http.Response, error)
+	RegisterUser(ctx context.Context, user *model.UserRequest) ([]byte, error)
 	EditUser(ctx context.Context, bearer string, userId string, user *model.EditUserRequest) (string, error)
 	EditUserImage(ctx context.Context, bearer string, userId string, userImage []*multipart.FileHeader) (string, error)
 	ActivateUser(ctx context.Context, activationId string) (bool, error)
@@ -57,4 +56,5 @@ type UserService interface {
 
 	GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error)
 	RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error)
+	RedisConnection(finished chan bool)
 }

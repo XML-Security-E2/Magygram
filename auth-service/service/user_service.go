@@ -5,13 +5,17 @@ import (
 	"auth-service/domain/repository"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"auth-service/saga"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/go-playground/validator"
+	"github.com/go-redis/redis"
 	"github.com/pquerna/otp/totp"
 	"github.com/sirupsen/logrus"
 	"image/jpeg"
+	"log"
 )
 
 type userService struct {
@@ -43,7 +47,7 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 
 	imageInBytes := buffer.Bytes()
 
-	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Info("TOTP QR code created")
+//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Info("TOTP QR code created")
 
 	user, err := model.NewUser(userRequest,key.Secret())
 	if err != nil {
@@ -63,7 +67,7 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 	}
 
 	if userId, ok := result.InsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
+		//logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Info("User registered")
 		return userId,imageInBytes, nil
 	}
 	return "",imageInBytes, err
@@ -208,4 +212,78 @@ func (u userService) RegisterAgent(ctx context.Context, userRequest *model.UserR
 		return userId,imageInBytes, nil
 	}
 	return "",imageInBytes, err
+}
+
+func (u userService) RedisConnection() {
+	// create client and ping redis
+	var err error
+	client := redis.NewClient(&redis.Options{Addr: "localhost:6379", Password: "", DB: 0})
+	if _, err = client.Ping().Result(); err != nil {
+		log.Fatalf("error creating redis client %s", err)
+	}
+
+	// subscribe to the required channels
+	pubsub := client.Subscribe(saga.AuthChannel, saga.ReplyChannel)
+	if _, err = pubsub.Receive(); err != nil {
+		log.Fatalf("error subscribing %s", err)
+	}
+	defer func() { _ = pubsub.Close() }()
+	ch := pubsub.Channel()
+
+	log.Println("starting the stock service")
+	for {
+		select {
+		case msg := <-ch:
+			m := saga.RegisterUserMessage{}
+			err := json.Unmarshal([]byte(msg.Payload), &m)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			switch msg.Channel {
+			case saga.AuthChannel:
+
+				// Happy Flow
+				if m.Action == saga.ActionStart {
+					// Check quantity of product
+
+					userRequest := model.UserRequest{Id: m.User.Id, Email: m.User.Email, Password: m.User.Password, RepeatedPassword: m.User.RepeatedPassword}
+					_,bufer, err := u.RegisterUser(context.TODO(),&userRequest)
+
+					log.Println(bufer)
+					if err != nil{
+						m.Ok = false
+						m.ImageByte = nil
+						sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceUser, saga.ServiceAuth)
+					}else {
+						m.Ok = true
+						m.ImageByte = bufer
+						sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceUser, saga.ServiceAuth)
+
+						//sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceRelationship, saga.ServiceAuth)
+						//skinuti komentar za testiranje
+						//sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceUser, saga.ServiceAuth)
+					}
+				}
+
+				// Rollback flow
+				if m.Action == saga.ActionRollback {
+					//pozvati delete
+				}
+
+			}
+		}
+	}
+}
+
+func sendToReplyChannel(client *redis.Client, m *saga.RegisterUserMessage, action string, service string, senderService string) {
+	var err error
+	m.Action = action
+	m.Service = service
+	m.SenderService = senderService
+	if err = client.Publish(saga.ReplyChannel, m).Err(); err != nil {
+		log.Printf("error publishing done-message to %s channel", saga.ReplyChannel)
+	}
+	log.Printf("done message published to channel :%s", saga.ReplyChannel)
 }

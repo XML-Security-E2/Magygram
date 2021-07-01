@@ -513,3 +513,20 @@ time="2021-06-30T13:36:18+02:00" level=info msg="Successful first stage of login
 time="2021-06-29T17:57:38+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/main.go:127" host=localhost port=461
 time="2021-06-29T18:06:02+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:44" request_ip=127.0.0.1 user_email=22jel3001@gmail.com
 >>>>>>> develop
+time="2021-07-01T00:49:04+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T00:58:02+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T00:59:25+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:00:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:02:23+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:03:48+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:05:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:06:34+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:07:26+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:08:36+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:14:32+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:20:36+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:36:49+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:46:32+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T01:49:53+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T02:09:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461
+time="2021-07-01T02:10:07+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/auth-service/main.go:130" host=localhost port=461

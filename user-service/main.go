@@ -16,6 +16,7 @@ import (
 	"user-service/controller/router"
 	"user-service/interactor"
 	"user-service/logger"
+	"user-service/saga"
 )
 
 
@@ -82,6 +83,12 @@ func main() {
 	e := echo.New()
 	i := interactor.NewInteractor(usersCol, accActivationsCol, resetPasswordsCol, notificationsCol)
 	h := i.NewAppHandler()
+
+	//server := i.NewUserService()
+	//go server.RedisConnection()
+
+	Orchestrator := saga.NewOrchestrator()
+	go Orchestrator.Start()
 
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
