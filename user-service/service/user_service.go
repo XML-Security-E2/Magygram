@@ -489,14 +489,12 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 
 	go u.RedisConnection(finished)
 
-	//redisResult := <-finished
-	//
-	//if(!redisResult){
-	//	return nil, errors.New("Internal server error")
-	//}
-
 	select {
-	case <-finished:
+	case redisResult := <-finished:
+		if !redisResult {
+			return nil, errors.New("Internal server error")
+		}
+
 		accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
 
 		go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
@@ -507,7 +505,7 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 		}
 		return ImageBytes, err
 	case <-time.After(10 * time.Second):
-		fmt.Println("ROLLBACK")
+		fmt.Println("ROLLBACK ODRADI KAD JEDAN MS NE RADI")
 		sendToReplyChannel(RedisClient, &registrationMessage, saga.ActionError, saga.ServiceAuth, saga.ServiceUser)
 		sendToReplyChannel(RedisClient, &registrationMessage, saga.ActionError, saga.ServiceUser, saga.ServiceUser)
 
@@ -1459,8 +1457,10 @@ func (u *userService) RedisConnection(finished chan bool) {
 
 				// Rollback flow
 				if m.Action == saga.ActionRollback {
+					log.Println("TEST")
 					u.UserRepository.PhysicalDelete(context.TODO(), m.User.Id)
-					finished<-false
+
+					finished <- false
 				}
 			}
 		}

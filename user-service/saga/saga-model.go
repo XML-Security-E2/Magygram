@@ -10,7 +10,6 @@ type RegisterUserMessage struct {
 	UserType 	  string          `json:"user_type"`
 	Action        string         `json:"action"`
 	User          UserRequest       `json:"user_request"`
-	Ok            bool           `json:"ok"`
 	ImageByte []byte `json:"image"`
 }
 

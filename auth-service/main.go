@@ -63,6 +63,14 @@ func main() {
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	loginEventsCol := client.Database(*mongoDatabase).Collection("login-events")
 
+	usersCol.Indexes().CreateMany(context.Background(),
+		[]mongo.IndexModel{{
+			Keys: bson.M{
+				"email": 1,
+			},
+			Options: options.Index().SetUnique(true),
+		}})
+
 	_, err = usersCol.InsertOne(ctx, bson.D{
 		{Key: "_id", Value: "2bdfa5ed-be19-4573-8fe9-49bdfbd8dc12"},
 		{Key: "active", Value: true},

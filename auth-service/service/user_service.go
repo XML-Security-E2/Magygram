@@ -48,7 +48,7 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 
 	imageInBytes := buffer.Bytes()
 
-//	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Info("TOTP QR code created")
+	//logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Info("TOTP QR code created")
 
 	user, err := model.NewUser(userRequest,key.Secret())
 	if err != nil {
@@ -63,7 +63,7 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 
 	result, err := u.UserRepository.Create(ctx, user)
 	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Error("User database create failure")
+		//logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Error("User database create failure")
 		return "",[]byte{}, err
 	}
 
