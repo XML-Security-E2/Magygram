@@ -54,9 +54,10 @@ func main() {
 
 	campaignCol := client.Database(*mongoDatabase).Collection("campaigns")
 	influencerCampaignCol := client.Database(*mongoDatabase).Collection("influencer-campaigns")
+	updateReqCampaignCol := client.Database(*mongoDatabase).Collection("update-campaign-requests")
 
 	e := echo.New()
-	i := interactor.NewInteractor(campaignCol, influencerCampaignCol)
+	i := interactor.NewInteractor(campaignCol, influencerCampaignCol, updateReqCampaignCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

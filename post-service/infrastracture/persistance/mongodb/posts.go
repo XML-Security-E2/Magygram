@@ -214,16 +214,23 @@ func (r *postRepository) GetPostsByPostIdArray(ctx context.Context, ids []string
 	var results []*model.Post
 
 	if err != nil {
-		defer cursor.Close(ctx)
+		if cursor != nil{
+			defer cursor.Close(ctx)
+		}
 		return nil, err
 	} else {
-		for cursor.Next(ctx) {
-			var result model.Post
+		if cursor != nil {
+			for cursor.Next(ctx) {
+				var result model.Post
 
-			_ = cursor.Decode(&result)
-			results = append(results, &result)
+				_ = cursor.Decode(&result)
+				results = append(results, &result)
 
+			}
+		} else {
+			return nil , nil
 		}
+
 	}
 	return results, nil
 }

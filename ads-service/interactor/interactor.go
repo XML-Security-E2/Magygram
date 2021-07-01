@@ -13,6 +13,7 @@ import (
 type Interactor interface {
 	NewCampaignRepository() repository.CampaignRepository
 	NewInfluencerCampaignRepository() repository.InfluencerCampaignRepository
+	NewCampaignUpdateRequestsRepository() repository.CampaignUpdateRequestsRepository
 	NewCampaignService() service_contracts.CampaignService
 	NewCampaignHandler() handler.CampaignHandler
 	NewAuthClient() intercomm.AuthClient
@@ -22,10 +23,11 @@ type Interactor interface {
 type interactor struct {
 	campaignCol *mongo.Collection
 	influencerCampaignCol *mongo.Collection
+	updateReqCampaignCol *mongo.Collection
 }
 
-func NewInteractor(campaignCol *mongo.Collection, influencerCampaignCol *mongo.Collection) Interactor {
-	return &interactor{campaignCol, influencerCampaignCol}
+func NewInteractor(campaignCol *mongo.Collection, influencerCampaignCol *mongo.Collection, updateReqCampaignCol *mongo.Collection) Interactor {
+	return &interactor{campaignCol, influencerCampaignCol, updateReqCampaignCol}
 }
 
 type appHandler struct {
@@ -42,6 +44,10 @@ func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
 }
 
+func (i *interactor) NewCampaignUpdateRequestsRepository() repository.CampaignUpdateRequestsRepository {
+	return mongodb.NewCampaignUpdateRequestsRepository(i.updateReqCampaignCol)
+}
+
 func (i *interactor) NewCampaignRepository() repository.CampaignRepository {
 	return mongodb.NewCampaignRepository(i.campaignCol)
 }
@@ -51,7 +57,7 @@ func (i *interactor) NewInfluencerCampaignRepository() repository.InfluencerCamp
 }
 
 func (i *interactor) NewCampaignService() service_contracts.CampaignService {
-	return service.NewCampaignService(i.NewCampaignRepository(), i.NewInfluencerCampaignRepository(), i.NewAuthClient())
+	return service.NewCampaignService(i.NewCampaignRepository(), i.NewInfluencerCampaignRepository(), i.NewCampaignUpdateRequestsRepository(), i.NewAuthClient())
 }
 
 func (i *interactor) NewCampaignHandler() handler.CampaignHandler {

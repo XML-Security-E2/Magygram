@@ -47,6 +47,11 @@ const StoryContextProvider = (props) => {
 			visited: false,
 			userId: "",
 		},
+		agentCampaignStoryModal: {
+			showModal: false,
+			stories: "",
+		},
+		agentCampaignStories: [],
 		storyId: "",
 		iHaveAStory: false,
 		storyReport: {

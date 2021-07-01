@@ -100,6 +100,7 @@ func (p postService) CreatePostCampaign(ctx context.Context, bearer string, post
 		return "", err
 	}
 
+	campaignReq.ContentId = post.Id
 	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
 	if err != nil {
 		return "", err
@@ -943,6 +944,35 @@ func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*m
 	var retVal,_ = model.NewGuestTimelinePostResponse(post)
 
 	return retVal, nil
+}
+
+func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
+	posts, err := p.AdsClient.GetAllActiveAgentsPostCampaigns(bearer)
+	if err != nil{
+		return []*model.PostProfileResponse{}, err
+	}
+	fmt.Println(posts[0])
+
+	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, posts)
+	fmt.Println(len(userPosts))
+	if userPosts == nil {
+		return nil, nil
+	}
+
+	if err != nil{
+		return []*model.PostProfileResponse{},err
+	}
+
+	var userPostsResponse []*model.PostProfileResponse
+	for _, post := range userPosts {
+		fmt.Println(post.Id)
+		userPostsResponse = append(userPostsResponse, &model.PostProfileResponse{
+			Id:    post.Id,
+			Media: post.Media[0],
+		})
+	}
+
+	return userPostsResponse, nil
 }
 
 func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {

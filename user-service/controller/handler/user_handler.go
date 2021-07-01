@@ -465,6 +465,7 @@ func (h *userHandler) SearchForUsersByUsername(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
+	fmt.Println(len(users))
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, users)
 }

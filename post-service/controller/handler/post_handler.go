@@ -47,6 +47,7 @@ type PostHandler interface {
 	EditDislikedByInfo(c echo.Context) error
 	EditCommentedByInfo(c echo.Context) error
 	GetPostForMessagesById(c echo.Context) error
+	GetUsersPostCampaigns(c echo.Context) error
 }
 
 type postHandler struct {
@@ -169,6 +170,7 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 		DateTo:                   dateTo,
 		Type: "POST",
 		DisplayTime: displayTime,
+		ContentId: "",
 	}
 
 	ctx := c.Request().Context()
@@ -185,6 +187,26 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 	return c.JSON(http.StatusCreated, postId)
 }
 
+func (p postHandler) GetUsersPostCampaigns(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetUserPostCampaigns(ctx,bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	if posts == nil {
+		return c.JSON(http.StatusOK, []model.PostProfileResponse{})
+	}
+
+	fmt.Println(posts[0].Id)
+	return c.JSON(http.StatusOK, posts)
+}
 
 func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	ctx := c.Request().Context()

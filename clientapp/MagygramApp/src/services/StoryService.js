@@ -16,6 +16,7 @@ export const storyService = {
 	HaveActiveStoriesLoggedUser,
 	findStoryById,
 	reportStory,
+	findAllUsersCampaignStories,
 };
 
 function reportStory(reportDTO, dispatch) {
@@ -207,6 +208,33 @@ async function findAllProfileHighlights(userId, dispatch) {
 	}
 	function failure() {
 		return { type: storyConstants.PROFILE_HIGHLIGHTS_FAILURE };
+	}
+}
+
+async function findAllUsersCampaignStories(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/story/campaign`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: storyConstants.SET_STORY_CAMPAIGN_REQUEST };
+	}
+
+	function success(data) {
+		return { type: storyConstants.SET_STORY_CAMPAIGN_SUCCESS, stories: data };
+	}
+	function failure() {
+		return { type: storyConstants.SET_STORY_CAMPAIGN_FAILURE };
 	}
 }
 

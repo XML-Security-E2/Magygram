@@ -198,6 +198,11 @@ const Header = () => {
 									Profile
 								</Link>
 							</li>
+							<li hidden={!hasRoles(["agent"])}>
+								<Link className="la la-user btn shadow-none" to="/campaigns">
+									Campaigns
+								</Link>
+							</li>
 							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-cog btn shadow-none" onClick={handleSettings}>
 									Settings

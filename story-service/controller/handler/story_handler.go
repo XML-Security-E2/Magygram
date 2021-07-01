@@ -30,10 +30,25 @@ type StoryHandler interface {
 	DeleteStory(c echo.Context) error
 	UpdateUserInfo(c echo.Context) error
 	GetStoryForUserMessage(c echo.Context) error
+	GetUserStoryCampaign(c echo.Context) error
 }
 
 type storyHandler struct {
 	StoryService service_contracts.StoryService
+}
+
+func (p storyHandler) GetUserStoryCampaign(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	stories, err := p.StoryService.GetAllUserStoryCampaigns(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, stories)
 }
 
 func (p storyHandler) GetStoryForAdmin(c echo.Context) error {
@@ -127,6 +142,7 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 		DateTo:                   dateTo,
 		Type: "STORY",
 		DisplayTime: displayTime,
+		ContentId: "",
 	}
 
 	storyId, err := p.StoryService.CreateStoryCampaign(ctx, bearer, headers, tags, campaignRequest)

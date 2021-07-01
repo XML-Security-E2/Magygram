@@ -41,6 +41,9 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_STORY_MESSAGE_MODAL:
 			stateCpy = { ...state };
+
+			stateCpy.storyModal.stories = createStory(action.story);
+
 			stateCpy.storyModal.showModal = true;
 
 			return stateCpy;
@@ -199,13 +202,13 @@ export const messageReducer = (state, action) => {
 						UserId: action.story.userInfo.Id,
 						UserImageUrl: action.story.userInfo.ImageURL,
 						Username: action.story.userInfo.Username,
+						Tags: action.story.media.Tags,
 						Unauthorized: false,
 						Expired: false,
 					};
 				}
 			});
 
-			stateCpy.storyModal.stories = createStory(action.story);
 			console.log(stateCpy);
 			return stateCpy;
 
@@ -495,14 +498,14 @@ function createStory(story) {
 	var retVal = [];
 
 	retVal.push({
-		url: story.media.Url,
+		url: story.Url,
 		header: {
-			heading: story.userInfo.Username,
-			profileImage: story.userInfo.ImageURL,
-			storyId: story.media.StoryId,
+			heading: story.Username,
+			profileImage: story.UserImageUrl === "" ? "assets/img/profile.jpg" : story.UserImageUrl,
+			storyId: story.Id,
 		},
-		type: story.media.MediaType === "VIDEO" ? "video" : "image",
-		tags: story.media.Tags,
+		type: story.MediaType === "VIDEO" ? "video" : "image",
+		tags: story.Tags,
 	});
 
 	return retVal;

@@ -19,6 +19,7 @@ import RecommendedUsersPage from "./pages/RecommendedUsersPage";
 import MessagesPage from "./pages/MessagesPage";
 import PostPage from "./pages/PostPage";
 import CreateAgentPostPage from "./pages/CreateAgentPostPage";
+import CampaignsPage from "./pages/CampaignsPage";
 
 function App() {
 	return (
@@ -43,6 +44,7 @@ function App() {
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/chat" component={MessagesPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/post" component={PostPage} />
 				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/add-agent-posts" component={CreateAgentPostPage} />
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaigns" component={CampaignsPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 

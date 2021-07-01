@@ -7,5 +7,15 @@ import (
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/ads/campaign", h.CreateCampaign)
+	e.GET("/api/ads/campaign/:campaignId", h.GetCampaignById)
+	e.GET("/api/ads/campaign/post/:contentId", h.GetCampaignByPostId)
+	e.GET("/api/ads/campaign/story/:contentId", h.GetCampaignByStoryId)
+
+	e.GET("/api/ads/campaign/post", h.GetAllActiveAgentsPostCampaigns)
+	e.GET("/api/ads/campaign/story", h.GetAllActiveAgentsStoryCampaigns)
+
 	e.POST("/api/ads/campaign/influencer", h.CreateInfluencerCampaign)
+
+	e.PUT("/api/ads/campaign", h.UpdateCampaignRequest)
+
 }

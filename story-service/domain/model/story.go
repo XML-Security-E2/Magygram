@@ -30,6 +30,7 @@ const(
 )
 
 type CampaignRequest struct {
+	ContentId string `json:"contentId"`
 	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
 	Frequency CampaignFrequency `json:"frequency"`
 	TargetGroup TargetGroup `json:"targetGroup"`

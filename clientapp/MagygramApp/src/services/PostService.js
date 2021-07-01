@@ -31,6 +31,8 @@ export const postService = {
 	reportPost,
 	findPostByIdForPage,
 	sendCampaign,
+	findAllUsersCampaignPosts,
+	getCampaignByPostId,
 };
 
 function sendCampaign(requestDTO, dispatch) {
@@ -58,6 +60,34 @@ function sendCampaign(requestDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.REPORT_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function getCampaignByPostId(postId, dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/ads/campaign/post/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.SET_POST_CAMPAIGN_REQUEST };
+	}
+	function success(data) {
+		return { type: postConstants.SET_POST_CAMPAIGN_SUCCESS, campaign: data };
+	}
+	function failure(message) {
+		return { type: postConstants.SET_POST_CAMPAIGN_FAILURE, errorMessage: message };
 	}
 }
 
@@ -113,6 +143,33 @@ async function findPostsForTimeline(dispatch) {
 	}
 	function failure() {
 		return { type: postConstants.TIMELINE_POSTS_FAILURE };
+	}
+}
+
+async function findAllUsersCampaignPosts(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/campaign`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("error"));
+		});
+
+	function request() {
+		return { type: postConstants.SET_USER_CAMPAIGN_POSTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.SET_USER_CAMPAIGN_POSTS_SUCCESS, posts: data };
+	}
+	function failure(error) {
+		return { type: postConstants.SET_USER_CAMPAIGN_POSTS_FAILURE, errorMessage: error };
 	}
 }
 
@@ -177,28 +234,40 @@ async function findAllUsersCollections(dispatch) {
 
 async function findPostById(postId, dispatch) {
 	dispatch(request());
+	dispatch(requestCampaign());
 	await Axios.get(`/api/posts/id/${postId}`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
+				dispatch(successCampaign(res.data));
 			} else {
-				dispatch(failure("Error while loading collections"));
+				dispatch(failure("Error while loading posts"));
+				dispatch(failureCampaign("Error while loading posts"));
 			}
 		})
 		.catch((err) => {
 			dispatch(failure());
+			dispatch(failureCampaign());
 		});
 
 	function request() {
 		return { type: postConstants.PROFILE_POST_DETAILS_REQUEST };
 	}
-
+	function requestCampaign() {
+		return { type: postConstants.SET_CAMPAIGN_POST_DETAILS_REQUEST };
+	}
 	function success(data) {
 		return { type: postConstants.PROFILE_POST_DETAILS_SUCCESS, post: data };
 	}
+	function successCampaign(data) {
+		return { type: postConstants.SET_CAMPAIGN_POST_DETAILS_SUCCESS, post: data };
+	}
 	function failure(message) {
 		return { type: postConstants.PROFILE_POST_DETAILS_FAILURE, errorMessage: message };
+	}
+	function failureCampaign(message) {
+		return { type: postConstants.SET_CAMPAIGN_POST_DETAILS_FAILURE, errorMessage: message };
 	}
 }
 

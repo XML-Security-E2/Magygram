@@ -144,10 +144,20 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
-			postCopy.Liked = true;
-			if (postCopy.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === action.loggedUser.Id) === undefined) {
-				postCopy.LikedBy.push(action.loggedUser);
+			if (postCopy !== undefined) {
+				postCopy.Liked = true;
+				if (postCopy.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+					postCopy.LikedBy.push(action.loggedUser);
+				}
 			}
+
+			if (strcpy.viewAgentCampaignPostModal.post.Id !== "" && strcpy.viewAgentCampaignPostModal.post.Id === action.postId) {
+				strcpy.viewAgentCampaignPostModal.post.Liked = true;
+				if (strcpy.viewAgentCampaignPostModal.post.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+					strcpy.viewAgentCampaignPostModal.post.LikedBy.push(action.loggedUser);
+				}
+			}
+
 			return strcpy;
 		case postConstants.LIKE_POST_FAILURE:
 			return {
@@ -162,10 +172,18 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
-			postCopy.Liked = false;
+			if (postCopy !== undefined) {
+				postCopy.Liked = false;
+				var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
+				postCopy.LikedBy = newLikedByList;
+			}
 
-			var newLikedByList = postCopy.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
-			postCopy.LikedBy = newLikedByList;
+			if (strcpy.viewAgentCampaignPostModal.post.Id !== "") {
+				strcpy.viewAgentCampaignPostModal.post.Liked = false;
+				var newLikedByList = strcpy.viewAgentCampaignPostModal.post.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
+				strcpy.viewAgentCampaignPostModal.post.LikedBy = newLikedByList;
+			}
+
 			return strcpy;
 		case postConstants.UNLIKE_POST_FAILURE:
 			return {
@@ -180,10 +198,20 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
-			postCopy.Disliked = true;
-			if (postCopy.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === action.loggedUser.Id) === undefined) {
-				postCopy.DislikedBy.push(action.loggedUser);
+			if (postCopy !== undefined) {
+				postCopy.Disliked = true;
+				if (postCopy.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+					postCopy.DislikedBy.push(action.loggedUser);
+				}
 			}
+
+			if (strcpy.viewAgentCampaignPostModal.post.Id !== "" && strcpy.viewAgentCampaignPostModal.post.Id === action.postId) {
+				strcpy.viewAgentCampaignPostModal.post.Disliked = true;
+				if (strcpy.viewAgentCampaignPostModal.post.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+					strcpy.viewAgentCampaignPostModal.post.DislikedBy.push(action.loggedUser);
+				}
+			}
+
 			return strcpy;
 		case postConstants.DISLIKE_POST_FAILURE:
 			return {
@@ -198,9 +226,17 @@ export const postReducer = (state, action) => {
 				...state,
 			};
 			postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);
-			postCopy.Disliked = false;
-			var newDisikedByList = postCopy.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== action.loggedUser.Id);
-			postCopy.DislikedBy = newDisikedByList;
+			if (postCopy !== undefined) {
+				postCopy.Disliked = false;
+				var newDisikedByList = postCopy.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== action.loggedUser.Id);
+				postCopy.DislikedBy = newDisikedByList;
+			}
+
+			if (strcpy.viewAgentCampaignPostModal.post.Id !== "") {
+				strcpy.viewAgentCampaignPostModal.post.Disliked = false;
+				var newDisikedByList = strcpy.viewAgentCampaignPostModal.post.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== action.loggedUser.Id);
+				strcpy.viewAgentCampaignPostModal.post.DislikedBy = newDisikedByList;
+			}
 			return strcpy;
 		case postConstants.UNDISLIKE_POST_FAILURE:
 			return {
@@ -293,6 +329,57 @@ export const postReducer = (state, action) => {
 				LikedBy: [{}],
 				DislikedBy: [{}],
 				Comments: [{}],
+				Liked: false,
+				Disliked: false,
+			};
+			return strcpy;
+
+		case postConstants.SET_CAMPAIGN_POST_DETAILS_REQUEST:
+			strcpy = {
+				...state,
+			};
+			strcpy.viewAgentCampaignPostModal.showModal = false;
+			strcpy.viewAgentCampaignPostModal.post = {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [],
+				UserInfo: {},
+				LikedBy: [],
+				DislikedBy: [],
+				Comments: [],
+				Liked: false,
+				Disliked: false,
+			};
+			return strcpy;
+
+		case postConstants.SET_CAMPAIGN_POST_DETAILS_SUCCESS:
+			strcpy = {
+				...state,
+			};
+			strcpy.viewAgentCampaignPostModal.showModal = true;
+			strcpy.viewAgentCampaignPostModal.post = action.post;
+			return strcpy;
+		case postConstants.SET_CAMPAIGN_POST_DETAILS_FAILURE:
+			strcpy = {
+				...state,
+			};
+			strcpy.viewAgentCampaignPostModal.showModal = false;
+			strcpy.viewAgentCampaignPostModal.post = {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [],
+				UserInfo: {},
+				LikedBy: [],
+				DislikedBy: [],
+				Comments: [],
 				Liked: false,
 				Disliked: false,
 			};
@@ -835,6 +922,22 @@ export const postReducer = (state, action) => {
 				...state,
 				userLikedPosts: null,
 			};
+
+		case postConstants.SET_USER_CAMPAIGN_POSTS_REQUEST:
+			return {
+				...state,
+				agentCampaignPosts: [],
+			};
+		case postConstants.SET_USER_CAMPAIGN_POSTS_SUCCESS:
+			return {
+				...state,
+				agentCampaignPosts: action.posts,
+			};
+		case postConstants.SET_USER_CAMPAIGN_POSTS_FAILURE:
+			return {
+				...state,
+				agentCampaignPosts: [],
+			};
 		case postConstants.DISLIKED_POSTS_REQUEST:
 			return {
 				...state,
@@ -886,6 +989,80 @@ export const postReducer = (state, action) => {
 
 		case postConstants.SET_POST_FOR_PAGE_FAILURE:
 			return state;
+
+		case postConstants.HIDE_POST_CAMPAIGN_OPTION_ALERTS:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
+			return postCopy;
+		case modalConstants.SHOW_POST_AGENT_OPTIONS_MODAL:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showModal = true;
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
+			return postCopy;
+		case modalConstants.HIDE_POST_AGENT_OPTIONS_MODAL:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showModal = false;
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
+			return postCopy;
+
+		case postConstants.SET_POST_CAMPAIGN_REQUEST:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.campaign = {
+				minAge: "",
+				maxAge: "",
+				displayTime: "12",
+				checkedOnce: true,
+				gender: "ANY",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			};
+			return postCopy;
+		case postConstants.SET_POST_CAMPAIGN_SUCCESS:
+			postCopy = { ...state };
+			// campaignType: "POST"
+			// dateFrom: "2021-07-22T00:00:00Z"
+			// dateTo: "2021-07-29T00:00:00Z"
+			// displayTime: 12
+			// frequency: "REPEATEDLY"
+			// id: "f1cbd6ef-6a6c-421d-8530-1fa1715719e0"
+			// minDisplaysForRepeatedly: 0
+			// targetGroup:
+			// gender: "MALE"
+			// maxAge: 26
+			// minAge: 17
+
+			postCopy.agentCampaignPostOptionModal.campaign = {
+				id: action.campaign.id,
+				minAge: action.campaign.targetGroup.minAge,
+				maxAge: action.campaign.targetGroup.maxAge,
+				displayTime: action.campaign.minDisplaysForRepeatedly,
+				checkedOnce: action.campaign.frequency === "ONCE",
+				gender: action.campaign.targetGroup.gender,
+				startDate: new Date(action.campaign.dateFrom),
+				endDate: new Date(action.campaign.dateTo),
+			};
+			return postCopy;
+		case postConstants.SET_POST_CAMPAIGN_FAILURE:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.campaign = {
+				minAge: "",
+				maxAge: "",
+				displayTime: "12",
+				checkedOnce: true,
+				gender: "ANY",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			};
+			return postCopy;
 		default:
 			return state;
 	}

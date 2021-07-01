@@ -104,6 +104,8 @@ func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, fi
 		return "", err
 	}
 
+	campaignReq.ContentId = post.Id
+
 	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
 	if err != nil {
 		return "", err
@@ -131,6 +133,32 @@ func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, fi
 	}
 
 	return "", err
+}
+
+func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer string) ([]*model.UsersStoryResponseWithUserInfo, error) {
+
+	storyIds, err := p.AdsClient.GetAllActiveAgentsStoryCampaigns(bearer)
+	if err != nil {
+		return nil, err
+	}
+	var stories []*model.UsersStoryResponseWithUserInfo
+
+	for _, storyId := range storyIds {
+		story, err := p.StoryRepository.GetByID(ctx, storyId)
+		if err != nil {
+			return nil, err
+		}
+
+		stories = append(stories, &model.UsersStoryResponseWithUserInfo{
+			Id: story.Id,
+			ContentType: story.ContentType,
+			Media:      story.Media,
+			DateTime:    "",
+			UserInfo:   story.UserInfo,
+		})
+	}
+
+	return stories, nil
 }
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {

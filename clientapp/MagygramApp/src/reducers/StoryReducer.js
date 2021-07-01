@@ -38,6 +38,36 @@ export const storyReducer = (state, action) => {
 				},
 			};
 
+		case storyConstants.SET_STORY_CAMPAIGN_REQUEST:
+			return {
+				...state,
+				agentCampaignStories: [],
+			};
+		case storyConstants.SET_STORY_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			if (action.stories !== null) {
+				action.stories.forEach((story) => {
+					if (storyCopy.agentCampaignStories.find((storyy) => storyy.Id === story.Id) === undefined) {
+						storyCopy.agentCampaignStories.push({
+							Id: story.Id,
+							MediaType: story.media.MediaType,
+							Url: story.media.Url,
+							UserId: story.userInfo.Id,
+							UserImageUrl: story.userInfo.ImageURL,
+							Username: story.userInfo.Username,
+						});
+					}
+				});
+			}
+
+			return storyCopy;
+		case storyConstants.SET_STORY_CAMPAIGN_FAILURE:
+			return {
+				...state,
+				agentCampaignStories: [],
+			};
+
 		case storyConstants.CREATE_AGENT_STORY_REQUEST:
 			return {
 				...state,
@@ -72,7 +102,6 @@ export const storyReducer = (state, action) => {
 				},
 			};
 		case modalConstants.OPEN_CREATE_STORY_MODAL:
-			console.log(state);
 			return {
 				...state,
 				createStory: {
@@ -328,6 +357,17 @@ export const storyReducer = (state, action) => {
 				iHaveAStory: false,
 			};
 		}
+		case modalConstants.SHOW_STORY_AGENT_CAMPAIGN_MODAL:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryModal.showModal = true;
+			storyCopy.agentCampaignStoryModal.stories = createStory(action.story);
+
+			return storyCopy;
+		case modalConstants.HIDE_STORY_AGENT_CAMPAIGN_MODAL:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryModal.showModal = false;
+
+			return storyCopy;
 		default:
 			return state;
 	}
@@ -384,5 +424,22 @@ function createHighlights(highlights, name) {
 		});
 	});
 	console.log(retVal);
+	return retVal;
+}
+
+function createStory(story) {
+	var retVal = [];
+
+	retVal.push({
+		url: story.Url,
+		header: {
+			heading: story.Username,
+			profileImage: story.UserImageUrl === "" ? "assets/img/profile.jpg" : story.UserImageUrl,
+			storyId: story.Id,
+		},
+		type: story.MediaType === "VIDEO" ? "video" : "image",
+		tags: story.Tags,
+	});
+
 	return retVal;
 }

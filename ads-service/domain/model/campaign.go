@@ -35,8 +35,40 @@ type Campaign struct {
 	DisplayTime int `bson:"display_time" validate:"required,numeric,min=0,max=24"`
 }
 
+type CampaignUpdateRequest struct {
+	Id string `bson:"_id,omitempty"`
+	CampaignId string `bson:"campaign_id,omitempty"`
+	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly"`
+	Frequency CampaignFrequency `bson:"frequency"`
+	TargetGroup TargetGroup `bson:"target_group"`
+	DateFrom time.Time `bson:"date_from"`
+	DateTo time.Time `bson:"date_to"`
+	RequestedDate time.Time `bson:"requested_date"`
+	CampaignUpdateStatus CampaignUpdateStatus `bson:"campaign_update_status"`
+}
+
+type CampaignUpdateRequestDTO struct {
+	CampaignId string `bson:"campaign_id,omitempty" json:"campaignId"`
+	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly" json:"minDisplaysForRepeatedly"`
+	Frequency CampaignFrequency `bson:"frequency" json:"frequency"`
+	TargetGroup TargetGroup `bson:"target_group" json:"targetGroup"`
+	DateFrom time.Time `bson:"date_from" json:"dateFrom"`
+	DateTo time.Time `bson:"date_to" json:"dateTo"`
+}
+
 type CampaignRequest struct {
 	ContentId string `json:"contentId"`
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Type ContentType `json:"campaignType"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	DisplayTime int `json:"displayTime"`
+}
+
+type CampaignRetreiveRequest struct {
+	Id string `json:"id"`
 	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
 	Type ContentType `json:"campaignType"`
 	Frequency CampaignFrequency `json:"frequency"`
@@ -51,6 +83,13 @@ type InfluencerContent struct {
 	ContentId int `bson:"content_id"`
 	ContentType ContentType `bson:"content_type"`
 }
+
+type CampaignUpdateStatus string
+
+const (
+	PENDING = iota
+	DONE
+)
 
 type ContentType string
 
@@ -79,6 +118,34 @@ const(
 	ONCE = iota
 	REPEATEDLY
 )
+
+func NewCampaignUpdateRequest(campaignRequest *CampaignUpdateRequestDTO) (*CampaignUpdateRequest, error) {
+	if err := validateCampaignFrequencyEnums(campaignRequest.Frequency); err != nil {
+		return nil, err
+	}
+	if err := validateGenderTypeEnums(campaignRequest.TargetGroup.Gender); err != nil {
+		return nil, err
+	}
+
+	if campaignRequest.DateFrom.After(campaignRequest.DateTo) {
+		return nil, errors.New("dates out of range")
+	}
+	if campaignRequest.TargetGroup.MinAge > campaignRequest.TargetGroup.MaxAge || campaignRequest.TargetGroup.MinAge < 12 || campaignRequest.TargetGroup.MaxAge > 120 {
+		return nil, errors.New("age out of range")
+	}
+
+	return &CampaignUpdateRequest{
+		Id:                       guid.New().String(),
+		CampaignId:               campaignRequest.CampaignId,
+		MinDisplaysForRepeatedly: campaignRequest.MinDisplaysForRepeatedly,
+		Frequency:                campaignRequest.Frequency,
+		TargetGroup:              campaignRequest.TargetGroup,
+		DateFrom:                 campaignRequest.DateFrom,
+		DateTo:                   campaignRequest.DateTo,
+		RequestedDate:            time.Now(),
+		CampaignUpdateStatus:     "PENDING",
+	}, nil
+}
 
 func NewCampaign(campaignRequest *CampaignRequest, ownerId string) (*Campaign, error) {
 	if err := validateContentTypeEnums(campaignRequest.Type); err != nil {

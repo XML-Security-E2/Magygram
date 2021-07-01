@@ -63,6 +63,7 @@ type PostRequest struct {
 }
 
 type CampaignRequest struct {
+	ContentId string `json:"contentId"`
 	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
 	Frequency CampaignFrequency `json:"frequency"`
 	TargetGroup TargetGroup `json:"targetGroup"`
@@ -229,6 +230,7 @@ func NewPostResponse(post *Post, liked bool, disliked bool, favourites bool) (*P
 		Tags: post.Tags,
 		Disliked: disliked,
 		Favourites: favourites,
+		ContentType: post.ContentType,
 	}, nil
 }
 

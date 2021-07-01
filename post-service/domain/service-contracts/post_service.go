@@ -11,6 +11,8 @@ type PostService interface {
 	GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error)
 	CreatePost(ctx context.Context, bearer string,  post *model.PostRequest) (string, error)
 	CreatePostCampaign(ctx context.Context, bearer string,  post *model.PostRequest, campaignReq *model.CampaignRequest) (string, error)
+	GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
+
 	EditPost(ctx context.Context, bearer string,  post *model.PostEditRequest) error
 	LikePost(ctx context.Context, bearer string,  postId string) error
 	UnlikePost(ctx context.Context, bearer string,  postId string) error
