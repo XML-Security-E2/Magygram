@@ -321,6 +321,16 @@ export const userReducer = (state, action) => {
 					user: action.user,
 				},
 			};
+		case userConstants.SET_USER_CAMPAIGNS_REQUEST:
+		return {
+			...state,
+			campaigns:[],
+		};
+		case userConstants.SET_USER_CAMPAIGNS:
+		return {
+			...state,
+			campaigns:action.campaigns,
+		};
 
 		case userConstants.GET_USER_PROFILE_FAILURE:
 			return state;

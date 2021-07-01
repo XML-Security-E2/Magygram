@@ -800,6 +800,7 @@ func (u *userService) GetUserProfileById(ctx context.Context, bearer string, use
 		Bio:                  user.Bio,
 		Number:               user.Number,
 		Gender:               user.Gender,
+		Category:             user.Category,
 		ImageUrl:             user.ImageUrl,
 		PostNumber:           postsCount,
 		Following:            following,

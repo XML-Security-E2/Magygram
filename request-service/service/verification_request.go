@@ -125,6 +125,7 @@ func mapCampaignRequestToCampaignRequestDTO(requests []*model.CampaignRequest) [
 			ContentId:      request.ContentId,
 			Influencer:   request.Influencer,
 			Status: request.Status,
+			Price: request.Price,
 		}
 		retVal = append(retVal, &result)
 	}
