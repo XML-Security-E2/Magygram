@@ -23,6 +23,7 @@ const SearchInfluencerModal = () => {
 	const [tags, setTags] = useState([]);
 	const [tagInput, setTagInput] = useState("");
 	const [search, setSearch] = useState("");
+	const [price, setPrice] = useState("");
 	const [usernameSearch, setUsername] = useState("");
 
 	const loadOptions = (value, callback) => {
@@ -59,6 +60,7 @@ const SearchInfluencerModal = () => {
 		let requestDTO = {
 			contentId: postState.viewPostModal.post.Id,
 			username: usernameSearch,
+			price: price,
 			status: "PENDING",
 		};
 		console.log(requestDTO)
@@ -78,6 +80,9 @@ const SearchInfluencerModal = () => {
 
                         <AsyncSelect defaultOptions loadOptions={loadOptions} onInputChange={onInputChange} onChange={onChange} placeholder="search" inputValue={search} />
                     </div>
+					<div className="form-group">
+						<input className="form-control" required type="number" name="nameInput" placeholder="Offer price" value={price} onChange={(e) => setPrice(e.target.value)} />
+					</div>
                      <hr />
 					<div className="row">
 						<button

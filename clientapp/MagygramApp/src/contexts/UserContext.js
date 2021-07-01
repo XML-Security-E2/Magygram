@@ -52,6 +52,12 @@ const UserContextProvider = (props) => {
 		userFollowRequests: {
 			userInfos: [],
 		},
+		activeTab:{
+            verificationRequestsShow: true,
+            contentReportShow: false,
+            agentRequestsShow: false,
+        },
+		campaigns:[],
 		campaignOptions: {
 			showModal: false,
 		},

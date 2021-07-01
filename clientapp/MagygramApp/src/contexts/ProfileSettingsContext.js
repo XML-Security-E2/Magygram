@@ -10,6 +10,7 @@ const ProfileSettingsContextProvider = (props) => {
 			showVerifyAccount: false,
 			showEditNotifications: false,
 			showEditPrivacySettings: false,
+			showInfluencerCampagn: false,
 		},
 		sendedVerifyRequest: false,
 		sendRequest: {

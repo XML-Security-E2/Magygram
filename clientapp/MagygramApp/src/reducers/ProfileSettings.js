@@ -11,6 +11,19 @@ export const profileSettingsReducer = (state, action) => {
 					showVerifyAccount: false,
 					showEditNotifications: false,
 					showEditPrivacySettings: false,
+					showInfluencerCampagn: false,
+				},
+			};
+			
+		case profileSettingsConstants.SHOW_INFLUENCER_CAMPAIGN_PAGE:
+			return {
+				...state,
+				activeSideBar: {
+					showEditProfile: false,
+					showVerifyAccount: false,
+					showEditNotifications: false,
+					showEditPrivacySettings: false,
+					showInfluencerCampagn: true,
 				},
 			};
 		case profileSettingsConstants.SHOW_VERIFY_ACCOUNT_PAGE:
@@ -21,6 +34,7 @@ export const profileSettingsReducer = (state, action) => {
 					showVerifyAccount: true,
 					showEditNotifications: false,
 					showEditPrivacySettings: false,
+					showInfluencerCampagn: false,
 				},
 			};
 
@@ -32,6 +46,7 @@ export const profileSettingsReducer = (state, action) => {
 					showVerifyAccount: false,
 					showEditNotifications: true,
 					showEditPrivacySettings: false,
+					showInfluencerCampagn: false,
 				},
 			};
 		case profileSettingsConstants.SHOW_EDIT_PRIVACY_SETTINGS_PAGE:
@@ -42,6 +57,7 @@ export const profileSettingsReducer = (state, action) => {
 					showVerifyAccount: false,
 					showEditNotifications: false,
 					showEditPrivacySettings: true,
+					showInfluencerCampagn: false,
 				},
 			};
 		case profileSettingsConstants.CREATE_VERIFICATION_REQUEST_REQUEST:

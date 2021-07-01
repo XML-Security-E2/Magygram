@@ -36,7 +36,37 @@ export const userService = {
 	IsUserVerifiedById,
 	reportUser,
 	registerAgentByAdmin,
+	getCampaignsForUser,
 };
+
+async function getCampaignsForUser(dispatch) {
+
+	dispatch(request());
+	await Axios.get(`/api/requests/campaign`, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res.data);
+				if (res.status === 200) {
+					dispatch(success(res.data));
+				} else {
+					dispatch(failure());
+				}
+			})
+			.catch((err) => {
+				dispatch(failure());
+			});
+
+
+		function request() {
+			return { type: userConstants.SET_USER_CAMPAIGNS_REQUEST };
+		}
+		function success(data) {
+			return { type: userConstants.SET_USER_CAMPAIGNS, campaigns: data,  };
+		}
+		function failure() {
+			return { type: userConstants.SET_USER_FOLLOWING_FAILURE };
+		}
+}
+
 
 function reportUser(reportDTO, dispatch) {
 	dispatch(request());
