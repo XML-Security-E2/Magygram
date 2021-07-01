@@ -10,11 +10,14 @@ import VerifyAccoundSidebar from "./VerifyAccountSidebar";
 import { profileSettingsConstants } from "../constants/ProfileSettingsConstants";
 import VerifyAccontInfoForm from "./VerifyAccountInfoForm";
 import EditNotificationsSidebar from "./EditNotificationsSidebar";
+import EditCampaignsSidebar from "./EditCampaignsSidebar";
 import EditPrivacySettingsSidebar from "./EditPrivacySettingsSidebar";
 import EditNotificationsForm from "./EditNotificationsForm";
 import EditPrivacySettingsForm from "./EditPrivacySettingsForm";
 import { userService } from "../services/UserService";
 import { requestsService } from "../services/RequestsService";
+import InfluencerCampaigns from "./InfluencerCampagns";
+
 
 const UserEditProfile = () => {
 	const { userState, dispatch } = useContext(UserContext);
@@ -34,6 +37,10 @@ const UserEditProfile = () => {
 
 	const handleEditPrivacySettings = () => {
 		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_EDIT_PRIVACY_SETTINGS_PAGE });
+	};
+
+	const handleInfluencerCampaigns  = () => {
+		profileSettingsDispatch({ type: profileSettingsConstants.SHOW_INFLUENCER_CAMPAIGN_PAGE });
 	};
 
 	useEffect(() => {
@@ -66,12 +73,15 @@ const UserEditProfile = () => {
 					<EditNotificationsSidebar show={profileSettingsState.activeSideBar.showEditNotifications} handleEditNotifications={handleEditNotifications} />
 					<EditPrivacySettingsSidebar show={profileSettingsState.activeSideBar.showEditPrivacySettings} handleEditPrivacySettings={handleEditPrivacySettings} />
 					<VerifyAccoundSidebar show={profileSettingsState.activeSideBar.showVerifyAccount} handleVerifyAccount={handleVerifyAccount} />
+					<EditCampaignsSidebar show={profileSettingsState.activeSideBar.showInfluencerCampagn} handleInfluencerCampaigns={handleInfluencerCampaigns} />
 				</div>
 				<div className="col-9 border-left" style={{ minHeight: "600px" }}>
 					<EditProfileInfoForm show={profileSettingsState.activeSideBar.showEditProfile} />
 					<EditNotificationsForm show={profileSettingsState.activeSideBar.showEditNotifications} />
 					<VerifyAccontInfoForm show={profileSettingsState.activeSideBar.showVerifyAccount} />
 					<EditPrivacySettingsForm show={profileSettingsState.activeSideBar.showEditPrivacySettings} />
+					<InfluencerCampaigns show={profileSettingsState.activeSideBar.showInfluencerCampagn} />
+				
 				</div>
 			</div>
 		</React.Fragment>
