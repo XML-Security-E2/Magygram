@@ -11,6 +11,7 @@ import (
 type Interactor interface {
 	NewFollowHandler() handler.FollowHandler
 	NewAppHandler() handler.AppHandler
+	NewFollowService() service.FollowService
 }
 
 type interactor struct {
@@ -33,4 +34,8 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 
 func (i *interactor) NewFollowHandler() handler.FollowHandler {
 	return handler.NewFollowHandler(service.NewFollowService(neo4jdb.NewFollowRepository(i.Driver), intercomm.NewUserClient(), intercomm.NewAuthClient()))
+}
+
+func (i *interactor) NewFollowService() service.FollowService {
+	return service.NewFollowService(neo4jdb.NewFollowRepository(i.Driver), intercomm.NewUserClient(), intercomm.NewAuthClient())
 }

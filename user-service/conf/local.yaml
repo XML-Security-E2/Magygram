@@ -53,3 +53,9 @@ messageservice:
   protocol: "https://"
   domain: "localhost"
   port: "467"
+
+redisdatabase:
+  host: "localhost"
+  port: "6379"
+  password: ""
+  database: 0

@@ -68,6 +68,14 @@ type Config struct {
 		Domain string
 		Port 	 string
 	}
+
+	RedisDatabase struct {
+		Host     string
+		Port     string
+		User     string
+		Password string
+		Database int
+	}
 }
 
 var Current *Config

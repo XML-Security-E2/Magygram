@@ -10,6 +10,8 @@ import (
 	"log"
 	"mime/multipart"
 	"regexp"
+	"time"
+	"user-service/conf"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	service_contracts "user-service/domain/service-contracts"
@@ -40,6 +42,7 @@ type userService struct {
 var (
 	MaxUnsuccessfulLogins = 3
 	ImageBytes []byte= nil
+	RedisClient *redis.Client = nil
 )
 
 func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient, sclient intercomm.StoryClient, orchestrator saga.Orchestrator) service_contracts.UserService {
@@ -484,28 +487,34 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 
 	finished := make(chan bool)
 
-	fmt.Println("Main: Starting worker")
 	go u.RedisConnection(finished)
-	fmt.Println("Main: Waiting for worker to finish")
-	resultss := <- finished
-	if(!resultss){
-		return nil,errors.New("Internal server errorssss")
-	}
-	fmt.Println("test")
-	//err = u.RelationshipClient.CreateUser(user)
-	//if err != nil {
-	//	return nil, err
+
+	//redisResult := <-finished
+	//
+	//if(!redisResult){
+	//	return nil, errors.New("Internal server error")
 	//}
 
-	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
+	select {
+	case <-finished:
+		accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
 
-	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
+		go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
 
-	if userId, ok := result.InsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User registered")
-		return ImageBytes, nil
+		if userId, ok := result.InsertedID.(string); ok {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User registered")
+			return ImageBytes, nil
+		}
+		return ImageBytes, err
+	case <-time.After(10 * time.Second):
+		fmt.Println("ROLLBACK")
+		sendToReplyChannel(RedisClient, &registrationMessage, saga.ActionError, saga.ServiceAuth, saga.ServiceUser)
+		sendToReplyChannel(RedisClient, &registrationMessage, saga.ActionError, saga.ServiceUser, saga.ServiceUser)
+
+		return nil, errors.New("Internal server error")
 	}
-	return ImageBytes, err
+
+	return nil, errors.New("Internal server error")
 }
 
 func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error) {
@@ -1409,10 +1418,15 @@ func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword st
 func (u *userService) RedisConnection(finished chan bool) {
 	// create client and ping redis
 	var err error
-	client := redis.NewClient(&redis.Options{Addr: "localhost:6379", Password: "", DB: 0})
+
+
+	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host+":"+ conf.Current.RedisDatabase.Port, Password: "", DB: 0})
 	if _, err = client.Ping().Result(); err != nil {
 		log.Fatalf("error creating redis client %s", err)
 	}
+
+	RedisClient=client
+
 
 	// subscribe to the required channels
 	pubsub := client.Subscribe(saga.UserChannel, saga.ReplyChannel)
@@ -1437,39 +1451,22 @@ func (u *userService) RedisConnection(finished chan bool) {
 			case saga.UserChannel:
 				// Happy Flow
 				if m.Action == saga.ActionStart {
-					if m.SenderService == saga.ServiceAuth{
-						if m.Ok {
-							ImageBytes = m.ImageByte
-							finished <- true
-						}
+					if m.SenderService == saga.ServiceRelationship{
+						ImageBytes = m.ImageByte
+						finished <- true
 					}
-					/*if m.SenderService == saga.ServiceRelationship {
-						if m.Ok{
-							finished <- true
-							sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceShipping, saga.ServiceOrder)
-						} else {
-							oss.orderRepo.UpdateStatus(orderId, orderstore.CANCELLED)
-						}
-
-					} else {
-						oss.orderRepo.UpdateStatus(orderId, orderstore.FINISHED)
-					}*/
-
 				}
 
 				// Rollback flow
 				if m.Action == saga.ActionRollback {
-					log.Println("USAO U ROLLBACK")
 					u.UserRepository.PhysicalDelete(context.TODO(), m.User.Id)
 					finished<-false
-					//if m.SenderService == saga.ServiceShipping {
-					//	sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceStock, saga.ServiceOrder)
-					//}*/
 				}
 			}
 		}
 	}
 }
+
 
 func sendToReplyChannel(client *redis.Client, m *saga.RegisterUserMessage, action string, service string, senderService string) {
 	var err error

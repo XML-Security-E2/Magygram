@@ -15,6 +15,7 @@ import (
 
 var runServer = flag.Bool("relationship-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
+
 func main(){
 
 	logger.InitLogger()
@@ -27,6 +28,9 @@ func main(){
 	e := echo.New()
 	i := interactor.NewInteractor(driver)
 	h := i.NewAppHandler()
+
+	followService := i.NewFollowService()
+	go followService.RedisConnection()
 
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)

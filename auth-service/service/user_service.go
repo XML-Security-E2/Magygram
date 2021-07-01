@@ -1,6 +1,7 @@
 package service
 
 import (
+	"auth-service/conf"
 	"auth-service/domain/model"
 	"auth-service/domain/repository"
 	"auth-service/domain/service-contracts"
@@ -217,7 +218,7 @@ func (u userService) RegisterAgent(ctx context.Context, userRequest *model.UserR
 func (u userService) RedisConnection() {
 	// create client and ping redis
 	var err error
-	client := redis.NewClient(&redis.Options{Addr: "localhost:6379", Password: "", DB: 0})
+	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host+":"+ conf.Current.RedisDatabase.Port, Password: "", DB: 0})
 	if _, err = client.Ping().Result(); err != nil {
 		log.Fatalf("error creating redis client %s", err)
 	}
@@ -230,7 +231,7 @@ func (u userService) RedisConnection() {
 	defer func() { _ = pubsub.Close() }()
 	ch := pubsub.Channel()
 
-	log.Println("starting the stock service")
+	log.Println("starting the auth service")
 	for {
 		select {
 		case msg := <-ch:
@@ -251,17 +252,12 @@ func (u userService) RedisConnection() {
 					userRequest := model.UserRequest{Id: m.User.Id, Email: m.User.Email, Password: m.User.Password, RepeatedPassword: m.User.RepeatedPassword}
 					_,bufer, err := u.RegisterUser(context.TODO(),&userRequest)
 
-					log.Println(bufer)
 					if err != nil{
-						m.Ok = false
 						m.ImageByte = nil
 						sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceUser, saga.ServiceAuth)
 					}else {
-						m.Ok = true
 						m.ImageByte = bufer
-						sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceUser, saga.ServiceAuth)
-
-						//sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceRelationship, saga.ServiceAuth)
+						sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceRelationship, saga.ServiceAuth)
 						//skinuti komentar za testiranje
 						//sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceUser, saga.ServiceAuth)
 					}
@@ -269,9 +265,9 @@ func (u userService) RedisConnection() {
 
 				// Rollback flow
 				if m.Action == saga.ActionRollback {
-					//pozvati delete
+					u.UserRepository.PhysicalDelete(context.TODO(), m.User.Id)
+					sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceUser, saga.ServiceAuth)
 				}
-
 			}
 		}
 	}

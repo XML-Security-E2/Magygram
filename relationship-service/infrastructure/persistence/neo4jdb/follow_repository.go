@@ -25,6 +25,7 @@ type FollowRepository interface {
 	Mute(mute *model.Mute) error
 	Unmute(mute *model.Mute) error
 	GetPopularUsers(user *model.User, number int, recommendedUsers []string) (model.Users, error)
+	DeleteUser(user *model.User) error
 }
 
 type followRepository struct {
@@ -212,6 +213,24 @@ func (f *followRepository) CreateUser(user *model.User) (err error) {
 	defer unsafeClose(session)
 	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
 		query := "CREATE (:User{id:$uId})"
+		parameters := map[string]interface{}{
+			"uId": user.Id,
+		}
+		_, err := tx.Run(query, parameters)
+		return nil, err
+	}); err != nil {
+		return err
+	}
+	return err
+}
+
+func (f *followRepository) DeleteUser(user *model.User) (err error) {
+	session := f.Driver.NewSession(neo4j.SessionConfig{
+		AccessMode: neo4j.AccessModeWrite,
+	})
+	defer unsafeClose(session)
+	if _, err := session.WriteTransaction(func(tx neo4j.Transaction) (interface{}, error) {
+		query := "DELETE (:User{id:$uId})"
 		parameters := map[string]interface{}{
 			"uId": user.Id,
 		}
