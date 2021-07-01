@@ -16,6 +16,7 @@ type User struct {
 	Password  string `bson:"password"`
 	Roles     []Role `bson:"roles"`
 	TotpToken string `bson:"totp_token"`
+	AgentToken string `bson:"agent_token,omitempty"`
 }
 
 type UserRequest struct {
@@ -100,7 +101,7 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 		TotpToken: token}, err
 }
 
-func NewAgent(userRequest *UserRequest, token string) (*User, error) {
+func NewAgent(userRequest *UserRequest, token string, agentToken string) (*User, error) {
 	return &User{Id: userRequest.Id,
 		Active:   false,
 		Email:    html.EscapeString(userRequest.Email),
@@ -149,7 +150,8 @@ func NewAgent(userRequest *UserRequest, token string) (*User, error) {
 		}},{Name: "agent", Permissions: []Permission{
 			{"create_campaign"},
 		}}},
-		TotpToken: token}, nil
+		TotpToken: token,
+		AgentToken: agentToken}, nil
 }
 
 

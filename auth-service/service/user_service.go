@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/beevik/guid"
 	"github.com/go-playground/validator"
 	"github.com/go-redis/redis"
 	"github.com/pquerna/otp/totp"
@@ -191,11 +192,14 @@ func (u userService) RegisterAgent(ctx context.Context, userRequest *model.UserR
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Info("TOTP QR code created")
 
-	user, err := model.NewAgent(userRequest,key.Secret())
+	agentToken := guid.New().String()
+	user, err := model.NewAgent(userRequest,key.Secret(), agentToken)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")
 		return "",[]byte{}, err
 	}
+
+	go SendAgentTokenMail(user.Email, agentToken)
 
 	if err := validator.New().Struct(user); err!= nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email" : userRequest.Email}).Warn("User registration validation failure")

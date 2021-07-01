@@ -92,6 +92,7 @@ func main() {
 					bson.D{{Key: "name", Value: "search_all_post_by_hashtag"}},
 					bson.D{{Key: "name", Value: "search_all_post_by_location"}},
 					bson.D{{Key: "name", Value: "view_profile_highlights"}},
+					bson.D{{Key: "name", Value: "create_agent"}},
 				}}}}},
 		{Key: "totp_token", Value: "123"},
 	})
@@ -117,6 +118,7 @@ func main() {
 					bson.D{{Key: "name", Value: "search_all_post_by_hashtag"}},
 					bson.D{{Key: "name", Value: "search_all_post_by_location"}},
 					bson.D{{Key: "name", Value: "view_profile_highlights"}},
+					bson.D{{Key: "name", Value: "create_agent"}},
 				}}}}},
 		{Key: "totp_token", Value: "123"},
 	})
