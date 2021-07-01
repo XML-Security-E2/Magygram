@@ -1,11 +1,16 @@
 package service
 
 import (
+	"encoding/json"
 	"github.com/go-playground/validator"
+	"github.com/go-redis/redis"
 	"github.com/sirupsen/logrus"
+	"log"
+	"relationship-service/conf"
 	"relationship-service/domain/model"
 	"relationship-service/infrastructure/persistence/neo4jdb"
 	"relationship-service/logger"
+	"relationship-service/saga"
 	"relationship-service/service/intercomm"
 )
 
@@ -24,6 +29,7 @@ type FollowService interface {
 	Mute(mute *model.Mute) error
 	Unmute(mute *model.Mute) error
 	ReturnRecommendedUsers(user *model.User) (interface{}, error)
+	RedisConnection()
 }
 
 type followService struct {
@@ -137,7 +143,6 @@ func (f *followService) CreateUser(user *model.User) error {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Create user node, database failure")
 		return err
 	}
-	logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : user.Id}).Info("User node created")
 
 	return nil
 }
@@ -234,4 +239,72 @@ func (f *followService) ReturnRecommendedUsers(user *model.User) (interface{}, e
 	}
 
 	return retVal, err
+}
+
+func (f *followService) RedisConnection() {
+	// create client and ping redis
+	var err error
+	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host+":"+ conf.Current.RedisDatabase.Port, Password: "", DB: 0})
+	if _, err = client.Ping().Result(); err != nil {
+		log.Fatalf("error creating redis client %s", err)
+	}
+
+	// subscribe to the required channels
+	pubsub := client.Subscribe(saga.RelationshipChannel, saga.ReplyChannel)
+	if _, err = pubsub.Receive(); err != nil {
+		log.Fatalf("error subscribing %s", err)
+	}
+	defer func() { _ = pubsub.Close() }()
+	ch := pubsub.Channel()
+
+	log.Println("starting the stock service")
+	for {
+		select {
+		case msg := <-ch:
+			m := saga.RegisterUserMessage{}
+			err := json.Unmarshal([]byte(msg.Payload), &m)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			switch msg.Channel {
+			case saga.RelationshipChannel:
+
+				// Happy Flow
+				if m.Action == saga.ActionStart {
+					// Check quantity of product
+
+					userDTO := model.User{Id: m.User.Id}
+					err := f.CreateUser(&userDTO)
+
+					if err != nil{
+						sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceAuth, saga.ServiceRelationship)
+					}else {
+						sendToReplyChannel(client, &m, saga.ActionDone, saga.ServiceUser, saga.ServiceRelationship)
+						//skinuti komentar za testiranje
+						//sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceAuth, saga.ServiceRelationship)
+					}
+				}
+
+				// Rollback flow
+				if m.Action == saga.ActionRollback {
+					userDTO := model.User{Id: m.User.Id}
+					f.DeleteUser(&userDTO)
+					sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceAuth, saga.ServiceRelationship)
+				}
+			}
+		}
+	}
+}
+
+func sendToReplyChannel(client *redis.Client, m *saga.RegisterUserMessage, action string, service string, senderService string) {
+	var err error
+	m.Action = action
+	m.Service = service
+	m.SenderService = senderService
+	if err = client.Publish(saga.ReplyChannel, m).Err(); err != nil {
+		log.Printf("error publishing done-message to %s channel", saga.ReplyChannel)
+	}
+	log.Printf("done message published to channel :%s", saga.ReplyChannel)
 }

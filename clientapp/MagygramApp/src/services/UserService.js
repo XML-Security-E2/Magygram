@@ -668,7 +668,7 @@ function register(user, dispatch) {
 					let image = URL.createObjectURL(blob);
 					dispatch(success(user.email, image));
 				} else {
-					dispatch(failure("Email adress and username must be unique"));
+					dispatch(failure("Email adress and username must be unique or we have some internal server problem"));
 				}
 			})
 			.catch((err) => {});

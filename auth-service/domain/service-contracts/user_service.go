@@ -14,4 +14,5 @@ type UserService interface {
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	GetAllRolesByUserId(ctx context.Context, userId string) ([]model.Role, error)
 	RegisterAgent(ctx context.Context, user *model.UserRequest)  (string, []byte , error)
+	RedisConnection()
 }
