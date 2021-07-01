@@ -39,6 +39,7 @@ type CampaignRequestResponseDTO struct {
 	ContentId string
 	Influencer string
 	Status RequestStatus
+	Price string
 }
 
 type ReportRequest struct {
@@ -54,6 +55,7 @@ type CampaignRequest struct {
 	Id string `bson:"_id,omitempty"`
 	Influencer string `bson:"username"`
 	ContentId string `bson:"content_id"`
+	Price string `bson:"price"`
 	Status RequestStatus `bson:"request_status"`
 	IsDeleted bool `bson:"deleted"`
 }
@@ -163,13 +165,16 @@ func NewReportRequest(reportRequest *ReportRequestDTO, whoReported string) (*Rep
 type CampaignRequestDTO struct {
 	ContentId string `json:"contentId"`
 	Influencer string `json:"username"`
+	Price string `json:"price"`
 	Status RequestStatus `json:"status"`
+
 }
 
 func NewCampaignRequest(campaignRequest *CampaignRequestDTO) (*CampaignRequest, error) {
 	return &CampaignRequest{Id: guid.New().String(),
 		ContentId:   campaignRequest.ContentId,
 		Influencer:    campaignRequest.Influencer,
+		Price: campaignRequest.Price,
 		Status: campaignRequest.Status,
 		IsDeleted: false,
 	}, nil

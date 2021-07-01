@@ -57,6 +57,7 @@ const UserContextProvider = (props) => {
             contentReportShow: false,
             agentRequestsShow: false,
         },
+		campaigns:[],
 		campaignOptions: {
 			showModal: false,
 		},
