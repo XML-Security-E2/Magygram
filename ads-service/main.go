@@ -3,6 +3,7 @@ package main
 import (
 	"ads-service/conf"
 	"ads-service/controller/router"
+	"ads-service/interactor"
 	"context"
 	"flag"
 	"fmt"
@@ -52,9 +53,10 @@ func main() {
 	}()
 
 	campaignCol := client.Database(*mongoDatabase).Collection("campaigns")
+	influencerCampaignCol := client.Database(*mongoDatabase).Collection("influencer-campaigns")
 
 	e := echo.New()
-	i := interactor.NewInteractor(campaignCol)
+	i := interactor.NewInteractor(campaignCol, influencerCampaignCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)

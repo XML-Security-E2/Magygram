@@ -25,6 +25,7 @@ type storyService struct {
 	intercomm.AuthClient
 	intercomm.RelationshipClient
 	intercomm.MessageClient
+	intercomm.AdsClient
 }
 
 func (p storyService) DeleteStory(ctx context.Context, requestId string) error {
@@ -40,8 +41,9 @@ func (p storyService) DeleteStory(ctx context.Context, requestId string) error {
 		return nil
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient) service_contracts.StoryService {
-	return &storyService{r , ic, uc,ac,rc, mc}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient, adscli 	intercomm.AdsClient,
+						) service_contracts.StoryService {
+	return &storyService{r , ic, uc,ac,rc, mc, adscli}
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
@@ -81,6 +83,50 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 
 	if postId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"story_id": post.Id, "user_id" : userInfo.Id}).Info("Story created")
+		return postId, nil
+	}
+
+	return "", err
+}
+
+func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag, campaignReq *model.CampaignRequest) (string, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil { return "", err}
+
+	media, err := p.MediaClient.SaveMedia(file)
+	if err != nil { return "", err}
+
+	post, err := model.NewStory(*userInfo, "CAMPAIGN", media, tags)
+	if err != nil {
+		return "", err}
+
+	if err := validator.New().Struct(post); err!= nil {
+		return "", err
+	}
+
+	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := p.StoryRepository.Create(ctx, post)
+	if err != nil {
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedStory,
+	})
+	if err != nil {
+		return "", err
+	}
+
+
+	if postId, ok := result.InsertedID.(string); ok {
 		return postId, nil
 	}
 

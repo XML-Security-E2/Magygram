@@ -18,6 +18,7 @@ type Interactor interface {
 	NewAuthClient() intercomm.AuthClient
 	NewMessageClient() intercomm.MessageClient
 	NewUserClient() intercomm.UserClient
+	NewAdsClient() intercomm.AdsClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -39,6 +40,10 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.PostHandler = i.NewPostHandler()
 	return appHandler
+}
+
+func (i *interactor) NewAdsClient() intercomm.AdsClient {
+	return intercomm.NewAdsClient()
 }
 
 func (i *interactor) NewMediaClient() intercomm.MediaClient {
@@ -66,7 +71,7 @@ func (i *interactor) NewPostRepository() repository.PostRepository {
 }
 
 func (i *interactor) NewPostService() service_contracts.PostService {
-	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewRelationshipClient(), i.NewAuthClient(), i.NewMessageClient())
+	return service.NewPostService(i.NewPostRepository(), i.NewMediaClient(), i.NewUserClient(), i.NewRelationshipClient(), i.NewAuthClient(), i.NewMessageClient(), i.NewAdsClient())
 }
 
 func (i *interactor) NewPostHandler() handler.PostHandler {

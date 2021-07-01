@@ -7,4 +7,5 @@ import (
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/ads/campaign", h.CreateCampaign)
+	e.POST("/api/ads/campaign/influencer", h.CreateInfluencerCampaign)
 }

@@ -7,6 +7,7 @@ import (
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/posts", h.CreatePost, h.LoggingMiddleware)
+	e.POST("/api/posts/campaign", h.CreatePostCampaign)
 	e.PUT("/api/posts", h.EditPost, h.LoggingMiddleware)
 	e.GET("/api/posts", h.GetPostsForTimeline, h.LoggingMiddleware)
 	e.GET("/api/posts/id/:postId", h.GetPostById, h.LoggingMiddleware)

@@ -28,10 +28,11 @@ type postService struct {
 	intercomm.RelationshipClient
 	intercomm.AuthClient
 	intercomm.MessageClient
+	intercomm.AdsClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient) service_contracts.PostService {
-	return &postService{r , ic, uc, ir, ac, mc}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient,adsc intercomm.AdsClient) service_contracts.PostService {
+	return &postService{r , ic, uc, ir, ac, mc, adsc}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -84,6 +85,50 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 
 	return "", err
 }
+
+func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil { return "", err}
+
+	media, err := p.MediaClient.SaveMedia(postRequest.Media)
+	if err != nil { return "", err}
+
+	post, err := model.NewPost(postRequest, *userInfo, "CAMPAIGN", media)
+	if err != nil {return "", err}
+
+	if err = validator.New().Struct(post); err!= nil {
+		return "", err
+	}
+
+	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := p.PostRepository.Create(ctx, post)
+	if err != nil {
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedPost,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if postId, ok := result.InsertedID.(string); ok {
+		return postId, nil
+	}
+
+	return "", err
+}
+
 
 func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]*model.PostResponse, error) {
 

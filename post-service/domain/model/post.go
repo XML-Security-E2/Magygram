@@ -62,6 +62,37 @@ type PostRequest struct {
 	Tags []Tag `json:"tags"`
 }
 
+type CampaignRequest struct {
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DisplayTime int `json:"displayTime"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	Type string `json:"campaignType"`
+}
+
+type TargetGroup struct {
+	MinAge int `json:"minAge"`
+	MaxAge int `json:"maxAge"`
+	Gender GenderType `json:"gender"`
+}
+
+type GenderType string
+
+const (
+	MALE = iota
+	FEMALE
+	ANY
+)
+
+type CampaignFrequency string
+
+const(
+	ONCE = iota
+	REPEATEDLY
+)
+
 func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media) (*Post, error) {
 	err := validatePostTypeEnums(postType)
 	if err != nil {

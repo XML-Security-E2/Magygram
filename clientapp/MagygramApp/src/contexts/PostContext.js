@@ -11,7 +11,12 @@ const PostContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
-		
+		createAgentPost: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
 		searchInfluencer: {
 			post: {
 				id: "",

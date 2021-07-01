@@ -42,3 +42,8 @@ messageservice:
   protocol: "https://"
   domain: "localhost"
   port: "467"
+
+adsservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "468"

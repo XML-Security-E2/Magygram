@@ -29,6 +29,37 @@ const(
 	CAMPAIGN
 )
 
+type CampaignRequest struct {
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DisplayTime int `json:"displayTime"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	Type string `json:"campaignType"`
+}
+
+type TargetGroup struct {
+	MinAge int `json:"minAge"`
+	MaxAge int `json:"maxAge"`
+	Gender GenderType `json:"gender"`
+}
+
+type GenderType string
+
+const (
+	MALE = iota
+	FEMALE
+	ANY
+)
+
+type CampaignFrequency string
+
+const(
+	ONCE = iota
+	REPEATEDLY
+)
+
 func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag) (*Story, error) {
 	err := validateStoryTypeEnums(storyType)
 	if err != nil {

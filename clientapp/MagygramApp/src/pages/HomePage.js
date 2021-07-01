@@ -18,6 +18,7 @@ import FollowRecommendation from "../components/FollowRecommendation";
 import AdminReportRequestTab from "../components/AdminReportRequestTab";
 import AgentRegistrationRequestTabContent from "../components/AgentRegistrationRequestTabContent";
 import MessageContextProvider from "../contexts/MessageContext";
+import CreateAgentStoryModal from "../components/modals/CreateAgentStoryModal";
 
 const HomePage = () => {
 	return (
@@ -31,6 +32,7 @@ const HomePage = () => {
 									<Header />
 								</NotificationContextProvider>
 								<CreateStoryModal />
+								<CreateAgentStoryModal />
 								<AddPostToFavouritesModal />
 								<MessageContextProvider>
 									<div>

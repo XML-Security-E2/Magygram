@@ -12,6 +12,13 @@ const StoryContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		createAgentStory: {
+			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
 		storyline: {
 			stories: [],
 		},

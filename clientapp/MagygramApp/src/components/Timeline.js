@@ -4,6 +4,7 @@ import Post from "./Post";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { postService } from "../services/PostService";
 import { Link } from "react-router-dom";
+import { hasRoles } from "../helpers/auth-header";
 
 const Timeline = ({ search }) => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -19,7 +20,7 @@ const Timeline = ({ search }) => {
 		<React.Fragment>
 			<div className="d-flex flex-column mt-4 mb-4">
 				<div hidden={search} className="card">
-					<Link type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" to="/add-posts">
+					<Link type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" to={hasRoles(["agent"]) ? "/add-agent-posts" : "/add-posts"}>
 						Create new post
 					</Link>
 				</div>

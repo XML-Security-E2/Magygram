@@ -37,11 +37,57 @@ export const storyReducer = (state, action) => {
 					successMessage: "",
 				},
 			};
+
+		case storyConstants.CREATE_AGENT_STORY_REQUEST:
+			return {
+				...state,
+				createAgentStory: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+		case storyConstants.CREATE_AGENT_STORY_SUCCESS:
+			return {
+				...state,
+				createAgentStory: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
+			};
+		case storyConstants.CREATE_AGENT_STORY_FAILURE:
+			return {
+				...state,
+				createAgentStory: {
+					showModal: false,
+					showError: true,
+					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
 		case modalConstants.OPEN_CREATE_STORY_MODAL:
 			console.log(state);
 			return {
 				...state,
 				createStory: {
+					showModal: true,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case modalConstants.OPEN_CREATE_AGENT_STORY_MODAL:
+			return {
+				...state,
+				createAgentStory: {
 					showModal: true,
 					showError: false,
 					errorMessage: "",
@@ -111,26 +157,26 @@ export const storyReducer = (state, action) => {
 					userId: action.userId,
 				},
 			};
-			case modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN:
-				return {
-					...state,
-					storySliderModal: {
-						showModal: true,
-						stories: createStoriesAdmin(action.stories),
-						firstUnvisitedStory: action.stories.FirstUnvisitedStory,
-						visited: action.visited,
-						userId: action.userId,
-					},
-				};
-			case modalConstants.HIDE_STORY_SLIDER_MODAL_ADMIN:
-				return {
-					...state,
-					storySliderModal: {
-						showModal: false,
-						stories: action.stories,
-						firstUnvisitedStory: 0,
-					},
-				};
+		case modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN:
+			return {
+				...state,
+				storySliderModal: {
+					showModal: true,
+					stories: createStoriesAdmin(action.stories),
+					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
+					visited: action.visited,
+					userId: action.userId,
+				},
+			};
+		case modalConstants.HIDE_STORY_SLIDER_MODAL_ADMIN:
+			return {
+				...state,
+				storySliderModal: {
+					showModal: false,
+					stories: action.stories,
+					firstUnvisitedStory: 0,
+				},
+			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
 			return {
 				...state,

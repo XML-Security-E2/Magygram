@@ -1,18 +1,49 @@
 package model
 
-import "time"
+import (
+	"errors"
+	"github.com/beevik/guid"
+	"time"
+)
+
+type InfluencerCampaign struct {
+	Id string `bson:"_id,omitempty"`
+	UserId string `bson:"user_id,omitempty"`
+	ContentId string `bson:"content_id,omitempty"`
+	ParentCampaignId string `bson:"parent_campaign_id,omitempty"`
+	SeenBy []string `bson:"seen_by"`
+	Type ContentType `bson:"campaign_type"`
+}
+
+type InfluencerCampaignRequest struct {
+	ContentId string `json:"contentId"`
+	ParentCampaignId string `json:"parentCampaignId"`
+	Type ContentType `json:"campaignType"`
+}
 
 type Campaign struct {
 	Id string `bson:"_id,omitempty"`
+	OwnerId string `bson:"owner_id,omitempty"`
 	ContentId string `bson:"content_id,omitempty"`
-	MinDisplays int `bson:"min_displays"`
+	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly"`
 	SeenBy []string `bson:"seen_by"`
-	Type CampaignType `bson:"campaign_type"`
+	Type ContentType `bson:"campaign_type"`
 	Frequency CampaignFrequency `bson:"frequency"`
 	TargetGroup TargetGroup `bson:"target_group"`
 	DateFrom time.Time `bson:"date_from"`
 	DateTo time.Time `bson:"date_to"`
-	InfluencersContent []InfluencerContent `bson:"influencers_content"`
+	DisplayTime int `bson:"display_time" validate:"required,numeric,min=0,max=24"`
+}
+
+type CampaignRequest struct {
+	ContentId string `json:"contentId"`
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Type ContentType `json:"campaignType"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	DisplayTime int `json:"displayTime"`
 }
 
 type InfluencerContent struct {
@@ -29,9 +60,9 @@ const (
 )
 
 type TargetGroup struct {
-	MinAge int `bson:"min_age"`
-	MaxAge int `bson:"max_age"`
-	Gender GenderType `bson:"gender"`
+	MinAge int `bson:"min_age" json:"minAge" validate:"required,numeric,min=12,max=70"`
+	MaxAge int `bson:"max_age" json:"maxAge" validate:"required,numeric,min=12,max=120"`
+	Gender GenderType `bson:"gender" json:"gender"`
 }
 
 type GenderType string
@@ -39,14 +70,7 @@ type GenderType string
 const (
 	MALE = iota
 	FEMALE
-)
-
-
-type CampaignType string
-
-const(
-	REGULAR = iota
-	CAMPAIGN
+	ANY
 )
 
 type CampaignFrequency string
@@ -55,3 +79,75 @@ const(
 	ONCE = iota
 	REPEATEDLY
 )
+
+func NewCampaign(campaignRequest *CampaignRequest, ownerId string) (*Campaign, error) {
+	if err := validateContentTypeEnums(campaignRequest.Type); err != nil {
+		return nil, err
+	}
+	if err := validateCampaignFrequencyEnums(campaignRequest.Frequency); err != nil {
+		return nil, err
+	}
+	if err := validateGenderTypeEnums(campaignRequest.TargetGroup.Gender); err != nil {
+		return nil, err
+	}
+
+	if campaignRequest.DateFrom.After(campaignRequest.DateTo) {
+		return nil, errors.New("dates out of range")
+	}
+	if campaignRequest.TargetGroup.MinAge > campaignRequest.TargetGroup.MaxAge || campaignRequest.TargetGroup.MinAge < 12 || campaignRequest.TargetGroup.MaxAge > 120 {
+		return nil, errors.New("age out of range")
+	}
+
+	return &Campaign{
+		Id:                       guid.New().String(),
+		ContentId:                campaignRequest.ContentId,
+		MinDisplaysForRepeatedly: campaignRequest.MinDisplaysForRepeatedly,
+		SeenBy:                   []string{},
+		Type:                     campaignRequest.Type,
+		Frequency:                campaignRequest.Frequency,
+		TargetGroup:              campaignRequest.TargetGroup,
+		DateFrom:                 campaignRequest.DateFrom,
+		DateTo:                   campaignRequest.DateTo,
+		OwnerId: 				  ownerId,
+		DisplayTime:              campaignRequest.DisplayTime,
+	}, nil
+}
+
+func NewInfluencerCampaign(campaignRequest *InfluencerCampaignRequest, userId string) (*InfluencerCampaign, error) {
+	if err := validateContentTypeEnums(campaignRequest.Type); err != nil {
+		return nil, err
+	}
+
+	return &InfluencerCampaign{
+		Id:               guid.New().String(),
+		UserId:           userId,
+		ContentId:        campaignRequest.ContentId,
+		ParentCampaignId: campaignRequest.ParentCampaignId,
+		SeenBy:           []string{},
+		Type:             campaignRequest.Type,
+	}, nil
+}
+
+func validateGenderTypeEnums(pt GenderType) error {
+	switch pt {
+	case "MALE", "FEMALE":
+		return nil
+	}
+	return errors.New("invalid gender type")
+}
+
+func validateCampaignFrequencyEnums(pt CampaignFrequency) error {
+	switch pt {
+	case "ONCE", "REPEATEDLY":
+		return nil
+	}
+	return errors.New("invalid campaign frequency")
+}
+
+func validateContentTypeEnums(pt ContentType) error {
+	switch pt {
+	case "POST", "STORY":
+		return nil
+	}
+	return errors.New("invalid campaign content type")
+}

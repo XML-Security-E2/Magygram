@@ -12,11 +12,14 @@ import (
 	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
+	"strconv"
+	"time"
 )
 
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
+	CreatePostCampaign(c echo.Context) error
 	GetPostsForTimeline(c echo.Context) error
 	LikePost(c echo.Context) error
 	UnlikePost(c echo.Context) error
@@ -106,6 +109,75 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	postId, err := p.PostService.CreatePost(ctx, bearer, postRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, postId)
+}
+
+func (p postHandler) CreatePostCampaign(c echo.Context) error {
+
+	location := c.FormValue("location")
+	description := c.FormValue("description")
+	tagsString := c.FormValue("tags")
+	minD := c.FormValue("minDisplays")
+	minDisplays, _ := strconv.Atoi(minD)
+	frequency := c.FormValue("frequency")
+	minA := c.FormValue("minAge")
+	minAge, _ := strconv.Atoi(minA)
+	maxA := c.FormValue("maxAge")
+	maxAge, _ := strconv.Atoi(maxA)
+	gender := c.FormValue("gender")
+
+	dateF := c.FormValue("startDate")
+	dateFr, _ := strconv.ParseInt(dateF, 10, 64)
+	dateFrom := time.Unix(0, dateFr * int64(time.Millisecond))
+
+	dateT := c.FormValue("endDate")
+	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
+
+	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+	displayT := c.FormValue("displayTime")
+	displayTime, _ := strconv.Atoi(displayT)
+
+	mpf, _ := c.MultipartForm()
+	var tags []model.Tag
+	json.Unmarshal([]byte(tagsString), &tags)
+
+	var headers []*multipart.FileHeader
+	for _, v := range mpf.File {
+		headers = append(headers, v[0])
+	}
+
+	postRequest := &model.PostRequest{
+		Description:              description,
+		Location:                 location,
+		Media:                    headers,
+		Tags:                     tags,
+	}
+
+	campaignRequest := &model.CampaignRequest{
+		MinDisplaysForRepeatedly: minDisplays,
+		Frequency:                model.CampaignFrequency(frequency),
+		TargetGroup:              model.TargetGroup{
+			MinAge: minAge,
+			MaxAge: maxAge,
+			Gender: model.GenderType(gender),
+		},
+		DateFrom:                 dateFrom,
+		DateTo:                   dateTo,
+		Type: "POST",
+		DisplayTime: displayTime,
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	postId, err := p.PostService.CreatePostCampaign(ctx, bearer, postRequest, campaignRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

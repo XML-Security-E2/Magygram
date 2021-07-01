@@ -44,6 +44,12 @@ export const postReducer = (state, action) => {
 					showSuccessMessage: false,
 					successMessage: "",
 				},
+				createAgentPost: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
 			};
 		case postConstants.CREATE_POST_SUCCESS:
 			return {
@@ -54,11 +60,54 @@ export const postReducer = (state, action) => {
 					showSuccessMessage: true,
 					successMessage: action.successMessage,
 				},
+				createAgentPost: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
 			};
 		case postConstants.CREATE_POST_FAILURE:
 			return {
 				...state,
 				createPost: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+				createAgentPost: {
+					showError: true,
+					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case postConstants.CREATE_POST_CAMPAIGN_REQUEST:
+			return {
+				...state,
+				createAgentPost: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+		case postConstants.CREATE_POST_CAMPAIGN_SUCCESS:
+			return {
+				...state,
+				createAgentPost: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
+			};
+		case postConstants.CREATE_POST_CAMPAIGN_FAILURE:
+			return {
+				...state,
+				createAgentPost: {
 					showError: true,
 					errorMessage: action.errorMessage,
 					showSuccessMessage: false,
@@ -614,22 +663,22 @@ export const postReducer = (state, action) => {
 				},
 			};
 		case modalConstants.SHOW_SEARCH_INFLUENCER_MODAL:
-		return {
-			...state,
-			searchInfluencer: {
-				post: {
-					id: action.post.Id,
-					userId: action.post.UserInfo.Id,
-					location: action.post.Location,
-					tags: action.post.Tags,
-					description: action.post.Description,
-					media: action.post.Media,
+			return {
+				...state,
+				searchInfluencer: {
+					post: {
+						id: action.post.Id,
+						userId: action.post.UserInfo.Id,
+						location: action.post.Location,
+						tags: action.post.Tags,
+						description: action.post.Description,
+						media: action.post.Media,
+					},
 				},
-			},
-			campaignOptions: {
-				showModal: true,
-			},
-		};
+				campaignOptions: {
+					showModal: true,
+				},
+			};
 		case modalConstants.HIDE_SEARCH_INFLUENCER_MODAL:
 			return {
 				...state,

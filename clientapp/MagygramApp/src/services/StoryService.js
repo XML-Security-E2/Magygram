@@ -5,6 +5,7 @@ import { authHeader } from "../helpers/auth-header";
 
 export const storyService = {
 	createStory,
+	createAgentStory,
 	createHighlight,
 	findAllProfileHighlights,
 	findAllStoriesByHighlightName,
@@ -72,6 +73,44 @@ function createStory(storyDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: storyConstants.CREATE_STORY_FAILURE, errorMessage: message };
+	}
+}
+
+function createAgentStory(storyCampaignDTO, dispatch) {
+	const formData = fetchFormData(storyCampaignDTO);
+	dispatch(request());
+	console.log(formData);
+
+	formData.append("minAge", storyCampaignDTO.minAge);
+	formData.append("maxAge", storyCampaignDTO.maxAge);
+	formData.append("displayTime", storyCampaignDTO.displayTime);
+	formData.append("frequency", storyCampaignDTO.frequency);
+	formData.append("gender", storyCampaignDTO.gender);
+	formData.append("startDate", storyCampaignDTO.startDate);
+	formData.append("endDate", storyCampaignDTO.endDate);
+
+	Axios.post(`/api/story/campaign`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+
+			if (res.status === 201) {
+				dispatch(success("Story successfully created"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: storyConstants.CREATE_AGENT_STORY_REQUEST };
+	}
+	function success(message) {
+		return { type: storyConstants.CREATE_AGENT_STORY_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: storyConstants.CREATE_AGENT_STORY_FAILURE, errorMessage: message };
 	}
 }
 
@@ -237,12 +276,12 @@ function fetchFormData(storyDTO) {
 	return formData;
 }
 
-function findStoryById(storyId,userId, dispatch) {
-	 Axios.get(`/api/story/${storyId}/getForAdmin`, { validateStatus: () => true, headers: authHeader() })
+function findStoryById(storyId, userId, dispatch) {
+	Axios.get(`/api/story/${storyId}/getForAdmin`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
-			console.log(res.data)
+			console.log(res.data);
 			if (res.status === 200) {
-				dispatch(success(res.data,1));
+				dispatch(success(res.data, 1));
 			} else {
 				//failure()
 			}
@@ -251,9 +290,9 @@ function findStoryById(storyId,userId, dispatch) {
 			//failure()
 		});
 
-		function success(data, visited) {
-			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN, stories: data, visited,userId };
-		}
+	function success(data, visited) {
+		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN, stories: data, visited, userId };
+	}
 }
 
 function GetStoriesForUser(userId, visited, dispatch) {

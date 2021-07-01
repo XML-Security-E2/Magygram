@@ -6,5 +6,6 @@ import (
 )
 
 type CampaignService interface {
-	CreateCampaign(ctx context.Context, bearer string) (*model.Campaign , error)
+	CreateCampaign(ctx context.Context, bearer string, campaignRequest *model.CampaignRequest) (string , error)
+	CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignRequest) (string , error)
 }

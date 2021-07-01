@@ -14,6 +14,7 @@ export const postService = {
 	createCollection,
 	deletePostFromCollection,
 	createPost,
+	createPostCampaign,
 	editPost,
 	likePost,
 	unlikePost,
@@ -31,7 +32,6 @@ export const postService = {
 	findPostByIdForPage,
 	sendCampaign,
 };
-
 
 function sendCampaign(requestDTO, dispatch) {
 	dispatch(request());
@@ -310,6 +310,44 @@ function createPost(postDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function createPostCampaign(postCampaignDTO, dispatch) {
+	const formData = fetchFormData(postCampaignDTO);
+	dispatch(request());
+	console.log(formData);
+
+	formData.append("minAge", postCampaignDTO.minAge);
+	formData.append("maxAge", postCampaignDTO.maxAge);
+	formData.append("displayTime", postCampaignDTO.displayTime);
+	formData.append("frequency", postCampaignDTO.frequency);
+	formData.append("gender", postCampaignDTO.gender);
+	formData.append("startDate", postCampaignDTO.startDate);
+	formData.append("endDate", postCampaignDTO.endDate);
+
+	Axios.post(`/api/posts/campaign`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+
+			if (res.status === 201) {
+				dispatch(success("Post campaign successfully created"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_FAILURE, errorMessage: message };
 	}
 }
 
