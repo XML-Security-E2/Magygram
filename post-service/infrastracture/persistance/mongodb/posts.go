@@ -65,7 +65,6 @@ func (r *postRepository) GetAll(ctx context.Context) ([]*model.Post, error) {
 }
 
 func (r *postRepository) GetByID(ctx context.Context, id string) (*model.Post, error) {
-
 	var post = model.Post{}
 	err := r.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&post)
 	if err != nil {
@@ -98,7 +97,7 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) (*mongo.U
 }
 
 func (r *postRepository) GetPostsForUser(ctx context.Context, userId string) ([]*model.Post, error) {
-	cursor, err := r.Col.Find(ctx, bson.M{"user_info.id": userId})
+	cursor, err := r.Col.Find(ctx, bson.M{"user_info.id": userId, "deleted" : false})
 	var results []*model.Post
 
 	if err != nil {
