@@ -25,6 +25,13 @@ export const storyReducer = (state, action) => {
 					showSuccessMessage: true,
 					successMessage: action.successMessage,
 				},
+				createAgentStory: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
 			};
 		case storyConstants.CREATE_STORY_FAILURE:
 			return {
@@ -56,6 +63,8 @@ export const storyReducer = (state, action) => {
 							UserId: story.userInfo.Id,
 							UserImageUrl: story.userInfo.ImageURL,
 							Username: story.userInfo.Username,
+							Website: story.Website,
+							ContentType: story.contentType,
 						});
 					}
 				});
@@ -507,11 +516,13 @@ function createStories(stories) {
 			url: media.Url,
 			header: {
 				heading: stories.UserInfo.Username,
-				profileImage: stories.UserInfo.ImageURL,
+				profileImage: stories.UserInfo.ImageURL === "" ? "assets/img/profile.jpg" : stories.UserInfo.ImageURL,
 				storyId: media.StoryId,
 			},
 			type: media.MediaType === "VIDEO" ? "video" : "image",
 			tags: media.Tags,
+			contentType: media.ContentType,
+			website: media.Website,
 		});
 	});
 
@@ -528,6 +539,8 @@ function createStoriesAdmin(stories) {
 			},
 			type: media.MediaType === "VIDEO" ? "video" : "image",
 			tags: media.Tags,
+			contentType: media.ContentType,
+			website: media.Website,
 		});
 	});
 
@@ -556,6 +569,8 @@ function createHighlights(highlights, name) {
 function createStory(story) {
 	var retVal = [];
 
+	console.log(story);
+
 	retVal.push({
 		url: story.Url,
 		header: {
@@ -565,6 +580,8 @@ function createStory(story) {
 		},
 		type: story.MediaType === "VIDEO" ? "video" : "image",
 		tags: story.Tags,
+		contentType: story.ContentType,
+		website: story.Website,
 	});
 
 	return retVal;

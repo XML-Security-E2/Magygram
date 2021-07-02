@@ -19,6 +19,7 @@ type Story struct {
 	VisitedBy []UserInfo `bson:"visited_by"`
 	CreatedTime time.Time `bson:"created_time"`
 	Tags []Tag `bson:"tags"`
+	Website string `bson:"website"`
 	IsDeleted bool `bson:"deleted"`
 }
 
@@ -62,7 +63,7 @@ const(
 	REPEATEDLY
 )
 
-func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag) (*Story, error) {
+func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag, website string) (*Story, error) {
 	err := validateStoryTypeEnums(storyType)
 	if err != nil {
 		return nil, err
@@ -81,6 +82,7 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag
 				CreatedTime: time.Now(),
 				Tags: tags,
 				IsDeleted: false,
+				Website: website,
 	}, nil
 }
 
@@ -118,12 +120,20 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type AgentInfo struct {
+	Id string
+	Username string
+	ImageURL string
+	Website string
+}
+
 type UsersStoryResponseWithUserInfo struct {
 	Id string `json:"id"`
 	UserInfo UserInfo `json:"userInfo"`
 	ContentType ContentType `json:"contentType"`
 	Media Media `json:"media"`
 	DateTime string `json:"dateTime"`
+	Website string
 }
 
 type UsersStoryResponse struct {
@@ -145,6 +155,8 @@ type MediaContent struct{
 	MediaType string
 	StoryId string
 	Tags []Tag
+	ContentType ContentType
+	Website string
 }
 
 type HighlightImageWithMedia struct {

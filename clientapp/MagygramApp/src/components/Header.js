@@ -199,7 +199,7 @@ const Header = () => {
 								</Link>
 							</li>
 							<li hidden={!hasRoles(["agent"])}>
-								<Link className="la la-user btn shadow-none" to="/campaigns">
+								<Link className="la la-volume-up btn shadow-none" to="/campaigns">
 									Campaigns
 								</Link>
 							</li>

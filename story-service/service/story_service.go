@@ -77,7 +77,7 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	media, err := p.MediaClient.SaveMedia(file)
 	if err != nil { return "", err}
 
-	post, err := model.NewStory(*userInfo, "REGULAR", media, tags)
+	post, err := model.NewStory(*userInfo, "REGULAR", media, tags, "")
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
 		return "", err}
@@ -114,13 +114,17 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 }
 
 func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag, campaignReq *model.CampaignRequest) (string, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
 	if err != nil { return "", err}
 
 	media, err := p.MediaClient.SaveMedia(file)
 	if err != nil { return "", err}
 
-	post, err := model.NewStory(*userInfo, "CAMPAIGN", media, tags)
+	post, err := model.NewStory(model.UserInfo{
+		Id:       userInfo.Id,
+		Username: userInfo.Username,
+		ImageURL: userInfo.ImageURL,
+	}, "CAMPAIGN", media, tags, userInfo.Website)
 	if err != nil {
 		return "", err}
 
@@ -179,6 +183,7 @@ func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer strin
 			Media:      story.Media,
 			DateTime:    "",
 			UserInfo:   story.UserInfo,
+			Website:    story.Website,
 		})
 	}
 
@@ -236,6 +241,7 @@ func (p storyService) GetStoryForUserMessage(ctx context.Context, bearer string,
 		Media:      story.Media,
 		DateTime:    "",
 		UserInfo:   story.UserInfo,
+		Website:    story.Website,
 	}
 	return resp, nil, nil
 }
@@ -363,10 +369,12 @@ func (p storyService) GetStoryForAdmin(ctx context.Context, storyId string) (*mo
 
 	var media []model.MediaContent
 	mediaContent := model.MediaContent{
-		Url: result.Media.Url,
-		MediaType: result.Media.MediaType,
-		StoryId: result.Id,
-		Tags: result.Tags,
+		Url:         result.Media.Url,
+		MediaType:   result.Media.MediaType,
+		StoryId:     result.Id,
+		Tags:        result.Tags,
+		ContentType: result.ContentType,
+		Website:     result.Website,
 	}
 	media = append(media, mediaContent)
 
@@ -469,10 +477,12 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 
 	for _, story := range result {
 		mediaContent := model.MediaContent{
-			Url: story.Media.Url,
-			MediaType: story.Media.MediaType,
-			StoryId: story.Id,
-			Tags: story.Tags,
+			Url:         story.Media.Url,
+			MediaType:   story.Media.MediaType,
+			StoryId:     story.Id,
+			Tags:        story.Tags,
+			ContentType: story.ContentType,
+			Website:     story.Website,
 		}
 		retVal = append(retVal, mediaContent)
 	}

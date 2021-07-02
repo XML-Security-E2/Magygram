@@ -131,6 +131,8 @@ export const messageReducer = (state, action) => {
 						Username: "",
 						Unauthorized: true,
 						Expired: true,
+						Website: "",
+						ContentType: "",
 					};
 				}
 			});
@@ -195,6 +197,7 @@ export const messageReducer = (state, action) => {
 		case messageConstants.SET_STORY_MESSAGE_SUCCESS:
 			stateCpy = { ...state };
 
+			console.log(action.story);
 			stateCpy.showedMessages.forEach((message) => {
 				if (message.contentId === action.story.id) {
 					message.story = {
@@ -207,6 +210,8 @@ export const messageReducer = (state, action) => {
 						Tags: action.story.media.Tags,
 						Unauthorized: false,
 						Expired: false,
+						Website: action.story.Website,
+						ContentType: action.story.contentType,
 					};
 				}
 			});
@@ -228,6 +233,8 @@ export const messageReducer = (state, action) => {
 						Username: action.userInfo.Username,
 						Unauthorized: true,
 						Expired: false,
+						Website: "",
+						ContentType: "",
 					};
 				}
 			});
@@ -249,6 +256,8 @@ export const messageReducer = (state, action) => {
 						Username: action.userInfo.Username,
 						Unauthorized: false,
 						Expired: true,
+						Website: "",
+						ContentType: "",
 					};
 				}
 			});
@@ -499,6 +508,8 @@ export const messageReducer = (state, action) => {
 function createStory(story) {
 	var retVal = [];
 
+	console.log(story);
+
 	retVal.push({
 		url: story.Url,
 		header: {
@@ -508,6 +519,8 @@ function createStory(story) {
 		},
 		type: story.MediaType === "VIDEO" ? "video" : "image",
 		tags: story.Tags,
+		website: story.Website,
+		contentType: story.ContentType,
 	});
 
 	return retVal;
