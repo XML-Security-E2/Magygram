@@ -4,6 +4,7 @@ import (
 	"ads-service/domain/model"
 	"ads-service/domain/service-contracts"
 	"context"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"time"
@@ -18,6 +19,8 @@ type CampaignHandler interface {
 	GetCampaignById(c echo.Context) error
 	GetCampaignByPostId(c echo.Context) error
 	GetCampaignByStoryId(c echo.Context) error
+	DeleteCampaignByPostId(c echo.Context) error
+	DeleteCampaignByStory(c echo.Context) error
 }
 
 type campaignHandler struct {
@@ -26,6 +29,39 @@ type campaignHandler struct {
 
 func NewCampaignHandler(p service_contracts.CampaignService) CampaignHandler {
 	return &campaignHandler{p}
+}
+
+func (ch campaignHandler) DeleteCampaignByPostId(c echo.Context) error {
+	contentId := c.Param("contentId")
+	fmt.Println("USO")
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := ch.CampaignService.DeleteCampaignByPostId(ctx, bearer, contentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")}
+
+func (ch campaignHandler) DeleteCampaignByStory(c echo.Context) error {
+	contentId := c.Param("contentId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := ch.CampaignService.DeleteCampaignByStoryId(ctx, bearer, contentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
 }
 
 func (ch campaignHandler) GetCampaignByPostId(c echo.Context) error {

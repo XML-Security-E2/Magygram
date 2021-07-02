@@ -28,17 +28,41 @@ type storyService struct {
 	intercomm.AdsClient
 }
 
-func (p storyService) DeleteStory(ctx context.Context, requestId string) error {
-	request, err := p.StoryRepository.GetByID(ctx, requestId)
-		if err != nil {
-		return errors.New("Request not found")
+func (p storyService) DeleteStory(ctx context.Context, bearer string, requestId string) error {
+
+	retVal, err := p.AuthClient.HasRole(bearer,"delete_story")
+	if err != nil{
+		return errors.New("auth service not found")
 	}
 
-		request.IsDeleted = true
+	request, err := p.StoryRepository.GetByID(ctx, requestId)
+	if err!=nil {
+		return errors.New("story not found")
+	}
 
-		p.StoryRepository.DeleteStory(ctx, request)
+	if !retVal {
+		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		if err != nil {
+			return err
+		}
+		if request.UserInfo.Id != userId {
+			return errors.New("user not authorized for story delete")
+		}
+	}
 
-		return nil
+	err = p.AdsClient.DeleteCampaign(bearer, request.Id)
+	if err != nil {
+		return err
+	}
+
+	request.IsDeleted = true
+
+	_, err = p.StoryRepository.DeleteStory(ctx, request)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient, adscli 	intercomm.AdsClient,

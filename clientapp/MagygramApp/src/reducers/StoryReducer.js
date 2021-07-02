@@ -361,12 +361,138 @@ export const storyReducer = (state, action) => {
 			storyCopy = { ...state };
 			storyCopy.agentCampaignStoryModal.showModal = true;
 			storyCopy.agentCampaignStoryModal.stories = createStory(action.story);
-
+			storyCopy.agentCampaignStoryModal.storyId = action.story.Id;
 			return storyCopy;
 		case modalConstants.HIDE_STORY_AGENT_CAMPAIGN_MODAL:
 			storyCopy = { ...state };
 			storyCopy.agentCampaignStoryModal.showModal = false;
 
+			return storyCopy;
+
+		case storyConstants.HIDE_STORY_CAMPAIGN_OPTION_ALERTS:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case modalConstants.SHOW_STORY_AGENT_OPTIONS_MODAL:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showModal = true;
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case modalConstants.HIDE_STORY_AGENT_OPTIONS_MODAL:
+			return {
+				...state,
+				agentCampaignStoryOptionModal: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+					campaign: {
+						minAge: "",
+						maxAge: "",
+						minDisplays: "",
+						gender: "ANY",
+						frequency: "",
+						startDate: new Date(),
+						endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+					},
+				},
+			};
+
+		case storyConstants.SET_STORY_BY_ID_CAMPAIGN_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.campaign = {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				gender: "ANY",
+				frequency: "",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			};
+			return storyCopy;
+		case storyConstants.SET_STORY_BY_ID_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			storyCopy.agentCampaignStoryOptionModal.campaign = {
+				id: action.campaign.id,
+				minAge: action.campaign.targetGroup.minAge,
+				maxAge: action.campaign.targetGroup.maxAge,
+				minDisplays: action.campaign.minDisplaysForRepeatedly,
+				frequency: action.campaign.frequency,
+				gender: action.campaign.targetGroup.gender,
+				startDate: new Date(action.campaign.dateFrom),
+				endDate: new Date(action.campaign.dateTo),
+			};
+			return storyCopy;
+		case storyConstants.SET_STORY_BY_ID_CAMPAIGN_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.campaign = {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				frequency: "",
+				gender: "ANY",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			};
+			return storyCopy;
+
+		case storyConstants.UPDATE_STORY_CAMPAIGN_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case storyConstants.UPDATE_STORY_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = true;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = action.successMessage;
+			return storyCopy;
+		case storyConstants.UPDATE_STORY_CAMPAIGN_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = true;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = action.errorMessage;
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+
+		case storyConstants.DELETE_STORY_CAMPAIGN_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case storyConstants.DELETE_STORY_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			let storyes = state.agentCampaignStories.filter((story) => story.Id !== action.storyId);
+			storyCopy.agentCampaignStories = storyes;
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = true;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = action.successMessage;
+			storyCopy.agentCampaignStoryOptionModal.showModal = false;
+			storyCopy.agentCampaignStoryModal.showModal = false;
+
+			return storyCopy;
+		case storyConstants.DELETE_STORY_CAMPAIGN_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = true;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = action.errorMessage;
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
 			return storyCopy;
 		default:
 			return state;

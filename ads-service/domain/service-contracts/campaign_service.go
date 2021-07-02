@@ -15,4 +15,7 @@ type CampaignService interface {
 
 	GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error)
 	GetCampaignByStoryId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error)
+
+	DeleteCampaignByPostId(ctx context.Context, bearer string, contentId string) error
+	DeleteCampaignByStoryId(ctx context.Context, bearer string, contentId string) error
 }

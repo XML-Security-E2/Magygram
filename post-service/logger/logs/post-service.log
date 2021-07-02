@@ -583,3 +583,8 @@ time="2021-07-01T18:36:55+02:00" level=info msg="Post un-disliked" func=post-ser
 time="2021-07-01T18:38:44+02:00" level=info msg="Post commented" func=post-service/service.postService.AddComment file="C:/Users/Dusan/Desktop/Magygram/post-service/service/post_service.go:377" post_id=ede94b01-ebf1-48d2-9f49-a03baf51849d request_ip=127.0.0.1 user_id=2335f261-be54-4f69-b34e-654b4996616a
 time="2021-07-02T12:28:36+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
 time="2021-07-02T12:30:04+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-02T12:45:51+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-02T16:41:29+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-02T16:44:44+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-02T16:49:33+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-02T16:50:17+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462

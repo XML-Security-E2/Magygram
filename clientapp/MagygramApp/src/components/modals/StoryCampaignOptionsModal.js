@@ -1,16 +1,16 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
-import { PostContext } from "../../contexts/PostContext";
 import { hasRoles } from "../../helpers/auth-header";
-import { postConstants } from "../../constants/PostConstants";
 import SuccessAlert from "../SuccessAlert";
 import FailureAlert from "../FailureAlert";
-import EditCampaignForm from "../agent-campaigns/EditCampaignForm";
-import { postService } from "../../services/PostService";
+import { StoryContext } from "../../contexts/StoryContext";
+import { storyService } from "../../services/StoryService";
+import { storyConstants } from "../../constants/StoryConstants";
+import EditStoryCampaignForm from "../agent-campaigns/EditStoryCampaignForm";
 
-const PostCampaignOptionsModal = ({ postId }) => {
-	const { postState, dispatch } = useContext(PostContext);
+const StoryCampaignOptionsModal = ({ storyId }) => {
+	const { storyState, dispatch } = useContext(StoryContext);
 
 	const [hiddenForm, setHiddenForm] = useState(true);
 	const [hiddenCampaignAlert, setHiddenCampaignAlert] = useState(true);
@@ -18,7 +18,7 @@ const PostCampaignOptionsModal = ({ postId }) => {
 
 	const handleEditCampaign = () => {
 		let campaign = {
-			campaignId: postState.agentCampaignPostOptionModal.campaign.id,
+			campaignId: storyState.agentCampaignStoryOptionModal.campaign.id,
 			minDisplaysForRepeatedly: parseInt(campaignRef.current.campaignState.minDisplaysForRepeatedly),
 			targetGroup: {
 				minAge: parseInt(campaignRef.current.campaignState.minAge),
@@ -29,51 +29,51 @@ const PostCampaignOptionsModal = ({ postId }) => {
 			dateTo: campaignRef.current.campaignState.endDate.getTime(),
 		};
 
-		postService.updatePostCampaign(campaign, dispatch);
+		storyService.updateStoryCampaign(campaign, dispatch);
 	};
 
 	const handleModalClose = () => {
-		dispatch({ type: modalConstants.HIDE_POST_AGENT_OPTIONS_MODAL });
+		dispatch({ type: modalConstants.HIDE_STORY_AGENT_OPTIONS_MODAL });
 		setHiddenForm(true);
 		setHiddenCampaignAlert(true);
 	};
 
 	const handleDelete = () => {
-		postService.deletePostCampaign(postId, dispatch);
+		storyService.deleteStoryCampaign(storyId, dispatch);
 	};
 
-	const handleOpenCampaignPostEditModal = () => {
-		postService.getCampaignByPostId(postId, dispatch);
+	const handleOpenCampaignStoryEditModal = () => {
+		storyService.getCampaignByStoryId(storyId, dispatch);
 	};
 
 	useEffect(() => {
-		setHiddenCampaignAlert(postState.agentCampaignPostOptionModal.campaign.frequency === "REPEATEDLY" || postState.agentCampaignPostOptionModal.campaign.frequency === "");
-		setHiddenForm(postState.agentCampaignPostOptionModal.campaign.frequency === "ONCE" || postState.agentCampaignPostOptionModal.campaign.frequency === "");
-	}, [postState.agentCampaignPostOptionModal.campaign]);
+		setHiddenCampaignAlert(storyState.agentCampaignStoryOptionModal.campaign.frequency === "REPEATEDLY" || storyState.agentCampaignStoryOptionModal.campaign.frequency === "");
+		setHiddenForm(storyState.agentCampaignStoryOptionModal.campaign.frequency === "ONCE" || storyState.agentCampaignStoryOptionModal.campaign.frequency === "");
+	}, [storyState.agentCampaignStoryOptionModal.campaign]);
 
 	return (
-		<Modal show={postState.agentCampaignPostOptionModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
+		<Modal show={storyState.agentCampaignStoryOptionModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">{hiddenForm ? "Options" : "Report"}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<SuccessAlert
-					hidden={!postState.agentCampaignPostOptionModal.showSuccessMessage}
+					hidden={!storyState.agentCampaignStoryOptionModal.showSuccessMessage}
 					header="Success"
-					message={postState.agentCampaignPostOptionModal.successMessage}
-					handleCloseAlert={() => dispatch({ type: postConstants.HIDE_POST_CAMPAIGN_OPTION_ALERTS })}
+					message={storyState.agentCampaignStoryOptionModal.successMessage}
+					handleCloseAlert={() => dispatch({ type: storyConstants.HIDE_STORY_CAMPAIGN_OPTION_ALERTS })}
 				/>
 				<FailureAlert
-					hidden={!postState.agentCampaignPostOptionModal.showError}
+					hidden={!storyState.agentCampaignStoryOptionModal.showError}
 					header="Error"
-					message={postState.agentCampaignPostOptionModal.errorMessage}
-					handleCloseAlert={() => dispatch({ type: postConstants.HIDE_POST_CAMPAIGN_OPTION_ALERTS })}
+					message={storyState.agentCampaignStoryOptionModal.errorMessage}
+					handleCloseAlert={() => dispatch({ type: storyConstants.HIDE_STORY_CAMPAIGN_OPTION_ALERTS })}
 				/>
 				<FailureAlert hidden={hiddenCampaignAlert} header="Error" message="Camapigns that lasts only one day cannot be edited" handleCloseAlert={() => setHiddenCampaignAlert(true)} />
 
 				<div hidden={!hiddenForm}>
 					<div className="row">
-						<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleOpenCampaignPostEditModal}>
+						<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleOpenCampaignStoryEditModal}>
 							Edit
 						</button>
 					</div>
@@ -84,7 +84,7 @@ const PostCampaignOptionsModal = ({ postId }) => {
 					</div>
 				</div>
 				<div hidden={hiddenForm}>
-					<EditCampaignForm ref={campaignRef} fontColor="black" />
+					<EditStoryCampaignForm ref={campaignRef} fontColor="black" />
 					<Button onClick={handleEditCampaign} className="btn float-right">
 						Edit
 					</Button>
@@ -94,4 +94,4 @@ const PostCampaignOptionsModal = ({ postId }) => {
 	);
 };
 
-export default PostCampaignOptionsModal;
+export default StoryCampaignOptionsModal;

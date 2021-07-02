@@ -50,6 +50,23 @@ const StoryContextProvider = (props) => {
 		agentCampaignStoryModal: {
 			showModal: false,
 			stories: "",
+			storyId: "",
+		},
+		agentCampaignStoryOptionModal: {
+			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+			campaign: {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				gender: "ANY",
+				frequency: "",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			},
 		},
 		agentCampaignStories: [],
 		storyId: "",

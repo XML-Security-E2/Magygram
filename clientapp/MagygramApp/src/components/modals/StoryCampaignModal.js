@@ -4,6 +4,7 @@ import { modalConstants } from "../../constants/ModalConstants";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import Stories from "react-insta-stories";
 import { StoryContext } from "../../contexts/StoryContext";
+import StoryCampaignOptionsModal from "./StoryCampaignOptionsModal";
 
 const StoryCampaignModal = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
@@ -14,7 +15,7 @@ const StoryCampaignModal = () => {
 
 	const onAllStoriesEnd = () => {
 		//alert(test)
-		dispatch({ type: modalConstants.HIDE_STORY_AGENT_CAMPAIGN_MODAL });
+		//dispatch({ type: modalConstants.HIDE_STORY_AGENT_CAMPAIGN_MODAL });
 	};
 
 	const handleOpenOptionsModal = () => {
@@ -30,6 +31,7 @@ const StoryCampaignModal = () => {
 					</button>
 				</div>
 				<Stories currentIndex={0} width="100%" stories={storyState.agentCampaignStoryModal.stories} onAllStoriesEnd={onAllStoriesEnd} />
+				<StoryCampaignOptionsModal storyId={storyState.agentCampaignStoryModal.storyId} />
 			</Modal.Body>
 		</Modal>
 	);

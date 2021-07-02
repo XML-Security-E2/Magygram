@@ -15,7 +15,7 @@ const StoryCampaignList = () => {
 
 	return (
 		<React.Fragment>
-			{storyState.agentCampaignStories !== null && <h3 className="text-dark">Story campaigns</h3>}
+			<h3 className="text-dark">Story campaigns</h3>
 
 			<div className="row ">
 				{storyState.agentCampaignStories !== null ? (
@@ -27,6 +27,12 @@ const StoryCampaignList = () => {
 						);
 					})
 				) : (
+					<div className="col-12 mt-5 d-flex justify-content-center text-secondary">
+						<h4>User don't have active story campaigns</h4>
+					</div>
+				)}
+
+				{storyState.agentCampaignStories.length === 0 && (
 					<div className="col-12 mt-5 d-flex justify-content-center text-secondary">
 						<h4>User don't have active story campaigns</h4>
 					</div>

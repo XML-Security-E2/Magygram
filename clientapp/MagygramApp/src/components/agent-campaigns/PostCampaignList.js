@@ -18,7 +18,7 @@ const PostCampaignList = () => {
 
 	return (
 		<React.Fragment>
-			{postState.agentCampaignPosts.length > 0 && <h3 className="text-dark mt-5">Post campaigns</h3>}
+			<h3 className="text-dark mt-5">Post campaigns</h3>
 			<div className="row ">
 				{postState.agentCampaignPosts.length > 0 ? (
 					postState.agentCampaignPosts.map((post) => {

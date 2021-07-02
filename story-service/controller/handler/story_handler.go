@@ -73,8 +73,9 @@ func (p storyHandler) DeleteStory(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	bearer := c.Request().Header.Get("Authorization")
 
-	err := p.StoryService.DeleteStory(ctx, postId)
+	err := p.StoryService.DeleteStory(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

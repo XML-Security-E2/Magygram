@@ -178,9 +178,17 @@ func (p postService) DeletePost(ctx context.Context, bearer string, requestId st
 		}
 	}
 
+	err = p.AdsClient.DeleteCampaign(bearer, request.Id)
+	if err != nil {
+		return err
+	}
+
 	request.IsDeleted=true
 
-	p.PostRepository.DeletePost(ctx,request)
+	_, err = p.PostRepository.DeletePost(ctx,request)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -967,10 +975,9 @@ func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([
 	if err != nil{
 		return []*model.PostProfileResponse{}, err
 	}
-	fmt.Println(posts[0])
 
 	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, posts)
-	fmt.Println(len(userPosts))
+
 	if userPosts == nil {
 		return nil, nil
 	}

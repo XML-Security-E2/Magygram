@@ -1087,6 +1087,34 @@ export const postReducer = (state, action) => {
 			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
 			postCopy.agentCampaignPostOptionModal.successMessage = "";
 			return postCopy;
+
+		case postConstants.DELETE_POST_CAMPAIGN_REQUEST:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
+			return postCopy;
+		case postConstants.DELETE_POST_CAMPAIGN_SUCCESS:
+			postCopy = { ...state };
+
+			let posts = state.agentCampaignPosts.filter((post) => post.id !== action.postId);
+			postCopy.agentCampaignPosts = posts;
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = true;
+			postCopy.agentCampaignPostOptionModal.successMessage = action.successMessage;
+			postCopy.agentCampaignPostOptionModal.showModal = false;
+			postCopy.viewAgentCampaignPostModal.showModal = false;
+
+			return postCopy;
+		case postConstants.DELETE_POST_CAMPAIGN_FAILURE:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showError = true;
+			postCopy.agentCampaignPostOptionModal.errorMessage = action.errorMessage;
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
+			return postCopy;
 		default:
 			return state;
 	}

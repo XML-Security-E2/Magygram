@@ -75,6 +75,24 @@ func (c campaignService) GetCampaignByStoryId(ctx context.Context, bearer string
 	}, nil
 }
 
+func (c campaignService) DeleteCampaignByPostId(ctx context.Context, bearer string, contentId string) error {
+	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
+	if err != nil {
+		return err
+	}
+
+	return c.CampaignRepository.DeleteByID(ctx, campaign.Id)
+}
+
+func (c campaignService) DeleteCampaignByStoryId(ctx context.Context, bearer string, contentId string) error {
+	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
+	if err != nil {
+		return err
+	}
+
+	return c.CampaignRepository.DeleteByID(ctx, campaign.Id)
+}
+
 func (c campaignService) GetCampaignById(ctx context.Context, bearer string, campaignId string) (*model.Campaign, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
@@ -111,6 +129,9 @@ func getContentIdsFromCampaigns(campaigns []*model.Campaign) []string {
 	var retVal []string
 	for _, campaign := range campaigns {
 		retVal = append(retVal, campaign.ContentId)
+	}
+	if retVal == nil {
+		return []string{}
 	}
 	return retVal
 }

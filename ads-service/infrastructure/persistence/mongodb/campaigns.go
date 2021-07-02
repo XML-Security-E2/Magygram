@@ -23,11 +23,32 @@ func (c campaignRepository) Create(ctx context.Context, campaign *model.Campaign
 	return c.Col.InsertOne(ctx, campaign)
 }
 
+func (c campaignRepository) DeleteByID(ctx context.Context, id string) error {
+	_, err := c.Col.UpdateOne(ctx, bson.M{"_id":  id},bson.D{{"$set", bson.D{
+		{"deleted" , true}}}})
+	return err
+}
+
 func (c campaignRepository) GetFutureByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.Campaign, error) {
 	var campaign = model.Campaign{}
 	err := c.Col.FindOne(ctx, bson.M{"content_id": contentId,
 		"campaign_type": campaignType,
+		"deleted": false,
 		"date_to" : bson.M{"$gte" : primitive.NewDateTimeFromTime(time.Now())}}).Decode(&campaign)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("ErrNoDocuments")
+		}
+		return nil, err
+	}
+	return &campaign, nil
+}
+
+func (c campaignRepository) GetByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.Campaign, error) {
+	var campaign = model.Campaign{}
+	err := c.Col.FindOne(ctx, bson.M{"content_id": contentId,
+		"deleted": false,
+		"campaign_type": campaignType}).Decode(&campaign)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("ErrNoDocuments")
@@ -40,24 +61,32 @@ func (c campaignRepository) GetFutureByContentIDAndType(ctx context.Context, con
 func (c campaignRepository) GetAllFutureByOwnerIDAndType(ctx context.Context, ownerId string, campaignType string) ([]*model.Campaign, error) {
 
 	cursor, err := c.Col.Find(ctx, bson.M{"owner_id": ownerId,
+										  "deleted": false,
 										  "campaign_type": campaignType,
 										  "date_to" : bson.M{"$gte" : primitive.NewDateTimeFromTime(time.Now())}})
 
 	var results []*model.Campaign
 
 	if err != nil {
-		defer cursor.Close(ctx)
-		return nil, err
+		if cursor != nil {
+			defer cursor.Close(ctx)
+		}
+		return []*model.Campaign{}, err
 	} else {
-		for cursor.Next(ctx) {
-			var result model.Campaign
+		if cursor != nil {
 
-			err := cursor.Decode(&result)
-			results = append(results, &result)
+			for cursor.Next(ctx) {
+				var result model.Campaign
 
-			if err != nil {
-				return nil, err
+				err := cursor.Decode(&result)
+				results = append(results, &result)
+
+				if err != nil {
+					return []*model.Campaign{}, err
+				}
 			}
+		}else {
+			return []*model.Campaign{}, err
 		}
 	}
 	return results, nil

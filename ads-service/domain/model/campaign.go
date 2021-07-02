@@ -33,6 +33,7 @@ type Campaign struct {
 	DateFrom time.Time `bson:"date_from"`
 	DateTo time.Time `bson:"date_to"`
 	ExposeOnceDate time.Time `bson:"expose_once_date"`
+	Deleted bool `bson:"deleted"`
 	DisplayTime int `bson:"display_time" validate:"required,numeric,min=0,max=24"`
 }
 
@@ -183,6 +184,7 @@ func NewCampaign(campaignRequest *CampaignRequest, ownerId string) (*Campaign, e
 		OwnerId: 				  ownerId,
 		DisplayTime:              campaignRequest.DisplayTime,
 		ExposeOnceDate:           campaignRequest.ExposeOnceDate,
+		Deleted:                  false,
 	}, nil
 }
 

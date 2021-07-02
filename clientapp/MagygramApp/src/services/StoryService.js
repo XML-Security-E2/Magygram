@@ -17,7 +17,92 @@ export const storyService = {
 	findStoryById,
 	reportStory,
 	findAllUsersCampaignStories,
+	updateStoryCampaign,
+	deleteStoryCampaign,
+	getCampaignByStoryId,
 };
+
+function getCampaignByStoryId(storyId, dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/ads/campaign/story/${storyId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.SET_STORY_BY_ID_CAMPAIGN_REQUEST };
+	}
+	function success(data) {
+		return { type: storyConstants.SET_STORY_BY_ID_CAMPAIGN_SUCCESS, campaign: data };
+	}
+	function failure(message) {
+		return { type: storyConstants.SET_STORY_BY_ID_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
+function deleteStoryCampaign(storyId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/story/${storyId}/delete`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("Campaign deleted successfully", storyId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.DELETE_STORY_CAMPAIGN_REQUEST };
+	}
+	function success(message, storyId) {
+		return { type: storyConstants.DELETE_STORY_CAMPAIGN_SUCCESS, successMessage: message, storyId };
+	}
+	function failure(message) {
+		return { type: storyConstants.DELETE_STORY_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
+function updateStoryCampaign(campaignDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/ads/campaign`, campaignDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Your update request is sent. Changes will be applied within 24h."));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.UPDATE_STORY_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: storyConstants.UPDATE_STORY_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: storyConstants.UPDATE_STORY_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
 
 function reportStory(reportDTO, dispatch) {
 	dispatch(request());

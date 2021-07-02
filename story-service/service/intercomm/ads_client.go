@@ -16,6 +16,7 @@ import (
 type AdsClient interface {
 	CreatePostCampaign(bearer string, campaignReq *model.CampaignRequest) error
 	GetAllActiveAgentsStoryCampaigns(bearer string) ([]string, error)
+	DeleteCampaign(bearer string, postId string) error
 }
 
 type adsClient struct {}
@@ -56,6 +57,22 @@ func (a adsClient) CreatePostCampaign(bearer string, campaignReq *model.Campaign
 			return err
 		}
 		return errors.New(message)
+	}
+
+	return nil
+}
+
+func (a adsClient) DeleteCampaign(bearer string, postId string) error {
+
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/campaign/story/%s", baseAdsUrl, postId), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return err
 	}
 
 	return nil

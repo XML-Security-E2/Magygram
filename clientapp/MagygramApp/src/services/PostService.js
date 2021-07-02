@@ -34,7 +34,34 @@ export const postService = {
 	findAllUsersCampaignPosts,
 	getCampaignByPostId,
 	updatePostCampaign,
+	deletePostCampaign,
 };
+
+function deletePostCampaign(postId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts/${postId}/delete`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("Campaign deleted successfully", postId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.DELETE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message, postId) {
+		return { type: postConstants.DELETE_POST_CAMPAIGN_SUCCESS, successMessage: message, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.DELETE_POST_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
 
 function updatePostCampaign(campaignDTO, dispatch) {
 	dispatch(request());
