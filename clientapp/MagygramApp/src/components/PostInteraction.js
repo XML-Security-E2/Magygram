@@ -21,6 +21,13 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 	return (
 		<React.Fragment>
 			<div>
+				<div hidden={post.ContentType !== "CAMPAIGN"} className="border-bottom" style={{ cursor: "pointer" }} onClick={() => window.open("https://" + post.Website, "_blank")}>
+					<div>
+						<a type="button" className="btn btn-link border-0" href={"https://" + post.Website} target="_blank">
+							Visit {post.Website}
+						</a>
+					</div>
+				</div>
 				<div className="d-flex flex-row justify-content-center pl-3 pr-3 pt-3 pb-1">
 					<div hidden={!showAddToCollection}>
 						<button type="button" className="btn btn-outline-secondary btn-icon-text border-0" onClick={() => showCollectionModal(post.Id)}>
@@ -51,7 +58,7 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 							</button>
 						</li>
 						<li hidden={hasRoles(["admin"])} className="list-inline-item">
-							<button className="btn p-0" onClick={() => dispatch({ type: modalConstants.SHOW_SEND_POST_TO_USER_MODAL })}>
+							<button className="btn p-0" onClick={() => dispatch({ type: modalConstants.SHOW_SEND_POST_TO_USER_MODAL, postId: post.Id })}>
 								<i width="1.6em" height="1.6em" fill="currentColor" className="fa fa-paper-plane-o" style={iconStyle} />
 							</button>
 						</li>

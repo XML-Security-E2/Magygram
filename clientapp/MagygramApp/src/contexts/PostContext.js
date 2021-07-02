@@ -11,7 +11,12 @@ const PostContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
-		
+		createAgentPost: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
 		searchInfluencer: {
 			post: {
 				id: "",
@@ -62,6 +67,7 @@ const PostContextProvider = (props) => {
 				Liked: false,
 				Disliked: false,
 				Favourites: false,
+				Website: "",
 			},
 		},
 		guestTimeline: {
@@ -116,6 +122,43 @@ const PostContextProvider = (props) => {
 				Liked: false,
 				Disliked: false,
 				Favourites: false,
+				Website: "",
+			},
+		},
+		viewAgentCampaignPostModal: {
+			showModal: false,
+			post: {
+				Id: "",
+				Description: "",
+				Location: "",
+				ContentType: "",
+				Tags: null,
+				HashTags: null,
+				Media: [{}],
+				UserInfo: {},
+				LikedBy: [{}],
+				DislikedBy: [{}],
+				Comments: [{}],
+				Liked: false,
+				Disliked: false,
+				Favourites: false,
+				Website: "",
+			},
+		},
+		agentCampaignPostOptionModal: {
+			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+			campaign: {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				gender: "ANY",
+				frequency: "",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
 			},
 		},
 		viewPostModalForGuest: {
@@ -128,6 +171,7 @@ const PostContextProvider = (props) => {
 				UserInfo: {},
 			},
 		},
+		agentCampaignPosts: [],
 		userLikedPosts: null,
 		userDislikedPosts: null,
 		postReport: {

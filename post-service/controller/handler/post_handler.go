@@ -12,11 +12,14 @@ import (
 	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
+	"strconv"
+	"time"
 )
 
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
+	CreatePostCampaign(c echo.Context) error
 	GetPostsForTimeline(c echo.Context) error
 	LikePost(c echo.Context) error
 	UnlikePost(c echo.Context) error
@@ -44,6 +47,7 @@ type PostHandler interface {
 	EditDislikedByInfo(c echo.Context) error
 	EditCommentedByInfo(c echo.Context) error
 	GetPostForMessagesById(c echo.Context) error
+	GetUsersPostCampaigns(c echo.Context) error
 }
 
 type postHandler struct {
@@ -51,14 +55,16 @@ type postHandler struct {
 }
 
 func (p postHandler) DeletePost(c echo.Context) error {
-	postId := c.Param("requestId")
+	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	err := p.PostService.DeletePost(ctx, postId)
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.DeletePost(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -113,6 +119,101 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, postId)
 }
 
+func (p postHandler) CreatePostCampaign(c echo.Context) error {
+
+	location := c.FormValue("location")
+	description := c.FormValue("description")
+	tagsString := c.FormValue("tags")
+	minD := c.FormValue("minDisplays")
+	minDisplays, _ := strconv.Atoi(minD)
+	frequency := c.FormValue("frequency")
+	minA := c.FormValue("minAge")
+	minAge, _ := strconv.Atoi(minA)
+	maxA := c.FormValue("maxAge")
+	maxAge, _ := strconv.Atoi(maxA)
+	gender := c.FormValue("gender")
+
+	dateF := c.FormValue("startDate")
+	dateFr, _ := strconv.ParseInt(dateF, 10, 64)
+	dateFrom := time.Unix(0, dateFr * int64(time.Millisecond))
+
+	dateT := c.FormValue("endDate")
+	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
+	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+
+	exposeD := c.FormValue("exposeOnceDate")
+	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
+	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+
+	displayT := c.FormValue("displayTime")
+	displayTime, _ := strconv.Atoi(displayT)
+
+	mpf, _ := c.MultipartForm()
+	var tags []model.Tag
+	json.Unmarshal([]byte(tagsString), &tags)
+
+	var headers []*multipart.FileHeader
+	for _, v := range mpf.File {
+		headers = append(headers, v[0])
+	}
+
+	postRequest := &model.PostRequest{
+		Description:              description,
+		Location:                 location,
+		Media:                    headers,
+		Tags:                     tags,
+	}
+
+	campaignRequest := &model.CampaignRequest{
+		MinDisplaysForRepeatedly: minDisplays,
+		Frequency:                model.CampaignFrequency(frequency),
+		TargetGroup:              model.TargetGroup{
+			MinAge: minAge,
+			MaxAge: maxAge,
+			Gender: model.GenderType(gender),
+		},
+		DateFrom:                 dateFrom,
+		DateTo:                   dateTo,
+		Type: "POST",
+		DisplayTime: displayTime,
+		ContentId: "",
+		ExposeOnceDate: exposeDate,
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	postId, err := p.PostService.CreatePostCampaign(ctx, bearer, postRequest, campaignRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, postId)
+}
+
+func (p postHandler) GetUsersPostCampaigns(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	posts, err := p.PostService.GetUserPostCampaigns(ctx,bearer)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	if posts == nil {
+		return c.JSON(http.StatusOK, []model.PostProfileResponse{})
+	}
+
+	fmt.Println(posts[0].Id)
+	return c.JSON(http.StatusOK, posts)
+}
 
 func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	ctx := c.Request().Context()

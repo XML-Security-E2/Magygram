@@ -1,0 +1,34 @@
+server:
+  port: "468"
+  host: "post-service"
+  secret: "MagyGram"
+  name: "ads-service"
+  handshake : "ms-handshake"
+
+database:
+  host: "mongodb://mongo-db"
+  port: "27017"
+  user: "root"
+  password: "root"
+  database: "no-waiter-ads-service"
+
+mail:
+  sender: "info.magygram@gmail.com"
+  password: "magygramxml"
+  host: "smtp.gmail.com"
+  port: "587"
+
+authservice:
+  protocol: "http://"
+  domain: "auth-service"
+  port: "461"
+
+userservice:
+  protocol: "http://"
+  domain: "user-service"
+  port: "460"
+
+relationshipservice:
+  protocol: "http://"
+  domain: "relationship-service"
+  port: "463"

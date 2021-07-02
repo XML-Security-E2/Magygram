@@ -14,6 +14,9 @@ const StorySliderModal = () => {
 	const msgCtx = useContext(MessageContext);
 
 	const [tags, setTags] = useState([]);
+	const [website, setWebsite] = useState("");
+	const [contentType, setContentType] = useState("");
+
 	const [storyId, setStoryId] = useState("");
 
 	const handleModalClose = () => {
@@ -32,9 +35,12 @@ const StorySliderModal = () => {
 	const onStoryStart = (index, story) => {
 		console.log(index);
 		console.log(story);
-		setStoryId(story.header.storyId)
-		console.log(storyState.storySliderModal.userId);
+		setStoryId(story.header.storyId);
 		setTags(story.tags);
+
+		setContentType(story.contentType);
+		setWebsite(story.website);
+
 		setStoryId(story.header.storyId);
 		if (!storyState.storySliderModal.visited) {
 			if (index + 1 === storyState.storySliderModal.stories.length) {
@@ -51,13 +57,14 @@ const StorySliderModal = () => {
 	};
 
 	const handleOpenStorySendModal = () => {
-		msgCtx.dispatch({ type: modalConstants.SHOW_SEND_STORY_TO_USER_MODAL });
+		msgCtx.dispatch({ type: modalConstants.SHOW_SEND_STORY_TO_USER_MODAL, storyId });
 	};
 
 	return (
 		<Modal size="md" show={storyState.storySliderModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body className="modal-body-remove-margins modal-content-remove-margins">
-				<div className="d-flex justify-content-end" style={{ "background-color": "black" }}>
+				<div className={contentType === "CAMPAIGN" ? "d-flex justify-content-between pt-1" : "d-flex justify-content-end pt-1"} style={{ "background-color": "#111111" }}>
+					{contentType === "CAMPAIGN" && <span className="text-white ml-3">Sponsored</span>}
 					<button className="btn p-0 mr-3" onClick={handleOpenOptionsModal}>
 						<i className="fa fa-ellipsis-h text-white" aria-hidden="true"></i>
 					</button>
@@ -69,8 +76,15 @@ const StorySliderModal = () => {
 					onStoryStart={onStoryStart}
 					onAllStoriesEnd={onAllStoriesEnd}
 				/>
-				<div style={{ "background-color": "black" }}>
-					<label className="m-1 text-white">Tagged users: </label>
+				{contentType === "CAMPAIGN" && (
+					<div className="d-flex align-items-center" style={{ "background-color": "#111111" }}>
+						<a type="button" className="btn btn-link border-0 text-white" href={"https://" + website} target="_blank">
+							Visit {website}
+						</a>
+					</div>
+				)}
+				<div style={{ "background-color": "#111111" }}>
+					<label className="m-1 ml-2 text-white">Tagged users: </label>
 					{tags !== null &&
 						tags.map((tag) => {
 							return (
@@ -81,7 +95,7 @@ const StorySliderModal = () => {
 						})}
 				</div>
 
-				<div className="d-flex justify-content-end" style={{ "background-color": "black" }}>
+				<div className="d-flex justify-content-end pb-1" style={{ "background-color": "#111111" }}>
 					<button className="btn p-0 mr-3" onClick={handleOpenStorySendModal}>
 						<i className="fa fa-paper-plane-o text-white" aria-hidden="true" style={{ fontSize: "20px" }}></i>
 					</button>

@@ -12,10 +12,13 @@ import (
 	"story-service/domain/service-contracts/exceptions/expired"
 	"story-service/domain/service-contracts/exceptions/unauthorized"
 	"story-service/logger"
+	"strconv"
+	"time"
 )
 
 type StoryHandler interface {
 	CreateStory(c echo.Context) error
+	CreateStoryCampaign(c echo.Context) error
 	GetStoriesForStoryline(c echo.Context) error
 	GetStoryForAdmin(c echo.Context) error
 	GetStoriesForUser(c echo.Context) error
@@ -27,10 +30,25 @@ type StoryHandler interface {
 	DeleteStory(c echo.Context) error
 	UpdateUserInfo(c echo.Context) error
 	GetStoryForUserMessage(c echo.Context) error
+	GetUserStoryCampaign(c echo.Context) error
 }
 
 type storyHandler struct {
 	StoryService service_contracts.StoryService
+}
+
+func (p storyHandler) GetUserStoryCampaign(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	stories, err := p.StoryService.GetAllUserStoryCampaigns(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, stories)
 }
 
 func (p storyHandler) GetStoryForAdmin(c echo.Context) error {
@@ -55,8 +73,9 @@ func (p storyHandler) DeleteStory(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	bearer := c.Request().Header.Get("Authorization")
 
-	err := p.StoryService.DeleteStory(ctx, postId)
+	err := p.StoryService.DeleteStory(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -74,6 +93,70 @@ func (p storyHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc 
 
 func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 	return &storyHandler{p}
+}
+
+func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
+	headers, err := c.FormFile("images")
+	tagsString := c.FormValue("tags")
+	var tags []model.Tag
+	json.Unmarshal([]byte(tagsString), &tags)
+
+	minD := c.FormValue("minDisplays")
+	minDisplays, _ := strconv.Atoi(minD)
+	frequency := c.FormValue("frequency")
+	minA := c.FormValue("minAge")
+	minAge, _ := strconv.Atoi(minA)
+	maxA := c.FormValue("maxAge")
+	maxAge, _ := strconv.Atoi(maxA)
+	gender := c.FormValue("gender")
+
+	dateF := c.FormValue("startDate")
+	dateFr, _ := strconv.ParseInt(dateF, 10, 64)
+	dateFrom := time.Unix(0, dateFr * int64(time.Millisecond))
+
+	dateT := c.FormValue("endDate")
+	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
+	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+
+	exposeD := c.FormValue("exposeOnceDate")
+	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
+	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+
+	displayT := c.FormValue("displayTime")
+	displayTime, _ := strconv.Atoi(displayT)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	campaignRequest := &model.CampaignRequest{
+		MinDisplaysForRepeatedly: minDisplays,
+		Frequency:                model.CampaignFrequency(frequency),
+		TargetGroup:              model.TargetGroup{
+			MinAge: minAge,
+			MaxAge: maxAge,
+			Gender: model.GenderType(gender),
+		},
+		DateFrom:                 dateFrom,
+		DateTo:                   dateTo,
+		Type: "STORY",
+		DisplayTime: displayTime,
+		ContentId: "",
+		ExposeOnceDate: exposeDate,
+	}
+
+	storyId, err := p.StoryService.CreateStoryCampaign(ctx, bearer, headers, tags, campaignRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, storyId)
 }
 
 func (p storyHandler) CreateStory(c echo.Context) error {

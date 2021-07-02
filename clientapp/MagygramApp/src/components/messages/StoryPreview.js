@@ -9,7 +9,7 @@ const StoryPreview = ({ storyId, story }) => {
 	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 
 	const handleOpenStoryMessageModal = () => {
-		dispatch({ type: modalConstants.SHOW_STORY_MESSAGE_MODAL });
+		dispatch({ type: modalConstants.SHOW_STORY_MESSAGE_MODAL, story });
 	};
 
 	useEffect(() => {

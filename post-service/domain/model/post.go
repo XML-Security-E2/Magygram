@@ -39,6 +39,7 @@ type Post struct {
 	DislikedBy []UserInfo `bson:"disliked_by"`
 	Comments []Comment `bson:"comments"`
 	IsDeleted bool `bson:"deleted"`
+	WebSite string `bson:"website"`
 	CreatedTime time.Time `bson:"created_time"`
 }
 
@@ -63,7 +64,40 @@ type PostRequest struct {
 	Tags []Tag `json:"tags"`
 }
 
-func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media) (*Post, error) {
+type CampaignRequest struct {
+	ContentId string `json:"contentId"`
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DisplayTime int `json:"displayTime"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	ExposeOnceDate time.Time `json:"exposeOnceDate"`
+	Type string `json:"campaignType"`
+}
+
+type TargetGroup struct {
+	MinAge int `json:"minAge"`
+	MaxAge int `json:"maxAge"`
+	Gender GenderType `json:"gender"`
+}
+
+type GenderType string
+
+const (
+	MALE = iota
+	FEMALE
+	ANY
+)
+
+type CampaignFrequency string
+
+const(
+	ONCE = iota
+	REPEATEDLY
+)
+
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media, website string) (*Post, error) {
 	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
@@ -86,6 +120,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 		IsDeleted: false,
+		WebSite: website,
 		CreatedTime: time.Now(),
 	}, nil
 }
@@ -144,6 +179,13 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type AgentInfo struct {
+	Id string
+	Username string
+	ImageURL string
+	Website string
+}
+
 type UserInfoEdit struct {
 	Id string
 	Username string
@@ -174,6 +216,7 @@ type PostResponse struct {
 	Favourites bool
 	Liked bool
 	Disliked bool
+	Website string
 }
 
 type PostProfileResponse struct {
@@ -200,6 +243,8 @@ func NewPostResponse(post *Post, liked bool, disliked bool, favourites bool) (*P
 		Tags: post.Tags,
 		Disliked: disliked,
 		Favourites: favourites,
+		ContentType: post.ContentType,
+		Website: post.WebSite,
 	}, nil
 }
 

@@ -135,6 +135,13 @@ type UserInfo struct {
 	ImageURL string `json:"imageUrl"`
 }
 
+type AgentInfo struct {
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	ImageURL string `json:"imageUrl"`
+	Website string  `json:"website"`
+}
+
 type UserInfoEdit struct {
 	Id string
 	Username string

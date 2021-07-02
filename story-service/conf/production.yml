@@ -42,3 +42,8 @@ messageservice:
     protocol: "http://"
     domain: "message-service"
     port: "467"
+
+adsservice:
+    protocol: "http://"
+    domain: "ads-service"
+    port: "468"

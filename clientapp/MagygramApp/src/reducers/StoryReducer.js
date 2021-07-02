@@ -25,6 +25,13 @@ export const storyReducer = (state, action) => {
 					showSuccessMessage: true,
 					successMessage: action.successMessage,
 				},
+				createAgentStory: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
 			};
 		case storyConstants.CREATE_STORY_FAILURE:
 			return {
@@ -37,11 +44,88 @@ export const storyReducer = (state, action) => {
 					successMessage: "",
 				},
 			};
+
+		case storyConstants.SET_STORY_CAMPAIGN_REQUEST:
+			return {
+				...state,
+				agentCampaignStories: [],
+			};
+		case storyConstants.SET_STORY_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			if (action.stories !== null) {
+				action.stories.forEach((story) => {
+					if (storyCopy.agentCampaignStories.find((storyy) => storyy.Id === story.id) === undefined) {
+						storyCopy.agentCampaignStories.push({
+							Id: story.id,
+							MediaType: story.media.MediaType,
+							Url: story.media.Url,
+							UserId: story.userInfo.Id,
+							UserImageUrl: story.userInfo.ImageURL,
+							Username: story.userInfo.Username,
+							Website: story.Website,
+							ContentType: story.contentType,
+						});
+					}
+				});
+			}
+
+			return storyCopy;
+		case storyConstants.SET_STORY_CAMPAIGN_FAILURE:
+			return {
+				...state,
+				agentCampaignStories: [],
+			};
+
+		case storyConstants.CREATE_AGENT_STORY_REQUEST:
+			return {
+				...state,
+				createAgentStory: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+		case storyConstants.CREATE_AGENT_STORY_SUCCESS:
+			return {
+				...state,
+				createAgentStory: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: true,
+					successMessage: action.successMessage,
+				},
+			};
+		case storyConstants.CREATE_AGENT_STORY_FAILURE:
+			return {
+				...state,
+				createAgentStory: {
+					showModal: false,
+					showError: true,
+					errorMessage: action.errorMessage,
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
 		case modalConstants.OPEN_CREATE_STORY_MODAL:
-			console.log(state);
 			return {
 				...state,
 				createStory: {
+					showModal: true,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case modalConstants.OPEN_CREATE_AGENT_STORY_MODAL:
+			return {
+				...state,
+				createAgentStory: {
 					showModal: true,
 					showError: false,
 					errorMessage: "",
@@ -111,26 +195,26 @@ export const storyReducer = (state, action) => {
 					userId: action.userId,
 				},
 			};
-			case modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN:
-				return {
-					...state,
-					storySliderModal: {
-						showModal: true,
-						stories: createStoriesAdmin(action.stories),
-						firstUnvisitedStory: action.stories.FirstUnvisitedStory,
-						visited: action.visited,
-						userId: action.userId,
-					},
-				};
-			case modalConstants.HIDE_STORY_SLIDER_MODAL_ADMIN:
-				return {
-					...state,
-					storySliderModal: {
-						showModal: false,
-						stories: action.stories,
-						firstUnvisitedStory: 0,
-					},
-				};
+		case modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN:
+			return {
+				...state,
+				storySliderModal: {
+					showModal: true,
+					stories: createStoriesAdmin(action.stories),
+					firstUnvisitedStory: action.stories.FirstUnvisitedStory,
+					visited: action.visited,
+					userId: action.userId,
+				},
+			};
+		case modalConstants.HIDE_STORY_SLIDER_MODAL_ADMIN:
+			return {
+				...state,
+				storySliderModal: {
+					showModal: false,
+					stories: action.stories,
+					firstUnvisitedStory: 0,
+				},
+			};
 		case modalConstants.HIDE_STORY_SLIDER_MODAL:
 			return {
 				...state,
@@ -299,6 +383,143 @@ export const storyReducer = (state, action) => {
 				iHaveAStory: false,
 			};
 		}
+		case modalConstants.SHOW_STORY_AGENT_CAMPAIGN_MODAL:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryModal.showModal = true;
+			storyCopy.agentCampaignStoryModal.stories = createStory(action.story);
+			storyCopy.agentCampaignStoryModal.storyId = action.story.Id;
+			return storyCopy;
+		case modalConstants.HIDE_STORY_AGENT_CAMPAIGN_MODAL:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryModal.showModal = false;
+
+			return storyCopy;
+
+		case storyConstants.HIDE_STORY_CAMPAIGN_OPTION_ALERTS:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case modalConstants.SHOW_STORY_AGENT_OPTIONS_MODAL:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showModal = true;
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case modalConstants.HIDE_STORY_AGENT_OPTIONS_MODAL:
+			return {
+				...state,
+				agentCampaignStoryOptionModal: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+					campaign: {
+						minAge: "",
+						maxAge: "",
+						minDisplays: "",
+						gender: "ANY",
+						frequency: "",
+						startDate: new Date(),
+						endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+					},
+				},
+			};
+
+		case storyConstants.SET_STORY_BY_ID_CAMPAIGN_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.campaign = {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				gender: "ANY",
+				frequency: "",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			};
+			return storyCopy;
+		case storyConstants.SET_STORY_BY_ID_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			storyCopy.agentCampaignStoryOptionModal.campaign = {
+				id: action.campaign.id,
+				minAge: action.campaign.targetGroup.minAge,
+				maxAge: action.campaign.targetGroup.maxAge,
+				minDisplays: action.campaign.minDisplaysForRepeatedly,
+				frequency: action.campaign.frequency,
+				gender: action.campaign.targetGroup.gender,
+				startDate: new Date(action.campaign.dateFrom),
+				endDate: new Date(action.campaign.dateTo),
+			};
+			return storyCopy;
+		case storyConstants.SET_STORY_BY_ID_CAMPAIGN_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.campaign = {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				frequency: "",
+				gender: "ANY",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			};
+			return storyCopy;
+
+		case storyConstants.UPDATE_STORY_CAMPAIGN_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case storyConstants.UPDATE_STORY_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = true;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = action.successMessage;
+			return storyCopy;
+		case storyConstants.UPDATE_STORY_CAMPAIGN_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = true;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = action.errorMessage;
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+
+		case storyConstants.DELETE_STORY_CAMPAIGN_REQUEST:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
+		case storyConstants.DELETE_STORY_CAMPAIGN_SUCCESS:
+			storyCopy = { ...state };
+
+			let storyes = state.agentCampaignStories.filter((story) => story.Id !== action.storyId);
+			storyCopy.agentCampaignStories = storyes;
+			storyCopy.agentCampaignStoryOptionModal.showError = false;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = "";
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = true;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = action.successMessage;
+			storyCopy.agentCampaignStoryOptionModal.showModal = false;
+			storyCopy.agentCampaignStoryModal.showModal = false;
+
+			return storyCopy;
+		case storyConstants.DELETE_STORY_CAMPAIGN_FAILURE:
+			storyCopy = { ...state };
+			storyCopy.agentCampaignStoryOptionModal.showError = true;
+			storyCopy.agentCampaignStoryOptionModal.errorMessage = action.errorMessage;
+			storyCopy.agentCampaignStoryOptionModal.showSuccessMessage = false;
+			storyCopy.agentCampaignStoryOptionModal.successMessage = "";
+			return storyCopy;
 		default:
 			return state;
 	}
@@ -312,11 +533,13 @@ function createStories(stories) {
 			url: media.Url,
 			header: {
 				heading: stories.UserInfo.Username,
-				profileImage: stories.UserInfo.ImageURL,
+				profileImage: stories.UserInfo.ImageURL === "" ? "assets/img/profile.jpg" : stories.UserInfo.ImageURL,
 				storyId: media.StoryId,
 			},
 			type: media.MediaType === "VIDEO" ? "video" : "image",
 			tags: media.Tags,
+			contentType: media.ContentType,
+			website: media.Website,
 		});
 	});
 
@@ -333,6 +556,8 @@ function createStoriesAdmin(stories) {
 			},
 			type: media.MediaType === "VIDEO" ? "video" : "image",
 			tags: media.Tags,
+			contentType: media.ContentType,
+			website: media.Website,
 		});
 	});
 
@@ -355,5 +580,26 @@ function createHighlights(highlights, name) {
 		});
 	});
 	console.log(retVal);
+	return retVal;
+}
+
+function createStory(story) {
+	var retVal = [];
+
+	console.log(story);
+
+	retVal.push({
+		url: story.Url,
+		header: {
+			heading: story.Username,
+			profileImage: story.UserImageUrl === "" ? "assets/img/profile.jpg" : story.UserImageUrl,
+			storyId: story.Id,
+		},
+		type: story.MediaType === "VIDEO" ? "video" : "image",
+		tags: story.Tags,
+		contentType: story.ContentType,
+		website: story.Website,
+	});
+
 	return retVal;
 }

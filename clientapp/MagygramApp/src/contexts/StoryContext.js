@@ -12,6 +12,13 @@ const StoryContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		createAgentStory: {
+			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
 		storyline: {
 			stories: [],
 		},
@@ -46,6 +53,28 @@ const StoryContextProvider = (props) => {
 			visited: false,
 			userId: "",
 		},
+		agentCampaignStoryModal: {
+			showModal: false,
+			stories: "",
+			storyId: "",
+		},
+		agentCampaignStoryOptionModal: {
+			showModal: false,
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+			campaign: {
+				minAge: "",
+				maxAge: "",
+				minDisplays: "",
+				gender: "ANY",
+				frequency: "",
+				startDate: new Date(),
+				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+			},
+		},
+		agentCampaignStories: [],
 		storyId: "",
 		iHaveAStory: false,
 		storyReport: {

@@ -10,6 +10,9 @@ type PostService interface {
 	GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse , error)
 	GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error)
 	CreatePost(ctx context.Context, bearer string,  post *model.PostRequest) (string, error)
+	CreatePostCampaign(ctx context.Context, bearer string,  post *model.PostRequest, campaignReq *model.CampaignRequest) (string, error)
+	GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
+
 	EditPost(ctx context.Context, bearer string,  post *model.PostEditRequest) error
 	LikePost(ctx context.Context, bearer string,  postId string) error
 	UnlikePost(ctx context.Context, bearer string,  postId string) error
@@ -29,7 +32,7 @@ type PostService interface {
 	GetPostByIdForGuest(ctx context.Context, postId string) (*model.GuestTimelinePostResponse , error)
 	GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 	GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
-	DeletePost(ctx context.Context, requestId string) error
+	DeletePost(ctx context.Context, bearer string, requestId string) error
 	EditPostOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error
 	EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
 	EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error

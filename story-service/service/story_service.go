@@ -25,23 +25,49 @@ type storyService struct {
 	intercomm.AuthClient
 	intercomm.RelationshipClient
 	intercomm.MessageClient
+	intercomm.AdsClient
 }
 
-func (p storyService) DeleteStory(ctx context.Context, requestId string) error {
-	request, err := p.StoryRepository.GetByID(ctx, requestId)
-		if err != nil {
-		return errors.New("Request not found")
+func (p storyService) DeleteStory(ctx context.Context, bearer string, requestId string) error {
+
+	retVal, err := p.AuthClient.HasRole(bearer,"delete_story")
+	if err != nil{
+		return errors.New("auth service not found")
 	}
 
-		request.IsDeleted = true
+	request, err := p.StoryRepository.GetByID(ctx, requestId)
+	if err!=nil {
+		return errors.New("story not found")
+	}
 
-		p.StoryRepository.DeleteStory(ctx, request)
+	if !retVal {
+		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		if err != nil {
+			return err
+		}
+		if request.UserInfo.Id != userId {
+			return errors.New("user not authorized for story delete")
+		}
+	}
 
-		return nil
+	err = p.AdsClient.DeleteCampaign(bearer, request.Id)
+	if err != nil {
+		return err
+	}
+
+	request.IsDeleted = true
+
+	_, err = p.StoryRepository.DeleteStory(ctx, request)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient) service_contracts.StoryService {
-	return &storyService{r , ic, uc,ac,rc, mc}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient, adscli 	intercomm.AdsClient,
+						) service_contracts.StoryService {
+	return &storyService{r , ic, uc,ac,rc, mc, adscli}
 }
 
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
@@ -51,7 +77,7 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	media, err := p.MediaClient.SaveMedia(file)
 	if err != nil { return "", err}
 
-	post, err := model.NewStory(*userInfo, "REGULAR", media, tags)
+	post, err := model.NewStory(*userInfo, "REGULAR", media, tags, "")
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
 		return "", err}
@@ -85,6 +111,83 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	}
 
 	return "", err
+}
+
+func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag, campaignReq *model.CampaignRequest) (string, error) {
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
+	if err != nil { return "", err}
+
+	media, err := p.MediaClient.SaveMedia(file)
+	if err != nil { return "", err}
+
+	post, err := model.NewStory(model.UserInfo{
+		Id:       userInfo.Id,
+		Username: userInfo.Username,
+		ImageURL: userInfo.ImageURL,
+	}, "CAMPAIGN", media, tags, userInfo.Website)
+	if err != nil {
+		return "", err}
+
+	if err := validator.New().Struct(post); err!= nil {
+		return "", err
+	}
+
+	campaignReq.ContentId = post.Id
+
+	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := p.StoryRepository.Create(ctx, post)
+	if err != nil {
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedStory,
+	})
+	if err != nil {
+		return "", err
+	}
+
+
+	if postId, ok := result.InsertedID.(string); ok {
+		return postId, nil
+	}
+
+	return "", err
+}
+
+func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer string) ([]*model.UsersStoryResponseWithUserInfo, error) {
+
+	storyIds, err := p.AdsClient.GetAllActiveAgentsStoryCampaigns(bearer)
+	if err != nil {
+		return nil, err
+	}
+	var stories []*model.UsersStoryResponseWithUserInfo
+
+	for _, storyId := range storyIds {
+		story, err := p.StoryRepository.GetByID(ctx, storyId)
+		if err != nil {
+			return nil, err
+		}
+
+		stories = append(stories, &model.UsersStoryResponseWithUserInfo{
+			Id: story.Id,
+			ContentType: story.ContentType,
+			Media:      story.Media,
+			DateTime:    "",
+			UserInfo:   story.UserInfo,
+			Website:    story.Website,
+		})
+	}
+
+	return stories, nil
 }
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {
@@ -138,6 +241,7 @@ func (p storyService) GetStoryForUserMessage(ctx context.Context, bearer string,
 		Media:      story.Media,
 		DateTime:    "",
 		UserInfo:   story.UserInfo,
+		Website:    story.Website,
 	}
 	return resp, nil, nil
 }
@@ -265,10 +369,12 @@ func (p storyService) GetStoryForAdmin(ctx context.Context, storyId string) (*mo
 
 	var media []model.MediaContent
 	mediaContent := model.MediaContent{
-		Url: result.Media.Url,
-		MediaType: result.Media.MediaType,
-		StoryId: result.Id,
-		Tags: result.Tags,
+		Url:         result.Media.Url,
+		MediaType:   result.Media.MediaType,
+		StoryId:     result.Id,
+		Tags:        result.Tags,
+		ContentType: result.ContentType,
+		Website:     result.Website,
 	}
 	media = append(media, mediaContent)
 
@@ -371,10 +477,12 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 
 	for _, story := range result {
 		mediaContent := model.MediaContent{
-			Url: story.Media.Url,
-			MediaType: story.Media.MediaType,
-			StoryId: story.Id,
-			Tags: story.Tags,
+			Url:         story.Media.Url,
+			MediaType:   story.Media.MediaType,
+			StoryId:     story.Id,
+			Tags:        story.Tags,
+			ContentType: story.ContentType,
+			Website:     story.Website,
 		}
 		retVal = append(retVal, mediaContent)
 	}
