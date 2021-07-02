@@ -108,6 +108,14 @@ const ViewPostCampaignModal = () => {
 								openOptionsModal={handleOpenOptionsModal}
 								location={postState.viewAgentCampaignPostModal.post.Location}
 							/>
+							{postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && (
+								<div className="border-bottom d-flex align-items-center">
+									<span className="text-dark ml-2">Sponsored</span>
+									<a type="button" className="btn btn-link border-0" href={"https://" + postState.viewAgentCampaignPostModal.post.Website} target="_blank">
+										Visit {postState.viewAgentCampaignPostModal.post.Website}
+									</a>
+								</div>
+							)}
 							<hr></hr>
 							<div>
 								<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>

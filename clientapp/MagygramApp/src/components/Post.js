@@ -79,7 +79,13 @@ const Post = ({ post }) => {
 		<React.Fragment>
 			<div className="d-flex flex-column mt-4 mb-4">
 				<div className="card">
-					<PostHeader id={post.UserInfo.Id} username={post.UserInfo.Username} image={post.UserInfo.ImageURL} openOptionsModal={handleOpenOptionsModal} />
+					<PostHeader
+						id={post.UserInfo.Id}
+						username={post.UserInfo.Username}
+						image={post.UserInfo.ImageURL}
+						openOptionsModal={handleOpenOptionsModal}
+						sponsored={post.ContentType === "CAMPAIGN"}
+					/>
 					<div className="card-body p-0">
 						<PostImageSlider media={post.Media} />
 						<PostInteraction

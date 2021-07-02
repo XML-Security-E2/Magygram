@@ -324,3 +324,4 @@ time="2021-07-01T00:34:53+02:00" level=info msg="Server started" func=main.main 
 time="2021-07-01T00:44:02+02:00" level=info msg="User node created" func="relationship-service/service.(*followService).CreateUser" file="C:/Users/Dusan/Desktop/Magygram/relationship-service/service/follow_service.go:140" request_ip="::1" user_id=2335f261-be54-4f69-b34e-654b4996616a
 time="2021-07-01T17:33:28+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
 time="2021-07-01T19:34:00+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463
+time="2021-07-02T12:28:47+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:37" host=localhost port=463

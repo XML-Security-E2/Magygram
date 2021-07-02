@@ -158,6 +158,13 @@ export const postReducer = (state, action) => {
 				}
 			}
 
+			if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.postId) {
+				strcpy.postDetailsPage.post.Liked = true;
+				if (strcpy.postDetailsPage.post.LikedBy.find((likedByUserInfo) => likedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+					strcpy.postDetailsPage.post.LikedBy.push(action.loggedUser);
+				}
+			}
+
 			return strcpy;
 		case postConstants.LIKE_POST_FAILURE:
 			return {
@@ -178,10 +185,16 @@ export const postReducer = (state, action) => {
 				postCopy.LikedBy = newLikedByList;
 			}
 
-			if (strcpy.viewAgentCampaignPostModal.post.Id !== "") {
+			if (strcpy.viewAgentCampaignPostModal.post.Id !== "" && strcpy.viewAgentCampaignPostModal.post.Id === action.postId) {
 				strcpy.viewAgentCampaignPostModal.post.Liked = false;
 				var newLikedByList = strcpy.viewAgentCampaignPostModal.post.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
 				strcpy.viewAgentCampaignPostModal.post.LikedBy = newLikedByList;
+			}
+
+			if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.postId) {
+				strcpy.postDetailsPage.post.Liked = false;
+				var newLikedByList = strcpy.postDetailsPage.post.LikedBy.filter((likedByUserInfo) => likedByUserInfo.Id !== action.loggedUser.Id);
+				strcpy.postDetailsPage.post.LikedBy = newLikedByList;
 			}
 
 			return strcpy;
@@ -212,6 +225,13 @@ export const postReducer = (state, action) => {
 				}
 			}
 
+			if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.postId) {
+				strcpy.postDetailsPage.post.Disliked = true;
+				if (strcpy.postDetailsPage.post.DislikedBy.find((dislikedByUserInfo) => dislikedByUserInfo.Id === action.loggedUser.Id) === undefined) {
+					strcpy.postDetailsPage.post.DislikedBy.push(action.loggedUser);
+				}
+			}
+
 			return strcpy;
 		case postConstants.DISLIKE_POST_FAILURE:
 			return {
@@ -232,11 +252,18 @@ export const postReducer = (state, action) => {
 				postCopy.DislikedBy = newDisikedByList;
 			}
 
-			if (strcpy.viewAgentCampaignPostModal.post.Id !== "") {
+			if (strcpy.viewAgentCampaignPostModal.post.Id !== "" && strcpy.viewAgentCampaignPostModal.post.Id === action.postId) {
 				strcpy.viewAgentCampaignPostModal.post.Disliked = false;
 				var newDisikedByList = strcpy.viewAgentCampaignPostModal.post.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== action.loggedUser.Id);
 				strcpy.viewAgentCampaignPostModal.post.DislikedBy = newDisikedByList;
 			}
+
+			if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.postId) {
+				strcpy.postDetailsPage.post.Disliked = false;
+				var newDisikedByList = strcpy.postDetailsPage.post.DislikedBy.filter((dislikedByUserInfo) => dislikedByUserInfo.Id !== action.loggedUser.Id);
+				strcpy.postDetailsPage.post.DislikedBy = newDisikedByList;
+			}
+
 			return strcpy;
 		case postConstants.UNDISLIKE_POST_FAILURE:
 			return {
@@ -298,6 +325,7 @@ export const postReducer = (state, action) => {
 				Comments: [{}],
 				Liked: false,
 				Disliked: false,
+				Website: "",
 			};
 			return strcpy;
 
@@ -331,6 +359,7 @@ export const postReducer = (state, action) => {
 				Comments: [{}],
 				Liked: false,
 				Disliked: false,
+				Website: "",
 			};
 			return strcpy;
 
@@ -353,6 +382,7 @@ export const postReducer = (state, action) => {
 				Comments: [],
 				Liked: false,
 				Disliked: false,
+				Website: "",
 			};
 			return strcpy;
 
@@ -382,6 +412,7 @@ export const postReducer = (state, action) => {
 				Comments: [],
 				Liked: false,
 				Disliked: false,
+				Website: "",
 			};
 			return strcpy;
 
@@ -587,6 +618,10 @@ export const postReducer = (state, action) => {
 				} else {
 					strcpy.viewPostModal.post.Favourites = true;
 				}
+
+				if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.collectionDTO.postId) {
+					strcpy.postDetailsPage.post.Favourites = true;
+				}
 			} else {
 				if (strcpy.userCollections.collections[action.collectionDTO.collectionName].find((col) => col.id === action.collectionDTO.postId) === undefined) {
 					strcpy.userCollections.collections[action.collectionDTO.collectionName].push({
@@ -624,6 +659,10 @@ export const postReducer = (state, action) => {
 				postCopy.Favourites = false;
 			} else {
 				strcpy.viewPostModal.post.Favourites = false;
+			}
+
+			if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.postId) {
+				strcpy.postDetailsPage.post.Favourites = false;
 			}
 
 			for (const [key] of Object.entries(strcpy.userCollections.collections)) {
@@ -711,6 +750,10 @@ export const postReducer = (state, action) => {
 			if (strcpy.viewPostModal.showModal) {
 				if (strcpy.viewPostModal.post.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
 					strcpy.viewPostModal.post.Comments.push(action.comment);
+				}
+			} else if (strcpy.postDetailsPage.post.Id !== "" && strcpy.postDetailsPage.post.Id === action.postId) {
+				if (strcpy.postDetailsPage.post.Comments.find((comment) => comment.Id === action.comment.Id) === undefined) {
+					strcpy.postDetailsPage.post.Comments.push(action.comment);
 				}
 			} else {
 				postCopy = strcpy.timeline.posts.find((post) => post.Id === action.postId);

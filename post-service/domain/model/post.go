@@ -39,6 +39,7 @@ type Post struct {
 	DislikedBy []UserInfo `bson:"disliked_by"`
 	Comments []Comment `bson:"comments"`
 	IsDeleted bool `bson:"deleted"`
+	WebSite string `bson:"website"`
 }
 
 type ContentType string
@@ -95,7 +96,7 @@ const(
 	REPEATEDLY
 )
 
-func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media) (*Post, error) {
+func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType, media []Media, website string) (*Post, error) {
 	err := validatePostTypeEnums(postType)
 	if err != nil {
 		return nil, err
@@ -118,6 +119,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 		IsDeleted: false,
+		WebSite: website,
 	}, nil
 }
 
@@ -175,6 +177,13 @@ type UserInfo struct {
 	ImageURL string
 }
 
+type AgentInfo struct {
+	Id string
+	Username string
+	ImageURL string
+	Website string
+}
+
 type UserInfoEdit struct {
 	Id string
 	Username string
@@ -205,6 +214,7 @@ type PostResponse struct {
 	Favourites bool
 	Liked bool
 	Disliked bool
+	Website string
 }
 
 type PostProfileResponse struct {
@@ -232,6 +242,7 @@ func NewPostResponse(post *Post, liked bool, disliked bool, favourites bool) (*P
 		Disliked: disliked,
 		Favourites: favourites,
 		ContentType: post.ContentType,
+		Website: post.WebSite,
 	}, nil
 }
 

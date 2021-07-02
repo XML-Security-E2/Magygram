@@ -714,6 +714,24 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 	}, nil
 }
 
+func (u *userService) GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error) {
+	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return &model.AgentInfo{
+		Id:       userId,
+		Username: user.Username,
+		ImageURL: user.ImageUrl,
+		Website:  user.Website,
+	}, nil}
+
 func (u *userService) GetUserProfileById(ctx context.Context, bearer string, userId string) (*model.UserProfileResponse, error) {
 
 	log.Println(userId)

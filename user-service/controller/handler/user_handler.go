@@ -63,6 +63,7 @@ type UserHandler interface {
 	CheckIfUserVerifiedById(c echo.Context) error
 	GetUsersInfo(c echo.Context) error
 	RegisterAgentByAdmin(c echo.Context) error
+	GetLoggedAgentInfo(c echo.Context) error
 }
 
 var (
@@ -521,6 +522,20 @@ func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, userInfo)
 }
+
+func (h *userHandler) GetLoggedAgentInfo(c echo.Context) error {
+	ctx := c.Request().Context()
+	bearer := c.Request().Header.Get("Authorization")
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	userInfo, err := h.UserService.GetLoggedAgentInfo(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)}
 
 func (h *userHandler) GetUserProfileById(c echo.Context) error {
 	userId := c.Param("userId")

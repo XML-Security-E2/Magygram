@@ -16,6 +16,7 @@ import (
 
 type UserClient interface {
 	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
+	GetLoggedAgentInfo(bearer string) (*model.AgentInfo,error)
 	MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
 	IsUserPrivate(userId string) (bool, error)
 	UpdateLikedPosts(bearer string, postId string) error
@@ -80,6 +81,29 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 
 	return &userInfo, nil
 }
+
+func (u userClient) GetLoggedAgentInfo(bearer string) (*model.AgentInfo, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged/agent", baseUsersUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			return &model.AgentInfo{}, err
+		}
+		return &model.AgentInfo{}, errors.New("unauthorized")
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return &model.AgentInfo{}, err
+	}
+	var userInfo model.AgentInfo
+	_ = json.Unmarshal(bodyBytes, &userInfo)
+
+	return &userInfo, nil}
 
 func (u userClient) UpdateLikedPosts(bearer string, postId string) error {
 	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/like/" + postId, baseUsersUrl), nil)

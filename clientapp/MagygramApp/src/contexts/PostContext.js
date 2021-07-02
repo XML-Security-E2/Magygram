@@ -67,6 +67,7 @@ const PostContextProvider = (props) => {
 				Liked: false,
 				Disliked: false,
 				Favourites: false,
+				Website: "",
 			},
 		},
 		guestTimeline: {
@@ -121,6 +122,7 @@ const PostContextProvider = (props) => {
 				Liked: false,
 				Disliked: false,
 				Favourites: false,
+				Website: "",
 			},
 		},
 		viewAgentCampaignPostModal: {
@@ -140,6 +142,7 @@ const PostContextProvider = (props) => {
 				Liked: false,
 				Disliked: false,
 				Favourites: false,
+				Website: "",
 			},
 		},
 		agentCampaignPostOptionModal: {

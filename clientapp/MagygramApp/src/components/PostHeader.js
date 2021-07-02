@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const PostHeader = ({ username, image, id }) => {
+const PostHeader = ({ username, image, id, sponsored }) => {
 	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 
 	return (
@@ -18,6 +18,11 @@ const PostHeader = ({ username, image, id }) => {
 							<Link className="font-weight-bold" style={{ cursor: "pointer", color: "black" }} to={"/profile?userId=" + id}>
 								{username}
 							</Link>
+							{sponsored && (
+								<div className="text-dark" style={{ fontSize: "0.8em" }}>
+									Sponsored
+								</div>
+							)}
 						</li>
 					</ul>
 				</div>

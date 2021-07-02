@@ -43,7 +43,7 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	media, err := p.MediaClient.SaveMedia(postRequest.Media)
 	if err != nil { return "", err}
 
-	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media)
+	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media,"")
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
 													 "description" : postRequest.Description,
@@ -87,13 +87,17 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 }
 
 func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
 	if err != nil { return "", err}
 
 	media, err := p.MediaClient.SaveMedia(postRequest.Media)
 	if err != nil { return "", err}
 
-	post, err := model.NewPost(postRequest, *userInfo, "CAMPAIGN", media)
+	post, err := model.NewPost(postRequest, model.UserInfo{
+		Id:       userInfo.Id,
+		Username: userInfo.Username,
+		ImageURL: userInfo.ImageURL,
+	}, "CAMPAIGN", media, userInfo.Website)
 	if err != nil {return "", err}
 
 	if err = validator.New().Struct(post); err!= nil {

@@ -19,6 +19,7 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_SEND_POST_TO_USER_MODAL:
 			stateCpy = { ...state };
+			stateCpy.sendPostModal.postId = action.postId;
 			stateCpy.sendPostModal.showModal = true;
 
 			return stateCpy;
@@ -30,6 +31,7 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_SEND_STORY_TO_USER_MODAL:
 			stateCpy = { ...state };
+			stateCpy.sendStoryModal.storyId = action.storyId;
 			stateCpy.sendStoryModal.showModal = true;
 
 			return stateCpy;
