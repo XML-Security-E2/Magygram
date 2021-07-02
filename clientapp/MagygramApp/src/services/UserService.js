@@ -39,10 +39,10 @@ export const userService = {
 	getCampaignsForUser,
 };
 
-async function getCampaignsForUser(dispatch) {
+async function getCampaignsForUser(requestId,dispatch) {
 
 	dispatch(request());
-	await Axios.get(`/api/requests/campaign`, { validateStatus: () => true, headers: authHeader() })
+	await Axios.get(`/api/requests/campaign/${requestId}/get`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
 				if (res.status === 200) {
@@ -636,6 +636,7 @@ async function getUserProfileByUserId(userId, dispatch) {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data, userId));
+				localStorage.setItem('category',res.data.category);
 			} else {
 				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
 			}

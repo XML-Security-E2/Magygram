@@ -4,6 +4,7 @@ import { modalConstants } from "../../constants/ModalConstants";
 import { StoryContext } from "../../contexts/StoryContext";
 import Axios from "axios";
 import { authHeader } from "../../helpers/auth-header";
+import SearchInfluencerModalStory from "./SearchInfluencerModalStory";
 import { hasRoles } from "../../helpers/auth-header";
 import { storyConstants } from "../../constants/StoryConstants";
 import { storyService } from "../../services/StoryService";
@@ -69,6 +70,10 @@ const OptionsModalStory = () => {
 		});
 	}
 
+	const searchInfluencer = () => {
+		dispatch({ type: storyConstants.SHOW_SEARCH_INFLUENCER_MODAL, storyId: storyState.storyId });
+	};
+
 	return (
 		<Modal show={storyState.postOptions.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Header closeButton>
@@ -90,6 +95,11 @@ const OptionsModalStory = () => {
 				<div hidden={!hiddenForm} className="row">
 					<button hidden={localStorage.getItem("userId") === null} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleShowForm}>
 						Report
+					</button>
+				</div>
+				<div className="row">
+					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={searchInfluencer}>
+						Product placement
 					</button>
 				</div>
 				<div className="row">
@@ -164,8 +174,10 @@ const OptionsModalStory = () => {
 								Report
 							</button>
 						</div>
+						
 					</div>
 				</form>
+				<SearchInfluencerModalStory/>
 			</Modal.Body>
 		</Modal>
 	);

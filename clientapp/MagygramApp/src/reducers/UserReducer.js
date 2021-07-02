@@ -321,15 +321,18 @@ export const userReducer = (state, action) => {
 					user: action.user,
 				},
 			};
-		case userConstants.SET_USER_CAMPAIGNS_REQUEST:
-		return {
-			...state,
-			campaigns:[],
-		};
-		case userConstants.SET_USER_CAMPAIGNS:
-		return {
-			...state,
-			campaigns:action.campaigns,
+		case userConstants.SET_USER_CAMPAIGNS_REQUEST: { let strCpy = {
+				...state,
+			};
+			strCpy.campaigns=[]
+			return strCpy;
+		}
+		case userConstants.SET_USER_CAMPAIGNS:{
+			let strCpy = {
+				...state,
+			};
+            strCpy.campaigns=action.campaigns
+			return strCpy;
 		};
 
 		case userConstants.GET_USER_PROFILE_FAILURE:

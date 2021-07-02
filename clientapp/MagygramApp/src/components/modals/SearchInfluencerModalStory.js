@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Modal } from "react-bootstrap";
-import { modalConstants } from "../../constants/ModalConstants";
-import { PostContext } from "../../contexts/PostContext";
+import { storyConstants } from "../../constants/StoryConstants";
+import { StoryContext } from "../../contexts/StoryContext";
 import Axios from "axios";
 import { authHeader } from "../../helpers/auth-header";
 import { hasRoles } from "../../helpers/auth-header";
@@ -9,11 +9,11 @@ import { searchService } from "../../services/SearchService";
 import { postService } from "../../services/PostService";
 import AsyncSelect from "react-select/async";
 
-const SearchInfluencerModal = () => {
-	const { postState, dispatch } = useContext(PostContext);
+const SearchInfluencerModalStory = () => {
+	const { storyState, dispatch } = useContext(StoryContext);
 
 	const handleModalClose = () => {
-		dispatch({ type: modalConstants.HIDE_SEARCH_INFLUENCER_MODAL });
+		dispatch({ type: storyConstants.HIDE_SEARCH_INFLUENCER_MODAL });
 	};
 
 
@@ -58,9 +58,9 @@ const SearchInfluencerModal = () => {
 		let username = search
 		console.log(search)
 		let requestDTO = {
-			contentId: postState.viewPostModal.post.Id,
+			contentId: storyState.searchInfluencer.storyId,
+            contentType: "STORY",
 			username: usernameSearch,
-			contentType: "POST",
 			price: price,
 			status: "PENDING",
 		};
@@ -69,7 +69,7 @@ const SearchInfluencerModal = () => {
 	};
 
 	return (
-		<Modal show={postState.campaignOptions.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
+		<Modal show={storyState.campaignOptions.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">{ "Search" }</Modal.Title>
 			</Modal.Header>
@@ -100,4 +100,4 @@ const SearchInfluencerModal = () => {
 	);
 };
 
-export default SearchInfluencerModal;
+export default SearchInfluencerModalStory;
