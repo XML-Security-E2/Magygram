@@ -156,10 +156,26 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 	return retVal, nil
 }
 
-func (p postService) DeletePost(ctx context.Context, requestId string) error {
+func (p postService) DeletePost(ctx context.Context, bearer string, requestId string) error {
+
+	retVal, err := p.AuthClient.HasRole(bearer,"delete_posts")
+	if err != nil{
+		return errors.New("auth service not found")
+	}
+
 	request, err := p.PostRepository.GetByID(ctx, requestId)
 	if err!=nil {
-		return errors.New("Request not found")
+		return errors.New("post not found")
+	}
+
+	if !retVal {
+		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		if err != nil {
+			return err
+		}
+		if request.UserInfo.Id != userId {
+			return errors.New("user not authorized for post delete")
+		}
 	}
 
 	request.IsDeleted=true

@@ -70,6 +70,7 @@ type CampaignRequest struct {
 	DisplayTime int `json:"displayTime"`
 	DateFrom time.Time `json:"dateFrom"`
 	DateTo time.Time `json:"dateTo"`
+	ExposeOnceDate time.Time `json:"exposeOnceDate"`
 	Type string `json:"campaignType"`
 }
 

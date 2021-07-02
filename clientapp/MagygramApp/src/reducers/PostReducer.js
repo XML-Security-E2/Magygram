@@ -1006,46 +1006,47 @@ export const postReducer = (state, action) => {
 			postCopy.agentCampaignPostOptionModal.successMessage = "";
 			return postCopy;
 		case modalConstants.HIDE_POST_AGENT_OPTIONS_MODAL:
-			postCopy = { ...state };
-			postCopy.agentCampaignPostOptionModal.showModal = false;
-			postCopy.agentCampaignPostOptionModal.showError = false;
-			postCopy.agentCampaignPostOptionModal.errorMessage = "";
-			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
-			postCopy.agentCampaignPostOptionModal.successMessage = "";
-			return postCopy;
+			return {
+				...state,
+				agentCampaignPostOptionModal: {
+					showModal: false,
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+					campaign: {
+						minAge: "",
+						maxAge: "",
+						minDisplays: "",
+						gender: "ANY",
+						frequency: "",
+						startDate: new Date(),
+						endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+					},
+				},
+			};
 
 		case postConstants.SET_POST_CAMPAIGN_REQUEST:
 			postCopy = { ...state };
 			postCopy.agentCampaignPostOptionModal.campaign = {
 				minAge: "",
 				maxAge: "",
-				displayTime: "12",
-				checkedOnce: true,
+				minDisplays: "",
 				gender: "ANY",
+				frequency: "",
 				startDate: new Date(),
 				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
 			};
 			return postCopy;
 		case postConstants.SET_POST_CAMPAIGN_SUCCESS:
 			postCopy = { ...state };
-			// campaignType: "POST"
-			// dateFrom: "2021-07-22T00:00:00Z"
-			// dateTo: "2021-07-29T00:00:00Z"
-			// displayTime: 12
-			// frequency: "REPEATEDLY"
-			// id: "f1cbd6ef-6a6c-421d-8530-1fa1715719e0"
-			// minDisplaysForRepeatedly: 0
-			// targetGroup:
-			// gender: "MALE"
-			// maxAge: 26
-			// minAge: 17
 
 			postCopy.agentCampaignPostOptionModal.campaign = {
 				id: action.campaign.id,
 				minAge: action.campaign.targetGroup.minAge,
 				maxAge: action.campaign.targetGroup.maxAge,
-				displayTime: action.campaign.minDisplaysForRepeatedly,
-				checkedOnce: action.campaign.frequency === "ONCE",
+				minDisplays: action.campaign.minDisplaysForRepeatedly,
+				frequency: action.campaign.frequency,
 				gender: action.campaign.targetGroup.gender,
 				startDate: new Date(action.campaign.dateFrom),
 				endDate: new Date(action.campaign.dateTo),
@@ -1056,12 +1057,35 @@ export const postReducer = (state, action) => {
 			postCopy.agentCampaignPostOptionModal.campaign = {
 				minAge: "",
 				maxAge: "",
-				displayTime: "12",
-				checkedOnce: true,
+				minDisplays: "",
+				frequency: "",
 				gender: "ANY",
 				startDate: new Date(),
 				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
 			};
+			return postCopy;
+
+		case postConstants.UPDATE_POST_CAMPAIGN_REQUEST:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
+			return postCopy;
+		case postConstants.UPDATE_POST_CAMPAIGN_SUCCESS:
+			postCopy = { ...state };
+
+			postCopy.agentCampaignPostOptionModal.showError = false;
+			postCopy.agentCampaignPostOptionModal.errorMessage = "";
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = true;
+			postCopy.agentCampaignPostOptionModal.successMessage = action.successMessage;
+			return postCopy;
+		case postConstants.UPDATE_POST_CAMPAIGN_FAILURE:
+			postCopy = { ...state };
+			postCopy.agentCampaignPostOptionModal.showError = true;
+			postCopy.agentCampaignPostOptionModal.errorMessage = action.errorMessage;
+			postCopy.agentCampaignPostOptionModal.showSuccessMessage = false;
+			postCopy.agentCampaignPostOptionModal.successMessage = "";
 			return postCopy;
 		default:
 			return state;

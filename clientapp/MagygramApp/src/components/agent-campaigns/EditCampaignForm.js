@@ -6,9 +6,8 @@ const EditCampaignForm = forwardRef((props, ref) => {
 
 	const [minAge, setMinAge] = useState(postState.agentCampaignPostOptionModal.campaign.minAge);
 	const [maxAge, setMaxAge] = useState(postState.agentCampaignPostOptionModal.campaign.maxAge);
+	const [minDisplaysForRepeatedly, setMinDisplaysForRepeatedly] = useState(postState.agentCampaignPostOptionModal.campaign.minDisplays);
 
-	const [displayTime, setDisplayTime] = useState(postState.agentCampaignPostOptionModal.campaign.displayTime);
-	const [checkedOnce, setCheckedOnce] = useState(postState.agentCampaignPostOptionModal.campaign.checkedOnce);
 	const [gender, setGender] = useState(postState.agentCampaignPostOptionModal.campaign.gender);
 
 	const [startDate, setStartDate] = useState(new Date(postState.agentCampaignPostOptionModal.campaign.startDate));
@@ -29,8 +28,7 @@ const EditCampaignForm = forwardRef((props, ref) => {
 		campaignState: {
 			minAge,
 			maxAge,
-			displayTime,
-			checkedOnce,
+			minDisplaysForRepeatedly,
 			gender,
 			startDate,
 			endDate,
@@ -40,8 +38,7 @@ const EditCampaignForm = forwardRef((props, ref) => {
 	useEffect(() => {
 		setMinAge(postState.agentCampaignPostOptionModal.campaign.minAge);
 		setMaxAge(postState.agentCampaignPostOptionModal.campaign.maxAge);
-		setDisplayTime(postState.agentCampaignPostOptionModal.campaign.displayTime);
-		setCheckedOnce(postState.agentCampaignPostOptionModal.campaign.checkedOnce);
+		setMinDisplaysForRepeatedly(postState.agentCampaignPostOptionModal.campaign.minDisplays);
 		setGender(postState.agentCampaignPostOptionModal.campaign.gender);
 		setStartDate(new Date(postState.agentCampaignPostOptionModal.campaign.startDate));
 		setEndDate(new Date(postState.agentCampaignPostOptionModal.campaign.endDate));
@@ -50,47 +47,6 @@ const EditCampaignForm = forwardRef((props, ref) => {
 	return (
 		<div className="ml-3 mt-4">
 			<div className="row">
-				<div className="form-group">
-					<h5 style={{ color: props.fontColor }}>Campaign information</h5>
-
-					<label style={{ color: props.fontColor }}>Campaign frequency</label>
-
-					<div className="form-check">
-						<input className="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="once" checked={checkedOnce} onChange={() => setCheckedOnce(!checkedOnce)} />
-						<label className="form-check-label" for="exampleRadios1" style={{ color: props.fontColor }}>
-							One day campaign
-						</label>
-					</div>
-					<div className="form-check">
-						<input
-							className="form-check-input"
-							type="radio"
-							name="exampleRadios"
-							id="exampleRadios2"
-							value="repeatedly"
-							checked={!checkedOnce}
-							onChange={() => setCheckedOnce(!checkedOnce)}
-						/>
-						<label className="form-check-label" for="exampleRadios2" style={{ color: props.fontColor }}>
-							Multiple days campaign
-						</label>
-					</div>
-				</div>
-			</div>
-			<div className="row" hidden={!checkedOnce}>
-				<div className="form-group w-100">
-					<label style={{ color: props.fontColor }}>Exposure time</label>
-					<div className="form-row d-flex align-items-center">
-						<div className="col">
-							<input type="number" min="0" max="24" value={displayTime} className="form-control w-40" onChange={(e) => setDisplayTime(e.target.value)} />
-						</div>
-						<div className="col" style={{ color: props.fontColor }}>
-							h
-						</div>
-					</div>
-				</div>
-			</div>
-			<div className="row" hidden={checkedOnce}>
 				<div className="form-group">
 					<label>Exposure dates</label>
 
@@ -114,6 +70,14 @@ const EditCampaignForm = forwardRef((props, ref) => {
 								min={new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
 								onChange={(e) => setEndDate(new Date(e.target.value))}
 							/>
+						</div>
+					</div>
+				</div>
+				<div className="form-group">
+					<div className="form-row">
+						<div className="col" style={{ color: props.fontColor }}>
+							Times to expose per day
+							<input type="number" min="1" value={minDisplaysForRepeatedly} className="form-control" onChange={(e) => setMinDisplaysForRepeatedly(e.target.value)} />
 						</div>
 					</div>
 				</div>

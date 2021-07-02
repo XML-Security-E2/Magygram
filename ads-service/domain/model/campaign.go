@@ -32,6 +32,7 @@ type Campaign struct {
 	TargetGroup TargetGroup `bson:"target_group"`
 	DateFrom time.Time `bson:"date_from"`
 	DateTo time.Time `bson:"date_to"`
+	ExposeOnceDate time.Time `bson:"expose_once_date"`
 	DisplayTime int `bson:"display_time" validate:"required,numeric,min=0,max=24"`
 }
 
@@ -39,7 +40,6 @@ type CampaignUpdateRequest struct {
 	Id string `bson:"_id,omitempty"`
 	CampaignId string `bson:"campaign_id,omitempty"`
 	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly"`
-	Frequency CampaignFrequency `bson:"frequency"`
 	TargetGroup TargetGroup `bson:"target_group"`
 	DateFrom time.Time `bson:"date_from"`
 	DateTo time.Time `bson:"date_to"`
@@ -50,14 +50,22 @@ type CampaignUpdateRequest struct {
 type CampaignUpdateRequestDTO struct {
 	CampaignId string `bson:"campaign_id,omitempty" json:"campaignId"`
 	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly" json:"minDisplaysForRepeatedly"`
-	Frequency CampaignFrequency `bson:"frequency" json:"frequency"`
 	TargetGroup TargetGroup `bson:"target_group" json:"targetGroup"`
 	DateFrom time.Time `bson:"date_from" json:"dateFrom"`
 	DateTo time.Time `bson:"date_to" json:"dateTo"`
 }
 
+type CampaignUpdateRequestTimeDTO struct {
+	CampaignId string `bson:"campaign_id,omitempty" json:"campaignId"`
+	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly" json:"minDisplaysForRepeatedly"`
+	TargetGroup TargetGroup `bson:"target_group" json:"targetGroup"`
+	DateFrom int64 `bson:"date_from" json:"dateFrom"`
+	DateTo int64 `bson:"date_to" json:"dateTo"`
+}
+
 type CampaignRequest struct {
 	ContentId string `json:"contentId"`
+	ExposeOnceDate time.Time `json:"exposeOnceDate"`
 	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
 	Type ContentType `json:"campaignType"`
 	Frequency CampaignFrequency `json:"frequency"`
@@ -69,6 +77,7 @@ type CampaignRequest struct {
 
 type CampaignRetreiveRequest struct {
 	Id string `json:"id"`
+	ExposeOnceDate time.Time `json:"exposeOnceDate"`
 	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
 	Type ContentType `json:"campaignType"`
 	Frequency CampaignFrequency `json:"frequency"`
@@ -120,9 +129,6 @@ const(
 )
 
 func NewCampaignUpdateRequest(campaignRequest *CampaignUpdateRequestDTO) (*CampaignUpdateRequest, error) {
-	if err := validateCampaignFrequencyEnums(campaignRequest.Frequency); err != nil {
-		return nil, err
-	}
 	if err := validateGenderTypeEnums(campaignRequest.TargetGroup.Gender); err != nil {
 		return nil, err
 	}
@@ -138,7 +144,6 @@ func NewCampaignUpdateRequest(campaignRequest *CampaignUpdateRequestDTO) (*Campa
 		Id:                       guid.New().String(),
 		CampaignId:               campaignRequest.CampaignId,
 		MinDisplaysForRepeatedly: campaignRequest.MinDisplaysForRepeatedly,
-		Frequency:                campaignRequest.Frequency,
 		TargetGroup:              campaignRequest.TargetGroup,
 		DateFrom:                 campaignRequest.DateFrom,
 		DateTo:                   campaignRequest.DateTo,
@@ -177,6 +182,7 @@ func NewCampaign(campaignRequest *CampaignRequest, ownerId string) (*Campaign, e
 		DateTo:                   campaignRequest.DateTo,
 		OwnerId: 				  ownerId,
 		DisplayTime:              campaignRequest.DisplayTime,
+		ExposeOnceDate:           campaignRequest.ExposeOnceDate,
 	}, nil
 }
 

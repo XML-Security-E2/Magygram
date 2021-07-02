@@ -55,14 +55,16 @@ type postHandler struct {
 }
 
 func (p postHandler) DeletePost(c echo.Context) error {
-	postId := c.Param("requestId")
+	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	err := p.PostService.DeletePost(ctx, postId)
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := p.PostService.DeletePost(ctx, bearer, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -137,8 +139,12 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 
 	dateT := c.FormValue("endDate")
 	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
-
 	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+
+	exposeD := c.FormValue("exposeOnceDate")
+	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
+	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+
 	displayT := c.FormValue("displayTime")
 	displayTime, _ := strconv.Atoi(displayT)
 
@@ -171,6 +177,7 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 		Type: "POST",
 		DisplayTime: displayTime,
 		ContentId: "",
+		ExposeOnceDate: exposeDate,
 	}
 
 	ctx := c.Request().Context()

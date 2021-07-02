@@ -59,6 +59,7 @@ func main() {
 	e := echo.New()
 	i := interactor.NewInteractor(campaignCol, influencerCampaignCol, updateReqCampaignCol)
 	h := i.NewAppHandler()
+	i.NewSchedulerService()
 
 	router.NewRouter(e, h)
 

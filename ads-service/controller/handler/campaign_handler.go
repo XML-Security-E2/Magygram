@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/labstack/echo"
 	"net/http"
+	"time"
 )
 
 type CampaignHandler interface {
@@ -109,7 +110,7 @@ func (ch campaignHandler) GetAllActiveAgentsPostCampaigns(c echo.Context) error 
 }
 
 func (ch campaignHandler) UpdateCampaignRequest(c echo.Context) error {
-	campaignRequest := &model.CampaignUpdateRequestDTO{}
+	campaignRequest := &model.CampaignUpdateRequestTimeDTO{}
 	if err := c.Bind(campaignRequest); err != nil {
 		return err
 	}
@@ -119,8 +120,16 @@ func (ch campaignHandler) UpdateCampaignRequest(c echo.Context) error {
 		ctx = context.Background()
 	}
 
+	campaignReq := &model.CampaignUpdateRequestDTO{
+		CampaignId:               campaignRequest.CampaignId,
+		MinDisplaysForRepeatedly: campaignRequest.MinDisplaysForRepeatedly,
+		TargetGroup:              campaignRequest.TargetGroup,
+		DateFrom:                 time.Unix(0, campaignRequest.DateFrom * int64(time.Millisecond)),
+		DateTo:                   time.Unix(0, campaignRequest.DateTo * int64(time.Millisecond)),
+	}
+
 	bearer := c.Request().Header.Get("Authorization")
-	campaignId, err := ch.CampaignService.UpdateCampaignRequest(ctx, bearer, campaignRequest)
+	campaignId, err := ch.CampaignService.UpdateCampaignRequest(ctx, bearer, campaignReq)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

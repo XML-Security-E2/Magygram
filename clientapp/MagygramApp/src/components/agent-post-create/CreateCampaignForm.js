@@ -3,12 +3,14 @@ import React, { forwardRef, useImperativeHandle, useState } from "react";
 const CreateCampaignForm = forwardRef((props, ref) => {
 	const [minAge, setMinAge] = useState(16);
 	const [maxAge, setMaxAge] = useState(23);
+	const [minDisplaysForRepeatedly, setMinDisplaysForRepeatedly] = useState(1);
 
 	const [displayTime, setDisplayTime] = useState(12);
 	const [checkedOnce, setCheckedOnce] = useState(true);
 	const [gender, setGender] = useState("ANY");
 
 	const [startDate, setStartDate] = useState(new Date());
+	const [exposeOnceDate, setExposeOnceDate] = useState(new Date());
 	const [endDate, setEndDate] = useState(new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
 
 	const handleStartDateChange = (e) => {
@@ -31,6 +33,8 @@ const CreateCampaignForm = forwardRef((props, ref) => {
 			gender,
 			startDate,
 			endDate,
+			exposeOnceDate,
+			minDisplaysForRepeatedly,
 		},
 	}));
 
@@ -79,7 +83,7 @@ const CreateCampaignForm = forwardRef((props, ref) => {
 			</div>
 			<div className="row" hidden={checkedOnce}>
 				<div className="form-group">
-					<label>Exposure dates</label>
+					<label style={{ color: props.fontColor }}>Exposure dates</label>
 
 					<div className="form-row">
 						<div className="col" style={{ color: props.fontColor }}>
@@ -100,6 +104,30 @@ const CreateCampaignForm = forwardRef((props, ref) => {
 								value={endDate.toISOString().split("T")[0]}
 								min={new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
 								onChange={(e) => setEndDate(new Date(e.target.value))}
+							/>
+						</div>
+					</div>
+				</div>
+				<div className="form-group">
+					<div className="form-row">
+						<div className="col" style={{ color: props.fontColor }}>
+							Times to expose per day
+							<input type="number" min="1" value={minDisplaysForRepeatedly} className="form-control" onChange={(e) => setMinDisplaysForRepeatedly(e.target.value)} />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="row" hidden={!checkedOnce}>
+				<div className="form-group">
+					<label style={{ color: props.fontColor }}>Exposure date</label>
+					<div className="form-row">
+						<div className="col" style={{ color: props.fontColor }}>
+							<input
+								type="date"
+								className="form-control"
+								value={exposeOnceDate.toISOString().split("T")[0]}
+								min={new Date().toISOString().split("T")[0]}
+								onChange={(e) => setExposeOnceDate(new Date(e.target.value))}
 							/>
 						</div>
 					</div>

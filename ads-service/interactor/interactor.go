@@ -7,7 +7,9 @@ import (
 	"ads-service/infrastructure/persistence/mongodb"
 	"ads-service/service"
 	"ads-service/service/intercomm"
+	"ads-service/service/scheduler"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 type Interactor interface {
@@ -15,6 +17,7 @@ type Interactor interface {
 	NewInfluencerCampaignRepository() repository.InfluencerCampaignRepository
 	NewCampaignUpdateRequestsRepository() repository.CampaignUpdateRequestsRepository
 	NewCampaignService() service_contracts.CampaignService
+	NewSchedulerService() scheduler.SchedulerService
 	NewCampaignHandler() handler.CampaignHandler
 	NewAuthClient() intercomm.AuthClient
 	NewAppHandler() handler.AppHandler
@@ -38,6 +41,13 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler := &appHandler{}
 	appHandler.CampaignHandler = i.NewCampaignHandler()
 	return appHandler
+}
+
+func (i *interactor) NewSchedulerService() scheduler.SchedulerService {
+	serv := scheduler.NewSchedulerService(i.NewCampaignRepository(), i.NewCampaignUpdateRequestsRepository())
+	serv.UpdateAllPendingCampaigns(time.NewTicker(30 * time.Minute))
+
+	return serv
 }
 
 func (i *interactor) NewAuthClient() intercomm.AuthClient {

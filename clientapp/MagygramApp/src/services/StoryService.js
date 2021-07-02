@@ -89,6 +89,8 @@ function createAgentStory(storyCampaignDTO, dispatch) {
 	formData.append("gender", storyCampaignDTO.gender);
 	formData.append("startDate", storyCampaignDTO.startDate);
 	formData.append("endDate", storyCampaignDTO.endDate);
+	formData.append("minDisplays", storyCampaignDTO.minDisplays);
+	formData.append("exposeOnceDate", storyCampaignDTO.exposeOnceDate);
 
 	Axios.post(`/api/story/campaign`, formData, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {

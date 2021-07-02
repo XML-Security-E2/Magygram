@@ -59,6 +59,8 @@ const CreateAgentStoryModal = () => {
 			story.gender = campaignRef.current.campaignState.gender;
 			story.startDate = campaignRef.current.campaignState.startDate.getTime();
 			story.endDate = campaignRef.current.campaignState.endDate.getTime();
+			story.exposeOnceDate = campaignRef.current.campaignState.exposeOnceDate.getTime();
+			story.minDisplays = campaignRef.current.campaignState.minDisplaysForRepeatedly;
 
 			storyService.createAgentStory(story, dispatch);
 		}

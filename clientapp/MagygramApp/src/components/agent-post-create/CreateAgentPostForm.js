@@ -84,6 +84,8 @@ const CreateAgentPostForm = () => {
 			post.gender = campaignRef.current.campaignState.gender;
 			post.startDate = campaignRef.current.campaignState.startDate.getTime();
 			post.endDate = campaignRef.current.campaignState.endDate.getTime();
+			post.exposeOnceDate = campaignRef.current.campaignState.exposeOnceDate.getTime();
+			post.minDisplays = campaignRef.current.campaignState.minDisplaysForRepeatedly;
 
 			postService.createPostCampaign(post, dispatch);
 		}

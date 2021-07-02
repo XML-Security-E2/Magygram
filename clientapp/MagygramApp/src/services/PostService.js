@@ -33,7 +33,36 @@ export const postService = {
 	sendCampaign,
 	findAllUsersCampaignPosts,
 	getCampaignByPostId,
+	updatePostCampaign,
 };
+
+function updatePostCampaign(campaignDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/ads/campaign`, campaignDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Your update request is sent. Changes will be applied within 24h."));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.UPDATE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.UPDATE_POST_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.UPDATE_POST_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
 
 function sendCampaign(requestDTO, dispatch) {
 	dispatch(request());
@@ -394,6 +423,8 @@ function createPostCampaign(postCampaignDTO, dispatch) {
 	formData.append("gender", postCampaignDTO.gender);
 	formData.append("startDate", postCampaignDTO.startDate);
 	formData.append("endDate", postCampaignDTO.endDate);
+	formData.append("minDisplays", postCampaignDTO.minDisplays);
+	formData.append("exposeOnceDate", postCampaignDTO.exposeOnceDate);
 
 	Axios.post(`/api/posts/campaign`, formData, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {

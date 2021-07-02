@@ -45,6 +45,7 @@ func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string,
 		DateFrom:                 campaign.DateFrom,
 		DateTo:                   campaign.DateTo,
 		DisplayTime:              campaign.DisplayTime,
+		ExposeOnceDate:           campaign.ExposeOnceDate,
 	}, nil}
 
 func (c campaignService) GetCampaignByStoryId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {

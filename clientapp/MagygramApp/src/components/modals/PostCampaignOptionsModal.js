@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
@@ -15,38 +15,29 @@ const PostCampaignOptionsModal = ({ postId }) => {
 	const { postState, dispatch } = useContext(PostContext);
 
 	const [hiddenForm, setHiddenForm] = useState(true);
+	const [hiddenCampaignAlert, setHiddenCampaignAlert] = useState(true);
 	const campaignRef = useRef();
 
 	const handleEditCampaign = () => {
-		// 	CampaignId string `bson:"campaign_id,omitempty" json:"campaignId"`
-		// MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly" json:"minDisplaysForRepeatedly"`
-		// Frequency CampaignFrequency `bson:"frequency" json:"frequency"`
-		// TargetGroup TargetGroup `bson:"target_group" json:"targetGroup"`
-		// DateFrom time.Time `bson:"date_from" json:"dateFrom"`
-		// DateTo time.Time `bson:"date_to" json:"dateTo"`
-
-		// type TargetGroup struct {
-		// 	MinAge int `bson:"min_age" json:"minAge" validate:"required,numeric,min=12,max=70"`
-		// 	MaxAge int `bson:"max_age" json:"maxAge" validate:"required,numeric,min=12,max=120"`
-		// 	Gender GenderType `bson:"gender" json:"gender"`
-		// }
 		let campaign = {
 			campaignId: postState.agentCampaignPostOptionModal.campaign.id,
-			minDisplaysForRepeatedly: 0, //TOOOOODOOOOO
-			frequency: campaignRef.current.campaignState.checkedOnce ? "ONCE" : "REPEATEDLY",
+			minDisplaysForRepeatedly: parseInt(campaignRef.current.campaignState.minDisplaysForRepeatedly),
 			targetGroup: {
-				minAge: campaignRef.current.campaignState.minAge,
-				maxAge: campaignRef.current.campaignState.maxAge,
+				minAge: parseInt(campaignRef.current.campaignState.minAge),
+				maxAge: parseInt(campaignRef.current.campaignState.maxAge),
 				gender: campaignRef.current.campaignState.gender,
 			},
 			dateFrom: campaignRef.current.campaignState.startDate.getTime(),
 			dateTo: campaignRef.current.campaignState.endDate.getTime(),
 		};
+
+		postService.updatePostCampaign(campaign, dispatch);
 	};
 
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_POST_AGENT_OPTIONS_MODAL });
 		setHiddenForm(true);
+		setHiddenCampaignAlert(true);
 	};
 
 	const handleDelete = () => {
@@ -69,8 +60,12 @@ const PostCampaignOptionsModal = ({ postId }) => {
 
 	const handleOpenCampaignPostEditModal = () => {
 		postService.getCampaignByPostId(postId, dispatch);
-		setHiddenForm(false);
 	};
+
+	useEffect(() => {
+		setHiddenCampaignAlert(postState.agentCampaignPostOptionModal.campaign.frequency === "REPEATEDLY" || postState.agentCampaignPostOptionModal.campaign.frequency === "");
+		setHiddenForm(postState.agentCampaignPostOptionModal.campaign.frequency === "ONCE" || postState.agentCampaignPostOptionModal.campaign.frequency === "");
+	}, [postState.agentCampaignPostOptionModal.campaign]);
 
 	return (
 		<Modal show={postState.agentCampaignPostOptionModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
@@ -90,6 +85,8 @@ const PostCampaignOptionsModal = ({ postId }) => {
 					message={postState.agentCampaignPostOptionModal.errorMessage}
 					handleCloseAlert={() => dispatch({ type: postConstants.HIDE_POST_CAMPAIGN_OPTION_ALERTS })}
 				/>
+				<FailureAlert hidden={hiddenCampaignAlert} header="Error" message="Camapigns that lasts only one day cannot be edited" handleCloseAlert={() => setHiddenCampaignAlert(true)} />
+
 				<div hidden={!hiddenForm}>
 					<div className="row">
 						<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={handleOpenCampaignPostEditModal}>

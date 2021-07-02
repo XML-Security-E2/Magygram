@@ -89,7 +89,6 @@ func (c campaignRepository) Update(ctx context.Context, campaign *model.Campaign
 	return c.Col.UpdateOne(ctx, bson.M{"_id":  campaign.Id},bson.D{{"$set", bson.D{
 		{"min_displays_for_repeatedly" , campaign.MinDisplaysForRepeatedly},
 		{"seen_by" , campaign.SeenBy},
-		{"frequency" , campaign.Frequency},
 		{"target_group" , campaign.TargetGroup},
 		{"date_from" , campaign.DateFrom},
 		{"date_to" , campaign.DateTo}}}})}

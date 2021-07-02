@@ -48,9 +48,9 @@ export const storyReducer = (state, action) => {
 
 			if (action.stories !== null) {
 				action.stories.forEach((story) => {
-					if (storyCopy.agentCampaignStories.find((storyy) => storyy.Id === story.Id) === undefined) {
+					if (storyCopy.agentCampaignStories.find((storyy) => storyy.Id === story.id) === undefined) {
 						storyCopy.agentCampaignStories.push({
-							Id: story.Id,
+							Id: story.id,
 							MediaType: story.media.MediaType,
 							Url: story.media.Url,
 							UserId: story.userInfo.Id,

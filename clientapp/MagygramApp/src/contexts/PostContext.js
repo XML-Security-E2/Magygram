@@ -151,9 +151,9 @@ const PostContextProvider = (props) => {
 			campaign: {
 				minAge: "",
 				maxAge: "",
-				displayTime: "12",
-				checkedOnce: true,
+				minDisplays: "",
 				gender: "ANY",
+				frequency: "",
 				startDate: new Date(),
 				endDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
 			},

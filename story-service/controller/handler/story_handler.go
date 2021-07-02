@@ -115,8 +115,12 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 
 	dateT := c.FormValue("endDate")
 	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
-
 	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+
+	exposeD := c.FormValue("exposeOnceDate")
+	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
+	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+
 	displayT := c.FormValue("displayTime")
 	displayTime, _ := strconv.Atoi(displayT)
 
@@ -143,6 +147,7 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 		Type: "STORY",
 		DisplayTime: displayTime,
 		ContentId: "",
+		ExposeOnceDate: exposeDate,
 	}
 
 	storyId, err := p.StoryService.CreateStoryCampaign(ctx, bearer, headers, tags, campaignRequest)
