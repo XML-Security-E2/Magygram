@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"mime/multipart"
 	"request-service/domain/model"
@@ -123,6 +124,7 @@ func mapCampaignRequestToCampaignRequestDTO(requests []*model.CampaignRequest) [
 	for _, request := range requests{
 		var result = model.CampaignRequestResponseDTO{ Id: request.Id,
 			ContentId:      request.ContentId,
+			ContentType:    request.ContentType,
 			Influencer:   request.Influencer,
 			Status: request.Status,
 			Price: request.Price,
@@ -239,12 +241,13 @@ func (v verificationService) RejectVerificationRequest(ctx context.Context, requ
 }
 func (v verificationService) DeleteCampaignRequest(ctx context.Context, requestId string) error {
 	request, err := v.CampaignRequestsRepository.GetRequestById(ctx, requestId)
+	fmt.Println(request)
 	if err!=nil {
 		return errors.New("Request not found")
 	}
 
 	request.IsDeleted=true
-
+	fmt.Println(request)
 	v.CampaignRequestsRepository.CreateRequest(ctx,request)
 
 	return nil
@@ -252,6 +255,7 @@ func (v verificationService) DeleteCampaignRequest(ctx context.Context, requestI
 
 func (v verificationService) DeleteReportRequest(ctx context.Context, requestId string) error {
 	request, err := v.ReportRequestsRepository.GetReportRequestById(ctx, requestId)
+
 	if err!=nil {
 		return errors.New("Request not found")
 	}

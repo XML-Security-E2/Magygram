@@ -140,6 +140,23 @@ export const storyReducer = (state, action) => {
 					firstUnvisitedStory: 0,
 				},
 			};
+		case storyConstants.SHOW_SEARCH_INFLUENCER_MODAL:
+			return {
+				...state,
+				searchInfluencer: {
+					storyId:  action.storyId,
+				},
+				campaignOptions: {
+					showModal: true,
+				},
+			};
+			case storyConstants.HIDE_SEARCH_INFLUENCER_MODAL:
+				return {
+					...state,
+					campaignOptions: {
+						showModal: false,
+					},
+				};
 		case storyConstants.PROFILE_HIGHLIGHTS_REQUEST:
 			return {
 				...state,

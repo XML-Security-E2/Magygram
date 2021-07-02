@@ -19,6 +19,12 @@ const StoryContextProvider = (props) => {
 		postOptions: {
 			showModal: false,
 		},
+		searchInfluencer: {
+			storyId: "", 
+		},
+		campaignOptions: {
+			showModal: false,
+		},
 		highlights: {
 			showModal: false,
 			showError: false,
