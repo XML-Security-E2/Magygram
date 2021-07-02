@@ -6,6 +6,7 @@ import (
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
 	"user-service/infrastructure/persistence/mongodb"
+	"user-service/saga"
 	"user-service/service"
 	"user-service/service/intercomm"
 )
@@ -27,6 +28,7 @@ type Interactor interface {
 	NewUserHandler() handler.UserHandler
 	NewCollectionsHandler() handler.CollectionsHandler
 	NewAppHandler() handler.AppHandler
+	NewSagaOrchestrator() saga.Orchestrator
 }
 
 type interactor struct {
@@ -35,6 +37,7 @@ type interactor struct {
 	ResPwdCol *mongo.Collection
 	NotifyRulesCol *mongo.Collection
 }
+
 
 func NewInteractor(UserCol *mongo.Collection, AccCol *mongo.Collection, ResPwdCol *mongo.Collection, NotifyRulesCol *mongo.Collection) Interactor {
 	return &interactor{UserCol, AccCol,  ResPwdCol, NotifyRulesCol}
@@ -90,6 +93,10 @@ func (i *interactor) NewHighlightsService() service_contracts.HighlightsService 
 	return service.NewHighlightsService(i.NewUserRepository(), i.NewAuthClient(), i.NewStoryClient(), i.NewRelationshipClient())
 }
 
+func (i *interactor) NewSagaOrchestrator() saga.Orchestrator {
+	return *saga.NewOrchestrator()
+}
+
 func (i *interactor) NewCollectionsService() service_contracts.CollectionsService {
 	return service.NewCollectionsService(i.NewUserRepository(), i.NewAuthClient(), i.NewPostClient())
 }
@@ -107,7 +114,7 @@ func (i *interactor) NewAccountResetPasswordRepository() repository.ResetPasswor
 }
 
 func (i *interactor) NewUserService() service_contracts.UserService {
-	return service.NewAuthService(i.NewUserRepository(),i.NewNotificationRulesRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient(), i.NewStoryClient())
+	return service.NewAuthService(i.NewUserRepository(),i.NewNotificationRulesRepository(), i.NewAccountActivationService(), i.NewAuthClient(),i.NewResetPasswordService(), i.NewRelationshipClient(), i.NewPostClient(), i.NewMediaClient(), i.NewMessageClient(), i.NewStoryClient(), i.NewSagaOrchestrator())
 }
 
 

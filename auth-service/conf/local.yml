@@ -22,3 +22,9 @@ userservice:
   protocol: "https://"
   domain: "localhost"
   port: "460"
+
+redisdatabase:
+  host: "localhost"
+  port: "6379"
+  password: ""
+  database: 0

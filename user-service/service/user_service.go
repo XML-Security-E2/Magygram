@@ -2,18 +2,22 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-redis/redis"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"mime/multipart"
-	"net/http"
 	"regexp"
+	"time"
+	"user-service/conf"
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	service_contracts "user-service/domain/service-contracts"
 	"user-service/domain/service-contracts/exceptions"
 	"user-service/logger"
+	"user-service/saga"
 	"user-service/service/intercomm"
 
 	"github.com/beevik/guid"
@@ -32,14 +36,17 @@ type userService struct {
 	intercomm.MediaClient
 	intercomm.MessageClient
 	intercomm.StoryClient
+	saga.Orchestrator
 }
 
 var (
 	MaxUnsuccessfulLogins = 3
+	ImageBytes []byte= nil
+	RedisClient *redis.Client = nil
 )
 
-func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient, sclient intercomm.StoryClient) service_contracts.UserService {
-	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc,sclient}
+func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient, sclient intercomm.StoryClient, orchestrator saga.Orchestrator) service_contracts.UserService {
+	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc,sclient, orchestrator}
 }
 
 func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error) {
@@ -455,7 +462,7 @@ func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer strin
 	return nil
 }
 
-func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (*http.Response, error) {
+func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) ([]byte, error) {
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname": userRequest.Surname, "email": userRequest.Email, "username": userRequest.Username}).Warn("User registration validation failure")
@@ -468,25 +475,44 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 		return nil, err
 	}
 
-	resp, err := u.AuthClient.RegisterUser(user, userRequest.Password, userRequest.RepeatedPassword)
-	if err != nil {
-		return nil, err
+	sagaUserRequest := saga.UserRequest{
+		Id: user.Id,
+		Email: user.Email,
+		Password: userRequest.Password,
+		RepeatedPassword: userRequest.RepeatedPassword,
 	}
 
-	err = u.RelationshipClient.CreateUser(user)
-	if err != nil {
-		return nil, err
+	registrationMessage := saga.RegisterUserMessage{Service: saga.ServiceAuth, SenderService: saga.ServiceUser, Action: saga.ActionStart, User: sagaUserRequest}
+	u.Orchestrator.Next(saga.AuthChannel, saga.ServiceAuth, registrationMessage)
+
+	finished := make(chan bool)
+
+	go u.RedisConnection(finished)
+
+	select {
+	case redisResult := <-finished:
+		if !redisResult {
+			return nil, errors.New("Internal server error")
+		}
+
+		accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
+
+		go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
+
+		if userId, ok := result.InsertedID.(string); ok {
+			logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User registered")
+			return ImageBytes, nil
+		}
+		return ImageBytes, err
+	case <-time.After(10 * time.Second):
+		fmt.Println("ROLLBACK ODRADI KAD JEDAN MS NE RADI")
+		sendToReplyChannel(RedisClient, &registrationMessage, saga.ActionError, saga.ServiceAuth, saga.ServiceUser)
+		sendToReplyChannel(RedisClient, &registrationMessage, saga.ActionError, saga.ServiceUser, saga.ServiceUser)
+
+		return nil, errors.New("Internal server error")
 	}
 
-	accActivationId, _ := u.AccountActivationService.Create(ctx, user.Id)
-
-	go SendActivationMail(userRequest.Email, userRequest.Name, accActivationId)
-
-	if userId, ok := result.InsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User registered")
-		return resp, nil
-	}
-	return resp, err
+	return nil, errors.New("Internal server error")
 }
 
 func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error) {
@@ -1388,3 +1414,68 @@ func HashAndSaltPasswordIfStrongAndMatching(password string, repeatedPassword st
 	return string(hash), err
 }
 
+func (u *userService) RedisConnection(finished chan bool) {
+	// create client and ping redis
+	var err error
+
+
+	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host+":"+ conf.Current.RedisDatabase.Port, Password: "", DB: 0})
+	if _, err = client.Ping().Result(); err != nil {
+		log.Fatalf("error creating redis client %s", err)
+	}
+
+	RedisClient=client
+
+
+	// subscribe to the required channels
+	pubsub := client.Subscribe(saga.UserChannel, saga.ReplyChannel)
+	if _, err = pubsub.Receive(); err != nil {
+		log.Fatalf("error subscribing %s", err)
+	}
+	defer func() { _ = pubsub.Close() }()
+	ch := pubsub.Channel()
+
+	log.Println("starting the order service")
+	for {
+		select {
+		case msg := <-ch:
+			m := saga.RegisterUserMessage{}
+			err := json.Unmarshal([]byte(msg.Payload), &m)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			switch msg.Channel {
+			case saga.UserChannel:
+				// Happy Flow
+				if m.Action == saga.ActionStart {
+					if m.SenderService == saga.ServiceRelationship{
+						ImageBytes = m.ImageByte
+						finished <- true
+					}
+				}
+
+				// Rollback flow
+				if m.Action == saga.ActionRollback {
+					log.Println("TEST")
+					u.UserRepository.PhysicalDelete(context.TODO(), m.User.Id)
+
+					finished <- false
+				}
+			}
+		}
+	}
+}
+
+
+func sendToReplyChannel(client *redis.Client, m *saga.RegisterUserMessage, action string, service string, senderService string) {
+	var err error
+	m.Action = action
+	m.Service = service
+	m.SenderService = senderService
+	if err = client.Publish(saga.ReplyChannel, m).Err(); err != nil {
+		log.Printf("error publishing done-message to %s channel", saga.ReplyChannel)
+	}
+	log.Printf("done message published to channel :%s", saga.ReplyChannel)
+}

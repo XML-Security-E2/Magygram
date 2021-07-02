@@ -15,6 +15,7 @@ type userRepository struct {
 	Col *mongo.Collection
 }
 
+
 func NewUserRepository(Col *mongo.Collection) repository.UserRepository {
 	return &userRepository{Col}
 }
@@ -63,4 +64,8 @@ func (r *userRepository) GetAllRolesByUserId(ctx context.Context, userId string)
 		return nil, err
 	}
 	return user.Roles, nil
+}
+
+func (r *userRepository) PhysicalDelete(ctx context.Context, userId string) (*mongo.DeleteResult, error) {
+	return 	r.Col.DeleteOne(ctx, bson.M{"_id":  userId})
 }

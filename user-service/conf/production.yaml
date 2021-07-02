@@ -52,3 +52,9 @@ messageservice:
     protocol: "http://"
     domain: "message-service"
     port: "467"
+
+redisdatabase:
+    host: "redis-db"
+    port: "6379"
+    password: ""
+    database: 0

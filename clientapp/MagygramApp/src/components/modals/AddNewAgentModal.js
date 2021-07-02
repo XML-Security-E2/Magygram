@@ -16,6 +16,13 @@ const AddNewAgentModal = () => {
 	const [webSite, setWebSite] = useState("");
 
 	const handleModalClose = () => {
+		setName("")
+		setSurname("")
+		setEmail("")
+		setUsername("")
+		setPassword("")
+		setRepeatedPassword("")
+		setWebSite("")
 		dispatch({ type: modalConstants.HIDE_REGISTER_AGENT_MODAL });
 	};
 
