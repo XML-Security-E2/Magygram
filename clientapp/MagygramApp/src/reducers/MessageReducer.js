@@ -467,6 +467,7 @@ export const messageReducer = (state, action) => {
 			stateCpy = { ...state };
 
 			if (!action.response.isMessageRequest) {
+				console.log(action.response);
 				if (stateCpy.conversations.find((conversation) => conversation.id === action.response.conversation.id) === undefined) {
 					stateCpy.conversations.unshift(action.response.conversation);
 				} else {
@@ -490,7 +491,32 @@ export const messageReducer = (state, action) => {
 
 			if (!action.response.isMessageRequest) {
 				if (state.conversationWithId === action.response.conversation.lastMessage.messageFromId) {
-					stateCpy.showedMessages.push(action.response.conversation.lastMessage);
+					let messageCc = action.response.conversation.lastMessage;
+					if (messageCc.messageType === "POST") {
+						messageCc.post = {
+							Id: "",
+							MediaType: "",
+							Url: "",
+							Description: "",
+							UserId: "",
+							UserImageUrl: "",
+							Username: "",
+							Unauthorized: true,
+						};
+					} else if (messageCc.messageType === "STORY") {
+						messageCc.story = {
+							Id: "",
+							MediaType: "",
+							Url: "",
+							UserId: "",
+							UserImageUrl: "",
+							Username: "",
+							Unauthorized: true,
+							Expired: true,
+						};
+					}
+
+					stateCpy.showedMessages.push(messageCc);
 				}
 			} else {
 				if (state.conversationWithId === action.response.conversationRequest.lastMessage.messageFromId) {
