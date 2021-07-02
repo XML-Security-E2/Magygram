@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
@@ -314,7 +315,7 @@ func (h *userHandler) RegisterUser(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	resp, err := h.UserService.RegisterUser(ctx, userRequest)
+	bufer, err := h.UserService.RegisterUser(ctx, userRequest)
 
 	if err != nil {
 		fmt.Println(err)
@@ -322,8 +323,9 @@ func (h *userHandler) RegisterUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.Stream(http.StatusCreated,"image/png",resp.Body)
-}
+	yter := bytes.NewReader(bufer)
+
+	return c.Stream(http.StatusCreated,"image/png",yter)}
 
 func (h *userHandler) ActivateUser(c echo.Context) error {
 	activationId := c.Param("activationId")

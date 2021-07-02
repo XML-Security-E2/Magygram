@@ -63,6 +63,14 @@ func main() {
 	usersCol := client.Database(*mongoDatabase).Collection("users")
 	loginEventsCol := client.Database(*mongoDatabase).Collection("login-events")
 
+	usersCol.Indexes().CreateMany(context.Background(),
+		[]mongo.IndexModel{{
+			Keys: bson.M{
+				"email": 1,
+			},
+			Options: options.Index().SetUnique(true),
+		}})
+
 	_, err = usersCol.InsertOne(ctx, bson.D{
 		{Key: "_id", Value: "2bdfa5ed-be19-4573-8fe9-49bdfbd8dc12"},
 		{Key: "active", Value: true},
@@ -86,6 +94,7 @@ func main() {
 					bson.D{{Key: "name", Value: "search_all_post_by_hashtag"}},
 					bson.D{{Key: "name", Value: "search_all_post_by_location"}},
 					bson.D{{Key: "name", Value: "view_profile_highlights"}},
+					bson.D{{Key: "name", Value: "create_agent"}},
 				}}}}},
 		{Key: "totp_token", Value: "123"},
 	})
@@ -113,6 +122,7 @@ func main() {
 					bson.D{{Key: "name", Value: "search_all_post_by_hashtag"}},
 					bson.D{{Key: "name", Value: "search_all_post_by_location"}},
 					bson.D{{Key: "name", Value: "view_profile_highlights"}},
+					bson.D{{Key: "name", Value: "create_agent"}},
 				}}}}},
 		{Key: "totp_token", Value: "123"},
 	})
@@ -121,6 +131,9 @@ func main() {
 	e := echo.New()
 	i := interactor.NewInteractor(usersCol, loginEventsCol)
 	h := i.NewAppHandler()
+
+	userService := i.NewUserService()
+	go userService.RedisConnection()
 
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)

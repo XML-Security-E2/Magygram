@@ -12,4 +12,5 @@ type UserRepository interface {
 	GetByID(ctx context.Context, id string) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetAllRolesByUserId(ctx context.Context, userId string) ([]model.Role, error)
+	PhysicalDelete(ctx context.Context, userId string) (*mongo.DeleteResult,error)
 }

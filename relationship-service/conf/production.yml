@@ -27,3 +27,9 @@ authservice:
     protocol: "http://"
     domain: "auth-service"
     port: "461"
+
+redisdatabase:
+    host: "redis-db"
+    port: "6379"
+    password: ""
+    database: 0

@@ -18,7 +18,6 @@ import ReportedStory from "./ReportedStory";
 
 const AdminReportRequestTab = () => {
 	const { state,dispatch } = useContext(AdminContext);
-	const { statePost,dispatchPost } = useContext(PostContext);
 
 	const handleVisitProfile = (userId) => {
 		window.location = "#/profile?userId=" + userId;
@@ -56,14 +55,6 @@ const AdminReportRequestTab = () => {
 	}
 
     
-	const handleViewStory = (requestId)=>{
-
-    }
-    
-	const handleViewPost = async (postId) => {
-	
-		await postService.findPostById(postId, dispatchPost);
-	};
 
     useEffect(() => {
 		const getReportRequestsHandler = async () => {

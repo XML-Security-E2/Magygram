@@ -15,6 +15,7 @@ import (
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
 	"post-service/service/intercomm"
+	"sort"
 	"strings"
 	"time"
 )
@@ -134,6 +135,19 @@ func (p postService) CreatePostCampaign(ctx context.Context, bearer string, post
 	return "", err
 }
 
+type timeSlice []*model.Post
+
+func (p timeSlice) Len() int {
+	return len(p)
+}
+
+func (p timeSlice) Less(i, j int) bool {
+	return p[i].CreatedTime.After(p[j].CreatedTime)
+}
+
+func (p timeSlice) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
 
 func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]*model.PostResponse, error) {
 
@@ -155,9 +169,23 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 		posts= append(posts, newPosts...)
 	}
 
-	retVal := p.mapPostsToResponsePostDTO(bearer, posts, userInfo.Id)
+	sortedPosts := sortPostPerTime(posts)
+
+	retVal := p.mapPostsToResponsePostDTO(bearer, sortedPosts, userInfo.Id)
 
 	return retVal, nil
+}
+
+
+func sortPostPerTime(posts []*model.Post) []*model.Post {
+	dateSortedPosts := make(timeSlice, 0, len(posts))
+	for _, post := range posts {
+		dateSortedPosts = append(dateSortedPosts, post)
+	}
+
+	sort.Sort(dateSortedPosts)
+
+	return dateSortedPosts
 }
 
 func (p postService) DeletePost(ctx context.Context, bearer string, requestId string) error {
@@ -1152,4 +1180,6 @@ func (p postService) EditCommentedByInfo(ctx context.Context, bearer string, use
 		}
 	}
 
-	return nil}
+	return nil
+}
+

@@ -40,6 +40,7 @@ type Post struct {
 	Comments []Comment `bson:"comments"`
 	IsDeleted bool `bson:"deleted"`
 	WebSite string `bson:"website"`
+	CreatedTime time.Time `bson:"created_time"`
 }
 
 type ContentType string
@@ -120,6 +121,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 		Comments: []Comment{},
 		IsDeleted: false,
 		WebSite: website,
+		CreatedTime: time.Now(),
 	}, nil
 }
 

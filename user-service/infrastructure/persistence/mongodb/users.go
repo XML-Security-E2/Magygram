@@ -129,6 +129,10 @@ func (r userRepository) DeleteUser(ctx context.Context, request *model.User) (*m
 		{"deleted" , true}}}})
 }
 
+func (r userRepository) PhysicalDelete(ctx context.Context, userId string) (*mongo.DeleteResult,error){
+	return 	r.Col.DeleteOne(ctx, bson.M{"_id":  userId})
+}
+
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 
 	var user = model.User{}

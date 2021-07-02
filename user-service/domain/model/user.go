@@ -78,6 +78,7 @@ type UserProfileResponse struct {
 	Email                string                        `json:"email"`
 	Number               string                        `json:"number"`
 	Gender               Gender                        `json:"gender"`
+	Category             Category                      `json:"category"`
 	ImageUrl             string                        `json:"imageUrl"`
 	Following            bool                          `json:"following"`
 	Blocked              bool                          `json:"blocked"`

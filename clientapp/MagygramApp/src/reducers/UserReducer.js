@@ -74,6 +74,26 @@ export const userReducer = (state, action) => {
 				},
 				showTwoFactorAuth: false,
 			};
+		case userConstants.SHOW_INFLUENCER_CAMPAIGN_TAB:{
+			return{
+				...state,
+				activeTab:{
+					verificationRequestsShow: false,
+					contentReportShow: true,
+					agentRequestsShow: false,
+				},
+			}
+		}
+		case userConstants.HIDE_INFLUENCER_CAMPAIGN_TAB:{
+			return{
+				...state,
+				activeTab:{
+					verificationRequestsShow: false,
+					contentReportShow: false,
+					agentRequestsShow: true,
+				},
+			}
+		}
 		case userConstants.LOGIN_FAILURE:
 			return {
 				...state,
@@ -301,6 +321,19 @@ export const userReducer = (state, action) => {
 					user: action.user,
 				},
 			};
+		case userConstants.SET_USER_CAMPAIGNS_REQUEST: { let strCpy = {
+				...state,
+			};
+			strCpy.campaigns=[]
+			return strCpy;
+		}
+		case userConstants.SET_USER_CAMPAIGNS:{
+			let strCpy = {
+				...state,
+			};
+            strCpy.campaigns=action.campaigns
+			return strCpy;
+		};
 
 		case userConstants.GET_USER_PROFILE_FAILURE:
 			return state;
