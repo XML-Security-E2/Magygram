@@ -334,3 +334,5 @@ time="2021-07-01T20:41:33+02:00" level=info msg="Server started" func=main.main 
 time="2021-07-01T15:50:28+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463
 time="2021-07-01T16:41:38+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:37" host=localhost port=463
 >>>>>>> develop
+time="2021-07-02T18:26:30+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-02T18:26:45+02:00" level=info msg="Server started" func=main.main file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/main.go:41" host=localhost port=463

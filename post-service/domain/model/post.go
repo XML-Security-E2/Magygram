@@ -39,6 +39,7 @@ type Post struct {
 	DislikedBy []UserInfo `bson:"disliked_by"`
 	Comments []Comment `bson:"comments"`
 	IsDeleted bool `bson:"deleted"`
+	CreatedTime time.Time `bson:"created_time"`
 }
 
 type ContentType string
@@ -85,6 +86,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 		IsDeleted: false,
+		CreatedTime: time.Now(),
 	}, nil
 }
 
