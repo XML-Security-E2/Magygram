@@ -57,7 +57,7 @@ func (s storyRepository) GetAll(ctx context.Context) ([]*model.Story, error) {
 
 
 func (s storyRepository) GetStoriesForUser(ctx context.Context, userId string) ([]*model.Story, error) {
-	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId})
+	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId, "deleted" : false})
 	var results []*model.Story
 
 	if err != nil {
@@ -77,7 +77,7 @@ func (s storyRepository) GetStoriesForUser(ctx context.Context, userId string) (
 
 
 func (s storyRepository) GetActiveStoriesForUser(ctx context.Context, userId string) ([]*model.Story, error) {
-	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId , "created_time" : bson.M{"$gte" : primitive.NewDateTimeFromTime(time.Now().AddDate(0,0,-1))}})
+	cursor, err := s.Col.Find(context.TODO(), bson.M{"user_info.id": userId , "deleted" : false, "created_time" : bson.M{"$gte" : primitive.NewDateTimeFromTime(time.Now().AddDate(0,0,-1))}})
 	log.Println(primitive.NewObjectIDFromTimestamp(time.Now().AddDate(0,0,-1)))
 	var results []*model.Story
 
