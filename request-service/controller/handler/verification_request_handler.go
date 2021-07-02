@@ -119,12 +119,14 @@ func (v verificationRequestHandler) GetVerificationRequests(c echo.Context) erro
 }
 
 func (v verificationRequestHandler) GetCampaignRequests(c echo.Context) error {
+	postId := c.Param("requestId")
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	retVal, err := v.VerificationRequestService.GetCampaignRequests(ctx)
+	retVal, err := v.VerificationRequestService.GetCampaignRequests(ctx, postId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

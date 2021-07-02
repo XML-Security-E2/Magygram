@@ -104,10 +104,10 @@ func (v verificationService) CreateReportRequest(ctx context.Context, bearer str
 
 	return "",err
 }
-func (v verificationService) GetCampaignRequests(ctx context.Context) ([]*model.CampaignRequestResponseDTO, error) {
+func (v verificationService) GetCampaignRequests(ctx context.Context, requestId string) ([]*model.CampaignRequestResponseDTO, error) {
 	var campaignRequest []*model.CampaignRequest
 
-	campaignRequest, err := v.CampaignRequestsRepository.GetAllRequests(ctx)
+	campaignRequest, err := v.CampaignRequestsRepository.GetAllRequests(ctx, requestId)
 	if err != nil {
 		return []*model.CampaignRequestResponseDTO{}, err
 	}

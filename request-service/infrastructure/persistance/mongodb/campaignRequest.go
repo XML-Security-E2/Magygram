@@ -14,8 +14,8 @@ type campaignRequest struct {
 	Col *mongo.Collection
 }
 
-func (v *campaignRequest) GetAllRequests(ctx context.Context) ([]*model.CampaignRequest, error) {
-	cursor, err := v.Col.Find(context.TODO(), bson.M{"deleted": false})
+func (v *campaignRequest) GetAllRequests(ctx context.Context, requestId string) ([]*model.CampaignRequest, error) {
+	cursor, err := v.Col.Find(context.TODO(), bson.M{"deleted": false, "_id":  requestId})
 	var results []*model.CampaignRequest
 
 	if err != nil {
