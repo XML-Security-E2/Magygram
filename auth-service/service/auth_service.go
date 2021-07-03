@@ -26,6 +26,7 @@ type authService struct {
 	service_contracts.UserService
 }
 
+
 func NewAuthService(r repository.LoginEventRepository,u service_contracts.UserService) service_contracts.AuthService {
 	return &authService{r,u }
 }
@@ -185,4 +186,18 @@ func (a authService) DeleteCampaignJWTToken(ctx context.Context, bearer string) 
 	}
 
 	return nil
+}
+
+func (a authService) GetCampaignJWTToken(ctx context.Context, bearer string) (string, error) {
+	userId,err := getLoggedUserId(bearer)
+	if err!=nil{
+		return "", errors.New("Jwt token decode problem")
+	}
+
+	user, err := a.UserService.GetUserById(ctx, userId)
+	if err!=nil{
+		return "", errors.New("User not exist")
+	}
+
+	return user.AgentToken, nil
 }

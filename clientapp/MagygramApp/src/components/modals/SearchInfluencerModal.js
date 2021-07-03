@@ -60,6 +60,7 @@ const SearchInfluencerModal = () => {
 		let requestDTO = {
 			contentId: postState.viewPostModal.post.Id,
 			username: usernameSearch,
+			contentType: "POST",
 			price: price,
 			status: "PENDING",
 		};

@@ -14,6 +14,7 @@ export const postService = {
 	createCollection,
 	deletePostFromCollection,
 	createPost,
+	createPostCampaign,
 	editPost,
 	likePost,
 	unlikePost,
@@ -30,8 +31,65 @@ export const postService = {
 	reportPost,
 	findPostByIdForPage,
 	sendCampaign,
+	findAllUsersCampaignPosts,
+	getCampaignByPostId,
+	updatePostCampaign,
+	deletePostCampaign,
 };
 
+function deletePostCampaign(postId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/posts/${postId}/delete`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("Campaign deleted successfully", postId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.DELETE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message, postId) {
+		return { type: postConstants.DELETE_POST_CAMPAIGN_SUCCESS, successMessage: message, postId };
+	}
+	function failure(message) {
+		return { type: postConstants.DELETE_POST_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
+function updatePostCampaign(campaignDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/ads/campaign`, campaignDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Your update request is sent. Changes will be applied within 24h."));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.UPDATE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.UPDATE_POST_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.UPDATE_POST_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
 
 function sendCampaign(requestDTO, dispatch) {
 	dispatch(request());
@@ -58,6 +116,34 @@ function sendCampaign(requestDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.REPORT_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function getCampaignByPostId(postId, dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/ads/campaign/post/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: postConstants.SET_POST_CAMPAIGN_REQUEST };
+	}
+	function success(data) {
+		return { type: postConstants.SET_POST_CAMPAIGN_SUCCESS, campaign: data };
+	}
+	function failure(message) {
+		return { type: postConstants.SET_POST_CAMPAIGN_FAILURE, errorMessage: message };
 	}
 }
 
@@ -113,6 +199,33 @@ async function findPostsForTimeline(dispatch) {
 	}
 	function failure() {
 		return { type: postConstants.TIMELINE_POSTS_FAILURE };
+	}
+}
+
+async function findAllUsersCampaignPosts(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/posts/campaign`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("error"));
+		});
+
+	function request() {
+		return { type: postConstants.SET_USER_CAMPAIGN_POSTS_REQUEST };
+	}
+
+	function success(data) {
+		return { type: postConstants.SET_USER_CAMPAIGN_POSTS_SUCCESS, posts: data };
+	}
+	function failure(error) {
+		return { type: postConstants.SET_USER_CAMPAIGN_POSTS_FAILURE, errorMessage: error };
 	}
 }
 
@@ -177,28 +290,40 @@ async function findAllUsersCollections(dispatch) {
 
 async function findPostById(postId, dispatch) {
 	dispatch(request());
+	dispatch(requestCampaign());
 	await Axios.get(`/api/posts/id/${postId}`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data));
+				dispatch(successCampaign(res.data));
 			} else {
-				dispatch(failure("Error while loading collections"));
+				dispatch(failure("Error while loading posts"));
+				dispatch(failureCampaign("Error while loading posts"));
 			}
 		})
 		.catch((err) => {
 			dispatch(failure());
+			dispatch(failureCampaign());
 		});
 
 	function request() {
 		return { type: postConstants.PROFILE_POST_DETAILS_REQUEST };
 	}
-
+	function requestCampaign() {
+		return { type: postConstants.SET_CAMPAIGN_POST_DETAILS_REQUEST };
+	}
 	function success(data) {
 		return { type: postConstants.PROFILE_POST_DETAILS_SUCCESS, post: data };
 	}
+	function successCampaign(data) {
+		return { type: postConstants.SET_CAMPAIGN_POST_DETAILS_SUCCESS, post: data };
+	}
 	function failure(message) {
 		return { type: postConstants.PROFILE_POST_DETAILS_FAILURE, errorMessage: message };
+	}
+	function failureCampaign(message) {
+		return { type: postConstants.SET_CAMPAIGN_POST_DETAILS_FAILURE, errorMessage: message };
 	}
 }
 
@@ -310,6 +435,46 @@ function createPost(postDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
+	}
+}
+
+function createPostCampaign(postCampaignDTO, dispatch) {
+	const formData = fetchFormData(postCampaignDTO);
+	dispatch(request());
+	console.log(formData);
+
+	formData.append("minAge", postCampaignDTO.minAge);
+	formData.append("maxAge", postCampaignDTO.maxAge);
+	formData.append("displayTime", postCampaignDTO.displayTime);
+	formData.append("frequency", postCampaignDTO.frequency);
+	formData.append("gender", postCampaignDTO.gender);
+	formData.append("startDate", postCampaignDTO.startDate);
+	formData.append("endDate", postCampaignDTO.endDate);
+	formData.append("minDisplays", postCampaignDTO.minDisplays);
+	formData.append("exposeOnceDate", postCampaignDTO.exposeOnceDate);
+
+	Axios.post(`/api/posts/campaign`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+
+			if (res.status === 201) {
+				dispatch(success("Post campaign successfully created"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_FAILURE, errorMessage: message };
 	}
 }
 

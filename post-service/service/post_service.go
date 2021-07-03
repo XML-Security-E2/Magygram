@@ -29,10 +29,11 @@ type postService struct {
 	intercomm.RelationshipClient
 	intercomm.AuthClient
 	intercomm.MessageClient
+	intercomm.AdsClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient) service_contracts.PostService {
-	return &postService{r , ic, uc, ir, ac, mc}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient,adsc intercomm.AdsClient) service_contracts.PostService {
+	return &postService{r , ic, uc, ir, ac, mc, adsc}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -43,7 +44,7 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	media, err := p.MediaClient.SaveMedia(postRequest.Media)
 	if err != nil { return "", err}
 
-	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media)
+	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media,"")
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
 													 "description" : postRequest.Description,
@@ -80,6 +81,54 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 
 	if postId, ok := result.InsertedID.(string); ok {
 		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id" : userInfo.Id}).Info("Post created")
+		return postId, nil
+	}
+
+	return "", err
+}
+
+func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
+	if err != nil { return "", err}
+
+	media, err := p.MediaClient.SaveMedia(postRequest.Media)
+	if err != nil { return "", err}
+
+	post, err := model.NewPost(postRequest, model.UserInfo{
+		Id:       userInfo.Id,
+		Username: userInfo.Username,
+		ImageURL: userInfo.ImageURL,
+	}, "CAMPAIGN", media, userInfo.Website)
+	if err != nil {return "", err}
+
+	if err = validator.New().Struct(post); err!= nil {
+		return "", err
+	}
+
+	campaignReq.ContentId = post.Id
+	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := p.PostRepository.Create(ctx, post)
+	if err != nil {
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedPost,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if postId, ok := result.InsertedID.(string); ok {
 		return postId, nil
 	}
 
@@ -127,6 +176,7 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 	return retVal, nil
 }
 
+
 func sortPostPerTime(posts []*model.Post) []*model.Post {
 	dateSortedPosts := make(timeSlice, 0, len(posts))
 	for _, post := range posts {
@@ -138,15 +188,39 @@ func sortPostPerTime(posts []*model.Post) []*model.Post {
 	return dateSortedPosts
 }
 
-func (p postService) DeletePost(ctx context.Context, requestId string) error {
+func (p postService) DeletePost(ctx context.Context, bearer string, requestId string) error {
+
+	retVal, err := p.AuthClient.HasRole(bearer,"delete_posts")
+	if err != nil{
+		return errors.New("auth service not found")
+	}
+
 	request, err := p.PostRepository.GetByID(ctx, requestId)
 	if err!=nil {
-		return errors.New("Request not found")
+		return errors.New("post not found")
+	}
+
+	if !retVal {
+		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		if err != nil {
+			return err
+		}
+		if request.UserInfo.Id != userId {
+			return errors.New("user not authorized for post delete")
+		}
+	}
+
+	err = p.AdsClient.DeleteCampaign(bearer, request.Id)
+	if err != nil {
+		return err
 	}
 
 	request.IsDeleted=true
 
-	p.PostRepository.DeletePost(ctx,request)
+	_, err = p.PostRepository.DeletePost(ctx,request)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -926,6 +1000,34 @@ func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*m
 	var retVal,_ = model.NewGuestTimelinePostResponse(post)
 
 	return retVal, nil
+}
+
+func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
+	posts, err := p.AdsClient.GetAllActiveAgentsPostCampaigns(bearer)
+	if err != nil{
+		return []*model.PostProfileResponse{}, err
+	}
+
+	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, posts)
+
+	if userPosts == nil {
+		return nil, nil
+	}
+
+	if err != nil{
+		return []*model.PostProfileResponse{},err
+	}
+
+	var userPostsResponse []*model.PostProfileResponse
+	for _, post := range userPosts {
+		fmt.Println(post.Id)
+		userPostsResponse = append(userPostsResponse, &model.PostProfileResponse{
+			Id:    post.Id,
+			Media: post.Media[0],
+		})
+	}
+
+	return userPostsResponse, nil
 }
 
 func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {

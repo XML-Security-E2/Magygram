@@ -3,7 +3,8 @@ package mongodb
 import (
 "context"
 "errors"
-"go.mongodb.org/mongo-driver/bson"
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 "go.mongodb.org/mongo-driver/mongo"
 "os"
 "request-service/domain/model"
@@ -14,8 +15,9 @@ type campaignRequest struct {
 	Col *mongo.Collection
 }
 
-func (v *campaignRequest) GetAllRequests(ctx context.Context) ([]*model.CampaignRequest, error) {
-	cursor, err := v.Col.Find(context.TODO(), bson.M{"deleted": false})
+func (v *campaignRequest) GetAllRequests(ctx context.Context, requestId string) ([]*model.CampaignRequest, error) {
+	fmt.Println(requestId)
+	cursor, err := v.Col.Find(context.TODO(), bson.M{"deleted": false, "username":  requestId})
 	var results []*model.CampaignRequest
 
 	if err != nil {

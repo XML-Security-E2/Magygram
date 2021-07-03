@@ -7,12 +7,11 @@ import { UserContext } from "../contexts/UserContext";
 import { notificationService } from "../services/NotificationService";
 import { NotificationContext } from "../contexts/NotificationContext";
 import { notificationConstants } from "../constants/NotificationConstants";
-import { userConstants } from "../constants/UserConstants";
 import ActivityList from "./ActivityList";
 import { hasRoles } from "../helpers/auth-header";
 
 const Header = () => {
-	const {userCtx, dispatch } = useContext(UserContext);
+	const userCtx = useContext(UserContext);
 	const notifyCtx = useContext(NotificationContext);
 
 	const navStyle = { height: "50px", borderBottom: "1px solid rgb(200,200,200)" };
@@ -129,6 +128,11 @@ const Header = () => {
 		window.location = "#/disliked";
 	};
 
+	const handleCampaignApiToken = () => {
+		window.location = "#/campaign-api";
+
+	}
+
 	const campaignOffers = () => {
 		window.location = "#/influencer-campagns";
 	};
@@ -203,6 +207,11 @@ const Header = () => {
 									Profile
 								</Link>
 							</li>
+							<li hidden={!hasRoles(["agent"])}>
+								<Link className="la la-volume-up btn shadow-none" to="/campaigns">
+									Campaigns
+								</Link>
+							</li>
 							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-cog btn shadow-none" onClick={handleSettings}>
 									Settings
@@ -216,6 +225,11 @@ const Header = () => {
 							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-thumbs-down btn shadow-none" onClick={handleDisikedPosts}>
 									Disiked posts
+								</button>
+							</li>
+							<li hidden={!hasRoles(["agent"])}>
+								<button className="la la-thumbs-down btn shadow-none" onClick={handleCampaignApiToken}>
+									Campaign API Token
 								</button>
 							</li>
 							<hr hidden={hasRoles(["admin"])} className="solid" />

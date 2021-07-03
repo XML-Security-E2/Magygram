@@ -28,6 +28,7 @@ type AuthHandler interface {
 	LoginSecondStage(c echo.Context) error
 	GenerateNewAgentCampaignJWTToken(c echo.Context) error
 	DeleteCampaignJWTToken(c echo.Context) error
+	GetCampaignJWTToken(c echo.Context) error
 }
 
 type authHandler struct {
@@ -273,4 +274,19 @@ func (a authHandler) DeleteCampaignJWTToken(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (a authHandler) GetCampaignJWTToken(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	jwtToken, err := a.AuthService.GetCampaignJWTToken(ctx, bearer)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	return c.JSON(http.StatusOK, jwtToken)
 }

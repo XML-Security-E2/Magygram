@@ -64,6 +64,8 @@ type UserHandler interface {
 	CheckIfUserVerifiedById(c echo.Context) error
 	GetUsersInfo(c echo.Context) error
 	RegisterAgentByAdmin(c echo.Context) error
+	GetLoggedAgentInfo(c echo.Context) error
+	GetLoggedUserTargetGroup(c echo.Context) error
 }
 
 var (
@@ -467,6 +469,7 @@ func (h *userHandler) SearchForUsersByUsername(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
+	fmt.Println(len(users))
 	c.Response().Header().Set("Content-Type" , "text/javascript")
 	return c.JSON(http.StatusOK, users)
 }
@@ -516,6 +519,36 @@ func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
 		ctx = context.Background()
 	}
 	userInfo, err := h.UserService.GetLoggedUserInfo(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)
+}
+
+func (h *userHandler) GetLoggedUserTargetGroup(c echo.Context) error {
+	ctx := c.Request().Context()
+	bearer := c.Request().Header.Get("Authorization")
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	userInfo, err := h.UserService.GetLoggedUserTargetGroup(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)
+}
+
+func (h *userHandler) GetLoggedAgentInfo(c echo.Context) error {
+	ctx := c.Request().Context()
+	bearer := c.Request().Header.Get("Authorization")
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	userInfo, err := h.UserService.GetLoggedAgentInfo(ctx, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
 	}

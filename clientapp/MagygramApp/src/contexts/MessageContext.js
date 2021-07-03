@@ -14,6 +14,7 @@ const MessageContextProvider = (props) => {
 			},
 		},
 		sendPostModal: {
+			postId: "",
 			showModal: false,
 			selectedUser: {
 				Id: "",
@@ -22,6 +23,7 @@ const MessageContextProvider = (props) => {
 			},
 		},
 		sendStoryModal: {
+			storyId: "",
 			showModal: false,
 		},
 		storyModal: {

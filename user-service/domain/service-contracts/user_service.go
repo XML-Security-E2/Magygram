@@ -18,6 +18,7 @@ type UserService interface {
 	GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error)
 	GetUserById(ctx context.Context, userId string) (*model.User, error)
 	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error)
+	GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error)
 	GetUserProfileById(ctx context.Context, bearer string, userId string) (*model.UserProfileResponse, error)
 	GetFollowedUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error)
 	GetFollowingUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error)
@@ -57,4 +58,6 @@ type UserService interface {
 	GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error)
 	RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error)
 	RedisConnection(finished chan bool)
+
+	GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.TargetGroup, error)
 }

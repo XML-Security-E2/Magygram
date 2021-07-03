@@ -18,7 +18,10 @@ import DislikedPostPage from "./pages/DislikedPostPage";
 import RecommendedUsersPage from "./pages/RecommendedUsersPage";
 import MessagesPage from "./pages/MessagesPage";
 import PostPage from "./pages/PostPage";
+import CreateAgentPostPage from "./pages/CreateAgentPostPage";
+import CampaignsPage from "./pages/CampaignsPage";
 import InfluencerCampagns from "./components/InfluencerCampagns";
+import CampaignAPITokenGeneratorPage from "./pages/CampaignAPITokenGeneratorPage";
 
 function App() {
 	return (
@@ -42,8 +45,11 @@ function App() {
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/recommended-users" component={RecommendedUsersPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/chat" component={MessagesPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/post" component={PostPage} />
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/add-agent-posts" component={CreateAgentPostPage} />
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaigns" component={CampaignsPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/influencer-campagns" component={InfluencerCampagns} />
-				
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaign-api" component={CampaignAPITokenGeneratorPage} />
+
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 
 				<Route path="/404" component={PageNotFound} />

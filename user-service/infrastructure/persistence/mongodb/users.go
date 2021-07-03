@@ -36,6 +36,7 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"imageUrl" , user.ImageUrl},
 																{"number" , user.Number},
 																{"gender" , user.Gender},
+																{"birth_date" , user.BirthDate},
 																{"liked_posts" , user.LikedPosts},
 																{"disliked_posts" , user.DislikedPosts},
 																{"commented_posts" , user.CommentedPosts},
@@ -65,7 +66,7 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, e
 func (r *userRepository) SearchForUsersByUsername(ctx context.Context, username string, loggedUserId string) ([]model.User, error) {
 	var users []model.User
 	log.Println("param: " + username)
-	cursor, err := r.Col.Find(ctx,bson.M{"username": bson.M{"$regex": username, "$options": "i"},"category": "INFLUENCER", "_id" : bson.M{ "$ne": loggedUserId}, "blocked_users": bson.M{"$ne": loggedUserId}})
+	cursor, err := r.Col.Find(ctx, bson.M{"username": bson.M{"$regex": username, "$options": "i"}, "_id" : bson.M{ "$ne": loggedUserId}, "blocked_users": bson.M{"$ne": loggedUserId}})
 	if err != nil {
 		return nil, err
 	} else {

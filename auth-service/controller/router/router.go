@@ -17,5 +17,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/users/agent", h.RegisterAgent, h.UserLoggingMiddleware)
 	e.GET("/api/auth/generate-campaign-jwt-token", h.GenerateNewAgentCampaignJWTToken, h.AuthorizationMiddleware())
 	e.DELETE("/api/auth/delete-campaign-jwt-token", h.DeleteCampaignJWTToken, h.AuthorizationMiddleware())
-	e.GET("/api/auth/delete-campaign-jwt-token", h.DeleteCampaignJWTToken, h.AuthorizationMiddleware())
+	e.GET("/api/auth/get-campaign-jwt-token", h.GetCampaignJWTToken, h.AuthorizationMiddleware())
 }

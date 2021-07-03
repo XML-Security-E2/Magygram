@@ -19,6 +19,7 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_SEND_POST_TO_USER_MODAL:
 			stateCpy = { ...state };
+			stateCpy.sendPostModal.postId = action.postId;
 			stateCpy.sendPostModal.showModal = true;
 
 			return stateCpy;
@@ -30,6 +31,7 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_SEND_STORY_TO_USER_MODAL:
 			stateCpy = { ...state };
+			stateCpy.sendStoryModal.storyId = action.storyId;
 			stateCpy.sendStoryModal.showModal = true;
 
 			return stateCpy;
@@ -41,6 +43,9 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_STORY_MESSAGE_MODAL:
 			stateCpy = { ...state };
+
+			stateCpy.storyModal.stories = createStory(action.story);
+
 			stateCpy.storyModal.showModal = true;
 
 			return stateCpy;
@@ -126,6 +131,8 @@ export const messageReducer = (state, action) => {
 						Username: "",
 						Unauthorized: true,
 						Expired: true,
+						Website: "",
+						ContentType: "",
 					};
 				}
 			});
@@ -190,6 +197,7 @@ export const messageReducer = (state, action) => {
 		case messageConstants.SET_STORY_MESSAGE_SUCCESS:
 			stateCpy = { ...state };
 
+			console.log(action.story);
 			stateCpy.showedMessages.forEach((message) => {
 				if (message.contentId === action.story.id) {
 					message.story = {
@@ -199,13 +207,15 @@ export const messageReducer = (state, action) => {
 						UserId: action.story.userInfo.Id,
 						UserImageUrl: action.story.userInfo.ImageURL,
 						Username: action.story.userInfo.Username,
+						Tags: action.story.media.Tags,
 						Unauthorized: false,
 						Expired: false,
+						Website: action.story.Website,
+						ContentType: action.story.contentType,
 					};
 				}
 			});
 
-			stateCpy.storyModal.stories = createStory(action.story);
 			console.log(stateCpy);
 			return stateCpy;
 
@@ -223,6 +233,8 @@ export const messageReducer = (state, action) => {
 						Username: action.userInfo.Username,
 						Unauthorized: true,
 						Expired: false,
+						Website: "",
+						ContentType: "",
 					};
 				}
 			});
@@ -244,6 +256,8 @@ export const messageReducer = (state, action) => {
 						Username: action.userInfo.Username,
 						Unauthorized: false,
 						Expired: true,
+						Website: "",
+						ContentType: "",
 					};
 				}
 			});
@@ -453,6 +467,7 @@ export const messageReducer = (state, action) => {
 			stateCpy = { ...state };
 
 			if (!action.response.isMessageRequest) {
+				console.log(action.response);
 				if (stateCpy.conversations.find((conversation) => conversation.id === action.response.conversation.id) === undefined) {
 					stateCpy.conversations.unshift(action.response.conversation);
 				} else {
@@ -476,7 +491,32 @@ export const messageReducer = (state, action) => {
 
 			if (!action.response.isMessageRequest) {
 				if (state.conversationWithId === action.response.conversation.lastMessage.messageFromId) {
-					stateCpy.showedMessages.push(action.response.conversation.lastMessage);
+					let messageCc = action.response.conversation.lastMessage;
+					if (messageCc.messageType === "POST") {
+						messageCc.post = {
+							Id: "",
+							MediaType: "",
+							Url: "",
+							Description: "",
+							UserId: "",
+							UserImageUrl: "",
+							Username: "",
+							Unauthorized: true,
+						};
+					} else if (messageCc.messageType === "STORY") {
+						messageCc.story = {
+							Id: "",
+							MediaType: "",
+							Url: "",
+							UserId: "",
+							UserImageUrl: "",
+							Username: "",
+							Unauthorized: true,
+							Expired: true,
+						};
+					}
+
+					stateCpy.showedMessages.push(messageCc);
 				}
 			} else {
 				if (state.conversationWithId === action.response.conversationRequest.lastMessage.messageFromId) {
@@ -494,15 +534,19 @@ export const messageReducer = (state, action) => {
 function createStory(story) {
 	var retVal = [];
 
+	console.log(story);
+
 	retVal.push({
-		url: story.media.Url,
+		url: story.Url,
 		header: {
-			heading: story.userInfo.Username,
-			profileImage: story.userInfo.ImageURL,
-			storyId: story.media.StoryId,
+			heading: story.Username,
+			profileImage: story.UserImageUrl === "" ? "assets/img/profile.jpg" : story.UserImageUrl,
+			storyId: story.Id,
 		},
-		type: story.media.MediaType === "VIDEO" ? "video" : "image",
-		tags: story.media.Tags,
+		type: story.MediaType === "VIDEO" ? "video" : "image",
+		tags: story.Tags,
+		website: story.Website,
+		contentType: story.ContentType,
 	});
 
 	return retVal;

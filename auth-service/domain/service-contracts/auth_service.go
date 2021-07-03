@@ -12,4 +12,5 @@ type AuthService interface {
 	AuthenticateTwoFactoryUser(ctx context.Context, loginRequest *model.LoginTwoFactoryRequest) (*model.User, error)
 	UpdateAgentCampaignJWTToken(ctx context.Context, bearer string, token string) error
 	DeleteCampaignJWTToken(ctx context.Context, bearer string) error
+	GetCampaignJWTToken(ctx context.Context, bearer string) (string, error)
 }

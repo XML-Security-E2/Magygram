@@ -5,6 +5,7 @@ import { authHeader } from "../helpers/auth-header";
 
 export const storyService = {
 	createStory,
+	createAgentStory,
 	createHighlight,
 	findAllProfileHighlights,
 	findAllStoriesByHighlightName,
@@ -15,7 +16,93 @@ export const storyService = {
 	HaveActiveStoriesLoggedUser,
 	findStoryById,
 	reportStory,
+	findAllUsersCampaignStories,
+	updateStoryCampaign,
+	deleteStoryCampaign,
+	getCampaignByStoryId,
 };
+
+function getCampaignByStoryId(storyId, dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/ads/campaign/story/${storyId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.SET_STORY_BY_ID_CAMPAIGN_REQUEST };
+	}
+	function success(data) {
+		return { type: storyConstants.SET_STORY_BY_ID_CAMPAIGN_SUCCESS, campaign: data };
+	}
+	function failure(message) {
+		return { type: storyConstants.SET_STORY_BY_ID_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
+function deleteStoryCampaign(storyId, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/story/${storyId}/delete`, null, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success("Campaign deleted successfully", storyId));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.DELETE_STORY_CAMPAIGN_REQUEST };
+	}
+	function success(message, storyId) {
+		return { type: storyConstants.DELETE_STORY_CAMPAIGN_SUCCESS, successMessage: message, storyId };
+	}
+	function failure(message) {
+		return { type: storyConstants.DELETE_STORY_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
+function updateStoryCampaign(campaignDTO, dispatch) {
+	dispatch(request());
+
+	Axios.put(`/api/ads/campaign`, campaignDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success("Your update request is sent. Changes will be applied within 24h."));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Internal server error"));
+		});
+
+	function request() {
+		return { type: storyConstants.UPDATE_STORY_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: storyConstants.UPDATE_STORY_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: storyConstants.UPDATE_STORY_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
 
 function reportStory(reportDTO, dispatch) {
 	dispatch(request());
@@ -72,6 +159,46 @@ function createStory(storyDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: storyConstants.CREATE_STORY_FAILURE, errorMessage: message };
+	}
+}
+
+function createAgentStory(storyCampaignDTO, dispatch) {
+	const formData = fetchFormData(storyCampaignDTO);
+	dispatch(request());
+	console.log(formData);
+
+	formData.append("minAge", storyCampaignDTO.minAge);
+	formData.append("maxAge", storyCampaignDTO.maxAge);
+	formData.append("displayTime", storyCampaignDTO.displayTime);
+	formData.append("frequency", storyCampaignDTO.frequency);
+	formData.append("gender", storyCampaignDTO.gender);
+	formData.append("startDate", storyCampaignDTO.startDate);
+	formData.append("endDate", storyCampaignDTO.endDate);
+	formData.append("minDisplays", storyCampaignDTO.minDisplays);
+	formData.append("exposeOnceDate", storyCampaignDTO.exposeOnceDate);
+
+	Axios.post(`/api/story/campaign`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+
+			if (res.status === 201) {
+				dispatch(success("Story successfully created"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: storyConstants.CREATE_AGENT_STORY_REQUEST };
+	}
+	function success(message) {
+		return { type: storyConstants.CREATE_AGENT_STORY_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: storyConstants.CREATE_AGENT_STORY_FAILURE, errorMessage: message };
 	}
 }
 
@@ -171,6 +298,33 @@ async function findAllProfileHighlights(userId, dispatch) {
 	}
 }
 
+async function findAllUsersCampaignStories(dispatch) {
+	dispatch(request());
+	await Axios.get(`/api/story/campaign`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				failure();
+			}
+		})
+		.catch((err) => {
+			failure();
+		});
+
+	function request() {
+		return { type: storyConstants.SET_STORY_CAMPAIGN_REQUEST };
+	}
+
+	function success(data) {
+		return { type: storyConstants.SET_STORY_CAMPAIGN_SUCCESS, stories: data };
+	}
+	function failure() {
+		return { type: storyConstants.SET_STORY_CAMPAIGN_FAILURE };
+	}
+}
+
 function findAllStoriesByHighlightName(userId, name, dispatch) {
 	dispatch(request());
 
@@ -237,12 +391,12 @@ function fetchFormData(storyDTO) {
 	return formData;
 }
 
-function findStoryById(storyId,userId, dispatch) {
-	 Axios.get(`/api/story/${storyId}/getForAdmin`, { validateStatus: () => true, headers: authHeader() })
+function findStoryById(storyId, userId, dispatch) {
+	Axios.get(`/api/story/${storyId}/getForAdmin`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
-			console.log(res.data)
+			console.log(res.data);
 			if (res.status === 200) {
-				dispatch(success(res.data,1));
+				dispatch(success(res.data, 1));
 			} else {
 				//failure()
 			}
@@ -251,9 +405,9 @@ function findStoryById(storyId,userId, dispatch) {
 			//failure()
 		});
 
-		function success(data, visited) {
-			return { type: modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN, stories: data, visited,userId };
-		}
+	function success(data, visited) {
+		return { type: modalConstants.SHOW_STORY_SLIDER_MODAL_ADMIN, stories: data, visited, userId };
+	}
 }
 
 function GetStoriesForUser(userId, visited, dispatch) {

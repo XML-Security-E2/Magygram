@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"html"
+	"time"
 
 	"github.com/beevik/guid"
 )
@@ -28,8 +29,15 @@ type User struct {
 	NotificationSettings NotificationSettings               `bson:"notification_settings" json:"notificationSettings"`
 	PrivacySettings      PrivacySettings                    `bson:"privacy_settings" json:"privacySettings"`
 	Category             Category                           `bson:"category"`
+	BirthDate            time.Time                          `bson:"birth_date"`
 	IsVerified           bool                               `bson:"verified_profile"`
 	IsDeleted            bool                               `bson:"deleted"`
+}
+
+type TargetGroup struct {
+	Id string `json:"id"`
+	Age int `json:"age"`
+	Gender Gender `json:"gender"`
 }
 
 type NotificationSettings struct {
@@ -76,6 +84,7 @@ type UserProfileResponse struct {
 	Website              string                        `json:"website" `
 	Bio                  string                        `json:"bio"`
 	Email                string                        `json:"email"`
+	BirthDate			 time.Time					   `json:"birthDate"`
 	Number               string                        `json:"number"`
 	Gender               Gender                        `json:"gender"`
 	Category             Category                      `json:"category"`
@@ -135,6 +144,13 @@ type UserInfo struct {
 	ImageURL string `json:"imageUrl"`
 }
 
+type AgentInfo struct {
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	ImageURL string `json:"imageUrl"`
+	Website string  `json:"website"`
+}
+
 type UserInfoEdit struct {
 	Id string
 	Username string
@@ -163,6 +179,8 @@ type UserRequest struct {
 	Email            string `json:"email"`
 	Password         string `json:"password"`
 	RepeatedPassword string `json:"repeatedPassword"`
+	BirthDate		 int64  `json:"birthDate"`
+	Gender			 string `json:"gender"`
 }
 
 type AgentRequest struct {
@@ -173,6 +191,8 @@ type AgentRequest struct {
 	Password         string `json:"password"`
 	RepeatedPassword string `json:"repeatedPassword"`
 	WebSite            string `json:"webSite"`
+	BirthDate		 int64  `json:"birthDate"`
+	Gender			 string `json:"gender"`
 }
 
 type EditUserRequest struct {
@@ -183,6 +203,7 @@ type EditUserRequest struct {
 	Bio      string `json:"bio"`
 	Number   string `json:"number"`
 	Gender   Gender `json:"gender"`
+	BirthDate int64  `json:"birthDate"`
 }
 
 type ResetPasswordRequest struct {
@@ -268,6 +289,8 @@ func NewUser(userRequest *UserRequest) (*User, error) {
 			IsTaggable:      true,
 		},
 		IsVerified: false,
+		BirthDate: time.Unix(0, userRequest.BirthDate * int64(time.Millisecond)),
+		Gender: Gender(userRequest.Gender),
 	}, nil
 }
 
@@ -299,6 +322,8 @@ func NewAgent(agentRegistrationDTO *AgentRegistrationDTO) (*User, error) {
 			IsTaggable:      true,
 		},
 		IsVerified: false,
+		BirthDate: time.Unix(0, agentRegistrationDTO.BirthDate * int64(time.Millisecond)),
+		Gender: Gender(agentRegistrationDTO.Gender),
 	}, nil
 }
 
@@ -352,5 +377,7 @@ type AgentRegistrationDTO struct {
 	Surname	 string
 	Website	string
 	Password string
+	BirthDate		 int64  `json:"birthDate"`
+	Gender			 string `json:"gender"`
 }
 

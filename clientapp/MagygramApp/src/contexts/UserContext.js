@@ -52,12 +52,12 @@ const UserContextProvider = (props) => {
 		userFollowRequests: {
 			userInfos: [],
 		},
-		activeTab:{
-            verificationRequestsShow: true,
-            contentReportShow: false,
-            agentRequestsShow: false,
-        },
-		campaigns:[],
+		activeTab: {
+			verificationRequestsShow: true,
+			contentReportShow: false,
+			agentRequestsShow: false,
+		},
+		campaigns: [],
 		campaignOptions: {
 			showModal: false,
 		},
@@ -77,7 +77,7 @@ const UserContextProvider = (props) => {
 				website: "",
 				bio: "",
 				email: "",
-				gender: "",
+				gender: "MALE",
 				imageUrl: "",
 				postNumber: "",
 				followersNumber: "",
@@ -85,6 +85,7 @@ const UserContextProvider = (props) => {
 				sentFollowRequest: false,
 				muted: false,
 				blocked: false,
+				birthDate: new Date(),
 				notificationSettings: {
 					notifyStory: false,
 					notifyPost: false,
@@ -116,6 +117,7 @@ const UserContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		agentCampaignAPITOken: ""
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

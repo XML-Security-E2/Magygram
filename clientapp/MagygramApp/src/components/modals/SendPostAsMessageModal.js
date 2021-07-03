@@ -6,7 +6,7 @@ import { searchService } from "../../services/SearchService";
 import AsyncSelect from "react-select/async";
 import { messageService } from "../../services/MessageService";
 
-const SendPostAsMessageModal = ({ postId }) => {
+const SendPostAsMessageModal = () => {
 	const { messageState, dispatch } = useContext(MessageContext);
 	const [search, setSearch] = useState("");
 	const [selectedUserId, setSelectedUserId] = useState("");
@@ -48,7 +48,7 @@ const SendPostAsMessageModal = ({ postId }) => {
 			messageType: "POST",
 			media: "",
 			text: "",
-			contentId: postId,
+			contentId: messageState.sendPostModal.postId,
 		};
 
 		messageService.sendMessage(message, dispatch);

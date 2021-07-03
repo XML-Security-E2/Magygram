@@ -49,7 +49,6 @@ const ViewPostModal = () => {
 			postService.commentPost(postDTO, dispatch);
 		}
 	};
-	
 
 	const addToDefaultCollection = (postId) => {
 		let collectionDTO = {
@@ -74,7 +73,7 @@ const ViewPostModal = () => {
 	const handleOpenOptionsModal = () => {
 		dispatch({ type: modalConstants.SHOW_POST_OPTIONS_MODAL, post: postState.viewPostModal.post });
 	};
-	
+
 	const searchInfluencer = () => {
 		dispatch({ type: modalConstants.SHOW_SEARCH_INFLUENCER_MODAL, post: postState.viewPostModal.post });
 	};
@@ -88,7 +87,7 @@ const ViewPostModal = () => {
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body>
 				<div className="d-flex flex-row align-items-top">
-					<PostImageSliderModalView media={postState.viewPostModal.post.Media} />
+					<PostImageSliderModalView media={postState.viewPostModal.post.Media} website={postState.viewPostModal.post.Website} contentType={postState.viewPostModal.post.ContentType} />
 					<div className="p-2" style={style}>
 						<div className="align-top" style={style}>
 							<div>
@@ -108,9 +107,19 @@ const ViewPostModal = () => {
 								openOptionsModal={handleOpenOptionsModal}
 								location={postState.viewPostModal.post.Location}
 							/>
+							{postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && (
+								<div className="border-bottom d-flex align-items-center">
+									<span className="text-dark ml-2">Sponsored</span>
+									<a type="button" className="btn btn-link border-0" href={"https://" + postState.viewAgentCampaignPostModal.post.Website} target="_blank">
+										Visit {postState.viewAgentCampaignPostModal.post.Website}
+									</a>
+								</div>
+							)}
 							<hr></hr>
 							<div>
-								<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>searchInfluencer()}><i className="icofont-subscribe mr-1"></i>Product placement</button>
+								<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>
+									<i className="icofont-subscribe mr-1"></i>Product placement
+								</button>
 							</div>
 							<PostCommentsModalView
 								imageUrl={postState.viewPostModal.post.UserInfo.ImageURL}
@@ -142,7 +151,7 @@ const ViewPostModal = () => {
 					</div>
 				</div>
 				<OptionsModal />
-				<SearchInfluencerModal/>
+				<SearchInfluencerModal />
 			</Modal.Body>
 		</Modal>
 	);
