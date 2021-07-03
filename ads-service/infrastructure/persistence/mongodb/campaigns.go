@@ -122,6 +122,7 @@ func (c campaignRepository) Update(ctx context.Context, campaign *model.Campaign
 	return c.Col.UpdateOne(ctx, bson.M{"_id":  campaign.Id},bson.D{{"$set", bson.D{
 		{"min_displays_for_repeatedly" , campaign.MinDisplaysForRepeatedly},
 		{"seen_by" , campaign.SeenBy},
+		{"daily_seen_by", campaign.DailySeenBy},
 		{"target_group" , campaign.TargetGroup},
 		{"date_from" , campaign.DateFrom},
 		{"date_to" , campaign.DateTo}}}})}
@@ -140,7 +141,7 @@ func (c campaignRepository) GetByID(ctx context.Context, id string) (*model.Camp
 
 func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string) ([]*model.Campaign, error) {
 	y,m,d := time.Now().Date()
-	timee := time.Date(y,m,d,0,0,0,0, time.Local)
+	timee := time.Date(y,m,d,0,0,0,0, time.UTC)
 
 
 	cursor, err := c.Col.Find(ctx,bson.M{"seen_by": bson.M{"$ne": targetGroup.Id},
@@ -154,7 +155,9 @@ func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Cont
 													 "$or" : []interface{}{bson.M{"display_time": time.Now().Hour() + 1}, bson.M{"display_time": time.Now().Hour()}}},
 													 bson.M{"frequency": "REPEATEDLY", "date_from" : bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now())},
 														 "date_to" : bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now())}}}},
-										 }})
+										 },
+										 "$expr": bson.M{"$lt" : []interface{}{bson.M{"$size" : bson.M{"$daily_seen_by.seen_by" : bson.M{"$eq": primitive.NewDateTimeFromTime(timee)}}},
+										 				"$min_displays_for_repeatedly"} }})
 
 	var results []*model.Campaign
 

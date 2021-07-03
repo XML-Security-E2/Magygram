@@ -153,7 +153,7 @@ const Header = () => {
 	};
 
 	const testTest = () => {
-		Axios.get(`/api/ads/campaign/post/suggestion`, { validateStatus: () => true, headers: authHeader() })
+		Axios.get(`/api/ads/campaign/post/suggestion/2`, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res.data);
 			})

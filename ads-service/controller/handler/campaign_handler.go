@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -67,13 +68,16 @@ func (ch campaignHandler) DeleteCampaignByStory(c echo.Context) error {
 }
 
 func (ch campaignHandler) GetPostCampaignSuggestion(c echo.Context) error {
+	count := c.Param("count")
+	countI, _ := strconv.Atoi(count)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
 	bearer := c.Request().Header.Get("Authorization")
-	campaign, err := ch.CampaignService.GetUnseenPostIdsCampaignsForUser(ctx, bearer)
+	campaign, err := ch.CampaignService.GetUnseenPostIdsCampaignsForUser(ctx, bearer, countI)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -82,13 +86,16 @@ func (ch campaignHandler) GetPostCampaignSuggestion(c echo.Context) error {
 }
 
 func (ch campaignHandler) GetStoryCampaignSuggestion(c echo.Context) error {
+	count := c.Param("count")
+	countI, _ := strconv.Atoi(count)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
 	bearer := c.Request().Header.Get("Authorization")
-	campaign, err := ch.CampaignService.GetUnseenStoryIdsCampaignsForUser(ctx, bearer)
+	campaign, err := ch.CampaignService.GetUnseenStoryIdsCampaignsForUser(ctx, bearer, countI)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

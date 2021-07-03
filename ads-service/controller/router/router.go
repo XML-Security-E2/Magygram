@@ -14,8 +14,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.DELETE("/api/ads/campaign/post/:contentId", h.DeleteCampaignByPostId)
 	e.DELETE("/api/ads/campaign/story/:contentId", h.DeleteCampaignByStory)
 
-	e.GET("/api/ads/campaign/post/suggestion", h.GetPostCampaignSuggestion)
-	e.GET("/api/ads/campaign/story/suggestion", h.GetStoryCampaignSuggestion)
+	e.GET("/api/ads/campaign/post/suggestion/:count", h.GetPostCampaignSuggestion)
+	e.GET("/api/ads/campaign/story/suggestion/:count", h.GetStoryCampaignSuggestion)
 
 	e.GET("/api/ads/campaign/post", h.GetAllActiveAgentsPostCampaigns)
 	e.GET("/api/ads/campaign/story", h.GetAllActiveAgentsStoryCampaigns)
