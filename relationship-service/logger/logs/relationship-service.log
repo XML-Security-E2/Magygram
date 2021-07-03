@@ -365,3 +365,4 @@ time="2021-07-02T19:03:13+02:00" level=info msg="User followed" func="relationsh
 >>>>>>> develop
 >>>>>>> develop
 time="2021-07-02T23:28:43+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-03T14:22:28+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463

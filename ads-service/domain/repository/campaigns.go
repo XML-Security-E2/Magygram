@@ -16,5 +16,5 @@ type CampaignRepository interface {
 	GetFutureByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.Campaign, error)
 	GetByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.Campaign, error)
 
-	GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string) ([]*model.Campaign, error)
+	GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string, count int) ([]*model.Campaign, error)
 }

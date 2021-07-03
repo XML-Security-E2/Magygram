@@ -178,7 +178,7 @@ func (c campaignService) GetUnseenPostIdsCampaignsForUser(ctx context.Context, b
 		return []string{}, err
 	}
 
-	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "POST")
+	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "POST", count)
 	if err != nil || suggestions == nil{
 		return []string{}, err
 	}
@@ -274,7 +274,7 @@ func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, 
 		return []string{}, err
 	}
 
-	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "STORY")
+	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "STORY", count)
 	if err != nil || suggestions == nil {
 		return []string{}, err
 	}
@@ -282,11 +282,40 @@ func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, 
 	var retVal []string
 	i := 0
 
+	y,m,d := time.Now().Date()
+	today := time.Date(y,m,d,0,0,0,0, time.UTC)
+
 	for _, suggestion := range suggestions {
 		if count <= i {
 			break
 		}
-		suggestion.SeenBy = append(suggestion.SeenBy, targetUser.Id)
+		if !isSeenByUser(suggestion.SeenBy, targetUser.Id) {
+			suggestion.SeenBy = append(suggestion.SeenBy, targetUser.Id)
+		}
+		if !isSeenByUserToday(suggestion.DailySeenBy, targetUser.Id, today){
+			if hasDay(suggestion.DailySeenBy, today) {
+				idx := 0
+				for i, seen := range suggestion.DailySeenBy {
+					if seen.Date == today {
+						idx = i
+						break
+					}
+				}
+				suggestion.DailySeenBy[idx].SeenBy = append(suggestion.DailySeenBy[idx].SeenBy, model.UserGroupStatistic{
+					Id:  targetUser.Id,
+					Age: targetUser.Age,
+				})
+			} else {
+				suggestion.DailySeenBy = append(suggestion.DailySeenBy, model.UserGroupStatisticWrapper{
+					Date:   today,
+					SeenBy: []model.UserGroupStatistic{{
+						Id:  targetUser.Id,
+						Age: targetUser.Age,
+					}},
+				})
+			}
+		}
+
 		c.CampaignRepository.Update(ctx, suggestion)
 		retVal = append(retVal, suggestion.ContentId)
 		i = i + 1

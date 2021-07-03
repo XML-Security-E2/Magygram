@@ -139,7 +139,7 @@ func (c campaignRepository) GetByID(ctx context.Context, id string) (*model.Camp
 	return &campaign, nil
 }
 
-func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string) ([]*model.Campaign, error) {
+func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string, count int) ([]*model.Campaign, error) {
 	y,m,d := time.Now().Date()
 	timee := time.Date(y,m,d,0,0,0,0, time.UTC)
 
@@ -155,11 +155,10 @@ func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Cont
 													 "$or" : []interface{}{bson.M{"display_time": time.Now().Hour() + 1}, bson.M{"display_time": time.Now().Hour()}}},
 													 bson.M{"frequency": "REPEATEDLY", "date_from" : bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now())},
 														 "date_to" : bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now())}}}},
-										 },
-										 "$expr": bson.M{"$lt" : []interface{}{bson.M{"$size" : bson.M{"$daily_seen_by.seen_by" : bson.M{"$eq": primitive.NewDateTimeFromTime(timee)}}},
-										 				"$min_displays_for_repeatedly"} }})
+										 }})
 
 	var results []*model.Campaign
+	var resultsTmp []*model.Campaign
 
 	if err != nil {
 		if cursor != nil {
@@ -184,5 +183,20 @@ func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Cont
 			return nil, err
 		}
 	}
-	return results, nil
+	if len(results) > 0 {
+		for _, res := range results {
+			for _, dates := range res.DailySeenBy {
+				if dates.Date == timee && len(dates.SeenBy) < res.MinDisplaysForRepeatedly {
+					resultsTmp = append(resultsTmp, res)
+					break
+				}
+			}
+		}
+	}
+
+	if len(resultsTmp) < count {
+		return results, nil
+	} else {
+		return resultsTmp, nil
+	}
 }
