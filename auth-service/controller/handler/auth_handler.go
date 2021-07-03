@@ -282,6 +282,8 @@ func (a authHandler) GetCampaignJWTToken(c echo.Context) error {
 		ctx = context.Background()
 	}
 
+	log.Println("TESTT")
+
 	bearer := c.Request().Header.Get("Authorization")
 	jwtToken, err := a.AuthService.GetCampaignJWTToken(ctx, bearer)
 	if err != nil {

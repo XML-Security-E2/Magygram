@@ -228,7 +228,7 @@ const Header = () => {
 								</button>
 							</li>
 							<li hidden={!hasRoles(["agent"])}>
-								<button className="la la-thumbs-down btn shadow-none" onClick={handleCampaignApiToken}>
+								<button className="la la-key btn shadow-none" onClick={handleCampaignApiToken}>
 									Campaign API Token
 								</button>
 							</li>

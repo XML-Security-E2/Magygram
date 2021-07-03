@@ -1,42 +1,49 @@
 import React, { useContext, useEffect } from "react";
-import { StoryContext } from "../../contexts/StoryContext";
-import { storyService } from "../../services/StoryService";
-import StoryCampaignPreview from "./StoryCampaignPreview";
+import { UserContext } from "../../contexts/UserContext";
+import { userService } from "../../services/UserService";
 
 const CampaignTokenGenerator = () => {
-	const { storyState, dispatch } = useContext(StoryContext);
+	const {userState, dispatch } = useContext(UserContext);
 
 	useEffect(() => {
-		const getStoriesHandler = async () => {
-			await storyService.findAllUsersCampaignStories(dispatch);
-		};
-		getStoriesHandler();
+		userService.getCampaignAPITokenForAgent(dispatch);
 	}, []);
+
+	const generateNewToken = () => {
+		userService.generateNewToken(dispatch);
+	}
+
+	const deleteToken = () => {
+		userService.deleteToken(dispatch);
+	}
 
 	return (
 		<React.Fragment>
-			<h3 className="text-dark">Story campaigns</h3>
-
-			<div className="row ">
-				{storyState.agentCampaignStories !== null ? (
-					storyState.agentCampaignStories.map((story) => {
-						return (
-							<div className="col-3">
-								<StoryCampaignPreview story={story} storyId={story.Id} />
-							</div>
-						);
-					})
-				) : (
-					<div className="col-12 mt-5 d-flex justify-content-center text-secondary">
-						<h4>User don't have active story campaigns</h4>
-					</div>
-				)}
-
-				{storyState.agentCampaignStories.length === 0 && (
-					<div className="col-12 mt-5 d-flex justify-content-center text-secondary">
-						<h4>User don't have active story campaigns</h4>
-					</div>
-				)}
+			<div className="form-group row">
+                <button className="btn btn-primary float-right" onClick={() => generateNewToken()}>
+                    Generate new token
+                </button>
+				<button className="btn btn-danger float-right ml-3" onClick={() => deleteToken()}>
+                    Delete token
+                </button>
+			</div>
+			<div className="form-group row">
+				<label for="apitoken" className="col-form-label">
+					<b>API Token</b>
+				</label>
+			</div>
+			<div className="form-group row">
+			<textarea
+          		value={userState.agentCampaignAPITOken}
+		  		readOnly
+				rows="10"
+				cols="40"
+        		/>
+			</div>
+			<div className="form-group row">
+                <button className="btn btn-secondary float-right" onClick={() => {navigator.clipboard.writeText(userState.agentCampaignAPITOken)}}>
+                    Copy to clipboard
+                </button>
 			</div>
 		</React.Fragment>
 	);
