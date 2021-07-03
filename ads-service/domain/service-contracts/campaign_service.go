@@ -18,4 +18,7 @@ type CampaignService interface {
 
 	DeleteCampaignByPostId(ctx context.Context, bearer string, contentId string) error
 	DeleteCampaignByStoryId(ctx context.Context, bearer string, contentId string) error
+
+	GetUnseenPostIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error)
+	GetUnseenStoryIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error)
 }

@@ -27,6 +27,7 @@ type Campaign struct {
 	ContentId string `bson:"content_id,omitempty"`
 	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly"`
 	SeenBy []string `bson:"seen_by"`
+	DailySeenBy []UserGroupStatisticWrapper `bson:"daily_seen_by""`
 	Type ContentType `bson:"campaign_type"`
 	Frequency CampaignFrequency `bson:"frequency"`
 	TargetGroup TargetGroup `bson:"target_group"`
@@ -114,6 +115,24 @@ type TargetGroup struct {
 	Gender GenderType `bson:"gender" json:"gender"`
 }
 
+type UserGroupStatisticWrapper struct {
+	Date time.Time `bson:"date"`
+	SeenBy []UserGroupStatistic `bson:"seen_by"`
+}
+
+type UserGroupStatistic struct {
+	Id string `json:"id"`
+	Age int `json:"age"`
+}
+
+type UserTargetGroup struct {
+	Id string `json:"id"`
+	Age int `json:"age"`
+	Gender Gender `json:"gender"`
+}
+
+type Gender string
+
 type GenderType string
 
 const (
@@ -141,13 +160,19 @@ func NewCampaignUpdateRequest(campaignRequest *CampaignUpdateRequestDTO) (*Campa
 		return nil, errors.New("age out of range")
 	}
 
+	yf,mf,df := campaignRequest.DateFrom.Date()
+	timeef := time.Date(yf,mf,df,0,0,1,0, time.UTC)
+
+	yt,mt,dt := campaignRequest.DateTo.Date()
+	timeet := time.Date(yt,mt,dt,0,0,1,0, time.UTC)
+
 	return &CampaignUpdateRequest{
 		Id:                       guid.New().String(),
 		CampaignId:               campaignRequest.CampaignId,
 		MinDisplaysForRepeatedly: campaignRequest.MinDisplaysForRepeatedly,
 		TargetGroup:              campaignRequest.TargetGroup,
-		DateFrom:                 campaignRequest.DateFrom,
-		DateTo:                   campaignRequest.DateTo,
+		DateFrom:                 timeef,
+		DateTo:                   timeet,
 		RequestedDate:            time.Now(),
 		CampaignUpdateStatus:     "PENDING",
 	}, nil
@@ -171,19 +196,30 @@ func NewCampaign(campaignRequest *CampaignRequest, ownerId string) (*Campaign, e
 		return nil, errors.New("age out of range")
 	}
 
+
+	yf,mf,df := campaignRequest.DateFrom.Date()
+	timeef := time.Date(yf,mf,df,0,0,1,0, time.UTC)
+
+	yt,mt,dt := campaignRequest.DateTo.Date()
+	timeet := time.Date(yt,mt,dt,0,0,1,0, time.UTC)
+
+	yo,mo,do := campaignRequest.ExposeOnceDate.Date()
+	timeeo := time.Date(yo,mo,do,0,0,1,0, time.UTC)
+
 	return &Campaign{
 		Id:                       guid.New().String(),
 		ContentId:                campaignRequest.ContentId,
 		MinDisplaysForRepeatedly: campaignRequest.MinDisplaysForRepeatedly,
 		SeenBy:                   []string{},
+		DailySeenBy: 			  []UserGroupStatisticWrapper{},
 		Type:                     campaignRequest.Type,
 		Frequency:                campaignRequest.Frequency,
 		TargetGroup:              campaignRequest.TargetGroup,
-		DateFrom:                 campaignRequest.DateFrom,
-		DateTo:                   campaignRequest.DateTo,
+		DateFrom:                 timeef,
+		DateTo:                   timeet,
 		OwnerId: 				  ownerId,
 		DisplayTime:              campaignRequest.DisplayTime,
-		ExposeOnceDate:           campaignRequest.ExposeOnceDate,
+		ExposeOnceDate:           timeeo,
 		Deleted:                  false,
 	}, nil
 }
@@ -205,7 +241,7 @@ func NewInfluencerCampaign(campaignRequest *InfluencerCampaignRequest, userId st
 
 func validateGenderTypeEnums(pt GenderType) error {
 	switch pt {
-	case "MALE", "FEMALE":
+	case "MALE", "FEMALE", "ANY":
 		return nil
 	}
 	return errors.New("invalid gender type")

@@ -7,7 +7,9 @@ import (
 	"ads-service/service/intercomm"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/go-playground/validator"
+	"time"
 )
 
 type campaignService struct {
@@ -15,10 +17,11 @@ type campaignService struct {
 	repository.InfluencerCampaignRepository
 	repository.CampaignUpdateRequestsRepository
 	intercomm.AuthClient
+	intercomm.UserClient
 }
 
-func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient) service_contracts.CampaignService {
-	return &campaignService{r , ic,curr, ac}
+func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.CampaignService {
+	return &campaignService{r , ic,curr, ac, uc}
 }
 
 func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
@@ -168,6 +171,159 @@ func (c campaignService) CreateCampaign(ctx context.Context, bearer string, camp
 
 	return campaign.Id, nil
 }
+
+func (c campaignService) GetUnseenPostIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error) {
+	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	if err != nil {
+		return []string{}, err
+	}
+
+	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "POST", count)
+	if err != nil || suggestions == nil{
+		return []string{}, err
+	}
+
+	var retVal []string
+	i := 0
+
+	y,m,d := time.Now().Date()
+	today := time.Date(y,m,d,0,0,0,0, time.UTC)
+
+	for _, suggestion := range suggestions {
+		if count <= i {
+			break
+		}
+		if !isSeenByUser(suggestion.SeenBy, targetUser.Id) {
+			suggestion.SeenBy = append(suggestion.SeenBy, targetUser.Id)
+		}
+		if !isSeenByUserToday(suggestion.DailySeenBy, targetUser.Id, today){
+			if hasDay(suggestion.DailySeenBy, today) {
+				idx := 0
+				for i, seen := range suggestion.DailySeenBy {
+					if seen.Date == today {
+						idx = i
+						break
+					}
+				}
+				suggestion.DailySeenBy[idx].SeenBy = append(suggestion.DailySeenBy[idx].SeenBy, model.UserGroupStatistic{
+					Id:  targetUser.Id,
+					Age: targetUser.Age,
+				})
+			} else {
+				suggestion.DailySeenBy = append(suggestion.DailySeenBy, model.UserGroupStatisticWrapper{
+					Date:   today,
+					SeenBy: []model.UserGroupStatistic{{
+						Id:  targetUser.Id,
+						Age: targetUser.Age,
+					}},
+				})
+			}
+		}
+
+		c.CampaignRepository.Update(ctx, suggestion)
+		retVal = append(retVal, suggestion.ContentId)
+		i = i + 1
+	}
+
+	return retVal, nil
+}
+
+func isSeenByUser(seenBy []string, userId string) bool {
+	for _, seen := range seenBy{
+		if seen == userId {
+			return true
+		}
+	}
+	return false
+}
+
+func hasDay(seenBy []model.UserGroupStatisticWrapper, today time.Time) bool {
+	for _, seen := range seenBy {
+		fmt.Println(seen.Date)
+		fmt.Println(today)
+		if seen.Date == today {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isSeenByUserToday(seenBy []model.UserGroupStatisticWrapper, userId string, today time.Time) bool {
+
+	if !hasDay(seenBy, today) {
+		return false
+	}
+
+	for _, seen := range seenBy {
+		if seen.Date == today {
+			for _, users := range seen.SeenBy {
+				if users.Id == userId {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error){
+	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	if err != nil {
+		return []string{}, err
+	}
+
+	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "STORY", count)
+	if err != nil || suggestions == nil {
+		return []string{}, err
+	}
+
+	var retVal []string
+	i := 0
+
+	y,m,d := time.Now().Date()
+	today := time.Date(y,m,d,0,0,0,0, time.UTC)
+
+	for _, suggestion := range suggestions {
+		if count <= i {
+			break
+		}
+		if !isSeenByUser(suggestion.SeenBy, targetUser.Id) {
+			suggestion.SeenBy = append(suggestion.SeenBy, targetUser.Id)
+		}
+		if !isSeenByUserToday(suggestion.DailySeenBy, targetUser.Id, today){
+			if hasDay(suggestion.DailySeenBy, today) {
+				idx := 0
+				for i, seen := range suggestion.DailySeenBy {
+					if seen.Date == today {
+						idx = i
+						break
+					}
+				}
+				suggestion.DailySeenBy[idx].SeenBy = append(suggestion.DailySeenBy[idx].SeenBy, model.UserGroupStatistic{
+					Id:  targetUser.Id,
+					Age: targetUser.Age,
+				})
+			} else {
+				suggestion.DailySeenBy = append(suggestion.DailySeenBy, model.UserGroupStatisticWrapper{
+					Date:   today,
+					SeenBy: []model.UserGroupStatistic{{
+						Id:  targetUser.Id,
+						Age: targetUser.Age,
+					}},
+				})
+			}
+		}
+
+		c.CampaignRepository.Update(ctx, suggestion)
+		retVal = append(retVal, suggestion.ContentId)
+		i = i + 1
+	}
+
+	return retVal, nil
+}
+
 
 func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignRequest) (string, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)

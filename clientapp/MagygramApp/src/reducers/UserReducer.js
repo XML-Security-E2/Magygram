@@ -54,6 +54,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.REGISTER_VALIDATION_FAILURE:
 			return {
+				...state,
 				registrationError: {
 					showError: true,
 					errorMessage: action.errorMessage,
@@ -74,25 +75,25 @@ export const userReducer = (state, action) => {
 				},
 				showTwoFactorAuth: false,
 			};
-		case userConstants.SHOW_INFLUENCER_CAMPAIGN_TAB:{
-			return{
+		case userConstants.SHOW_INFLUENCER_CAMPAIGN_TAB: {
+			return {
 				...state,
-				activeTab:{
+				activeTab: {
 					verificationRequestsShow: false,
 					contentReportShow: true,
 					agentRequestsShow: false,
 				},
-			}
+			};
 		}
-		case userConstants.HIDE_INFLUENCER_CAMPAIGN_TAB:{
-			return{
+		case userConstants.HIDE_INFLUENCER_CAMPAIGN_TAB: {
+			return {
 				...state,
-				activeTab:{
+				activeTab: {
 					verificationRequestsShow: false,
 					contentReportShow: false,
 					agentRequestsShow: true,
 				},
-			}
+			};
 		}
 		case userConstants.LOGIN_FAILURE:
 			return {
@@ -192,6 +193,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESET_PASSWORD_LINK_REQUEST:
 			return {
+				...state,
 				forgotPasswordLinkError: {
 					showError: false,
 					errorMessage: "",
@@ -201,6 +203,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESET_PASSWORD_LINK_SUCCESS:
 			return {
+				...state,
 				forgotPasswordLinkError: {
 					showError: false,
 					errorMessage: "",
@@ -210,6 +213,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESET_PASSWORD_LINK_FAILURE:
 			return {
+				...state,
 				forgotPasswordLinkError: {
 					showError: true,
 					errorMessage: action.errorMessage,
@@ -220,6 +224,7 @@ export const userReducer = (state, action) => {
 
 		case userConstants.RESET_PASSWORD_REQUEST:
 			return {
+				...state,
 				resetPassword: {
 					showError: false,
 					errorMessage: "",
@@ -228,6 +233,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESET_PASSWORD_SUCCESS:
 			return {
+				...state,
 				resetPassword: {
 					showError: false,
 					errorMessage: "",
@@ -236,6 +242,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESET_PASSWORD_FAILURE:
 			return {
+				...state,
 				resetPassword: {
 					showError: true,
 					errorMessage: action.errorMessage,
@@ -244,6 +251,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESEND_ACTIVATION_LINK_REQUEST:
 			return {
+				...state,
 				blockedUser: {
 					showError: false,
 					errorMessage: "",
@@ -252,6 +260,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESEND_ACTIVATION_LINK_SUCCESS:
 			return {
+				...state,
 				blockedUser: {
 					showError: false,
 					errorMessage: "",
@@ -260,6 +269,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.RESEND_ACTIVATION_LINK_FAILURE:
 			return {
+				...state,
 				blockedUser: {
 					showError: true,
 					errorMessage: action.errorMessage,
@@ -268,6 +278,7 @@ export const userReducer = (state, action) => {
 			};
 		case userConstants.BLOCKED_USER_EMAIL_REQUEST:
 			return {
+				...state,
 				blockedUser: {
 					showError: false,
 					errorMessage: "",
@@ -288,13 +299,14 @@ export const userReducer = (state, action) => {
 						website: "",
 						bio: "",
 						following: "",
-						gender: "",
+						gender: "MALE",
 						imageUrl: "",
 						postNumber: "",
 						followersNumber: "",
 						followingNumber: "",
 						sentFollowRequest: false,
 						blocked: false,
+						birthDate: new Date(),
 						notificationSettings: {
 							notifyStory: false,
 							notifyPost: false,
@@ -321,19 +333,20 @@ export const userReducer = (state, action) => {
 					user: action.user,
 				},
 			};
-		case userConstants.SET_USER_CAMPAIGNS_REQUEST: { let strCpy = {
-				...state,
-			};
-			strCpy.campaigns=[]
-			return strCpy;
-		}
-		case userConstants.SET_USER_CAMPAIGNS:{
+		case userConstants.SET_USER_CAMPAIGNS_REQUEST: {
 			let strCpy = {
 				...state,
 			};
-            strCpy.campaigns=action.campaigns
+			strCpy.campaigns = [];
 			return strCpy;
-		};
+		}
+		case userConstants.SET_USER_CAMPAIGNS: {
+			let strCpy = {
+				...state,
+			};
+			strCpy.campaigns = action.campaigns;
+			return strCpy;
+		}
 
 		case userConstants.GET_USER_PROFILE_FAILURE:
 			return state;
