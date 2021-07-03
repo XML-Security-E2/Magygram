@@ -15,10 +15,11 @@ type campaignService struct {
 	repository.InfluencerCampaignRepository
 	repository.CampaignUpdateRequestsRepository
 	intercomm.AuthClient
+	intercomm.UserClient
 }
 
-func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient) service_contracts.CampaignService {
-	return &campaignService{r , ic,curr, ac}
+func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.CampaignService {
+	return &campaignService{r , ic,curr, ac, uc}
 }
 
 func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
@@ -168,6 +169,51 @@ func (c campaignService) CreateCampaign(ctx context.Context, bearer string, camp
 
 	return campaign.Id, nil
 }
+
+func (c campaignService) GetUnseenPostIdsCampaignsForUser(ctx context.Context, bearer string) ([]string, error) {
+	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	if err != nil {
+		return []string{}, err
+	}
+
+	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "POST")
+	if err != nil || suggestions == nil{
+		return []string{}, err
+	}
+
+	var retVal []string
+
+	for _, suggestion := range suggestions {
+		suggestion.SeenBy = append(suggestion.SeenBy, targetUser.Id)
+		c.CampaignRepository.Update(ctx, suggestion)
+		retVal = append(retVal, suggestion.ContentId)
+	}
+
+	return retVal, nil
+}
+
+func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, bearer string) ([]string, error){
+	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	if err != nil {
+		return []string{}, err
+	}
+
+	suggestions, err := c.CampaignRepository.GetUnseenContentIdsCampaignsForUser(ctx, targetUser, "STORY")
+	if err != nil || suggestions == nil {
+		return []string{}, err
+	}
+
+	var retVal []string
+
+	for _, suggestion := range suggestions {
+		suggestion.SeenBy = append(suggestion.SeenBy, targetUser.Id)
+		c.CampaignRepository.Update(ctx, suggestion)
+		retVal = append(retVal, suggestion.ContentId)
+	}
+
+	return retVal, nil
+}
+
 
 func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignRequest) (string, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)

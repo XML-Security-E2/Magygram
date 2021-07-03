@@ -58,4 +58,6 @@ type UserService interface {
 	GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error)
 	RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error)
 	RedisConnection(finished chan bool)
+
+	GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.TargetGroup, error)
 }

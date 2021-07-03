@@ -15,6 +15,8 @@ const RegistrationForm = () => {
 	const [password, setPassword] = useState("");
 	const [repeatedPassword, setRepeatedPassword] = useState("");
 	const [webSite, setWebSite] = useState("");
+	const [birthDate, setBirthDate] = useState(new Date());
+	const [gender, setGender] = useState("MALE");
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -27,6 +29,8 @@ const RegistrationForm = () => {
 				username,
 				password,
 				repeatedPassword,
+				birthDate: birthDate.getTime(),
+				gender,
 			};
 
 			userService.register(user, dispatch);
@@ -39,6 +43,8 @@ const RegistrationForm = () => {
 				password,
 				repeatedPassword,
 				webSite,
+				birthDate: birthDate.getTime(),
+				gender,
 			};
 
 			userService.registerAgent(agent, dispatch);
@@ -103,6 +109,55 @@ const RegistrationForm = () => {
 						</div>
 					)}
 
+					<div className="form-group">
+						<div className="form-row d-flex align-items-center">
+							<label>Birth date</label>
+
+							<div className="col">
+								<input
+									type="date"
+									className="form-control"
+									value={birthDate.toISOString().split("T")[0]}
+									max={new Date().toISOString().split("T")[0]}
+									onChange={(e) => setBirthDate(new Date(e.target.value))}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className="form-group">
+						<div className="form-row d-flex align-items-center">
+							<label>Gender</label>
+
+							<div className="form-check form-check-inline ml-4">
+								<input
+									className="form-check-input"
+									type="radio"
+									name="exampleRadios1"
+									id="exampleRadios5"
+									value="MALE"
+									checked={gender === "MALE"}
+									onChange={() => setGender("MALE")}
+								/>
+								<label className="form-check-label" style={{ fontSize: "1.2em" }} for="exampleRadios5">
+									Male
+								</label>
+							</div>
+							<div className="form-check form-check-inline ml-2">
+								<input
+									className="form-check-input"
+									type="radio"
+									name="exampleRadios1"
+									id="exampleRadios4"
+									value="FEMALE"
+									checked={gender === "FEMALE"}
+									onChange={() => setGender("FEMALE")}
+								/>
+								<label className="form-check-label" style={{ fontSize: "1.2em" }} for="exampleRadios4">
+									Female
+								</label>
+							</div>
+						</div>
+					</div>
 					<div className="form-group">
 						<input className="form-control" required type="password" name="passwordInput" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
 					</div>

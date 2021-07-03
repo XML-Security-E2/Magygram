@@ -5,6 +5,7 @@ import (
 	"ads-service/domain/repository"
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -98,7 +99,10 @@ func (c campaignRepository) GetAll(ctx context.Context) ([]*model.Campaign, erro
 	var results []*model.Campaign
 
 	if err != nil {
-		defer cursor.Close(ctx)
+		if cursor != nil {
+			defer cursor.Close(ctx)
+		}
+		return nil, err
 	} else {
 		for cursor.Next(ctx) {
 			var result model.Campaign
@@ -132,4 +136,50 @@ func (c campaignRepository) GetByID(ctx context.Context, id string) (*model.Camp
 		return nil, err
 	}
 	return &campaign, nil
+}
+
+func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string) ([]*model.Campaign, error) {
+	y,m,d := time.Now().Date()
+	timee := time.Date(y,m,d,0,0,0,0, time.Local)
+
+
+	cursor, err := c.Col.Find(ctx,bson.M{"seen_by": bson.M{"$ne": targetGroup.Id},
+										 "campaign_type": contentType,
+										 "target_group.min_age": bson.M{"$lte" : targetGroup.Age},
+										 "target_group.max_age": bson.M{"$gte" : targetGroup.Age},
+										 "$and" : []interface{}{
+											 bson.M{"$or" : []interface{}{ bson.M{"target_group.gender": "ANY"}, bson.M{"target_group.gender": targetGroup.Gender}}},
+											 bson.M{"$or" : []interface{}{ bson.M{"frequency": "ONCE", "expose_once_date" : bson.M{"$gte": primitive.NewDateTimeFromTime(timee),
+													 "$lt": primitive.NewDateTimeFromTime(timee.AddDate(0,0,1))},
+													 "$or" : []interface{}{bson.M{"display_time": time.Now().Hour() + 1}, bson.M{"display_time": time.Now().Hour()}}},
+													 bson.M{"frequency": "REPEATEDLY", "date_from" : bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now())},
+														 "date_to" : bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now())}}}},
+										 }})
+
+	var results []*model.Campaign
+
+	if err != nil {
+		if cursor != nil {
+			defer cursor.Close(ctx)
+		}
+		return nil, err
+	} else {
+		if cursor != nil {
+			for cursor.Next(ctx) {
+			var result model.Campaign
+
+			fmt.Println(result.Id)
+			err := cursor.Decode(&result)
+			results = append(results, &result)
+
+			if err != nil {
+				return nil, err
+			}
+
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return results, nil
 }

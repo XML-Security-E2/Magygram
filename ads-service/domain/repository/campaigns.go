@@ -15,4 +15,6 @@ type CampaignRepository interface {
 	GetAllFutureByOwnerIDAndType(ctx context.Context, ownerId string, campaignType string) ([]*model.Campaign, error)
 	GetFutureByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.Campaign, error)
 	GetByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.Campaign, error)
+
+	GetUnseenContentIdsCampaignsForUser(ctx context.Context, targetGroup *model.UserTargetGroup, contentType string) ([]*model.Campaign, error)
 }

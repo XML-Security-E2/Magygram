@@ -21,6 +21,8 @@ type CampaignHandler interface {
 	GetCampaignByStoryId(c echo.Context) error
 	DeleteCampaignByPostId(c echo.Context) error
 	DeleteCampaignByStory(c echo.Context) error
+	GetPostCampaignSuggestion(c echo.Context) error
+	GetStoryCampaignSuggestion(c echo.Context) error
 }
 
 type campaignHandler struct {
@@ -62,6 +64,36 @@ func (ch campaignHandler) DeleteCampaignByStory(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (ch campaignHandler) GetPostCampaignSuggestion(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	campaign, err := ch.CampaignService.GetUnseenPostIdsCampaignsForUser(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, campaign)
+}
+
+func (ch campaignHandler) GetStoryCampaignSuggestion(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	campaign, err := ch.CampaignService.GetUnseenStoryIdsCampaignsForUser(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, campaign)
 }
 
 func (ch campaignHandler) GetCampaignByPostId(c echo.Context) error {

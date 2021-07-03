@@ -8,7 +8,8 @@ import { notificationService } from "../services/NotificationService";
 import { NotificationContext } from "../contexts/NotificationContext";
 import { notificationConstants } from "../constants/NotificationConstants";
 import ActivityList from "./ActivityList";
-import { hasRoles } from "../helpers/auth-header";
+import { authHeader, hasRoles } from "../helpers/auth-header";
+import Axios from "axios";
 
 const Header = () => {
 	const userCtx = useContext(UserContext);
@@ -151,6 +152,14 @@ const Header = () => {
 		setLoadData(!loadData);
 	};
 
+	const testTest = () => {
+		Axios.get(`/api/ads/campaign/post/suggestion`, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res.data);
+			})
+			.catch((err) => {});
+	};
+
 	return (
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
 			<div className="container">
@@ -206,6 +215,11 @@ const Header = () => {
 								<Link className="la la-volume-up btn shadow-none" to="/campaigns">
 									Campaigns
 								</Link>
+							</li>
+							<li>
+								<button className="la la-volume-up btn shadow-none" onClick={testTest}>
+									tryMEEE
+								</button>
 							</li>
 							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-cog btn shadow-none" onClick={handleSettings}>

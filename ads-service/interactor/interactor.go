@@ -20,6 +20,7 @@ type Interactor interface {
 	NewSchedulerService() scheduler.SchedulerService
 	NewCampaignHandler() handler.CampaignHandler
 	NewAuthClient() intercomm.AuthClient
+	NewUserClient() intercomm.UserClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -50,6 +51,10 @@ func (i *interactor) NewSchedulerService() scheduler.SchedulerService {
 	return serv
 }
 
+func (i *interactor) NewUserClient() intercomm.UserClient {
+	return intercomm.NewUserClient()
+}
+
 func (i *interactor) NewAuthClient() intercomm.AuthClient {
 	return intercomm.NewAuthClient()
 }
@@ -67,7 +72,7 @@ func (i *interactor) NewInfluencerCampaignRepository() repository.InfluencerCamp
 }
 
 func (i *interactor) NewCampaignService() service_contracts.CampaignService {
-	return service.NewCampaignService(i.NewCampaignRepository(), i.NewInfluencerCampaignRepository(), i.NewCampaignUpdateRequestsRepository(), i.NewAuthClient())
+	return service.NewCampaignService(i.NewCampaignRepository(), i.NewInfluencerCampaignRepository(), i.NewCampaignUpdateRequestsRepository(), i.NewAuthClient(), i.NewUserClient())
 }
 
 func (i *interactor) NewCampaignHandler() handler.CampaignHandler {

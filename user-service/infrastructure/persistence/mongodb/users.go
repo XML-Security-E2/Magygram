@@ -36,6 +36,7 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.U
 																{"imageUrl" , user.ImageUrl},
 																{"number" , user.Number},
 																{"gender" , user.Gender},
+																{"birth_date" , user.BirthDate},
 																{"liked_posts" , user.LikedPosts},
 																{"disliked_posts" , user.DislikedPosts},
 																{"commented_posts" , user.CommentedPosts},
