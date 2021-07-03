@@ -128,6 +128,11 @@ const Header = () => {
 		window.location = "#/disliked";
 	};
 
+	const handleCampaignApiToken = () => {
+		window.location = "#/campaign-api";
+
+	}
+
 	const campaignOffers = () => {
 		window.location = "#/influencer-campagns";
 	};
@@ -220,6 +225,11 @@ const Header = () => {
 							<li hidden={hasRoles(["admin"])}>
 								<button className="la la-thumbs-down btn shadow-none" onClick={handleDisikedPosts}>
 									Disiked posts
+								</button>
+							</li>
+							<li hidden={!hasRoles(["agent"])}>
+								<button className="la la-key btn shadow-none" onClick={handleCampaignApiToken}>
+									Campaign API Token
 								</button>
 							</li>
 							<hr hidden={hasRoles(["admin"])} className="solid" />

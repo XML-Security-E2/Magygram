@@ -117,6 +117,7 @@ const UserContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
+		agentCampaignAPITOken: ""
 	});
 
 	return <UserContext.Provider value={{ userState, dispatch }}>{props.children}</UserContext.Provider>;

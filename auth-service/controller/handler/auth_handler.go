@@ -5,6 +5,7 @@ import (
 	"auth-service/domain/model"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -25,11 +26,15 @@ type AuthHandler interface {
 	GetLoggedUserId(c echo.Context) error
 	AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 	LoginSecondStage(c echo.Context) error
+	GenerateNewAgentCampaignJWTToken(c echo.Context) error
+	DeleteCampaignJWTToken(c echo.Context) error
+	GetCampaignJWTToken(c echo.Context) error
 }
 
 type authHandler struct {
 	AuthService service_contracts.AuthService
 }
+
 
 func NewAuthHandler(a service_contracts.AuthService) AuthHandler {
 	return &authHandler{a}
@@ -216,4 +221,74 @@ func (a authHandler) GetLoggedUserId(c echo.Context) error {
 	} else{
 		return ErrUnauthorized
 	}
+}
+
+func (a authHandler) GenerateNewAgentCampaignJWTToken(c echo.Context) error {
+	expireTime := time.Now().Add(time.Hour*8760).Unix() * 1000 // 1 year
+	token, err := generateAgentCampaignJWTToken(expireTime)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err = a.AuthService.UpdateAgentCampaignJWTToken(ctx, bearer, token)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	return c.JSON(http.StatusOK, token)
+}
+
+func generateAgentCampaignJWTToken(expireTime int64) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	var roles = []model.Role{{Name: "campaign_role", Permissions: []model.Permission{
+		{"create_campaign"},
+		{"get_agent_campaign"},
+		{"get_monitoring_for_campaign"}}}}
+
+	rolesString, _ := json.Marshal(roles)
+
+	claims := token.Claims.(jwt.MapClaims)
+	claims["roles"] = string(rolesString)
+	claims["exp"] = expireTime
+
+	return token.SignedString([]byte(conf.Current.Server.Secret))
+}
+
+func (a authHandler) DeleteCampaignJWTToken(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	err := a.AuthService.DeleteCampaignJWTToken(ctx, bearer)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (a authHandler) GetCampaignJWTToken(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	log.Println("TESTT")
+
+	bearer := c.Request().Header.Get("Authorization")
+	jwtToken, err := a.AuthService.GetCampaignJWTToken(ctx, bearer)
+	if err != nil {
+		return ErrHttpGenericMessage
+	}
+
+	return c.JSON(http.StatusOK, jwtToken)
 }

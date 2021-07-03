@@ -37,6 +37,9 @@ export const userService = {
 	reportUser,
 	registerAgentByAdmin,
 	getCampaignsForUser,
+	getCampaignAPITokenForAgent,
+	generateNewToken,
+	deleteToken,
 };
 
 async function getCampaignsForUser(requestId, dispatch) {
@@ -946,4 +949,76 @@ function validateAgentByAdmin(user, dispatch) {
 	}
 
 	return true;
+}
+
+function getCampaignAPITokenForAgent(dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/auth/get-campaign-jwt-token`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.GET_CAMPAIGN_JWT_TOKEN_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.GET_CAMPAIGN_JWT_TOKEN_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.GET_CAMPAIGN_JWT_TOKEN_FAILURE, error };
+	}
+}
+
+function generateNewToken(dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/auth/generate-campaign-jwt-token`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_FAILURE, error };
+	}
+}
+
+function deleteToken(dispatch) {
+	dispatch(request());
+
+	Axios.delete(`/api/auth/delete-campaign-jwt-token`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(""));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.DELETE_CAMPAIGN_JWT_TOKEN_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.DELETE_CAMPAIGN_JWT_TOKEN_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.DELETE_CAMPAIGN_JWT_TOKEN_FAILURE, error };
+	}
 }
