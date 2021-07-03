@@ -28,6 +28,7 @@ type Orchestrator struct {
 func NewOrchestrator() *Orchestrator {
 	var err error
 	// create client and ping redis
+	
 	client := redis.NewClient(&redis.Options{Addr: "localhost:6379", Password: "", DB: 0})
 	if _, err = client.Ping().Result(); err != nil {
 		log.Fatalf("error creating redis client %s", err)

@@ -1,16 +1,20 @@
 package service
 
 import (
+	"auth-service/conf"
 	"auth-service/domain/model"
 	"auth-service/domain/repository"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
 	"context"
 	"errors"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/pquerna/otp/totp"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"strings"
 )
 
 var (
@@ -118,4 +122,67 @@ func (a authService) HandleLoginEventAndAccountActivation(ctx context.Context, u
 	}
 }
 
+func (a authService) UpdateAgentCampaignJWTToken(ctx context.Context, bearer string, token string) error {
+	userId,err := getLoggedUserId(bearer)
+	if err!=nil{
+		return errors.New("Jwt token decode problem")
+	}
 
+	user, err := a.UserService.GetUserById(ctx, userId)
+	if err!=nil{
+		return errors.New("User not exist")
+	}
+
+	user.AgentToken = token
+
+	err = a.UserService.Update(ctx,user)
+	if err!=nil{
+		return errors.New("User not modified")
+	}
+
+	return nil
+}
+
+func getLoggedUserId(bearer string) (string, error) {
+	authHeader := strings.Split(bearer, "Bearer ")
+	jwtToken := authHeader[1]
+
+	token, err := jwt.Parse(jwtToken, func (token *jwt.Token) (interface{}, error){
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(conf.Current.Server.Secret), nil
+	})
+
+	if err != nil {
+		return "",errors.New("Jwt token decode problem")
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userId := claims["id"].(string)
+		return userId,nil
+	} else{
+		return "",errors.New("Jwt token decode problem")
+	}
+}
+
+func (a authService) DeleteCampaignJWTToken(ctx context.Context, bearer string) error {
+	userId,err := getLoggedUserId(bearer)
+	if err!=nil{
+		return errors.New("Jwt token decode problem")
+	}
+
+	user, err := a.UserService.GetUserById(ctx, userId)
+	if err!=nil{
+		return errors.New("User not exist")
+	}
+
+	user.AgentToken = ""
+
+	err = a.UserService.Update(ctx,user)
+	if err!=nil{
+		return errors.New("User not modified")
+	}
+
+	return nil
+}

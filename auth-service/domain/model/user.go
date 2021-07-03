@@ -101,7 +101,7 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 		TotpToken: token}, err
 }
 
-func NewAgent(userRequest *UserRequest, token string, agentToken string) (*User, error) {
+func NewAgent(userRequest *UserRequest, token string) (*User, error) {
 	return &User{Id: userRequest.Id,
 		Active:   false,
 		Email:    html.EscapeString(userRequest.Email),
@@ -149,9 +149,11 @@ func NewAgent(userRequest *UserRequest, token string, agentToken string) (*User,
 			{"get_follow_recommendation"},
 		}},{Name: "agent", Permissions: []Permission{
 			{"create_campaign"},
+			{"generate_token"},
+			{"delete_token"},
 		}}},
 		TotpToken: token,
-		AgentToken: agentToken}, nil
+	}, nil
 }
 
 
