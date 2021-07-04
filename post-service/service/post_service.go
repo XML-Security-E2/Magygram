@@ -170,6 +170,12 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 		posts= append(posts, newPosts...)
 	}
 
+	for _, post := range posts{
+		if post.ContentType=="CAMPAIGN"{
+			p.AdsClient.UpdateCampaignVisitor(bearer,post.Id)
+		}
+	}
+
 	sortedPosts := sortPostPerTime(posts)
 
 	campaignCount := int64(len(sortedPosts)/5) // broj postova sortiranih, na svaki 5i

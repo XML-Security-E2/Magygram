@@ -21,4 +21,5 @@ type CampaignService interface {
 
 	GetUnseenPostIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error)
 	GetUnseenStoryIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error)
+	UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error
 }

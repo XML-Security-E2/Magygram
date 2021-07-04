@@ -24,4 +24,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.PUT("/api/ads/campaign", h.UpdateCampaignRequest)
 
+	e.PUT("/api/ads/campaign/post/visited/:postId", h.UpdatePostCampaignVisitor)
+	e.PUT("/api/ads/campaign/story/visited/:storyId", h.UpdateStoryCampaignVisitor)
+
 }

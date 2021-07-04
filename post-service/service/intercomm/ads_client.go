@@ -18,9 +18,11 @@ type AdsClient interface {
 	GetAllActiveAgentsPostCampaigns(bearer string) ([]string,error)
 	DeleteCampaign(bearer string, postId string) error
 	GetPostCampaignSuggestion(bearer string,count string) ([]string,error)
+	UpdateCampaignVisitor(bearer string,postId string) error
 }
 
 type adsClient struct {}
+
 
 func NewAdsClient() AdsClient {
 	baseAdsUrl = fmt.Sprintf("%s%s:%s/api/ads", conf.Current.Adsservice.Protocol, conf.Current.Adsservice.Domain, conf.Current.Adsservice.Port)
@@ -141,4 +143,20 @@ func (a adsClient) GetPostCampaignSuggestion(bearer string,count string) ([]stri
 	_ = json.Unmarshal(bodyBytes, &campaigns)
 
 	return campaigns, nil
+}
+
+func (a adsClient) UpdateCampaignVisitor(bearer string, postId string) error {
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/campaign/post/visited/%s", baseAdsUrl, postId), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		return err
+	}
+
+	fmt.Println(resp.StatusCode)
+	return nil
 }
