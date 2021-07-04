@@ -26,6 +26,7 @@ func NewCampaignService(r repository.CampaignRepository, ic repository.Influence
 	return &campaignService{r , ic,curr, ac, uc, sc, pc}
 }
 
+
 func (c campaignService) GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
@@ -666,4 +667,54 @@ func (c campaignService) UpdateCampaignRequest(ctx context.Context, bearer strin
 	}
 
 	return campaignUpdateRequest.Id, nil
+}
+
+func (c campaignService) UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error {
+	logged, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	if err != nil {
+		return err
+	}
+
+	campaignReq, err := c.CampaignRepository.GetByContentIDAndType(ctx, id, campaignType)
+	if err != nil {
+		return errors.New("database connection problem")
+	}
+
+	y,m,d := time.Now().Date()
+	today := time.Date(y,m,d,0,0,0,0, time.UTC)
+
+	if !isSeenByUser(campaignReq.SeenBy, logged.Id) {
+		campaignReq.SeenBy = append(campaignReq.SeenBy, logged.Id)
+	}
+
+	if !isSeenByUserToday(campaignReq.DailySeenBy, logged.Id, today){
+		if hasDay(campaignReq.DailySeenBy, today) {
+			idx := 0
+			for i, seen := range campaignReq.DailySeenBy {
+				if seen.Date == today {
+					idx = i
+					break
+				}
+			}
+			campaignReq.DailySeenBy[idx].SeenBy = append(campaignReq.DailySeenBy[idx].SeenBy, model.UserGroupStatistic{
+				Id:  logged.Id,
+				Age: logged.Age,
+			})
+		} else {
+			campaignReq.DailySeenBy = append(campaignReq.DailySeenBy, model.UserGroupStatisticWrapper{
+				Date:   today,
+				SeenBy: []model.UserGroupStatistic{{
+					Id:  logged.Id,
+					Age: logged.Age,
+				}},
+			})
+		}
+	}
+
+	_, err = c.CampaignRepository.Update(ctx, campaignReq)
+	if err != nil {
+		return errors.New("database connection problem")
+	}
+
+	return nil
 }

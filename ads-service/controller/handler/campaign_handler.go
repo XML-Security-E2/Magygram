@@ -28,11 +28,14 @@ type CampaignHandler interface {
 	ClickOnPostCampaignWebsite(c echo.Context) error
 	GetPostCampaignStatistic(c echo.Context) error
 	GetStoryCampaignStatistic(c echo.Context) error
+	UpdatePostCampaignVisitor(c echo.Context) error
+	UpdateStoryCampaignVisitor(c echo.Context) error
 }
 
 type campaignHandler struct {
 	CampaignService service_contracts.CampaignService
 }
+
 
 func NewCampaignHandler(p service_contracts.CampaignService) CampaignHandler {
 	return &campaignHandler{p}
@@ -314,4 +317,41 @@ func (ch campaignHandler) CreateInfluencerCampaign(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, campaignId)}
+	return c.JSON(http.StatusCreated, campaignId)
+}
+
+func (ch campaignHandler) UpdatePostCampaignVisitor(c echo.Context) error {
+	postId := c.Param("postId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := ch.CampaignService.UpdateCampaignVisitor(ctx, bearer, postId, "POST")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (ch campaignHandler) UpdateStoryCampaignVisitor(c echo.Context) error {
+	storyId := c.Param("storyId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+
+	err := ch.CampaignService.UpdateCampaignVisitor(ctx, bearer, storyId, "STORY")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}

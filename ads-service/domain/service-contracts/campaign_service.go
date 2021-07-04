@@ -27,4 +27,5 @@ type CampaignService interface {
 
 	GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
 	GetStoryCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
+	UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error
 }

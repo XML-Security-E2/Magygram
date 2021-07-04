@@ -15,6 +15,7 @@ import (
 	"story-service/domain/service-contracts/exceptions/unauthorized"
 	"story-service/logger"
 	"story-service/service/intercomm"
+	"strconv"
 	"time"
 )
 
@@ -217,8 +218,6 @@ func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer strin
 }
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {
-	//TODO 1: napraviti getStory za usera koji eliminise njegove storije a onda izbrisati iz mapStories proveru
-	log.Println("test")
 	var stories []*model.Story
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
@@ -237,13 +236,71 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 		stories= append(stories, userStories...)
 	}
 
+	for _, story := range stories{
+		if story.ContentType=="CAMPAIGN"{
+			p.AdsClient.UpdateCampaignVisitor(bearer,story.Id)
+		}
+	}
+
 	storiesMap := makeStoriesMapFromArray(stories, userInfo)
 
-    retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
+	if len(storiesMap)==0{
+		return []*model.StoryInfoResponse{}, nil
+	}
 
-	retVal = sortFirstUnvisited(retVal)
+	campaignCount := int64(len(storiesMap)/3) // broj postova sortiranih, na svaki 5i
 
-	return retVal, nil
+	if int(campaignCount) == 0 {
+		campaignCount=1
+	}
+
+	campaignStoryIds, err := p.AdsClient.GetStoryCampaignSuggestion(bearer,strconv.Itoa(int(campaignCount)))
+
+	log.Println("TEST")
+	log.Println(campaignCount)
+	log.Println(len(campaignStoryIds))
+
+	var index int = 0
+
+	if len(campaignStoryIds)!=0{
+		var storyNumberBeforeCampaign int32
+		if len(campaignStoryIds)==1{
+			storyNumberBeforeCampaign =  int32(len(storiesMap)/2)+1
+		}else{
+			storyNumberBeforeCampaign =  int32(len(storiesMap)/(len(campaignStoryIds)))
+		}
+
+		retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
+
+		retVal = sortFirstUnvisited(retVal)
+
+		var retStories []*model.StoryInfoResponse
+
+		for sortedIndex, story := range retVal {
+			if (sortedIndex+1) % int(storyNumberBeforeCampaign)==0{
+				value, err := p.StoryRepository.GetByID(ctx,campaignStoryIds[index])
+				if err!= nil{
+					return nil, errors.New("Campaign not exist")
+				}
+
+				res, err := model.NewStoryInfoResponse(value,false)
+				if err != nil { return nil,err}
+
+				retStories = append(retStories, res)
+				index++
+			}
+
+			retStories = append(retStories, story)
+		}
+
+		return retStories, nil
+	}else{
+		retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
+
+		retVal = sortFirstUnvisited(retVal)
+
+		return retVal, nil
+	}
 }
 
 func (p storyService) GetStoryForUserMessage(ctx context.Context, bearer string, storyId string) (*model.UsersStoryResponseWithUserInfo, *model.UserInfo, error) {
@@ -354,6 +411,7 @@ func makeStoriesMapFromArray(stories []*model.Story, userInfo *model.UserInfo) m
 	elementMap := make(map[string][]*model.Story)
 	for i := 0; i < len(stories); i +=1 {
 		if stories[i].UserInfo.Id!=userInfo.Id { // TODO 2: eliminise svoje storije, to obrisati kada se odradi TODO1
+
 			elementMap[stories[i].UserInfo.Id]=append(elementMap[stories[i].UserInfo.Id], stories[i])
 		}
 	}
