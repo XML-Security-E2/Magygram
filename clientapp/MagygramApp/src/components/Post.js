@@ -11,7 +11,6 @@ import { modalConstants } from "../constants/ModalConstants";
 import PostDislikesModal from "./modals/PostDislikesModal";
 import ViewPostModal from "./modals/ViewPostModal";
 import { getUserInfo } from "../helpers/auth-header";
-import SendPostAsMessageModal from "./modals/SendPostAsMessageModal";
 
 const Post = ({ post }) => {
 	const { dispatch } = useContext(PostContext);
@@ -112,7 +111,6 @@ const Post = ({ post }) => {
 						<PostLikesModal />
 						<PostDislikesModal />
 						<ViewPostModal />
-						<SendPostAsMessageModal postId={post.Id} />
 					</div>
 				</div>
 			</div>

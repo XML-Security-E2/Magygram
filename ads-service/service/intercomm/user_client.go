@@ -13,6 +13,7 @@ import (
 
 type UserClient interface {
 	GetLoggedUserTargetGroup(bearer string) (*model.UserTargetGroup,error)
+	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
 }
 
 type userClient struct {}
@@ -25,6 +26,32 @@ func NewUserClient() UserClient {
 var (
 	baseUsersUrl = ""
 )
+
+func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			return &model.UserInfo{}, err
+		}
+
+		return &model.UserInfo{}, errors.New("unauthorized")
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return &model.UserInfo{}, err
+	}
+	var userInfo model.UserInfo
+	_ = json.Unmarshal(bodyBytes, &userInfo)
+
+	return &userInfo, nil
+}
 
 func (u userClient) GetLoggedUserTargetGroup(bearer string) (*model.UserTargetGroup, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged/target-group", baseUsersUrl), nil)

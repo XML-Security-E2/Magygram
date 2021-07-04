@@ -31,6 +31,7 @@ type StoryHandler interface {
 	UpdateUserInfo(c echo.Context) error
 	GetStoryForUserMessage(c echo.Context) error
 	GetUserStoryCampaign(c echo.Context) error
+	GetStoryMediaAndWebsiteByIds(c echo.Context) error
 }
 
 type storyHandler struct {
@@ -93,6 +94,25 @@ func (p storyHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc 
 
 func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 	return &storyHandler{p}
+}
+
+func (p storyHandler) GetStoryMediaAndWebsiteByIds(c echo.Context) error {
+	request := &model.FollowedUsersResponse{}
+
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+	fmt.Println(len(request.Users))
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := p.StoryService.GetStoryMediaAndWebsiteByIds(ctx, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
 }
 
 func (p storyHandler) CreateStoryCampaign(c echo.Context) error {

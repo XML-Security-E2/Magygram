@@ -19,6 +19,7 @@ export const messageReducer = (state, action) => {
 
 		case modalConstants.SHOW_SEND_POST_TO_USER_MODAL:
 			stateCpy = { ...state };
+			console.log("USAOOO");
 			stateCpy.sendPostModal.postId = action.postId;
 			stateCpy.sendPostModal.showModal = true;
 
@@ -201,7 +202,7 @@ export const messageReducer = (state, action) => {
 			stateCpy.showedMessages.forEach((message) => {
 				if (message.contentId === action.story.id) {
 					message.story = {
-						Id: action.story.Id,
+						Id: action.story.id,
 						MediaType: action.story.media.MediaType,
 						Url: action.story.media.Url,
 						UserId: action.story.userInfo.Id,

@@ -47,6 +47,18 @@ type Config struct {
 		Domain 	 string
 		Port 	 string
 	}
+
+	Postservice struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
+
+	Storyservice struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
 }
 
 var Current *Config

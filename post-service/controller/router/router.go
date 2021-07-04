@@ -39,4 +39,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/posts/disliked-by/user-info", h.EditDislikedByInfo)
 	e.PUT("/api/posts/commented/user-info", h.EditCommentedByInfo)
 
+
+	e.POST("/api/posts/media/first/preview", h.GetPostsMediaAndWebsiteByIds)
+
 }

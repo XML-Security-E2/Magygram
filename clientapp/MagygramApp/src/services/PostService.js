@@ -35,7 +35,18 @@ export const postService = {
 	getCampaignByPostId,
 	updatePostCampaign,
 	deletePostCampaign,
+	clickOnPostCampaignWebsite,
 };
+
+async function clickOnPostCampaignWebsite(postId) {
+	await Axios.get(`/api/ads/campaign/post/website/${postId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+}
 
 function deletePostCampaign(postId, dispatch) {
 	dispatch(request());

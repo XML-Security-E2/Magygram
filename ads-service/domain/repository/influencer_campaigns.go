@@ -9,5 +9,5 @@ import (
 type InfluencerCampaignRepository interface {
 	Create(ctx context.Context, campaign *model.InfluencerCampaign) (*mongo.InsertOneResult, error)
 	GetByID(ctx context.Context, id string) (*model.InfluencerCampaign, error)
-	GetAllByParentID(ctx context.Context, id string) ([]*model.InfluencerCampaign, error)
+	GetAllByOwnerID(ctx context.Context, id string, campaignType string) ([]*model.InfluencerCampaign, error)
 }

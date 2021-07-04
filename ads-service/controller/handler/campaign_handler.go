@@ -24,6 +24,10 @@ type CampaignHandler interface {
 	DeleteCampaignByStory(c echo.Context) error
 	GetPostCampaignSuggestion(c echo.Context) error
 	GetStoryCampaignSuggestion(c echo.Context) error
+	ClickOnStoryCampaignWebsite(c echo.Context) error
+	ClickOnPostCampaignWebsite(c echo.Context) error
+	GetPostCampaignStatistic(c echo.Context) error
+	GetStoryCampaignStatistic(c echo.Context) error
 	UpdatePostCampaignVisitor(c echo.Context) error
 	UpdateStoryCampaignVisitor(c echo.Context) error
 }
@@ -36,6 +40,67 @@ type campaignHandler struct {
 func NewCampaignHandler(p service_contracts.CampaignService) CampaignHandler {
 	return &campaignHandler{p}
 }
+
+func (ch campaignHandler) GetPostCampaignStatistic(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	campaigns, err := ch.CampaignService.GetPostCampaignStatistic(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, campaigns)
+}
+
+func (ch campaignHandler) GetStoryCampaignStatistic(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	campaigns, err := ch.CampaignService.GetStoryCampaignStatistic(ctx, bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, campaigns)
+}
+
+
+func (ch campaignHandler) ClickOnStoryCampaignWebsite(c echo.Context) error {
+	contentId := c.Param("contentId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := ch.CampaignService.ClickOnStoryCampaignWebsite(ctx, contentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")
+}
+
+func (ch campaignHandler) ClickOnPostCampaignWebsite(c echo.Context) error {
+	contentId := c.Param("contentId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := ch.CampaignService.ClickOnPostCampaignWebsite(ctx, contentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "")}
+
 
 func (ch campaignHandler) DeleteCampaignByPostId(c echo.Context) error {
 	contentId := c.Param("contentId")
@@ -236,7 +301,7 @@ func (ch campaignHandler) CreateCampaign(c echo.Context) error {
 }
 
 func (ch campaignHandler) CreateInfluencerCampaign(c echo.Context) error {
-	campaignRequest := &model.InfluencerCampaignRequest{}
+	campaignRequest := &model.InfluencerCampaignCreateRequest{}
 	if err := c.Bind(campaignRequest); err != nil {
 		return err
 	}

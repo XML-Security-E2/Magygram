@@ -20,7 +20,18 @@ export const storyService = {
 	updateStoryCampaign,
 	deleteStoryCampaign,
 	getCampaignByStoryId,
+	clickOnStoryCampaignWebsite,
 };
+
+async function clickOnStoryCampaignWebsite(storyId) {
+	await Axios.get(`/api/ads/campaign/story/website/${storyId}`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+}
 
 function getCampaignByStoryId(storyId, dispatch) {
 	dispatch(request());

@@ -268,6 +268,17 @@ type Tag struct {
 	Username string `bson:"username"`
 }
 
+type IdMediaWebsiteResponse struct {
+	Id string
+	Media Media
+	Website string
+	Likes int
+	Dislikes int
+	Comments int
+	StoryViews int
+}
+
+
 type FollowedUsersResponse struct {
 	Users []string
 }

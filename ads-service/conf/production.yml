@@ -32,3 +32,13 @@ relationshipservice:
   protocol: "http://"
   domain: "relationship-service"
   port: "463"
+
+postservice:
+  protocol: "http://"
+  domain: "post-service"
+  port: "462"
+
+storyservice:
+  protocol: "http://"
+  domain: "story-service"
+  port: "464"

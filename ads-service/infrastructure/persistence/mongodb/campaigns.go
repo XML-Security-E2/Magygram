@@ -20,6 +20,30 @@ func NewCampaignRepository(Col *mongo.Collection) repository.CampaignRepository 
 	return &campaignRepository{Col}
 }
 
+func (c campaignRepository) GetAllByOwnerID(ctx context.Context, id string, campaignType string) ([]*model.Campaign, error) {
+	cursor, err := c.Col.Find(ctx, bson.M{"owner_id": id, "campaign_type": campaignType})
+	var results []*model.Campaign
+
+	if err != nil {
+		if cursor != nil {
+			defer cursor.Close(ctx)
+		}
+		return nil, err
+	} else {
+		if cursor != nil {
+			for cursor.Next(ctx) {
+				var result model.Campaign
+
+				_ = cursor.Decode(&result)
+				results = append(results, &result)
+			}
+		} else {
+			return nil, err
+		}
+	}
+	return results, nil
+}
+
 func (c campaignRepository) Create(ctx context.Context, campaign *model.Campaign) (*mongo.InsertOneResult, error) {
 	return c.Col.InsertOne(ctx, campaign)
 }
@@ -124,6 +148,7 @@ func (c campaignRepository) Update(ctx context.Context, campaign *model.Campaign
 		{"seen_by" , campaign.SeenBy},
 		{"daily_seen_by", campaign.DailySeenBy},
 		{"target_group" , campaign.TargetGroup},
+		{"website_click_count", campaign.WebsiteClickCount},
 		{"date_from" , campaign.DateFrom},
 		{"date_to" , campaign.DateTo}}}})}
 

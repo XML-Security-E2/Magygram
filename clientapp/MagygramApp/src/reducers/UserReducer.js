@@ -647,39 +647,39 @@ export const userReducer = (state, action) => {
 			return a;
 		case userConstants.GET_CAMPAIGN_JWT_TOKEN_REQUEST:
 			a = { ...state };
-			a.agentCampaignAPITOken=""
+			a.agentCampaignAPITOken = "";
 			return a;
 		case userConstants.GET_CAMPAIGN_JWT_TOKEN_SUCCESS:
 			a = { ...state };
-			a.agentCampaignAPITOken=action.result
+			a.agentCampaignAPITOken = action.result;
 			return a;
 		case userConstants.GET_CAMPAIGN_JWT_TOKEN_FAILURE:
 			a = { ...state };
-			a.agentCampaignAPITOken=""
+			a.agentCampaignAPITOken = "";
 			return a;
 		case userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_REQUEST:
 			a = { ...state };
-			a.agentCampaignAPITOken=""
+			a.agentCampaignAPITOken = "";
 			return a;
 		case userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_SUCCESS:
 			a = { ...state };
-			a.agentCampaignAPITOken=action.result
+			a.agentCampaignAPITOken = action.result;
 			return a;
 		case userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_FAILURE:
 			a = { ...state };
-			a.agentCampaignAPITOken=""
+			a.agentCampaignAPITOken = "";
 			return a;
 		case userConstants.DELETE_CAMPAIGN_JWT_TOKEN_REQUEST:
 			a = { ...state };
-			a.agentCampaignAPITOken=""
+			a.agentCampaignAPITOken = "";
 			return a;
-		case userConstants.DELETE_CAMPAIGN_JWT_TOKEN_REQUEST:
+		case userConstants.DELETE_CAMPAIGN_JWT_TOKEN_SUCCESS:
 			a = { ...state };
-			a.agentCampaignAPITOken=action.result
+			a.agentCampaignAPITOken = action.result;
 			return a;
-		case userConstants.DELETE_CAMPAIGN_JWT_TOKEN_REQUEST:
+		case userConstants.DELETE_CAMPAIGN_JWT_TOKEN_FAILURE:
 			a = { ...state };
-			a.agentCampaignAPITOken=""
+			a.agentCampaignAPITOken = "";
 			return a;
 		default:
 			return state;
