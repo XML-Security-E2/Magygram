@@ -18,11 +18,254 @@ type campaignService struct {
 	repository.CampaignUpdateRequestsRepository
 	intercomm.AuthClient
 	intercomm.UserClient
+	intercomm.StoryClient
+	intercomm.PostClient
 }
 
-func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.CampaignService {
-	return &campaignService{r , ic,curr, ac, uc}
+func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient, sc intercomm.StoryClient, pc intercomm.PostClient) service_contracts.CampaignService {
+	return &campaignService{r , ic,curr, ac, uc, sc, pc}
 }
+
+func (c campaignService) GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
+	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var statResponse []*model.CampaignStatisticResponse
+
+	campaigns, err := c.CampaignRepository.GetAllByOwnerID(ctx, loggedId, "POST")
+	if err != nil {
+		return nil, err
+	}
+
+	influecerCampaigns, err := c.InfluencerCampaignRepository.GetAllByOwnerID(ctx, loggedId, "POST")
+	if err != nil {
+		return nil, err
+	}
+
+	ids := createIdListFromCampaigns(campaigns)
+	newIds := createIdListFromInfluencerCampaigns(influecerCampaigns, &ids)
+
+	postMedia, err := c.PostClient.GetPostsFirstMedia(newIds)
+
+	yf,mf,df := time.Now().Date()
+	timeef := time.Date(yf,mf,df,0,0,1,0, time.UTC)
+
+	for _, campaign := range campaigns {
+		for _, media := range postMedia {
+			if media.Id == campaign.ContentId {
+				activity := "ACTIVE"
+				if campaign.Frequency == "REPEATEDLY" {
+					if campaign.DateTo.Before(timeef)  || campaign.DateFrom.After(timeef) {
+						activity = "UNACTIVE"
+					}
+				} else {
+					if campaign.ExposeOnceDate != timeef {
+						activity = "UNACTIVE"
+					}
+				}
+
+				statResponse = append(statResponse, &model.CampaignStatisticResponse{
+					Id:                       campaign.Id,
+					ExposeOnceDate:           campaign.ExposeOnceDate,
+					MinDisplaysForRepeatedly: campaign.MinDisplaysForRepeatedly,
+					Type:                     campaign.Type,
+					Frequency:                campaign.Frequency,
+					UserViews: 				  len(campaign.SeenBy),
+					WebsiteClicks:            campaign.WebsiteClickCount,
+					TargetGroup:              campaign.TargetGroup,
+					DateFrom:                 campaign.DateFrom,
+					DateTo:                   campaign.DateTo,
+					DisplayTime:              campaign.DisplayTime,
+					CampaignStatus:           "REGULAR",
+					InfluencerUsername:       "",
+					Media:                    media.Media,
+					Website:                  media.Website,
+					Likes:                    media.Likes,
+					Dislikes:                 media.Dislikes,
+					Comments:                 media.Comments,
+					StoryViews:               media.StoryViews,
+					Activity:                 model.CampaignStatisticActivity(activity),
+					DailyAverage: getDailyAverage(campaign.DailySeenBy),
+					InfluencerId: "",
+				})
+			}
+		}
+	}
+
+	for _, campaign := range influecerCampaigns {
+		for _, media := range postMedia {
+			if media.Id == campaign.ContentId {
+				statResponse = append(statResponse, &model.CampaignStatisticResponse{
+					Id:                       campaign.Id,
+					ExposeOnceDate:           time.Now(),
+					MinDisplaysForRepeatedly: 0,
+					Type:                     campaign.Type,
+					Frequency:                "",
+					UserViews: 				  len(campaign.SeenBy),
+					WebsiteClicks:            campaign.WebsiteClickCount,
+					TargetGroup:              model.TargetGroup{
+						MinAge: 0,
+						MaxAge: 0,
+						Gender: "",
+					},
+					DateFrom:                 time.Now(),
+					DateTo:                   time.Now(),
+					DisplayTime:              0,
+					CampaignStatus:           "INFLUENCER",
+					InfluencerUsername:       campaign.Username,
+					Media:                    media.Media,
+					Website:                  media.Website,
+					Likes:                    media.Likes,
+					Dislikes:                 media.Dislikes,
+					Comments:                 media.Comments,
+					StoryViews:               media.StoryViews,
+					Activity: "",
+					DailyAverage: getDailyAverage(campaign.DailySeenBy),
+					InfluencerId: campaign.UserId,
+				})
+			}
+		}
+	}
+
+	return statResponse, nil
+}
+
+func getDailyAverage(statistic []model.UserGroupStatisticWrapper) float32 {
+	if len(statistic) == 0 {
+		return 0
+	}
+	sum := 0
+	for _, stat := range statistic {
+		sum = sum + len(stat.SeenBy)
+	}
+
+	return float32(sum) / float32(len(statistic))
+}
+
+func createIdListFromCampaigns(campaigns []*model.Campaign) []string {
+	var ids []string
+	for _, campaign := range campaigns {
+		ids = append(ids, campaign.ContentId)
+	}
+
+	return ids
+}
+
+func createIdListFromInfluencerCampaigns(campaigns []*model.InfluencerCampaign, ids *[]string) []string {
+	for _, campaign := range campaigns {
+		*ids = append(*ids, campaign.ContentId)
+	}
+
+	return *ids
+}
+
+func (c campaignService) GetStoryCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
+	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	var statResponse []*model.CampaignStatisticResponse
+
+	campaigns, err := c.CampaignRepository.GetAllByOwnerID(ctx, loggedId, "STORY")
+	if err != nil {
+		return nil, err
+	}
+
+	influecerCampaigns, err := c.InfluencerCampaignRepository.GetAllByOwnerID(ctx, loggedId, "STORY")
+	if err != nil {
+		return nil, err
+	}
+
+	ids := createIdListFromCampaigns(campaigns)
+	newIds := createIdListFromInfluencerCampaigns(influecerCampaigns, &ids)
+
+	storyMedia, err := c.StoryClient.GetStoryMedia(newIds)
+
+	yf,mf,df := time.Now().Date()
+	timeef := time.Date(yf,mf,df,0,0,1,0, time.UTC)
+
+	for _, campaign := range campaigns {
+		for _, media := range storyMedia {
+			if media.Id == campaign.ContentId {
+				activity := "ACTIVE"
+				if campaign.Frequency == "REPEATEDLY" {
+					if campaign.DateTo.Before(timeef)  || campaign.DateFrom.After(timeef) {
+						activity = "UNACTIVE"
+					}
+				} else {
+					if campaign.ExposeOnceDate != timeef {
+						activity = "UNACTIVE"
+					}
+				}
+
+				statResponse = append(statResponse, &model.CampaignStatisticResponse{
+					Id:                       campaign.Id,
+					ExposeOnceDate:           campaign.ExposeOnceDate,
+					MinDisplaysForRepeatedly: campaign.MinDisplaysForRepeatedly,
+					Type:                     campaign.Type,
+					Frequency:                campaign.Frequency,
+					UserViews:                len(campaign.SeenBy),
+					WebsiteClicks:            campaign.WebsiteClickCount,
+					TargetGroup:              campaign.TargetGroup,
+					DateFrom:                 campaign.DateFrom,
+					DateTo:                   campaign.DateTo,
+					DisplayTime:              campaign.DisplayTime,
+					CampaignStatus:           "REGULAR",
+					InfluencerUsername:       "",
+					Media:                    media.Media,
+					Website:                  media.Website,
+					Likes:                    media.Likes,
+					Dislikes:                 media.Dislikes,
+					Comments:                 media.Comments,
+					StoryViews:               media.StoryViews,
+					Activity: 				  model.CampaignStatisticActivity(activity),
+					DailyAverage: getDailyAverage(campaign.DailySeenBy),
+					InfluencerId: "",
+				})
+			}
+		}
+	}
+
+	for _, campaign := range influecerCampaigns {
+		for _, media := range storyMedia {
+			if media.Id == campaign.ContentId {
+				statResponse = append(statResponse, &model.CampaignStatisticResponse{
+					Id:                       campaign.Id,
+					ExposeOnceDate:           time.Now(),
+					MinDisplaysForRepeatedly: 0,
+					Type:                     campaign.Type,
+					Frequency:                "",
+					UserViews: 				  len(campaign.SeenBy),
+					WebsiteClicks:            campaign.WebsiteClickCount,
+					TargetGroup:              model.TargetGroup{
+						MinAge: 0,
+						MaxAge: 0,
+						Gender: "",
+					},
+					DateFrom:                 time.Now(),
+					DateTo:                   time.Now(),
+					DisplayTime:              0,
+					CampaignStatus:           "INFLUENCER",
+					InfluencerUsername:       campaign.Username,
+					Media:                    media.Media,
+					Website:                  media.Website,
+					Likes:                    media.Likes,
+					Dislikes:                 media.Dislikes,
+					Comments:                 media.Comments,
+					StoryViews:               media.StoryViews,
+					Activity: "",
+					DailyAverage: getDailyAverage(campaign.DailySeenBy),
+					InfluencerId: campaign.UserId,
+				})
+			}
+		}
+	}
+
+	return statResponse, nil}
+
 
 func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
@@ -355,19 +598,19 @@ func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, 
 }
 
 
-func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignRequest) (string, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignCreateRequest) (string, error) {
+	logged, err := c.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil {
 		return "", err
 	}
 
 	//mozda posle nece trebati provera
-	_, err = c.CampaignRepository.GetByID(ctx, campaignRequest.ParentCampaignId)
-	if err != nil {
-		return "", errors.New("invalid parent campaign id")
-	}
+	//_, err = c.CampaignRepository.GetByID(ctx, campaignRequest.ParentCampaignId)
+	//if err != nil {
+	//	return "", errors.New("invalid parent campaign id")
+	//}
 
-	campaign, err := model.NewInfluencerCampaign(campaignRequest, loggedId)
+	campaign, err := model.NewInfluencerCampaign(campaignRequest, logged.Id, logged.Username)
 	if err != nil {
 		return "", err
 	}

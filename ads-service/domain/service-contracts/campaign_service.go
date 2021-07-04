@@ -7,7 +7,7 @@ import (
 
 type CampaignService interface {
 	CreateCampaign(ctx context.Context, bearer string, campaignRequest *model.CampaignRequest) (string , error)
-	CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignRequest) (string , error)
+	CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignCreateRequest) (string , error)
 	UpdateCampaignRequest(ctx context.Context, bearer string, campaignRequest *model.CampaignUpdateRequestDTO) (string , error)
 	GetAllActiveAgentsPostCampaigns(ctx context.Context, bearer string) ([]string, error)
 	GetAllActiveAgentsStoryCampaigns(ctx context.Context,bearer string) ([]string, error)
@@ -24,4 +24,7 @@ type CampaignService interface {
 
 	ClickOnStoryCampaignWebsite(ctx context.Context, contentId string) error
 	ClickOnPostCampaignWebsite(ctx context.Context, contentId string) error
+
+	GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
+	GetStoryCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
 }

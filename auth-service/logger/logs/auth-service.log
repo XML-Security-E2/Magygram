@@ -720,3 +720,4 @@ time="2021-07-03T23:12:51+02:00" level=info msg="Server started" func=main.main 
 time="2021-07-04T02:27:18+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/auth-service/main.go:144" host=localhost port=461
 time="2021-07-04T02:30:37+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Dusan/Desktop/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=dule_srb@hotmail.rs
 time="2021-07-04T02:44:35+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Dusan/Desktop/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=agent1@agent.com
+time="2021-07-04T14:33:08+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/auth-service/main.go:144" host=localhost port=461

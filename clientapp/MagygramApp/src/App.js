@@ -22,6 +22,7 @@ import CreateAgentPostPage from "./pages/CreateAgentPostPage";
 import CampaignsPage from "./pages/CampaignsPage";
 import InfluencerCampagns from "./components/InfluencerCampagns";
 import CampaignAPITokenGeneratorPage from "./pages/CampaignAPITokenGeneratorPage";
+import CampaignStatisticPage from "./pages/CampaignStatisticPage";
 
 function App() {
 	return (
@@ -49,6 +50,7 @@ function App() {
 				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaigns" component={CampaignsPage} />
 				<ProtectedRoute roles={["user"]} redirectTo="/unauthorized" path="/influencer-campagns" component={InfluencerCampagns} />
 				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaign-api" component={CampaignAPITokenGeneratorPage} />
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaign-statistic" component={CampaignStatisticPage} />
 
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 

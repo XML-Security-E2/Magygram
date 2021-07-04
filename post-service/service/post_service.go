@@ -36,6 +36,32 @@ func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc in
 	return &postService{r , ic, uc, ir, ac, mc, adsc}
 }
 
+func (p postService) GetPostsMediaAndWebsiteByIds(ctx context.Context, ids *model.FollowedUsersResponse) ([]*model.IdMediaWebsiteResponse, error) {
+
+	var resp []*model.IdMediaWebsiteResponse
+
+	for _, id := range ids.Users {
+		post, err := p.PostRepository.GetByID(ctx, id)
+		if err == nil {
+			resp = append(resp, &model.IdMediaWebsiteResponse{
+				Id:         post.Id,
+				Media:      post.Media[0],
+				Website:    post.WebSite,
+				Likes: 		len(post.LikedBy),
+				Dislikes: 	len(post.DislikedBy),
+				Comments: 	len(post.Comments),
+				StoryViews: 0,
+			})
+		}
+	}
+
+	if resp == nil {
+		return []*model.IdMediaWebsiteResponse{}, nil
+	}
+
+	return resp, nil
+}
+
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)

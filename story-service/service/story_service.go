@@ -70,6 +70,32 @@ func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc 
 	return &storyService{r , ic, uc,ac,rc, mc, adscli}
 }
 
+func (p storyService) GetStoryMediaAndWebsiteByIds(ctx context.Context, ids *model.FollowedUsersResponse) ([]*model.IdMediaWebsiteResponse, error) {
+
+	var resp []*model.IdMediaWebsiteResponse
+
+	for _, id := range ids.Users {
+		story, err := p.StoryRepository.GetByID(ctx, id)
+		if err == nil {
+			resp = append(resp, &model.IdMediaWebsiteResponse{
+				Id:         story.Id,
+				Media:      story.Media,
+				Website:    story.Website,
+				Likes:      0,
+				Dislikes:   0,
+				Comments:   0,
+				StoryViews: len(story.VisitedBy),
+			})
+		}
+	}
+
+	if resp == nil {
+		return []*model.IdMediaWebsiteResponse{}, nil
+	}
+
+	return resp, nil
+}
+
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil { return "", err}

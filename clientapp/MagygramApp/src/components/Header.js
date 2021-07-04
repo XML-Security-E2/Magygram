@@ -130,8 +130,7 @@ const Header = () => {
 
 	const handleCampaignApiToken = () => {
 		window.location = "#/campaign-api";
-
-	}
+	};
 
 	const campaignOffers = () => {
 		window.location = "#/influencer-campagns";
@@ -210,6 +209,11 @@ const Header = () => {
 							<li hidden={!hasRoles(["agent"])}>
 								<Link className="la la-volume-up btn shadow-none" to="/campaigns">
 									Campaigns
+								</Link>
+							</li>
+							<li hidden={!hasRoles(["agent"])}>
+								<Link className="mdi mdi-chart-bar btn shadow-none" to="/campaign-statistic">
+									Campaigns statistic
 								</Link>
 							</li>
 							<li hidden={hasRoles(["admin"])}>

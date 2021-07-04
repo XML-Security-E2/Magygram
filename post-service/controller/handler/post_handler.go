@@ -48,6 +48,7 @@ type PostHandler interface {
 	EditCommentedByInfo(c echo.Context) error
 	GetPostForMessagesById(c echo.Context) error
 	GetUsersPostCampaigns(c echo.Context) error
+	GetPostsMediaAndWebsiteByIds(c echo.Context) error
 }
 
 type postHandler struct {
@@ -74,6 +75,25 @@ func (p postHandler) DeletePost(c echo.Context) error {
 
 func NewPostHandler(p service_contracts.PostService) PostHandler {
 	return &postHandler{p}
+}
+
+func (p postHandler) GetPostsMediaAndWebsiteByIds(c echo.Context) error {
+	request := &model.FollowedUsersResponse{}
+
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := p.PostService.GetPostsMediaAndWebsiteByIds(ctx, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
 }
 
 func (p postHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {

@@ -33,19 +33,25 @@ func (i influencerCampaignRepository) GetByID(ctx context.Context, id string) (*
 	return &campaign, nil
 }
 
-func (i influencerCampaignRepository) GetAllByParentID(ctx context.Context, id string) ([]*model.InfluencerCampaign, error) {
-	cursor, err := i.Col.Find(ctx, bson.M{"parent_campaign_id": id})
+func (i influencerCampaignRepository) GetAllByOwnerID(ctx context.Context, id string, campaignType string) ([]*model.InfluencerCampaign, error) {
+	cursor, err := i.Col.Find(ctx, bson.M{"owner_id": id, "campaign_type": campaignType})
 	var results []*model.InfluencerCampaign
 
 	if err != nil {
-		defer cursor.Close(ctx)
+		if cursor != nil {
+			defer cursor.Close(ctx)
+		}
 		return nil, err
 	} else {
-		for cursor.Next(ctx) {
+		if cursor != nil {
+			for cursor.Next(ctx) {
 			var result model.InfluencerCampaign
 
 			_ = cursor.Decode(&result)
 			results = append(results, &result)
+			}
+		} else {
+			return nil, err
 		}
 	}
 	return results, nil
