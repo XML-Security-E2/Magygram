@@ -20,6 +20,7 @@ type campaignService struct {
 	intercomm.UserClient
 }
 
+
 func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient) service_contracts.CampaignService {
 	return &campaignService{r , ic,curr, ac, uc}
 }
@@ -393,4 +394,27 @@ func (c campaignService) UpdateCampaignRequest(ctx context.Context, bearer strin
 	}
 
 	return campaignUpdateRequest.Id, nil
+}
+
+func (c campaignService) UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error {
+	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		return err
+	}
+
+	campaignReq, err := c.CampaignRepository.GetByContentIDAndType(ctx, id, campaignType)
+	if err != nil {
+		return errors.New("database connection problem")
+	}
+
+	if !isSeenByUser(campaignReq.SeenBy, loggedId) {
+		campaignReq.SeenBy = append(campaignReq.SeenBy, loggedId)
+	}
+
+	_, err = c.CampaignRepository.Update(ctx, campaignReq)
+	if err != nil {
+		return errors.New("database connection problem")
+	}
+
+	return nil
 }
