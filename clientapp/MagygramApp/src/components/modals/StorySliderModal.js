@@ -60,6 +60,16 @@ const StorySliderModal = () => {
 		msgCtx.dispatch({ type: modalConstants.SHOW_SEND_STORY_TO_USER_MODAL, storyId });
 	};
 
+	const handleClickOnWebsite = async () => {
+		await storyService.clickOnStoryCampaignWebsite(storyId).then(handleOpenWebsite());
+	};
+
+	const handleOpenWebsite = () => {
+		return new Promise(function () {
+			window.open("https://" + website, "_blank");
+		});
+	};
+
 	return (
 		<Modal size="md" show={storyState.storySliderModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body className="modal-body-remove-margins modal-content-remove-margins">
@@ -78,9 +88,9 @@ const StorySliderModal = () => {
 				/>
 				{contentType === "CAMPAIGN" && (
 					<div className="d-flex align-items-center" style={{ "background-color": "#111111" }}>
-						<a type="button" className="btn btn-link border-0 text-white" href={"https://" + website} target="_blank">
+						<button type="button" className="btn btn-link text-white border-0" onClick={handleClickOnWebsite}>
 							Visit {website}
-						</a>
+						</button>
 					</div>
 				)}
 				<div style={{ "background-color": "#111111" }}>

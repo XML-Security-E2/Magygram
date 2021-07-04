@@ -96,6 +96,36 @@ func (c campaignService) DeleteCampaignByStoryId(ctx context.Context, bearer str
 	return c.CampaignRepository.DeleteByID(ctx, campaign.Id)
 }
 
+func (c campaignService) ClickOnStoryCampaignWebsite(ctx context.Context, contentId string) error {
+	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
+	if err != nil {
+		return err
+	}
+
+	campaign.WebsiteClickCount = campaign.WebsiteClickCount + 1
+	_, err = c.CampaignRepository.Update(ctx, campaign)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c campaignService) ClickOnPostCampaignWebsite(ctx context.Context, contentId string) error {
+	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
+	if err != nil {
+		return err
+	}
+
+	campaign.WebsiteClickCount = campaign.WebsiteClickCount + 1
+	_, err = c.CampaignRepository.Update(ctx, campaign)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c campaignService) GetCampaignById(ctx context.Context, bearer string, campaignId string) (*model.Campaign, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {

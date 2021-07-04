@@ -124,6 +124,7 @@ func (c campaignRepository) Update(ctx context.Context, campaign *model.Campaign
 		{"seen_by" , campaign.SeenBy},
 		{"daily_seen_by", campaign.DailySeenBy},
 		{"target_group" , campaign.TargetGroup},
+		{"website_click_count", campaign.WebsiteClickCount},
 		{"date_from" , campaign.DateFrom},
 		{"date_to" , campaign.DateTo}}}})}
 

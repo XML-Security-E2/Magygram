@@ -27,6 +27,7 @@ type Campaign struct {
 	ContentId string `bson:"content_id,omitempty"`
 	MinDisplaysForRepeatedly int `bson:"min_displays_for_repeatedly"`
 	SeenBy []string `bson:"seen_by"`
+	WebsiteClickCount int `bson:"website_click_count"`
 	DailySeenBy []UserGroupStatisticWrapper `bson:"daily_seen_by""`
 	Type ContentType `bson:"campaign_type"`
 	Frequency CampaignFrequency `bson:"frequency"`
@@ -221,6 +222,7 @@ func NewCampaign(campaignRequest *CampaignRequest, ownerId string) (*Campaign, e
 		DisplayTime:              campaignRequest.DisplayTime,
 		ExposeOnceDate:           timeeo,
 		Deleted:                  false,
+		WebsiteClickCount:        0,
 	}, nil
 }
 

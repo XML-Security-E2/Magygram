@@ -19,6 +19,7 @@ import AdminReportRequestTab from "../components/AdminReportRequestTab";
 import AgentRegistrationRequestTabContent from "../components/AgentRegistrationRequestTabContent";
 import MessageContextProvider from "../contexts/MessageContext";
 import CreateAgentStoryModal from "../components/modals/CreateAgentStoryModal";
+import SendPostAsMessageModal from "../components/modals/SendPostAsMessageModal";
 
 const HomePage = () => {
 	return (
@@ -35,6 +36,7 @@ const HomePage = () => {
 								<CreateAgentStoryModal />
 								<AddPostToFavouritesModal />
 								<MessageContextProvider>
+									<SendPostAsMessageModal />
 									<div>
 										<div class="mt-4">
 											<div class="container d-flex justify-content-center">

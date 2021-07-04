@@ -12,7 +12,6 @@ import PostLikesAndDislikesModalView from "../PostLikesAndDislikesModalView";
 import OptionsModal from "./OptionsModal";
 import SearchInfluencerModal from "./SearchInfluencerModal";
 import { getUserInfo } from "../../helpers/auth-header";
-import { postConstants } from "../../constants/PostConstants";
 
 const ViewPostModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
@@ -83,6 +82,16 @@ const ViewPostModal = () => {
 		window.location = "#/profile?userId=" + userId;
 	};
 
+	const handleClickOnWebsite = async () => {
+		await postService.clickOnPostCampaignWebsite(postState.viewPostModal.post.Id).then(handleOpenWebsite());
+	};
+
+	const handleOpenWebsite = () => {
+		return new Promise(function () {
+			window.open("https://" + postState.viewAgentCampaignPostModal.post.Website, "_blank");
+		});
+	};
+
 	return (
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body>
@@ -110,9 +119,9 @@ const ViewPostModal = () => {
 							{postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && (
 								<div className="border-bottom d-flex align-items-center">
 									<span className="text-dark ml-2">Sponsored</span>
-									<a type="button" className="btn btn-link border-0" href={"https://" + postState.viewAgentCampaignPostModal.post.Website} target="_blank">
+									<button type="button" className="btn btn-link border-0" onClick={handleClickOnWebsite}>
 										Visit {postState.viewAgentCampaignPostModal.post.Website}
-									</a>
+									</button>
 								</div>
 							)}
 							<hr></hr>

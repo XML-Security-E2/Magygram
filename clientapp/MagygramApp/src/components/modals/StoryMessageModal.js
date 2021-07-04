@@ -4,12 +4,14 @@ import { modalConstants } from "../../constants/ModalConstants";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import Stories from "react-insta-stories";
 import { MessageContext } from "../../contexts/MessageContext";
+import { storyService } from "../../services/StoryService";
 
 const StoryMessageModal = () => {
 	const { messageState, dispatch } = useContext(MessageContext);
 
 	const [website, setWebsite] = useState("");
 	const [contentType, setContentType] = useState("");
+	const [storyId, setStoryId] = useState("");
 
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_STORY_MESSAGE_MODAL });
@@ -17,13 +19,26 @@ const StoryMessageModal = () => {
 
 	const onStoryStart = (index, story) => {
 		console.log(index);
+		console.log(story);
+
 		setContentType(story.contentType);
 		setWebsite(story.website);
+		setStoryId(story.header.storyId);
 	};
 
 	const onAllStoriesEnd = () => {
 		//alert(test)
 		dispatch({ type: modalConstants.HIDE_STORY_MESSAGE_MODAL });
+	};
+
+	const handleClickOnWebsite = async () => {
+		await storyService.clickOnStoryCampaignWebsite(storyId).then(handleOpenWebsite());
+	};
+
+	const handleOpenWebsite = () => {
+		return new Promise(function () {
+			window.open("https://" + website, "_blank");
+		});
 	};
 
 	return (
@@ -35,9 +50,9 @@ const StoryMessageModal = () => {
 				<Stories currentIndex={0} width="100%" stories={messageState.storyModal.stories} onAllStoriesEnd={onAllStoriesEnd} onStoryStart={onStoryStart} />
 				{contentType === "CAMPAIGN" && (
 					<div className="d-flex align-items-center" style={{ "background-color": "#111111" }}>
-						<a type="button" className="btn btn-link border-0 text-white" href={"https://" + website} target="_blank">
+						<button type="button" className="btn btn-link text-white border-0" onClick={handleClickOnWebsite}>
 							Visit {website}
-						</a>
+						</button>
 					</div>
 				)}
 			</Modal.Body>
