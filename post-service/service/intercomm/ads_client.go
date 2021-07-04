@@ -17,6 +17,7 @@ type AdsClient interface {
 	CreatePostCampaign(bearer string, campaignReq *model.CampaignRequest) error
 	GetAllActiveAgentsPostCampaigns(bearer string) ([]string,error)
 	DeleteCampaign(bearer string, postId string) error
+	GetPostCampaignSuggestion(bearer string,count string) ([]string,error)
 }
 
 type adsClient struct {}
@@ -114,4 +115,30 @@ func getErrorMessageFromRequestBody(body io.ReadCloser) (string ,error){
 		return "", err
 	}
 	return result.Message, nil
+}
+
+func (a adsClient) GetPostCampaignSuggestion(bearer string,count string) ([]string,error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/campaign/post/suggestion/" + count, baseAdsUrl), nil)
+
+	req.Header.Add("Authorization", bearer)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+
+	if err != nil || resp.StatusCode != 200 {
+		return nil, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var campaigns []string
+	_ = json.Unmarshal(bodyBytes, &campaigns)
+
+	return campaigns, nil
 }

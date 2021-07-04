@@ -16,6 +16,7 @@ import (
 	"post-service/logger"
 	"post-service/service/intercomm"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -171,9 +172,47 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 
 	sortedPosts := sortPostPerTime(posts)
 
-	retVal := p.mapPostsToResponsePostDTO(bearer, sortedPosts, userInfo.Id)
+	campaignCount := int64(len(sortedPosts)/5) // broj postova sortiranih, na svaki 5i
 
-	return retVal, nil
+	campaignPostIds, err := p.AdsClient.GetPostCampaignSuggestion(bearer,strconv.Itoa(int(campaignCount)))
+
+	log.Println("TEST")
+	log.Println(campaignCount)
+	log.Println(len(campaignPostIds))
+
+	var retPosts []*model.Post
+	var index int = 0
+
+	if len(campaignPostIds)!=0{
+		var postNumberBeforeCampaign int32
+		if len(campaignPostIds)==1{
+			postNumberBeforeCampaign =  int32(len(sortedPosts)/2)+1
+		}else{
+			postNumberBeforeCampaign =  int32(len(sortedPosts)/(len(campaignPostIds)))
+		}
+
+		for sortedIndex, post := range sortedPosts {
+			if (sortedIndex+1) % int(postNumberBeforeCampaign)==0{
+				value, err := p.PostRepository.GetByID(ctx,campaignPostIds[index])
+				if err!= nil{
+					return nil, errors.New("Campaign not exist")
+				}
+				retPosts = append(retPosts, value)
+				index++
+			}
+
+			retPosts = append(retPosts, post)
+		}
+
+		retVal := p.mapPostsToResponsePostDTO(bearer, retPosts, userInfo.Id)
+
+		return retVal, nil
+
+	}else{
+		retVal := p.mapPostsToResponsePostDTO(bearer, sortedPosts, userInfo.Id)
+
+		return retVal, nil
+	}
 }
 
 
