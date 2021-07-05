@@ -1,6 +1,7 @@
 package intercomm
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,11 +10,12 @@ import (
 	"net/http"
 	"post-service/conf"
 	"post-service/logger"
+	"post-service/tracer"
 )
 
 type AuthClient interface {
-	GetLoggedUserId(bearer string) (string,error)
-	HasRole(bearer string, role string) (bool,error)
+	GetLoggedUserId(ctx context.Context, bearer string) (string,error)
+	HasRole(ctx context.Context, bearer string, role string) (bool,error)
 }
 
 type authClient struct {}
@@ -27,12 +29,15 @@ var (
 	baseAuthUrl = ""
 )
 
-func (a authClient) GetLoggedUserId(bearer string) (string,error) {
+func (a authClient) GetLoggedUserId(ctx context.Context, bearer string) (string,error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientGetLoggedUserId")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged-user", baseAuthUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged-user", baseAuthUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -55,13 +60,16 @@ func (a authClient) GetLoggedUserId(bearer string) (string,error) {
 	return userId, nil
 }
 
-func (a authClient) HasRole(bearer string,role string) (bool,error) {
+func (a authClient) HasRole(ctx context.Context, bearer string,role string) (bool,error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientHasRole")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/has-role", baseAuthUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/has-role", baseAuthUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	req.Header.Add("X-permissions", "[" + "\"" + role+ "\"" +"]")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -10,6 +10,7 @@ import (
 	"user-service/domain/model"
 	"user-service/domain/repository"
 	"user-service/logger"
+	"user-service/tracer"
 )
 
 type userRepository struct {
@@ -21,6 +22,8 @@ func NewUserRepository(Col *mongo.Collection) repository.UserRepository {
 }
 
 func (r *userRepository) Create(ctx context.Context, user *model.User) (*mongo.InsertOneResult, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserRepositoryRegisterUser")
+	defer span.Finish()
 	return r.Col.InsertOne(ctx, user)
 }
 
@@ -148,6 +151,9 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.U
 }
 
 func (r *userRepository) IsBlocked(ctx context.Context, subjectId string, objectId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserRepositoryIsBlocked")
+	defer span.Finish()
+
 	var user model.User
 	err := r.Col.FindOne(ctx, bson.M{"_id": subjectId, "blocked_users": objectId}).Decode(&user)
 	if err != nil {

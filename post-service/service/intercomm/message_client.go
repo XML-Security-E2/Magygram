@@ -2,16 +2,18 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"post-service/conf"
+	"post-service/tracer"
 )
 
 type MessageClient interface {
-	CreateNotification(request *NotificationRequest) error
-	CreateNotifications(request *NotificationRequest) error
+	CreateNotification(ctx context.Context, request *NotificationRequest) error
+	CreateNotifications(ctx context.Context, request *NotificationRequest) error
 }
 
 type NotificationRequest struct {
@@ -38,16 +40,20 @@ var (
 	PublishedPost = "PublishedPost"
 )
 
-func (m messageClient) CreateNotification(request *NotificationRequest) error {
+func (m messageClient) CreateNotification(ctx context.Context,request *NotificationRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "MessageClientCreateNotifications")
+	defer span.Finish()
+
 	jsonStr, err:= json.Marshal(request)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", baseMessageUrl, bytes.NewReader(jsonStr))
+	req, err := http.NewRequestWithContext(ctx,"POST", baseMessageUrl, bytes.NewReader(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -64,16 +70,20 @@ func (m messageClient) CreateNotification(request *NotificationRequest) error {
 	return nil
 }
 
-func (m messageClient) CreateNotifications(request *NotificationRequest) error {
+func (m messageClient) CreateNotifications(ctx context.Context, request *NotificationRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "MessageClientCreateNotifications")
+	defer span.Finish()
+
 	jsonStr, err:= json.Marshal(request)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/multiple", baseMessageUrl), bytes.NewReader(jsonStr))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/multiple", baseMessageUrl), bytes.NewReader(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

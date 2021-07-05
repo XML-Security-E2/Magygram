@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/go-playground/validator"
 	"github.com/go-redis/redis"
@@ -12,23 +13,24 @@ import (
 	"relationship-service/logger"
 	"relationship-service/saga"
 	"relationship-service/service/intercomm"
+	"relationship-service/tracer"
 )
 
 type FollowService interface {
-	FollowRequest(followRequest *model.FollowRequest) (bool, error)
-	Unfollow(followRequest *model.FollowRequest) error
-	IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error)
-	IsMuted(mute *model.Mute) (interface{}, error)
-	AcceptFollowRequest(bearer string, userId string) error
-	CreateUser(user *model.User) error
-	ReturnFollowedUsers(user *model.User) (interface{}, error)
-	ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error)
-	ReturnFollowingUsers(user *model.User) (interface{}, error)
-	ReturnFollowRequests(bearer string) (interface{}, error)
-	ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error)
-	Mute(mute *model.Mute) error
-	Unmute(mute *model.Mute) error
-	ReturnRecommendedUsers(user *model.User) (interface{}, error)
+	FollowRequest(ctx context.Context, followRequest *model.FollowRequest) (bool, error)
+	Unfollow(ctx context.Context, followRequest *model.FollowRequest) error
+	IsUserFollowed(ctx context.Context, followRequest *model.FollowRequest) (interface{}, error)
+	IsMuted(ctx context.Context, mute *model.Mute) (interface{}, error)
+	AcceptFollowRequest(ctx context.Context, bearer string, userId string) error
+	CreateUser(ctx context.Context, user *model.User) error
+	ReturnFollowedUsers(ctx context.Context, user *model.User) (interface{}, error)
+	ReturnUnmutedFollowedUsers(ctx context.Context, user *model.User) (interface{}, error)
+	ReturnFollowingUsers(ctx context.Context, user *model.User) (interface{}, error)
+	ReturnFollowRequests(ctx context.Context, bearer string) (interface{}, error)
+	ReturnFollowRequestsForUser(ctx context.Context, bearer string, objectId string) (interface{}, error)
+	Mute(ctx context.Context, mute *model.Mute) error
+	Unmute(ctx context.Context, mute *model.Mute) error
+	ReturnRecommendedUsers(ctx context.Context, user *model.User) (interface{}, error)
 	RedisConnection()
 }
 
@@ -42,7 +44,10 @@ func NewFollowService(r neo4jdb.FollowRepository, userClient intercomm.UserClien
 	return &followService{r, userClient, ac}
 }
 
-func (f *followService) Mute(mute *model.Mute) error {
+func (f *followService) Mute(ctx context.Context, mute *model.Mute) error {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceMute")
+	defer span.Finish()
+
 	if err := validator.New().Struct(mute); err != nil {
 		return err
 	}
@@ -52,7 +57,10 @@ func (f *followService) Mute(mute *model.Mute) error {
 	return nil
 }
 
-func (f *followService) Unmute(mute *model.Mute) error {
+func (f *followService) Unmute(ctx context.Context, mute *model.Mute) error {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceUnmute")
+	defer span.Finish()
+
 	if err := validator.New().Struct(mute); err != nil {
 		return err
 	}
@@ -62,11 +70,15 @@ func (f *followService) Unmute(mute *model.Mute) error {
 	return nil
 }
 
-func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool, error) {
+func (f *followService) FollowRequest(ctx context.Context, followRequest *model.FollowRequest) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceFollowRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	if err := validator.New().Struct(followRequest); err != nil {
 		return false, err
 	}
-	isPrivate, err := f.UserClient.IsPrivate(followRequest.ObjectId)
+	isPrivate, err := f.UserClient.IsPrivate(ctx, followRequest.ObjectId)
 	if err != nil {
 		return false, nil
 	}
@@ -92,12 +104,15 @@ func (f *followService) FollowRequest(followRequest *model.FollowRequest) (bool,
 	return false, nil
 }
 
-func (f *followService) Unfollow(followRequest *model.FollowRequest) error {
+func (f *followService) Unfollow(ctx context.Context, followRequest *model.FollowRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceUnfollow")
+	defer span.Finish()
+
 	err := f.FollowRepository.Unfollow(followRequest)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"subject_id": followRequest.SubjectId,
 													 "object_id" : followRequest.ObjectId}).Error("Unfollow user, database failure")
-
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -107,7 +122,10 @@ func (f *followService) Unfollow(followRequest *model.FollowRequest) error {
 	return err
 }
 
-func (f *followService) IsUserFollowed(followRequest *model.FollowRequest) (interface{}, error) {
+func (f *followService) IsUserFollowed(ctx context.Context, followRequest *model.FollowRequest) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceIsUserFollowed")
+	defer span.Finish()
+
 	if err := validator.New().Struct(followRequest); err != nil {
 		return false, err
 	}
@@ -122,7 +140,10 @@ func (f *followService) IsUserFollowed(followRequest *model.FollowRequest) (inte
 	return exists, nil
 }
 
-func (f *followService) IsMuted(mute *model.Mute) (interface{}, error) {
+func (f *followService) IsMuted(ctx context.Context, mute *model.Mute) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceIsUserIsMuted")
+	defer span.Finish()
+
 	if err := validator.New().Struct(mute); err != nil {
 		return false, err
 	}
@@ -135,7 +156,10 @@ func (f *followService) IsMuted(mute *model.Mute) (interface{}, error) {
 	return exists, nil
 }
 
-func (f *followService) CreateUser(user *model.User) error {
+func (f *followService) CreateUser(ctx context.Context, user *model.User) error {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceCreateUser")
+	defer span.Finish()
+
 	if err := validator.New().Struct(user); err != nil {
 		return err
 	}
@@ -147,8 +171,12 @@ func (f *followService) CreateUser(user *model.User) error {
 	return nil
 }
 
-func (f *followService) AcceptFollowRequest(bearer string, userId string) error {
-	loggedId, err := f.AuthClient.GetLoggedUserId(bearer)
+func (f *followService) AcceptFollowRequest(ctx context.Context, bearer string, userId string) error {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceAcceptFollowRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := f.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return  err
 	}
@@ -167,7 +195,10 @@ func (f *followService) AcceptFollowRequest(bearer string, userId string) error 
 	return err
 }
 
-func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, error) {
+func (f *followService) ReturnFollowedUsers(ctx context.Context, user *model.User) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnFollowedUsers")
+	defer span.Finish()
+
 	retVal, err := f.FollowRepository.ReturnFollowedUsers(user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
@@ -176,7 +207,10 @@ func (f *followService) ReturnFollowedUsers(user *model.User) (interface{}, erro
 	return retVal, err
 }
 
-func (f *followService) ReturnUnmutedFollowedUsers(user *model.User) (interface{}, error) {
+func (f *followService) ReturnUnmutedFollowedUsers(ctx context.Context, user *model.User) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnUnmutedFollowedUsers")
+	defer span.Finish()
+
 	retVal, err := f.FollowRepository.ReturnUnmutedFollowedUsers(user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get followed users, database fetch failure")
@@ -185,7 +219,10 @@ func (f *followService) ReturnUnmutedFollowedUsers(user *model.User) (interface{
 	return retVal, err
 }
 
-func (f *followService) ReturnFollowingUsers(user *model.User) (interface{}, error) {
+func (f *followService) ReturnFollowingUsers(ctx context.Context, user *model.User) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnFollowingUsers")
+	defer span.Finish()
+
 	retVal, err := f.FollowRepository.ReturnFollowingUsers(user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": user.Id}).Error("Get following users, database fetch failure")
@@ -194,8 +231,12 @@ func (f *followService) ReturnFollowingUsers(user *model.User) (interface{}, err
 	return retVal, err
 }
 
-func (f *followService) ReturnFollowRequests(bearer string) (interface{}, error) {
-	loggedId, err := f.AuthClient.GetLoggedUserId(bearer)
+func (f *followService) ReturnFollowRequests(ctx context.Context, bearer string) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnFollowRequests")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := f.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return false, err
 	}
@@ -208,8 +249,12 @@ func (f *followService) ReturnFollowRequests(bearer string) (interface{}, error)
 	return retVal, err
 }
 
-func (f *followService) ReturnFollowRequestsForUser(bearer string, objectId string) (interface{}, error) {
-	loggedId, err := f.AuthClient.GetLoggedUserId(bearer)
+func (f *followService) ReturnFollowRequestsForUser(ctx context.Context, bearer string, objectId string) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnFollowRequestsForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := f.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return false, err
 	}
@@ -222,7 +267,10 @@ func (f *followService) ReturnFollowRequestsForUser(bearer string, objectId stri
 	return retVal, err
 }
 
-func (f *followService) ReturnRecommendedUsers(user *model.User) (interface{}, error) {
+func (f *followService) ReturnRecommendedUsers(ctx context.Context, user *model.User) (interface{}, error) {
+	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnRecommendedUsers")
+	defer span.Finish()
+
 	retVal, err := f.FollowRepository.ReturnRecommendedUsers(user)
 	if err != nil {
 		return retVal, err
@@ -276,7 +324,7 @@ func (f *followService) RedisConnection() {
 					// Check quantity of product
 
 					userDTO := model.User{Id: m.User.Id}
-					err := f.CreateUser(&userDTO)
+					err := f.CreateUser(context.Background(), &userDTO)
 
 					if err != nil{
 						sendToReplyChannel(client, &m, saga.ActionError, saga.ServiceAuth, saga.ServiceRelationship)

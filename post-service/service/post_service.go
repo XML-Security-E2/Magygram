@@ -15,6 +15,7 @@ import (
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
 	"post-service/service/intercomm"
+	"post-service/tracer"
 	"sort"
 	"strings"
 	"time"
@@ -37,11 +38,14 @@ func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc in
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceCreatePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil { return "", err}
 
-	media, err := p.MediaClient.SaveMedia(postRequest.Media)
+	media, err := p.MediaClient.SaveMedia(ctx, postRequest.Media)
 	if err != nil { return "", err}
 
 	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media,"")
@@ -66,7 +70,7 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 													 "location" : postRequest.Location}).Error("Post database create failure")
 		return "", err}
 
-	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    userInfo.Id,
 		UserFromId:userInfo.Id,
@@ -88,10 +92,14 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 }
 
 func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
-	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
+	span := tracer.StartSpanFromContext(ctx, "PostServiceCreatePostCampaign")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(ctx, bearer)
 	if err != nil { return "", err}
 
-	media, err := p.MediaClient.SaveMedia(postRequest.Media)
+	media, err := p.MediaClient.SaveMedia(ctx, postRequest.Media)
 	if err != nil { return "", err}
 
 	post, err := model.NewPost(postRequest, model.UserInfo{
@@ -106,7 +114,7 @@ func (p postService) CreatePostCampaign(ctx context.Context, bearer string, post
 	}
 
 	campaignReq.ContentId = post.Id
-	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
+	err = p.AdsClient.CreatePostCampaign(ctx, bearer, campaignReq)
 	if err != nil {
 		return "", err
 	}
@@ -115,7 +123,7 @@ func (p postService) CreatePostCampaign(ctx context.Context, bearer string, post
 	if err != nil {
 		return "", err}
 
-	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    userInfo.Id,
 		UserFromId:userInfo.Id,
@@ -150,15 +158,18 @@ func (p timeSlice) Swap(i, j int) {
 }
 
 func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]*model.PostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostsForTimeline")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	var posts []*model.Post
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
 
 	var followedUsers model.FollowedUsersResponse
-	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(userInfo.Id)
+	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(ctx, userInfo.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +180,7 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 		posts= append(posts, newPosts...)
 	}
 
-	sortedPosts := sortPostPerTime(posts)
+	sortedPosts := sortPostPerTime(ctx, posts)
 
 	retVal := p.mapPostsToResponsePostDTO(bearer, sortedPosts, userInfo.Id)
 
@@ -177,7 +188,10 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 }
 
 
-func sortPostPerTime(posts []*model.Post) []*model.Post {
+func sortPostPerTime(ctx context.Context, posts []*model.Post) []*model.Post {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceSortPostPerTime")
+	defer span.Finish()
+
 	dateSortedPosts := make(timeSlice, 0, len(posts))
 	for _, post := range posts {
 		dateSortedPosts = append(dateSortedPosts, post)
@@ -190,7 +204,7 @@ func sortPostPerTime(posts []*model.Post) []*model.Post {
 
 func (p postService) DeletePost(ctx context.Context, bearer string, requestId string) error {
 
-	retVal, err := p.AuthClient.HasRole(bearer,"delete_posts")
+	retVal, err := p.AuthClient.HasRole(ctx, bearer,"delete_posts")
 	if err != nil{
 		return errors.New("auth service not found")
 	}
@@ -201,7 +215,7 @@ func (p postService) DeletePost(ctx context.Context, bearer string, requestId st
 	}
 
 	if !retVal {
-		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 		if err != nil {
 			return err
 		}
@@ -226,7 +240,7 @@ func (p postService) DeletePost(ctx context.Context, bearer string, requestId st
 }
 
 func (p postService) LikePost(ctx context.Context, bearer string, postId string) error {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -255,7 +269,7 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 		return err
 	}
 
-	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    result.UserInfo.Id,
 		UserFromId:userInfo.Id,
@@ -274,7 +288,7 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 }
 
 func (p postService) UnlikePost(ctx context.Context, bearer string, postId string) error {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -304,7 +318,7 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 }
 
 func (p postService) DislikePost(ctx context.Context, bearer string, postId string) error {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -333,7 +347,7 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 		return err
 	}
 
-	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    result.UserInfo.Id,
 		UserFromId:userInfo.Id,
@@ -353,7 +367,7 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 
 func (p postService) UndislikePost(ctx context.Context, bearer string, postId string) error {
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -384,7 +398,7 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 }
 
 func (p postService) AddComment(ctx context.Context, postId string, content string, bearer string, tags []model.Tag) (*model.Comment, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -416,7 +430,7 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 		return nil, err
 	}
 
-	err = p.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    result.UserInfo.Id,
 		UserFromId:userInfo.Id,
@@ -553,7 +567,7 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 		return errors.New("invalid post id")
 	}
 
-	isOwner, err := p.CheckIfUsersPostFromBearer(bearer, post.UserInfo.Id)
+	isOwner, err := p.CheckIfUsersPostFromBearer(ctx, bearer, post.UserInfo.Id)
 	if err != nil {
 		return err
 	}
@@ -584,8 +598,8 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 	return nil
 }
 
-func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId string) (bool, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+func (p postService) CheckIfUsersPostFromBearer(ctx context.Context, bearer string, postOwnerId string) (bool, error) {
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
 		return false, err
@@ -599,13 +613,16 @@ func (p postService) CheckIfUsersPostFromBearer(bearer string, postOwnerId strin
 }
 
 func (p postService) GetUsersPosts(ctx context.Context, bearer string, postOwnerId string) ([]*model.PostProfileResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetUsersPosts")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	retVal, err := p.AuthClient.HasRole(bearer,"visit_private_profiles")
+	retVal, err := p.AuthClient.HasRole(ctx, bearer,"visit_private_profiles")
 	if err!=nil{
 		return nil, errors.New("auth service not found")
 	}
 
-	if !p.checkIfUserContentIsAccessible(bearer, postOwnerId) {
+	if !p.checkIfUserContentIsAccessible(ctx, bearer, postOwnerId) {
 		if !retVal{
 			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 		}
@@ -629,8 +646,8 @@ func (p postService) GetUsersPosts(ctx context.Context, bearer string, postOwner
 	return userPostsResponse, nil
 }
 
-func (p postService) checkIfUserContentIsAccessible(bearer string, postOwnerId string) bool {
-	isPrivate, err := p.UserClient.IsUserPrivate(postOwnerId)
+func (p postService) checkIfUserContentIsAccessible(ctx context.Context, bearer string, postOwnerId string) bool {
+	isPrivate, err := p.UserClient.IsUserPrivate(ctx, postOwnerId)
 	if err != nil {
 		return false
 	}
@@ -640,14 +657,14 @@ func (p postService) checkIfUserContentIsAccessible(bearer string, postOwnerId s
 			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
 			return false
 		}
-		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 		if err != nil {
 			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
 			return false
 		}
 
 		if userId != postOwnerId {
-			followedUsers, err := p.RelationshipClient.GetFollowedUsers(userId)
+			followedUsers, err := p.RelationshipClient.GetFollowedUsers(ctx, userId)
 			if err != nil {
 				logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userId}).Warn("Unauthorized access")
 				return false
@@ -668,6 +685,9 @@ func (p postService) checkIfUserContentIsAccessible(bearer string, postOwnerId s
 }
 
 func (p postService) GetUsersPostsCount(ctx context.Context, postOwnerId string) (int, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetUsersPostsCount")
+	defer span.Finish()
+
 	userPosts, err := p.PostRepository.GetPostsForUser(ctx, postOwnerId)
 	if err != nil {
 		return 0, errors.New("invalid user id")
@@ -677,7 +697,7 @@ func (p postService) GetUsersPostsCount(ctx context.Context, postOwnerId string)
 }
 
 func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error) {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -687,13 +707,13 @@ func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, 
 		return nil, nil, errors.New("invalid post id")
 	}
 
-	retVal, err := p.AuthClient.HasRole(bearer,"visit_private_profiles")
+	retVal, err := p.AuthClient.HasRole(ctx, bearer,"visit_private_profiles")
 	if err!=nil{
 		return nil, nil, errors.New("auth service not found")
 	}
 
 	if !retVal {
-		if !p.checkIfUserContentIsAccessible(bearer, post.UserInfo.Id) {
+		if !p.checkIfUserContentIsAccessible(ctx, bearer, post.UserInfo.Id) {
 			return nil, &post.UserInfo, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 		}
 
@@ -719,7 +739,7 @@ func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, 
 }
 
 func (p postService) GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse, error) {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -729,13 +749,13 @@ func (p postService) GetPostById(ctx context.Context, bearer string, postId stri
 		return nil, errors.New("invalid post id")
 	}
 
-	retVal, err := p.AuthClient.HasRole(bearer,"visit_private_profiles")
+	retVal, err := p.AuthClient.HasRole(ctx, bearer,"visit_private_profiles")
 	if err!=nil{
 		return nil, errors.New("auth service not found")
 	}
 
 	if !retVal {
-		if !p.checkIfUserContentIsAccessible(bearer, post.UserInfo.Id) {
+		if !p.checkIfUserContentIsAccessible(ctx, bearer, post.UserInfo.Id) {
 			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 		}
 
@@ -812,7 +832,7 @@ func (p postService) GetPostsByHashTagForGuest(ctx context.Context, hashtag stri
 	var publicPosts []*model.Post
 
 	for _,post := range posts{
-		value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
+		value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
 
 		if err!=nil{
 			log.Println(err)
@@ -851,7 +871,7 @@ func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashta
 
 	var publicPosts []*model.Post
 
-	retValRole, err := p.AuthClient.HasRole(bearer,"search_all_post_by_hashtag")
+	retValRole, err := p.AuthClient.HasRole(ctx, bearer,"search_all_post_by_hashtag")
 	if err!=nil{
 		return nil, errors.New("auth service not found")
 	}
@@ -862,13 +882,13 @@ func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashta
 
 		return retVal, nil
 	}else {
-		userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+		userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 		if err != nil {
 			return nil, err
 		}
 
 		for _,post := range posts{
-			value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
+			value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
 			if err!=nil{
 				return nil,err
 			}
@@ -933,7 +953,7 @@ func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, loca
 	var publicPosts []*model.Post
 
 	for _,post := range posts{
-		value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
+		value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
 
 		if err!=nil{
 			log.Println(err)
@@ -957,7 +977,7 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 	}
 
 
-	retValRole, err := p.AuthClient.HasRole(bearer,"search_all_post_by_location")
+	retValRole, err := p.AuthClient.HasRole(ctx, bearer,"search_all_post_by_location")
 	if err!=nil{
 		return nil, errors.New("auth service not found")
 	}
@@ -967,14 +987,14 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 
 		return retVal, nil
 	}else {
-		userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+		userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 		if err != nil {
 			return nil, err
 		}
 
 		var publicPosts []*model.Post
 		for _,post := range posts{
-			value, err := p.UserClient.IsUserPrivate(post.UserInfo.Id)
+			value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
 			if err!=nil{
 				return nil,err
 			}
@@ -1031,7 +1051,11 @@ func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([
 }
 
 func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
-	userLikedPostIds, err := p.UserClient.GetLikedPosts(bearer)
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetUserLikedPosts")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userLikedPostIds, err := p.UserClient.GetLikedPosts(ctx, bearer)
 	if err!=nil{
 		return []*model.PostProfileResponse{},err
 	}
@@ -1050,7 +1074,11 @@ func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*m
 }
 
 func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
-	userLikedPostIds, err := p.UserClient.GetDislikedPosts(bearer)
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetUserDislikedPosts")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userLikedPostIds, err := p.UserClient.GetDislikedPosts(ctx, bearer)
 	if err!=nil{
 		return []*model.PostProfileResponse{},err
 	}
@@ -1069,7 +1097,7 @@ func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([
 }
 
 func (p postService) EditPostOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -1097,7 +1125,7 @@ func (p postService) EditPostOwnerInfo(ctx context.Context, bearer string, userI
 }
 
 func (p postService) EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -1127,7 +1155,7 @@ func (p postService) EditLikedByInfo(ctx context.Context, bearer string, userInf
 }
 
 func (p postService) EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -1156,7 +1184,7 @@ func (p postService) EditDislikedByInfo(ctx context.Context, bearer string, user
 }
 
 func (p postService) EditCommentedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}

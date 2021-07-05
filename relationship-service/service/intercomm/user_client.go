@@ -1,6 +1,7 @@
 package intercomm
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,10 +11,11 @@ import (
 	"net/http"
 	"relationship-service/conf"
 	"relationship-service/logger"
+	"relationship-service/tracer"
 )
 
 type UserClient interface {
-	IsPrivate(id string) (bool, error)
+	IsPrivate(ctx context.Context, id string) (bool, error)
 }
 
 type userClient struct {
@@ -32,11 +34,15 @@ type privateFlag struct {
 	isPrivate bool `json:"isPrivate"`
 }
 
-func (u userClient) IsPrivate(id string) (bool, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUrl, id),nil)
+func (u userClient) IsPrivate(ctx context.Context, id string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientIsPrivate")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/is-private", baseUrl, id),nil)
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -5,11 +5,14 @@ import (
 	"auth-service/domain/model"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"auth-service/tracer"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -29,10 +32,14 @@ type AuthHandler interface {
 
 type authHandler struct {
 	AuthService service_contracts.AuthService
+	tracer      opentracing.Tracer
+	closer      io.Closer
 }
 
 func NewAuthHandler(a service_contracts.AuthService) AuthHandler {
-	return &authHandler{a}
+	tracer, closer := tracer.Init("auth-service")
+	opentracing.SetGlobalTracer(tracer)
+	return &authHandler{a, tracer, closer}
 }
 
 func (a authHandler) AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -191,6 +198,12 @@ func checkPermission(userRoles []model.Role, allowedPermissions []string) bool{
 }
 
 func (a authHandler) GetLoggedUserId(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("AuthHandlerGetLoggedUserId", a.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get logged user id at %s\n", c.Path())),
+	)
+
 	authStringHeader := c.Request().Header.Get("Authorization")
 
 	if authStringHeader == "" {

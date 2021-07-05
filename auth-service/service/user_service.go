@@ -7,6 +7,7 @@ import (
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
 	"auth-service/saga"
+	"auth-service/tracer"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -30,6 +31,9 @@ func NewUserService(r repository.UserRepository,a repository.LoginEventRepositor
 }
 
 func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) (string,[]byte, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceRegisterUser")
+	defer span.Finish()
+
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "Magygram",
 		AccountName: userRequest.Email,
@@ -76,6 +80,8 @@ func (u userService) RegisterUser(ctx context.Context, userRequest *model.UserRe
 }
 
 func (u userService) ActivateUser(ctx context.Context, userId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceActivateUser")
+	defer span.Finish()
 
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {

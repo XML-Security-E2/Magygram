@@ -26,7 +26,7 @@ func NewHighlightsService(r repository.UserRepository, ic 	intercomm.AuthClient,
 
 
 func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, highlights *model.HighlightRequest) (*model.HighlightProfileResponse,error) {
-	userId, err := h.AuthClient.GetLoggedUserId(bearer)
+	userId, err := h.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (h highlightsService) GetProfileHighlights(ctx context.Context, bearer stri
 		return nil, errors.New("auth service not found")
 	}
 
-	if !h.checkIfUserContentIsAccessible(bearer, owner) {
+	if !h.checkIfUserContentIsAccessible(ctx, bearer, owner) {
 		if !retVal {
 			logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id": owner.Id}).Warn("Unauthorized access")
 			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
@@ -99,18 +99,18 @@ func (h highlightsService) GetProfileHighlights(ctx context.Context, bearer stri
 	return response, nil
 }
 
-func (h highlightsService) checkIfUserContentIsAccessible(bearer string, owner *model.User) bool {
+func (h highlightsService) checkIfUserContentIsAccessible(ctx context.Context, bearer string, owner *model.User) bool {
 	if owner.IsPrivate {
 		if bearer == "" {
 			return false
 		}
-		loggedId, err := h.AuthClient.GetLoggedUserId(bearer)
+		loggedId, err := h.AuthClient.GetLoggedUserId(ctx, bearer)
 		if err != nil {
 			return false
 		}
 
 		if loggedId != owner.Id {
-			followedUsers, err := h.RelationshipClient.GetFollowedUsers(loggedId)
+			followedUsers, err := h.RelationshipClient.GetFollowedUsers(ctx, loggedId)
 			if err != nil {
 				return false
 			}
@@ -139,7 +139,7 @@ func (h highlightsService) GetProfileHighlightsByHighlightName(ctx context.Conte
 		return nil, errors.New("auth service not found")
 	}
 
-	if !h.checkIfUserContentIsAccessible(bearer, owner) {
+	if !h.checkIfUserContentIsAccessible(ctx, bearer, owner) {
 		if !retValRole {
 			logger.LoggingEntry.WithFields(logrus.Fields{"content_owner_id" : owner.Id}).Warn("Unauthorized access")
 			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}

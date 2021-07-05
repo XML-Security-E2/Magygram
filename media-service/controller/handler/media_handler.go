@@ -1,10 +1,15 @@
 package handler
 
 import (
+	"context"
+	"fmt"
 	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
+	"io"
 	"media-service/logger"
 	"media-service/service"
+	"media-service/tracer"
 	"mime/multipart"
 	"net/http"
 )
@@ -15,13 +20,23 @@ type MediaHandler interface {
 
 type mediaHandler struct {
 	MediaService service.MediaService
+	tracer      opentracing.Tracer
+	closer      io.Closer
 }
 
 func NewMediaHandler(m service.MediaService) MediaHandler {
-	return &mediaHandler{m}
+	tracer, closer := tracer.Init("media-service")
+	opentracing.SetGlobalTracer(tracer)
+	return &mediaHandler{m, tracer,closer}
 }
 
 func (m mediaHandler) SaveMedia(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("MediaHandlerSaveMedia", m.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling save media at %s\n", c.Path())),
+	)
+
 	logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
 
 	mpf, _ := c.MultipartForm()
@@ -32,6 +47,10 @@ func (m mediaHandler) SaveMedia(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	media, err := m.MediaService.SaveMedia(ctx, headers)
 	if err != nil {

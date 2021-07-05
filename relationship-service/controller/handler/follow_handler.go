@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"relationship-service/domain/model"
 	"relationship-service/logger"
 	"relationship-service/service"
+	"relationship-service/tracer"
 )
 
 type FollowHandler interface {
@@ -31,10 +34,16 @@ type FollowHandler interface {
 
 type followHandler struct {
 	FollowService service.FollowService
+	tracer      opentracing.Tracer
+	closer      io.Closer
 }
 
+const name = "relationship-service"
+
 func NewFollowHandler(f service.FollowService) FollowHandler {
-	return &followHandler{f}
+	tracer, closer := tracer.Init(name)
+	opentracing.SetGlobalTracer(tracer)
+	return &followHandler{f, tracer, closer}
 }
 
 func (f followHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -45,12 +54,24 @@ func (f followHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 func (f followHandler) Mute(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerMute", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling mute user at %s\n", ctx.Path())),
+	)
+
+	c := ctx.Request().Context()
+	if c == nil {
+		c = context.Background()
+	}
+	c = tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	mute := &model.Mute{}
 	if err := ctx.Bind(mute); err != nil {
 		return err
 	}
 
-	if err := f.FollowService.Mute(mute); err != nil {
+	if err := f.FollowService.Mute(c, mute); err != nil {
 		return err
 	}
 
@@ -58,12 +79,24 @@ func (f followHandler) Mute(ctx echo.Context) error {
 }
 
 func (f followHandler) Unmute(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerUnmute", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling unmute user at %s\n", ctx.Path())),
+	)
+
+	c := ctx.Request().Context()
+	if c == nil {
+		c = context.Background()
+	}
+	c = tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	mute := &model.Mute{}
 	if err := ctx.Bind(mute); err != nil {
 		return err
 	}
 
-	if err := f.FollowService.Unmute(mute); err != nil {
+	if err := f.FollowService.Unmute(c, mute); err != nil {
 		return err
 	}
 
@@ -71,12 +104,24 @@ func (f followHandler) Unmute(ctx echo.Context) error {
 }
 
 func (f *followHandler) FollowRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerFollowRequest", f.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling follow requst at %s\n", c.Path())),
+	)
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	ctx = tracer.ContextWithSpan(c.Request().Context(), span)
+
 	followRequest := &model.FollowRequest{}
 	if err := c.Bind(followRequest); err != nil {
 		return err
 	}
 
-	sentRequest, err := f.FollowService.FollowRequest(followRequest)
+	sentRequest, err := f.FollowService.FollowRequest(ctx, followRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -85,13 +130,20 @@ func (f *followHandler) FollowRequest(c echo.Context) error {
 }
 
 func (f *followHandler) Unfollow(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerUnfollow", f.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling unfollow user at %s\n", c.Path())),
+	)
+
 	followRequest := &model.FollowRequest{}
 	if err := c.Bind(followRequest); err != nil {
 		return err
 	}
-
-	err := f.FollowService.Unfollow(followRequest)
+	ctx := tracer.ContextWithSpan(c.Request().Context(), span)
+	err := f.FollowService.Unfollow(ctx, followRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -99,10 +151,22 @@ func (f *followHandler) Unfollow(c echo.Context) error {
 }
 
 func (f *followHandler) AcceptFollowRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerAcceptFollowRequest", f.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling accept follow requst at %s\n", c.Path())),
+	)
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	ctx = tracer.ContextWithSpan(c.Request().Context(), span)
+
 	userId := c.Param("userId")
 	fmt.Println(userId)
 	bearer := c.Request().Header.Get("Authorization")
-	err := f.FollowService.AcceptFollowRequest(bearer, userId)
+	err := f.FollowService.AcceptFollowRequest(ctx, bearer, userId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -111,21 +175,41 @@ func (f *followHandler) AcceptFollowRequest(c echo.Context) error {
 }
 
 func (f *followHandler) CreateUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerCreateUser", f.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create user at %s\n", c.Path())),
+	)
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	ctx = tracer.ContextWithSpan(c.Request().Context(), span)
+
 	user := &model.User{}
 	if err := c.Bind(user); err != nil {
 		return err
 	}
-	if err := f.FollowService.CreateUser(user); err != nil {
+	if err := f.FollowService.CreateUser(ctx, user); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, true)
 }
 
 func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerReturnFollowedUsers", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling return followed users at %s\n", ctx.Path())),
+	)
+	c := tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	user := &model.User{Id: ctx.Param("userId")}
 
-	result, err := f.FollowService.ReturnFollowedUsers(user)
+	result, err := f.FollowService.ReturnFollowedUsers(c, user)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -133,9 +217,21 @@ func (f *followHandler) ReturnFollowedUsers(ctx echo.Context) error {
 }
 
 func (f *followHandler) ReturnUnmutedFollowedUsers(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerReturnUnmutedFollowedUsers", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling return unmuted followed users at %s\n", ctx.Path())),
+	)
+
+	c := ctx.Request().Context()
+	if c == nil {
+		c = context.Background()
+	}
+	c = tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	user := &model.User{Id: ctx.Param("userId")}
 
-	result, err := f.FollowService.ReturnUnmutedFollowedUsers(user)
+	result, err := f.FollowService.ReturnUnmutedFollowedUsers(c, user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -144,22 +240,38 @@ func (f *followHandler) ReturnUnmutedFollowedUsers(ctx echo.Context) error {
 }
 
 func (f *followHandler) ReturnFollowingUsers(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerReturnFollowingUsers", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling return following users at %s\n", ctx.Path())),
+	)
+	c := tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	user := &model.User{Id: ctx.Param("userId")}
 
-	result, err := f.FollowService.ReturnFollowingUsers(user)
+	result, err := f.FollowService.ReturnFollowingUsers(c, user)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return ctx.JSON(http.StatusOK, result)}
 
 func (f *followHandler) ReturnFollowRequests(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerReturnFollowRequests", f.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling return follow requsts at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(c.Request().Context(), span)
 	bearer := c.Request().Header.Get("Authorization")
-	result, err := f.FollowService.ReturnFollowRequests(bearer)
+
+	result, err := f.FollowService.ReturnFollowRequests(ctx, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -168,12 +280,24 @@ func (f *followHandler) ReturnFollowRequests(c echo.Context) error {
 }
 
 func (f *followHandler) IsUserFollowed(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerIsUserFollowed", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling is user followed at %s\n", ctx.Path())),
+	)
+
+	c := ctx.Request().Context()
+	if c == nil {
+		c = context.Background()
+	}
+	c = tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	followRequest := &model.FollowRequest{}
 	if err := ctx.Bind(followRequest); err != nil {
 		return err
 	}
 
-	exists, err := f.FollowService.IsUserFollowed(followRequest)
+	exists, err := f.FollowService.IsUserFollowed(c, followRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -182,13 +306,26 @@ func (f *followHandler) IsUserFollowed(ctx echo.Context) error {
 }
 
 func (f *followHandler) IsMuted(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerIsMuted", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling is user muted at %s\n", ctx.Path())),
+	)
+
+	c := ctx.Request().Context()
+	if c == nil {
+		c = context.Background()
+	}
+	c = tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	mute := &model.Mute{}
 	if err := ctx.Bind(mute); err != nil {
 		return err
 	}
 
-	exists, err := f.FollowService.IsMuted(mute)
+	exists, err := f.FollowService.IsMuted(c, mute)
 	if err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -196,14 +333,22 @@ func (f *followHandler) IsMuted(ctx echo.Context) error {
 }
 
 func (f *followHandler) ReturnFollowRequestsForUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerReturnFollowRequestsForUser", f.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling return follow requests for user at %s\n", c.Path())),
+	)
+
 	objectId := c.Param("objectId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(c.Request().Context(), span)
 	bearer := c.Request().Header.Get("Authorization")
-	exists, err := f.FollowService.ReturnFollowRequestsForUser(bearer, objectId)
+
+	exists, err := f.FollowService.ReturnFollowRequestsForUser(ctx, bearer, objectId)
 	fmt.Println(exists)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
@@ -213,9 +358,21 @@ func (f *followHandler) ReturnFollowRequestsForUser(c echo.Context) error {
 }
 
 func (f *followHandler) ReturnRecommendedUsers(ctx echo.Context) error {
+	span := tracer.StartSpanFromRequest("FollowHandlerReturnRecommendedUsers", f.tracer, ctx.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling return recommended users at %s\n", ctx.Path())),
+	)
+
+	c := ctx.Request().Context()
+	if c == nil {
+		c = context.Background()
+	}
+	c = tracer.ContextWithSpan(ctx.Request().Context(), span)
+
 	user := &model.User{Id: ctx.Param("userId")}
 
-	result, err := f.FollowService.ReturnRecommendedUsers(user)
+	result, err := f.FollowService.ReturnRecommendedUsers(c, user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

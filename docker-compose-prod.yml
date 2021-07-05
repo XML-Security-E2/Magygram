@@ -29,7 +29,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=user-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     auth-service:
         image: auth-service
@@ -39,7 +45,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=auth-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     media-service:
         image: media-service
@@ -49,7 +61,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=media-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     post-service:
         image: post-service
@@ -59,7 +77,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=post-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     story-service:
         image: story-service
@@ -79,7 +103,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=relationship-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     message-service:
         image: message-service
@@ -121,6 +151,18 @@ services:
 
     redis-db:
         image: redis
+        networks:
+            - backend
+    
+    tracing:
+        image: jaegertracing/all-in-one
+        container_name: jaeger
+        ports:
+            - "6831:6831/udp"
+            - "6832:6832/udp"
+            - "16686:16686"
+            - "14268:14268"
+            - "14250:14250"
         networks:
             - backend
 
