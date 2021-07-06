@@ -701,3 +701,4 @@ time="2021-07-02T19:08:13+02:00" level=info msg="Post created" func=post-service
 >>>>>>> develop
 >>>>>>> develop
 time="2021-07-02T23:08:24+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-06T16:25:36+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:74" host=localhost port=462

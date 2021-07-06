@@ -1,6 +1,7 @@
 package intercomm
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,16 +9,17 @@ import (
 	"io/ioutil"
 	"message-service/conf"
 	"message-service/domain/model"
+	"message-service/tracer"
 	"net/http"
 )
 
 type UserClient interface {
-	GetUsersForPostNotification(userId string) ([]*model.UserInfo, error)
-	GetUsersForStoryNotification(userId string) ([]*model.UserInfo, error)
-	GetLoggedUserInfo(bearer string) (*model.UserInfo, error)
-	GetUsersInfo(userId string) (*model.UserInfo, error)
-	CheckIfPostInteractionNotificationEnabled(userId string, userFromId string, interactionType string) (bool, error)
-	IsUserPrivate(userId string) (bool, error)
+	GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
+	GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error)
+	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error)
+	GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error)
+	CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, userFromId string, interactionType string) (bool, error)
+	IsUserPrivate(ctx context.Context, userId string) (bool, error)
 }
 
 type userClient struct {}
@@ -31,10 +33,14 @@ var (
 	baseUsersUrl = ""
 )
 
-func (u userClient) IsUserPrivate(userId string) (bool, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
+func (u userClient) IsUserPrivate(ctx context.Context, userId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientIsUserPrivate")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -52,11 +58,14 @@ func (u userClient) IsUserPrivate(userId string) (bool, error) {
 	return isPrivate, nil
 }
 
-func (u userClient) GetUsersInfo(userId string) (*model.UserInfo, error) {
+func (u userClient) GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetUsersInfo")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/info/%s", baseUsersUrl, userId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/info/%s", baseUsersUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -73,12 +82,15 @@ func (u userClient) GetUsersInfo(userId string) (*model.UserInfo, error) {
 	return &userInfo, nil
 }
 
-func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
+func (u userClient) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetLoggedUserInfo")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -95,11 +107,14 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 	return &userInfo, nil
 }
 
-func (u userClient) GetUsersForPostNotification(userId string) ([]*model.UserInfo, error) {
+func (u userClient) GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetUsersForPostNotification")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/notify/post", baseUsersUrl, userId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/notify/post", baseUsersUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -120,11 +135,14 @@ func (u userClient) GetUsersForPostNotification(userId string) ([]*model.UserInf
 	return userInfo, nil
 }
 
-func (u userClient) GetUsersForStoryNotification(userId string) ([]*model.UserInfo, error) {
+func (u userClient) GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetUsersForStoryNotification")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/notify/story", baseUsersUrl, userId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/notify/story", baseUsersUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -145,10 +163,14 @@ func (u userClient) GetUsersForStoryNotification(userId string) ([]*model.UserIn
 	return userInfo, nil
 }
 
-func (u userClient) CheckIfPostInteractionNotificationEnabled(userId string, userFromId string, interactionType string) (bool, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/%s/notify/%s", baseUsersUrl, userId, userFromId, interactionType), nil)
+func (u userClient) CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, userFromId string, interactionType string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientCheckIfPostInteractionNotificationEnabled")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/%s/notify/%s", baseUsersUrl, userId, userFromId, interactionType), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

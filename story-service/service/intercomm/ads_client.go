@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,12 +12,13 @@ import (
 	"net/http"
 	"story-service/conf"
 	"story-service/domain/model"
+	"story-service/tracer"
 )
 
 type AdsClient interface {
-	CreatePostCampaign(bearer string, campaignReq *model.CampaignRequest) error
-	GetAllActiveAgentsStoryCampaigns(bearer string) ([]string, error)
-	DeleteCampaign(bearer string, postId string) error
+	CreatePostCampaign(ctx context.Context, bearer string, campaignReq *model.CampaignRequest) error
+	GetAllActiveAgentsStoryCampaigns(ctx context.Context, bearer string) ([]string, error)
+	DeleteCampaign(ctx context.Context, earer string, postId string) error
 }
 
 type adsClient struct {}
@@ -34,17 +36,21 @@ type errMessage struct {
 	Message string `json:"message"`
 }
 
-func (a adsClient) CreatePostCampaign(bearer string, campaignReq *model.CampaignRequest) error {
+func (a adsClient) CreatePostCampaign(ctx context.Context, bearer string, campaignReq *model.CampaignRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientCreatePostCampaign")
+	defer span.Finish()
+
 	jsonStr, err:= json.Marshal(campaignReq)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/campaign", baseAdsUrl), bytes.NewReader(jsonStr))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/campaign", baseAdsUrl), bytes.NewReader(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -62,12 +68,15 @@ func (a adsClient) CreatePostCampaign(bearer string, campaignReq *model.Campaign
 	return nil
 }
 
-func (a adsClient) DeleteCampaign(bearer string, postId string) error {
+func (a adsClient) DeleteCampaign(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientDeleteCampaign")
+	defer span.Finish()
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/campaign/story/%s", baseAdsUrl, postId), nil)
+	req, err := http.NewRequestWithContext(ctx,"DELETE", fmt.Sprintf("%s/campaign/story/%s", baseAdsUrl, postId), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -78,12 +87,15 @@ func (a adsClient) DeleteCampaign(bearer string, postId string) error {
 	return nil
 }
 
-func (a adsClient) GetAllActiveAgentsStoryCampaigns(bearer string) ([]string, error) {
+func (a adsClient) GetAllActiveAgentsStoryCampaigns(ctx context.Context, bearer string) ([]string, error) {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientGetAllActiveAgentsStoryCampaigns")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/campaign/story", baseAdsUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/campaign/story", baseAdsUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

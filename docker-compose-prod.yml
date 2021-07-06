@@ -93,7 +93,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=story-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     relationship-service:
         image: relationship-service
@@ -121,7 +127,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=message-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     request-service:
         image: request-service
@@ -131,7 +143,13 @@ services:
         networks:
             - backend
         environment:
-            IS_PRODUCTION: "true"
+            - JAEGER_SERVICE_NAME=request-service
+            - JAEGER_AGENT_HOST=tracing
+            - JAEGER_AGENT_PORT=6831     
+            - JAEGER_SAMPLER_MANAGER_HOST_PORT=jaeger:5778
+            - JAEGER_SAMPLER_TYPE=const
+            - JAEGER_SAMPLER_PARAM=1
+            - IS_PRODUCTION=true
 
     mongo-db:
         image: mongo

@@ -9,6 +9,7 @@ import (
 	"message-service/domain/service-contracts"
 	"message-service/domain/service-contracts/exceptions/denied"
 	"message-service/service/intercomm"
+	"message-service/tracer"
 	"mime/multipart"
 )
 
@@ -29,7 +30,11 @@ func NewConversationService(r repository.ConversationRepository, ac intercomm.Au
 }
 
 func (c conversationService) AcceptConversationRequest(ctx context.Context, bearer string, requestId string) error {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceAcceptConversationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -65,7 +70,11 @@ func (c conversationService) AcceptConversationRequest(ctx context.Context, bear
 }
 
 func (c conversationService) DenyConversationRequest(ctx context.Context, bearer string, requestId string) error {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceDenyConversationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -89,7 +98,11 @@ func (c conversationService) DenyConversationRequest(ctx context.Context, bearer
 }
 
 func (c conversationService) DeleteConversationRequest(ctx context.Context, bearer string, requestId string) error {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceDeleteConversationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -114,14 +127,18 @@ func (c conversationService) DeleteConversationRequest(ctx context.Context, bear
 
 //PROVERITI ZA PRIVATNOST ITD
 func (c conversationService) SendMessage(ctx context.Context, bearer string, messageRequest *model.MessageSentRequest) (*model.MessageSendResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceSendMessage")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
 
 	var message *model.Message
 	if messageRequest.MessageType == "MEDIA" {
-		media, err := c.MediaClient.SaveMedia([]*multipart.FileHeader{messageRequest.Media})
+		media, err := c.MediaClient.SaveMedia(ctx, []*multipart.FileHeader{messageRequest.Media})
 		if err != nil {
 			return nil, err
 		}
@@ -140,13 +157,13 @@ func (c conversationService) SendMessage(ctx context.Context, bearer string, mes
 
 	conversation, err := c.ConversationRepository.GetConversationForUser(ctx, loggedId, messageRequest.MessageTo, limitConv)
 	if err == nil && conversation == nil {
-		isPrivate, err := c.UserClient.IsUserPrivate(messageRequest.MessageTo)
+		isPrivate, err := c.UserClient.IsUserPrivate(ctx, messageRequest.MessageTo)
 		if err != nil {
 			return nil, err
 		}
 
 		if isPrivate {
-			followers, err := c.RelationshipClient.GetFollowedUsers(loggedId)
+			followers, err := c.RelationshipClient.GetFollowedUsers(ctx, loggedId)
 			if err != nil {
 				return nil, err
 			}
@@ -169,11 +186,11 @@ func (c conversationService) SendMessage(ctx context.Context, bearer string, mes
 			}
 		}
 
-		participantOne, err := c.UserClient.GetLoggedUserInfo(bearer)
+		participantOne, err := c.UserClient.GetLoggedUserInfo(ctx, bearer)
 		if err != nil {
 			return nil, err
 		}
-		participantTwo, err := c.UserClient.GetUsersInfo(messageRequest.MessageTo)
+		participantTwo, err := c.UserClient.GetUsersInfo(ctx, messageRequest.MessageTo)
 		if err != nil {
 			return nil, err
 		}
@@ -219,11 +236,15 @@ func (c conversationService) SendMessage(ctx context.Context, bearer string, mes
 }
 
 func (c conversationService) sendMessageRequest(ctx context.Context, loggedId string, userId string, message *model.Message) (*model.ConversationRequest,error) {
-	messageFrom, err := c.UserClient.GetUsersInfo(loggedId)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceSendMessageRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	messageFrom, err := c.UserClient.GetUsersInfo(ctx, loggedId)
 	if err != nil {
 		return nil, err
 	}
-	messageTo, err := c.UserClient.GetUsersInfo(userId)
+	messageTo, err := c.UserClient.GetUsersInfo(ctx, userId)
 	if err != nil {
 		return  nil, err
 	}
@@ -261,7 +282,11 @@ func isInFollowers(followingUsers model.FollowedUsersResponse, userId string) bo
 }
 
 func (c conversationService) GetAllMessageRequestsForUser(ctx context.Context, bearer string) ([]*model.ConversationResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceGetAllMessageRequestsForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +308,11 @@ func (c conversationService) GetAllMessageRequestsForUser(ctx context.Context, b
 }
 
 func (c conversationService) GetAllMessagesFromUserFromRequest(ctx context.Context, bearer string, userId string) (*model.MessagesResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceGetAllMessagesFromUserFromRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +321,7 @@ func (c conversationService) GetAllMessagesFromUserFromRequest(ctx context.Conte
 	if err != nil {
 		return nil, err
 	}
-	participant, err := c.UserClient.GetUsersInfo(userId)
+	participant, err := c.UserClient.GetUsersInfo(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +334,11 @@ func (c conversationService) GetAllMessagesFromUserFromRequest(ctx context.Conte
 }
 
 func (c conversationService) GetAllConversationsForUser(ctx context.Context, bearer string) ([]*model.ConversationResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceGetAllConversationsForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -334,7 +367,11 @@ func (c conversationService) GetAllConversationsForUser(ctx context.Context, bea
 }
 
 func (c conversationService) GetAllMessagesFromUser(ctx context.Context, bearer string, userId string) (*model.MessagesResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceGetAllMessagesFromUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +380,7 @@ func (c conversationService) GetAllMessagesFromUser(ctx context.Context, bearer 
 	if err != nil {
 		return nil, err
 	}
-	participant, err := c.UserClient.GetUsersInfo(userId)
+	participant, err := c.UserClient.GetUsersInfo(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -356,6 +393,9 @@ func (c conversationService) GetAllMessagesFromUser(ctx context.Context, bearer 
 }
 
 func (c conversationService) GetAllNotViewedConversationsForUser(ctx context.Context, userId string) ([]*model.ConversationResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceGetAllNotViewedConversationsForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	var convResp []*model.ConversationResponse
 	conversations, err := c.ConversationRepository.GetAllForUser(ctx, userId, limitConv)
@@ -391,7 +431,11 @@ func (c conversationService) GetAllNotViewedConversationsForUser(ctx context.Con
 }
 
 func (c conversationService) ViewUsersMessages(ctx context.Context, bearer string, conversationId string) (string ,error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceViewUsersMessages")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -401,7 +445,11 @@ func (c conversationService) ViewUsersMessages(ctx context.Context, bearer strin
 }
 
 func (c conversationService) ViewUserMediaMessages(ctx context.Context, bearer string, conversationId string, messageId string) error {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "ConversationServiceViewUserMediaMessages")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}

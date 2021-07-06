@@ -8,6 +8,7 @@ import (
 	"message-service/domain/repository"
 	"message-service/domain/service-contracts"
 	"message-service/service/intercomm"
+	"message-service/tracer"
 )
 
 var (
@@ -25,9 +26,12 @@ func NewNotificationService(r repository.NotificationRepository, ac intercomm.Au
 }
 
 func (n notificationService) CreatePostInteractionNotification(ctx context.Context, notificationReq *model.NotificationRequest) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceCreatePostInteractionNotification")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	if notificationReq.Type == model.Liked {
-		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, notificationReq.UserFromId, "like")
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(ctx, notificationReq.UserId, notificationReq.UserFromId, "like")
 		if err != nil {
 			return false, err
 		}
@@ -37,7 +41,7 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 			return true, n.NotificationRepository.Create(ctx, notification)
 		}
 	} else if notificationReq.Type == model.Disliked {
-		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, notificationReq.UserFromId, "dislike")
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(ctx, notificationReq.UserId, notificationReq.UserFromId, "dislike")
 		if err != nil {
 			return false, err
 		}
@@ -47,7 +51,7 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 			return true, n.NotificationRepository.Create(ctx, notification)
 		}
 	} else if notificationReq.Type == model.Commented {
-		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, notificationReq.UserFromId, "comment")
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(ctx, notificationReq.UserId, notificationReq.UserFromId, "comment")
 		if err != nil {
 			return false, err
 		}
@@ -57,7 +61,7 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 			return true, n.NotificationRepository.Create(ctx, notification)
 		}
 	} else if notificationReq.Type == model.Followed {
-		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, notificationReq.UserFromId, "follow")
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(ctx, notificationReq.UserId, notificationReq.UserFromId, "follow")
 		if err != nil {
 			return false, err
 		}
@@ -67,7 +71,7 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 			return true, n.NotificationRepository.Create(ctx, notification)
 		}
 	} else if notificationReq.Type == model.FollowRequest {
-		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, notificationReq.UserFromId, "follow-request")
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(ctx, notificationReq.UserId, notificationReq.UserFromId, "follow-request")
 		if err != nil {
 			return false, err
 		}
@@ -77,7 +81,7 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 			return true, n.NotificationRepository.Create(ctx, notification)
 		}
 	} else if notificationReq.Type == model.AcceptedFollowRequest {
-		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(notificationReq.UserId, notificationReq.UserFromId, "accepted-follow-request")
+		notify, err := n.UserClient.CheckIfPostInteractionNotificationEnabled(ctx, notificationReq.UserId, notificationReq.UserFromId, "accepted-follow-request")
 		if err != nil {
 			return false, err
 		}
@@ -93,8 +97,12 @@ func (n notificationService) CreatePostInteractionNotification(ctx context.Conte
 
 
 func (n notificationService) CreatePostOrStoryNotification(ctx context.Context, notificationReq *model.NotificationRequest) ([]*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceCreatePostOrStoryNotification")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	if notificationReq.Type == model.PublishedPost {
-		userInfos, err := n.UserClient.GetUsersForPostNotification(notificationReq.UserId)
+		userInfos, err := n.UserClient.GetUsersForPostNotification(ctx, notificationReq.UserId)
 		fmt.Println(len(userInfos))
 		fmt.Println(notificationReq.UserId)
 
@@ -114,7 +122,7 @@ func (n notificationService) CreatePostOrStoryNotification(ctx context.Context, 
 		}
 		return userInfos, nil
 	} else if notificationReq.Type == model.PublishedStory {
-		userInfos, err := n.UserClient.GetUsersForStoryNotification(notificationReq.UserId)
+		userInfos, err := n.UserClient.GetUsersForStoryNotification(ctx, notificationReq.UserId)
 		if err != nil {
 			return []*model.UserInfo{}, err
 		}
@@ -136,7 +144,12 @@ func (n notificationService) CreatePostOrStoryNotification(ctx context.Context, 
 
 
 func (n notificationService) GetAllForUser(ctx context.Context, bearer string) ([]*model.Notification, error) {
-	userId, err := n.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceGetAllForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := n.AuthClient.GetLoggedUserId(ctx,
+		bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +158,11 @@ func (n notificationService) GetAllForUser(ctx context.Context, bearer string) (
 }
 
 func (n notificationService) GetAllForUserSortedByTime(ctx context.Context, bearer string) ([]*model.Notification, error) {
-	userId, err := n.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceGetAllForUserSortedByTime")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := n.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -154,11 +171,19 @@ func (n notificationService) GetAllForUserSortedByTime(ctx context.Context, bear
 }
 
 func (n notificationService) GetAllNotViewedForUser(ctx context.Context, userId string) ([]*model.Notification, error) {
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceGetAllNotViewedForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	return n.NotificationRepository.GetAllNotViewedForUser(ctx, userId, limit)
 }
 
 func (n notificationService) GetAllNotViewedForLoggedUser(ctx context.Context, bearer string) ([]*model.Notification, error) {
-	userId, err := n.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceGetAllNotViewedForLoggedUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := n.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +191,11 @@ func (n notificationService) GetAllNotViewedForLoggedUser(ctx context.Context, b
 	return n.NotificationRepository.GetAllNotViewedForUser(ctx, userId, limit)}
 
 func (n notificationService) ViewUsersNotifications(ctx context.Context, bearer string) error {
-	userId, err := n.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "NotificationServiceViewUsersNotifications")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := n.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}

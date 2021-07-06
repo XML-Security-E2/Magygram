@@ -1,6 +1,7 @@
 package intercomm
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,12 +12,13 @@ import (
 	"story-service/conf"
 	"story-service/domain/model"
 	"story-service/logger"
+	"story-service/tracer"
 )
 
 type UserClient interface {
-	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
-	IsUserPrivate(userId string) (bool, error)
-	GetLoggedAgentInfo(bearer string) (*model.AgentInfo, error)
+	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo,error)
+	IsUserPrivate(ctx context.Context, userId string) (bool, error)
+	GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error)
 }
 
 type userClient struct {}
@@ -30,11 +32,15 @@ var (
 	baseUsersUrl = ""
 )
 
-func (u userClient) GetLoggedAgentInfo(bearer string) (*model.AgentInfo, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged/agent", baseUsersUrl), nil)
+func (u userClient) GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetLoggedAgentInfo")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged/agent", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -53,10 +59,14 @@ func (u userClient) GetLoggedAgentInfo(bearer string) (*model.AgentInfo, error) 
 
 	return &userInfo, nil}
 
-func (u userClient) IsUserPrivate(userId string) (bool, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
+func (u userClient) IsUserPrivate(ctx context.Context, userId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientIsUserPrivate")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/is-private", baseUsersUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -80,12 +90,15 @@ func (u userClient) IsUserPrivate(userId string) (bool, error) {
 	return isPrivate, nil
 }
 
-func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
+func (u userClient) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetLoggedUserInfo")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

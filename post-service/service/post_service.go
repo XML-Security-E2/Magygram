@@ -4,14 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/beevik/guid"
-	"github.com/go-playground/validator"
-	"github.com/sirupsen/logrus"
 	"log"
 	_ "net/http"
 	"post-service/domain/model"
 	"post-service/domain/repository"
-	"post-service/domain/service-contracts"
+	service_contracts "post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
 	"post-service/service/intercomm"
@@ -19,9 +16,11 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/beevik/guid"
+	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 )
-
-
 
 type postService struct {
 	repository.PostRepository
@@ -33,8 +32,8 @@ type postService struct {
 	intercomm.AdsClient
 }
 
-func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient,adsc intercomm.AdsClient) service_contracts.PostService {
-	return &postService{r , ic, uc, ir, ac, mc, adsc}
+func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ir intercomm.RelationshipClient, ac intercomm.AuthClient, mc intercomm.MessageClient, adsc intercomm.AdsClient) service_contracts.PostService {
+	return &postService{r, ic, uc, ir, ac, mc, adsc}
 }
 
 func (p postService) CreatePost(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
@@ -43,40 +42,46 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
-	if err != nil { return "", err}
+	if err != nil {
+		return "", err
+	}
 
 	media, err := p.MediaClient.SaveMedia(ctx, postRequest.Media)
-	if err != nil { return "", err}
+	if err != nil {
+		return "", err
+	}
 
-	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media,"")
+	post, err := model.NewPost(postRequest, *userInfo, "REGULAR", media, "")
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
-													 "description" : postRequest.Description,
-													 "location" : postRequest.Location}).Warn("Post creating validation failure")
+			"description": postRequest.Description,
+			"location":    postRequest.Location}).Warn("Post creating validation failure")
 
-		return "", err}
+		return "", err
+	}
 
-	if err = validator.New().Struct(post); err!= nil {
+	if err = validator.New().Struct(post); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
-			"description" : postRequest.Description,
-			"location" : postRequest.Location}).Warn("Post creating validation failure")
+			"description": postRequest.Description,
+			"location":    postRequest.Location}).Warn("Post creating validation failure")
 		return "", err
 	}
 
 	result, err := p.PostRepository.Create(ctx, post)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": postRequest.Tags,
-													 "description" : postRequest.Description,
-													 "location" : postRequest.Location}).Error("Post database create failure")
-		return "", err}
+			"description": postRequest.Description,
+			"location":    postRequest.Location}).Error("Post database create failure")
+		return "", err
+	}
 
 	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    userInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  post.UserInfo.ImageURL,
-		Type:      intercomm.PublishedPost,
+		Username:   userInfo.Username,
+		UserId:     userInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   post.UserInfo.ImageURL,
+		Type:       intercomm.PublishedPost,
 	})
 
 	if err != nil {
@@ -84,7 +89,7 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	}
 
 	if postId, ok := result.InsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id" : userInfo.Id}).Info("Post created")
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id": userInfo.Id}).Info("Post created")
 		return postId, nil
 	}
 
@@ -97,19 +102,25 @@ func (p postService) CreatePostCampaign(ctx context.Context, bearer string, post
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userInfo, err := p.UserClient.GetLoggedAgentInfo(ctx, bearer)
-	if err != nil { return "", err}
+	if err != nil {
+		return "", err
+	}
 
 	media, err := p.MediaClient.SaveMedia(ctx, postRequest.Media)
-	if err != nil { return "", err}
+	if err != nil {
+		return "", err
+	}
 
 	post, err := model.NewPost(postRequest, model.UserInfo{
 		Id:       userInfo.Id,
 		Username: userInfo.Username,
 		ImageURL: userInfo.ImageURL,
 	}, "CAMPAIGN", media, userInfo.Website)
-	if err != nil {return "", err}
+	if err != nil {
+		return "", err
+	}
 
-	if err = validator.New().Struct(post); err!= nil {
+	if err = validator.New().Struct(post); err != nil {
 		return "", err
 	}
 
@@ -121,15 +132,16 @@ func (p postService) CreatePostCampaign(ctx context.Context, bearer string, post
 
 	result, err := p.PostRepository.Create(ctx, post)
 	if err != nil {
-		return "", err}
+		return "", err
+	}
 
 	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    userInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  post.UserInfo.ImageURL,
-		Type:      intercomm.PublishedPost,
+		Username:   userInfo.Username,
+		UserId:     userInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   post.UserInfo.ImageURL,
+		Type:       intercomm.PublishedPost,
 	})
 
 	if err != nil {
@@ -176,8 +188,8 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 
 	for _, userId := range followedUsers.Users {
 		var newPosts []*model.Post
-		newPosts, _ = p.PostRepository.GetPostsForUser(ctx,userId)
-		posts= append(posts, newPosts...)
+		newPosts, _ = p.PostRepository.GetPostsForUser(ctx, userId)
+		posts = append(posts, newPosts...)
 	}
 
 	sortedPosts := sortPostPerTime(ctx, posts)
@@ -186,7 +198,6 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 
 	return retVal, nil
 }
-
 
 func sortPostPerTime(ctx context.Context, posts []*model.Post) []*model.Post {
 	span := tracer.StartSpanFromContext(ctx, "PostServiceSortPostPerTime")
@@ -204,13 +215,13 @@ func sortPostPerTime(ctx context.Context, posts []*model.Post) []*model.Post {
 
 func (p postService) DeletePost(ctx context.Context, bearer string, requestId string) error {
 
-	retVal, err := p.AuthClient.HasRole(ctx, bearer,"delete_posts")
-	if err != nil{
+	retVal, err := p.AuthClient.HasRole(ctx, bearer, "delete_posts")
+	if err != nil {
 		return errors.New("auth service not found")
 	}
 
 	request, err := p.PostRepository.GetByID(ctx, requestId)
-	if err!=nil {
+	if err != nil {
 		return errors.New("post not found")
 	}
 
@@ -229,9 +240,9 @@ func (p postService) DeletePost(ctx context.Context, bearer string, requestId st
 		return err
 	}
 
-	request.IsDeleted=true
+	request.IsDeleted = true
 
-	_, err = p.PostRepository.DeletePost(ctx,request)
+	_, err = p.PostRepository.DeletePost(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -245,15 +256,15 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 		return err
 	}
 
-	result, err := p.PostRepository.GetByID(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
 		return err
 	}
 	var res model.UserInfo
 
-	res.Id= userInfo.Id
-	res.ImageURL= userInfo.ImageURL
-	res.Username= userInfo.Username
+	res.Id = userInfo.Id
+	res.ImageURL = userInfo.ImageURL
+	res.Username = userInfo.Username
 
 	result.LikedBy = append(result.LikedBy, res)
 
@@ -262,20 +273,20 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 		return err
 	}
 
-	_, err = p.PostRepository.Update(ctx,result)
+	_, err = p.PostRepository.Update(ctx, result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-													"post_id" : postId}).Error("Post like, database update failure")
+			"post_id": postId}).Error("Post like, database update failure")
 		return err
 	}
 
 	err = p.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    result.UserInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  userInfo.ImageURL,
-		Type:      intercomm.Liked,
+		Username:   userInfo.Username,
+		UserId:     result.UserInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   userInfo.ImageURL,
+		Type:       intercomm.Liked,
 	})
 
 	if err != nil {
@@ -283,7 +294,7 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-												 "post_id" : postId}).Info("Post liked")
+		"post_id": postId}).Info("Post liked")
 	return nil
 }
 
@@ -293,7 +304,7 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 		return err
 	}
 
-	result, err := p.PostRepository.GetByID(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
 		return err
 	}
@@ -305,15 +316,15 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 		return err
 	}
 
-	_, err = p.PostRepository.Update(ctx,result)
+	_, err = p.PostRepository.Update(ctx, result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-					 							     "post_id" : postId}).Error("Post dislike, database update failure")
+			"post_id": postId}).Error("Post dislike, database update failure")
 		return err
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-												 "post_id" : postId}).Info("Post unliked")
+		"post_id": postId}).Info("Post unliked")
 	return nil
 }
 
@@ -323,15 +334,15 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 		return err
 	}
 
-	result, err := p.PostRepository.GetByID(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
 		return err
 	}
 	var res model.UserInfo
 
-	res.Id= userInfo.Id
-	res.ImageURL= userInfo.ImageURL
-	res.Username= userInfo.Username
+	res.Id = userInfo.Id
+	res.ImageURL = userInfo.ImageURL
+	res.Username = userInfo.Username
 
 	result.DislikedBy = append(result.DislikedBy, res)
 
@@ -340,20 +351,20 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 		return err
 	}
 
-	_, err = p.PostRepository.Update(ctx,result)
+	_, err = p.PostRepository.Update(ctx, result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-													 "post_id" : postId}).Error("Post dislike, database update failure")
+			"post_id": postId}).Error("Post dislike, database update failure")
 		return err
 	}
 
 	err = p.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    result.UserInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  userInfo.ImageURL,
-		Type:      intercomm.Disliked,
+		Username:   userInfo.Username,
+		UserId:     result.UserInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   userInfo.ImageURL,
+		Type:       intercomm.Disliked,
 	})
 
 	if err != nil {
@@ -361,7 +372,7 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-												 "post_id" : postId}).Info("Post disliked")
+		"post_id": postId}).Info("Post disliked")
 	return nil
 }
 
@@ -373,7 +384,7 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 	}
 	fmt.Println(postId)
 
-	result, err := p.PostRepository.GetByID(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
 		return err
 	}
@@ -385,15 +396,15 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 		return err
 	}
 
-	_, err = p.PostRepository.Update(ctx,result)
+	_, err = p.PostRepository.Update(ctx, result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-			 										 "post_id" : postId}).Error("Post un-dislike, database update failure")
+			"post_id": postId}).Error("Post un-dislike, database update failure")
 		return err
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-											 	 "post_id" : postId}).Info("Post un-disliked")
+		"post_id": postId}).Info("Post un-disliked")
 	return nil
 }
 
@@ -403,16 +414,16 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 		return nil, err
 	}
 
-	result, err := p.PostRepository.GetByID(ctx,postId)
+	result, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	var res model.Comment
 
-	res.Id= guid.New().String()
-	res.Content= content
-	res.CreatedBy= *userInfo
+	res.Id = guid.New().String()
+	res.Content = content
+	res.CreatedBy = *userInfo
 	res.TimeCreated = time.Now()
 	res.Tags = tags
 
@@ -423,20 +434,20 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 		return nil, err
 	}
 
-	_, err = p.PostRepository.Update(ctx,result)
+	_, err = p.PostRepository.Update(ctx, result)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-												     "post_id" : postId}).Error("Post comment, database update failure")
+			"post_id": postId}).Error("Post comment, database update failure")
 		return nil, err
 	}
 
 	err = p.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    result.UserInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  userInfo.ImageURL,
-		Type:      intercomm.Commented,
+		Username:   userInfo.Username,
+		UserId:     result.UserInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   userInfo.ImageURL,
+		Type:       intercomm.Commented,
 	})
 
 	if err != nil {
@@ -444,11 +455,10 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id,
-												 "post_id" : postId}).Info("Post commented")
+		"post_id": postId}).Info("Post commented")
 
 	return &res, nil
 }
-
 
 func findAndDeleteDislikedBy(result *model.Post, info *model.UserInfo) []model.UserInfo {
 	index := 0
@@ -476,12 +486,16 @@ func (p postService) mapPostsToResponsePostDTO(bearer string, result []*model.Po
 	var retVal []*model.PostResponse
 
 	postIdFavourites, err := p.UserClient.MapPostsToFavourites(bearer, getIdsFromPosts(result))
-	if err != nil { return nil}
+	if err != nil {
+		return nil
+	}
 
 	for _, post := range result {
-		res, err := model.NewPostResponse(post,hasUserLikedPost(post,userId),hasUserDislikedPost(post,userId), isInFavourites(post, postIdFavourites))
+		res, err := model.NewPostResponse(post, hasUserLikedPost(post, userId), hasUserDislikedPost(post, userId), isInFavourites(post, postIdFavourites))
 
-		if err != nil { return nil}
+		if err != nil {
+			return nil
+		}
 
 		retVal = append(retVal, res)
 	}
@@ -492,11 +506,12 @@ func (p postService) mapPostsToResponsePostDTO(bearer string, result []*model.Po
 func (p postService) mapPostsToResponsePostDTOForAdmin(bearer string, result []*model.Post) []*model.PostResponse {
 	var retVal []*model.PostResponse
 
-
 	for _, post := range result {
-		res, err := model.NewPostResponse(post,false,false,false)
+		res, err := model.NewPostResponse(post, false, false, false)
 
-		if err != nil { return nil}
+		if err != nil {
+			return nil
+		}
 
 		retVal = append(retVal, res)
 	}
@@ -525,8 +540,8 @@ func hasUserLikedPost(post *model.Post, usedId string) bool {
 	var retVal = false
 
 	for _, likedUserInfo := range post.LikedBy {
-		if likedUserInfo.Id == usedId{
-			retVal=true
+		if likedUserInfo.Id == usedId {
+			retVal = true
 			break
 		}
 	}
@@ -538,15 +553,14 @@ func hasUserDislikedPost(post *model.Post, usedId string) bool {
 	var retVal = false
 
 	for _, dislikedUserInfo := range post.DislikedBy {
-		if dislikedUserInfo.Id == usedId{
-			retVal=true
+		if dislikedUserInfo.Id == usedId {
+			retVal = true
 			break
 		}
 	}
 
 	return retVal
 }
-
 
 func (p postService) GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error) {
 
@@ -584,16 +598,16 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 	_, err = p.PostRepository.Update(ctx, post)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": post.UserInfo.Id,
-													 "post_id" : post.Id,
-													 "tags": postRequest.Tags,
-													 "description": postRequest.Description,
-													 "location": postRequest.Location}).Error("Post edit, database update failure")
+			"post_id":     post.Id,
+			"tags":        postRequest.Tags,
+			"description": postRequest.Description,
+			"location":    postRequest.Location}).Error("Post edit, database update failure")
 		return err
 	}
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": post.UserInfo.Id,
-												 "post_id" : post.Id,
-												 }).Info("Post edited")
+		"post_id": post.Id,
+	}).Info("Post edited")
 
 	return nil
 }
@@ -601,12 +615,12 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 func (p postService) CheckIfUsersPostFromBearer(ctx context.Context, bearer string, postOwnerId string) (bool, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId}).Warn("Unauthorized access")
 		return false, err
 	}
 
 	if postOwnerId != userInfo.Id {
-		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userInfo.Id}).Warn("Unauthorized access")
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId, "user_id": userInfo.Id}).Warn("Unauthorized access")
 		return false, nil
 	}
 	return true, nil
@@ -617,21 +631,20 @@ func (p postService) GetUsersPosts(ctx context.Context, bearer string, postOwner
 	defer span.Finish()
 	ctx = tracer.ContextWithSpan(ctx, span)
 
-	retVal, err := p.AuthClient.HasRole(ctx, bearer,"visit_private_profiles")
-	if err!=nil{
+	retVal, err := p.AuthClient.HasRole(ctx, bearer, "visit_private_profiles")
+	if err != nil {
 		return nil, errors.New("auth service not found")
 	}
 
 	if !p.checkIfUserContentIsAccessible(ctx, bearer, postOwnerId) {
-		if !retVal{
+		if !retVal {
 			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 		}
 	}
 
-
 	userPosts, err := p.PostRepository.GetPostsForUser(ctx, postOwnerId)
 	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Error while getting user posts")
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId}).Warn("Error while getting user posts")
 		return nil, errors.New("invalid user id")
 	}
 
@@ -654,19 +667,19 @@ func (p postService) checkIfUserContentIsAccessible(ctx context.Context, bearer 
 
 	if isPrivate {
 		if bearer == "" {
-			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId}).Warn("Unauthorized access")
 			return false
 		}
 		userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 		if err != nil {
-			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId}).Warn("Unauthorized access")
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId}).Warn("Unauthorized access")
 			return false
 		}
 
 		if userId != postOwnerId {
 			followedUsers, err := p.RelationshipClient.GetFollowedUsers(ctx, userId)
 			if err != nil {
-				logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userId}).Warn("Unauthorized access")
+				logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId, "user_id": userId}).Warn("Unauthorized access")
 				return false
 			}
 
@@ -676,7 +689,7 @@ func (p postService) checkIfUserContentIsAccessible(ctx context.Context, bearer 
 				}
 			}
 
-			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id" : postOwnerId, "user_id" : userId}).Warn("Unauthorized access")
+			logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId, "user_id": userId}).Warn("Unauthorized access")
 			return false
 		}
 	}
@@ -707,8 +720,8 @@ func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, 
 		return nil, nil, errors.New("invalid post id")
 	}
 
-	retVal, err := p.AuthClient.HasRole(ctx, bearer,"visit_private_profiles")
-	if err!=nil{
+	retVal, err := p.AuthClient.HasRole(ctx, bearer, "visit_private_profiles")
+	if err != nil {
 		return nil, nil, errors.New("auth service not found")
 	}
 
@@ -749,8 +762,8 @@ func (p postService) GetPostById(ctx context.Context, bearer string, postId stri
 		return nil, errors.New("invalid post id")
 	}
 
-	retVal, err := p.AuthClient.HasRole(ctx, bearer,"visit_private_profiles")
-	if err!=nil{
+	retVal, err := p.AuthClient.HasRole(ctx, bearer, "visit_private_profiles")
+	if err != nil {
 		return nil, errors.New("auth service not found")
 	}
 
@@ -789,7 +802,7 @@ func (p postService) SearchForPostsByHashTagByGuest(ctx context.Context, hashTag
 	elementMap := makeHashTagMap(posts, hashTagValue)
 
 	retVal := mapHashTagMapToHashTagResponseDTO(elementMap)
-	
+
 	return retVal, err
 }
 
@@ -807,12 +820,12 @@ func mapHashTagMapToHashTagResponseDTO(hashTagMap map[string]int) []*model.HashT
 func makeHashTagMap(posts []*model.Post, hashTagValue string) map[string]int {
 	elementMap := make(map[string]int)
 
-	for _, post := range posts{
+	for _, post := range posts {
 		for _, hashTag := range post.HashTags {
-			if strings.Contains(hashTag,hashTagValue){
+			if strings.Contains(hashTag, hashTagValue) {
 				if _, ok := elementMap[hashTag]; ok {
-					elementMap[hashTag] = elementMap[hashTag]+1
-				}else{
+					elementMap[hashTag] = elementMap[hashTag] + 1
+				} else {
 					elementMap[hashTag] = 1
 				}
 			}
@@ -825,22 +838,22 @@ func makeHashTagMap(posts []*model.Post, hashTagValue string) map[string]int {
 func (p postService) GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse, error) {
 	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
 
-	if err!=nil{
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
 	var publicPosts []*model.Post
 
-	for _,post := range posts{
+	for _, post := range posts {
 		value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
 
-		if err!=nil{
+		if err != nil {
 			log.Println(err)
-			return nil,err
+			return nil, err
 		}
 
 		if !value {
-			publicPosts=append(publicPosts, post)
+			publicPosts = append(publicPosts, post)
 		}
 	}
 
@@ -855,7 +868,9 @@ func (p postService) mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(post
 	for _, post := range posts {
 		res, err := model.NewGuestTimelinePostResponse(post)
 
-		if err != nil { return nil}
+		if err != nil {
+			return nil
+		}
 
 		retVal = append(retVal, res)
 	}
@@ -865,36 +880,36 @@ func (p postService) mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(post
 
 func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string, bearer string) ([]*model.PostResponse, error) {
 	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
-	if err!=nil{
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
 	var publicPosts []*model.Post
 
-	retValRole, err := p.AuthClient.HasRole(ctx, bearer,"search_all_post_by_hashtag")
-	if err!=nil{
+	retValRole, err := p.AuthClient.HasRole(ctx, bearer, "search_all_post_by_hashtag")
+	if err != nil {
 		return nil, errors.New("auth service not found")
 	}
 
-	if retValRole{
-		publicPosts=posts
+	if retValRole {
+		publicPosts = posts
 		retVal := p.mapPostsToResponsePostDTOForAdmin(bearer, publicPosts)
 
 		return retVal, nil
-	}else {
+	} else {
 		userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 		if err != nil {
 			return nil, err
 		}
 
-		for _,post := range posts{
+		for _, post := range posts {
 			value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
-			if err!=nil{
-				return nil,err
+			if err != nil {
+				return nil, err
 			}
 
 			if !value {
-				publicPosts=append(publicPosts, post)
+				publicPosts = append(publicPosts, post)
 			}
 		}
 		retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
@@ -919,11 +934,11 @@ func (p postService) SearchPostsByLocation(ctx context.Context, locationValue st
 func makeLocationMap(posts []*model.Post, locationValue string) map[string]int {
 	elementMap := make(map[string]int)
 
-	for _, post := range posts{
-		if strings.Contains(post.Location,locationValue){
+	for _, post := range posts {
+		if strings.Contains(post.Location, locationValue) {
 			if _, ok := elementMap[post.Location]; ok {
-				elementMap[post.Location] = elementMap[post.Location]+1
-			}else {
+				elementMap[post.Location] = elementMap[post.Location] + 1
+			} else {
 				elementMap[post.Location] = 1
 			}
 		}
@@ -946,22 +961,22 @@ func mapLocationMapToLocationResponseDTO(hashTagMap map[string]int) []*model.Loc
 func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, location string) ([]*model.GuestTimelinePostResponse, error) {
 	posts, err := p.PostRepository.GetPostsByLocation(ctx, location)
 
-	if err!=nil{
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
 	var publicPosts []*model.Post
 
-	for _,post := range posts{
+	for _, post := range posts {
 		value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
 
-		if err!=nil{
+		if err != nil {
 			log.Println(err)
-			return nil,err
+			return nil, err
 		}
 
 		if !value {
-			publicPosts=append(publicPosts, post)
+			publicPosts = append(publicPosts, post)
 		}
 	}
 
@@ -972,35 +987,34 @@ func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, loca
 
 func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, location string, bearer string) ([]*model.PostResponse, error) {
 	posts, err := p.PostRepository.GetPostsByLocation(ctx, location)
-	if err!=nil{
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
-
-	retValRole, err := p.AuthClient.HasRole(ctx, bearer,"search_all_post_by_location")
-	if err!=nil{
+	retValRole, err := p.AuthClient.HasRole(ctx, bearer, "search_all_post_by_location")
+	if err != nil {
 		return nil, errors.New("auth service not found")
 	}
 
-	if retValRole{
+	if retValRole {
 		retVal := p.mapPostsToResponsePostDTOForAdmin(bearer, posts)
 
 		return retVal, nil
-	}else {
+	} else {
 		userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 		if err != nil {
 			return nil, err
 		}
 
 		var publicPosts []*model.Post
-		for _,post := range posts{
+		for _, post := range posts {
 			value, err := p.UserClient.IsUserPrivate(ctx, post.UserInfo.Id)
-			if err!=nil{
-				return nil,err
+			if err != nil {
+				return nil, err
 			}
 
 			if !value {
-				publicPosts=append(publicPosts, post)
+				publicPosts = append(publicPosts, post)
 			}
 		}
 
@@ -1017,14 +1031,14 @@ func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*m
 		return nil, errors.New("invalid post id")
 	}
 
-	var retVal,_ = model.NewGuestTimelinePostResponse(post)
+	var retVal, _ = model.NewGuestTimelinePostResponse(post)
 
 	return retVal, nil
 }
 
 func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
 	posts, err := p.AdsClient.GetAllActiveAgentsPostCampaigns(bearer)
-	if err != nil{
+	if err != nil {
 		return []*model.PostProfileResponse{}, err
 	}
 
@@ -1034,8 +1048,8 @@ func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([
 		return nil, nil
 	}
 
-	if err != nil{
-		return []*model.PostProfileResponse{},err
+	if err != nil {
+		return []*model.PostProfileResponse{}, err
 	}
 
 	var userPostsResponse []*model.PostProfileResponse
@@ -1056,8 +1070,8 @@ func (p postService) GetUserLikedPosts(ctx context.Context, bearer string) ([]*m
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userLikedPostIds, err := p.UserClient.GetLikedPosts(ctx, bearer)
-	if err!=nil{
-		return []*model.PostProfileResponse{},err
+	if err != nil {
+		return []*model.PostProfileResponse{}, err
 	}
 
 	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, userLikedPostIds)
@@ -1079,8 +1093,8 @@ func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userLikedPostIds, err := p.UserClient.GetDislikedPosts(ctx, bearer)
-	if err!=nil{
-		return []*model.PostProfileResponse{},err
+	if err != nil {
+		return []*model.PostProfileResponse{}, err
 	}
 
 	userPosts, err := p.PostRepository.GetPostsByPostIdArray(ctx, userLikedPostIds)
@@ -1102,7 +1116,6 @@ func (p postService) EditPostOwnerInfo(ctx context.Context, bearer string, userI
 		return err
 	}
 	fmt.Println(userId)
-
 
 	if userId != userInfo.Id {
 		return errors.New("unauthorized edit")
@@ -1135,7 +1148,7 @@ func (p postService) EditLikedByInfo(ctx context.Context, bearer string, userInf
 		post, err := p.PostRepository.GetByID(ctx, postId)
 		if err == nil {
 			for idx, likedBy := range post.LikedBy {
-				if userId == likedBy.Id{
+				if userId == likedBy.Id {
 					post.LikedBy[idx] = model.UserInfo{
 						Id:       userId,
 						Username: userInfoEdit.Username,
@@ -1210,4 +1223,3 @@ func (p postService) EditCommentedByInfo(ctx context.Context, bearer string, use
 
 	return nil
 }
-
