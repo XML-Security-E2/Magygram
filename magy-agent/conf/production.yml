@@ -22,3 +22,8 @@ magygram:
   protocol: "http://"
   domain: "gateway"
   port: "8085"
+
+xmldb:
+  protocol: "http://"
+  domain: "xml-db"
+  port: "8081"

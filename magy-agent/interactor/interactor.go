@@ -24,6 +24,7 @@ type Interactor interface {
 	NewProductHandler() handler.ProductHandler
 	NewOrderHandler() handler.OrderHandler
 	NewMagygramClient() intercomm.MagygramClient
+	NewXmlDbClient() intercomm.XmlDbClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -48,6 +49,10 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler.ProductHandler = i.NewProductHandler()
 	appHandler.OrderHandler = i.NewOrderHandler()
 	return appHandler
+}
+
+func (i *interactor) NewXmlDbClient() intercomm.XmlDbClient {
+	return intercomm.NewXmlDbClient()
 }
 
 func (i *interactor) NewMagygramClient() intercomm.MagygramClient {
@@ -107,5 +112,5 @@ func (i *interactor) NewProductRepository() repository.ProductRepository {
 }
 
 func (i *interactor) NewProductService() service_contracts.ProductService {
-	return service.NewProductService(i.NewProductRepository(), i.NewMagygramClient())
+	return service.NewProductService(i.NewProductRepository(), i.NewMagygramClient(), i.NewXmlDbClient())
 }

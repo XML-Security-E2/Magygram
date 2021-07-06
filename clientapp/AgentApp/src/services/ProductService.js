@@ -11,7 +11,36 @@ export const productService = {
 	deleteProduct,
 	createCampaign,
 	getCampaignStatistics,
+	getGeneratedCampaignStatisticsReports,
 };
+
+async function getGeneratedCampaignStatisticsReports(dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/products/campaign/reports`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Error while fetching data"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: productConstants.SET_CAMPAIGN_REPORTS_REQUEST };
+	}
+	function success(data) {
+		return { type: productConstants.SET_CAMPAIGN_REPORTS_SUCCESS, reports: data };
+	}
+	function failure(message) {
+		return { type: productConstants.SET_CAMPAIGN_REPORTS_FAILURE, errorMessage: message };
+	}
+}
 
 async function findAllProducts(dispatch) {
 	dispatch(request());
@@ -62,7 +91,7 @@ async function getCampaignStatistics(dispatch) {
 		return { type: productConstants.SET_CAMPAIGNS_STATS_REQUEST };
 	}
 	function success(data) {
-		return { type: productConstants.SET_CAMPAIGNS_STATS_SUCCESS, campaigns: data };
+		return { type: productConstants.SET_CAMPAIGNS_STATS_SUCCESS, report: data };
 	}
 	function failure() {
 		return { type: productConstants.SET_CAMPAIGNS_STATS_FAILURE };

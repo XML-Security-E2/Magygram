@@ -42,7 +42,8 @@ const ProductContextProvider = (props) => {
 			showSuccessMessage: false,
 			successMessage: "",
 		},
-		campaigns: [],
+		reports: [],
+		showedCampaigns: [],
 	});
 
 	return <ProductContext.Provider value={{ productState, dispatch }}>{props.children}</ProductContext.Provider>;

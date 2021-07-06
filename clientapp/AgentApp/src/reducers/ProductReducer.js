@@ -242,17 +242,41 @@ export const productReducer = (state, action) => {
 		case productConstants.SET_CAMPAIGNS_STATS_REQUEST:
 			return {
 				...state,
-				campaigns: [],
+				showedCampaigns: [],
 			};
 
 		case productConstants.SET_CAMPAIGNS_STATS_SUCCESS:
-			return {
-				...state,
-				campaigns: action.campaigns,
-			};
+			prodCpy = { ...state };
+
+			prodCpy.showedCampaigns = action.report.campaigns;
+			if (prodCpy.reports.find((report) => report.fileId === action.report.fileId) === undefined) {
+				prodCpy.reports.push(action.report);
+			}
+			return prodCpy;
 
 		case productConstants.SET_CAMPAIGNS_STATS_FAILURE:
 			return state;
+
+		case productConstants.SET_CAMPAIGN_REPORTS_REQUEST:
+			return {
+				...state,
+				reports: [],
+			};
+
+		case productConstants.SET_CAMPAIGN_REPORTS_SUCCESS:
+			return {
+				...state,
+				reports: action.reports,
+			};
+
+		case productConstants.SET_CAMPAIGN_REPORTS_FAILURE:
+			return state;
+
+		case productConstants.CHANGE_SHOWED_CAMPAIGNS:
+			return {
+				...state,
+				showedCampaigns: action.campaigns,
+			};
 
 		default:
 			return state;

@@ -22,3 +22,10 @@ magygram:
   protocol: "https://"
   domain: "localhost"
   port: "8085"
+
+xmldb:
+  protocol: "http://"
+  domain: "localhost"
+  username: "admin"
+  password: ""
+  port: "8081"

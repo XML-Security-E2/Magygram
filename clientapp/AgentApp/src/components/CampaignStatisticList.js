@@ -12,16 +12,14 @@ const CampaignStatisticList = () => {
 
 	return (
 		<React.Fragment>
-			<div className="row">
+			<div className="row mt-5">
 				<div className="col-12">
 					<button type="button" className="btn btn-outline-secondary" onClick={getCampaignStatisticHandler}>
 						Generate report
 					</button>
 				</div>
-				<div className="col-12">
-					<h3 className="text-dark">Top campaigns</h3>
-				</div>
-				{productState.campaigns.map((campaign) => {
+				<div className="col-12">{productState.showedCampaigns.lenght > 0 && <h3 className="text-dark">Top campaigns</h3>}</div>
+				{productState.showedCampaigns.map((campaign) => {
 					return <CampaignStatisticItem statistics={campaign} />;
 				})}
 			</div>

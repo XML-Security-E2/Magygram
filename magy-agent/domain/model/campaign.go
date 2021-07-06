@@ -68,9 +68,9 @@ type CampaignStatisticResponse struct {
 
 type CampaignStatisticReport struct {
 	XMLName        xml.Name       `xml:"report"`
-	FileId         string         `xml:"id,attr"`
-	DateCreating   time.Time	  `xml:"date-creation,attr"`
-	Campaigns 	   []CampaignStatisticInfo `xml:"campaign"`
+	FileId         string         `json:"fileId" xml:"id,attr"`
+	DateCreating   time.Time	  `json:"dateCreating" xml:"date-creation,attr"`
+	Campaigns 	   []CampaignStatisticInfo `json:"campaigns" xml:"campaign"`
 }
 
 type CampaignStatisticInfo struct {
@@ -94,6 +94,30 @@ type CampaignStatisticInfo struct {
 	StoryViews int `xml:"storyViews"`
 	DailyAverage float32 `json:"dailyAverage" xml:"dailyAverage"`
 	Activity CampaignStatisticActivity `json:"activity" xml:"activity"`
+}
+
+type XmlDatabaseResponse struct {
+	XmlName xml.Name `xml:"exist:result"`
+	Url string `xml:"exist,attr"`
+	XmlDatabaseCollections XmlDatabaseCollection `xml:"collection"`
+}
+
+type XmlDatabaseCollection struct {
+	Name string `xml:"name,attr"`
+	Created string `xml:"created,attr"`
+	Owner string `xml:"owner,attr"`
+	Group string `xml:"group,attr"`
+	Permissions string `xml:"permissions,attr"`
+	Resources []XmlDatabaseResource `xml:"resource,omitempty"`
+}
+
+type XmlDatabaseResource struct {
+	Name string `xml:"name,attr"`
+	Created string `xml:"created,attr"`
+	LastModified string `xml:"last-modified,attr"`
+	Owner string `xml:"owner,attr"`
+	Group string `xml:"group,attr"`
+	Permissions string `xml:"permissions,attr"`
 }
 
 type CampaignStatisticStatus string

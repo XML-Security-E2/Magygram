@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../components/Header";
 import CampaignStatisticList from "../components/CampaignStatisticList";
+import CampaignStatisticReportList from "../components/CampaignStatisticReportList";
 import OrderContextProvider from "../contexts/OrderContext";
 import ProductContextProvider from "../contexts/ProductContext";
 
@@ -14,6 +15,7 @@ const CampaignsStatisticsPage = () => {
 						<div className="mt-4">
 							<div className="container d-flex justify-content-center">
 								<div className="col-10">
+									<CampaignStatisticReportList />
 									<CampaignStatisticList />
 								</div>
 							</div>

@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { modalConstants } from "../constants/ModalConstants";
 import { OrderContext } from "../contexts/OrderContext";
 import { hasRoles } from "../helpers/auth-header";
-import { productService } from "../services/ProductService";
 import { userService } from "../services/UserService";
 import ShoppingCartList from "./ShoppingCartList";
 

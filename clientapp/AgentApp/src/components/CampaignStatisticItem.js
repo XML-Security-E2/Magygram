@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 const CampaignStatisticItem = ({ statistics }) => {
 	return (
@@ -149,9 +148,9 @@ const CampaignStatisticItem = ({ statistics }) => {
 								</div>
 
 								<div className="row">
-									<Link className="font-weight-bold btn btn-link" style={{ cursor: "pointer" }} to={"/profile?userId=" + statistics.influencerId}>
+									<button className="font-weight-bold btn btn-link" style={{ cursor: "pointer" }}>
 										@{statistics.influencerUsername}
-									</Link>
+									</button>
 								</div>
 							</div>
 
@@ -335,9 +334,9 @@ const CampaignStatisticItem = ({ statistics }) => {
 								</div>
 
 								<div className="row">
-									<Link className="font-weight-bold btn btn-link" style={{ cursor: "pointer" }} to={"/profile?userId=" + statistics.influencerId}>
+									<button className="font-weight-bold btn btn-link" style={{ cursor: "pointer" }}>
 										@{statistics.influencerUsername}
-									</Link>
+									</button>
 								</div>
 							</div>
 

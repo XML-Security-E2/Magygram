@@ -32,6 +32,14 @@ type Config struct {
 		Domain string
 		Port 	 string
 	}
+
+	Xmldb struct {
+		Protocol   string
+		Domain string
+		Username string
+		Password string
+		Port 	 string
+	}
 }
 
 var Current *Config

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/beevik/guid"
 	"io"
-	"io/ioutil"
 	"magyAgent/conf"
 	"magyAgent/domain/model"
 	"magyAgent/domain/repository"
@@ -22,10 +21,11 @@ import (
 type productService struct {
 	repository.ProductRepository
 	intercomm.MagygramClient
+	intercomm.XmlDbClient
 }
 
-func NewProductService(r repository.ProductRepository, mc intercomm.MagygramClient) service_contracts.ProductService {
-	return &productService{r, mc }
+func NewProductService(r repository.ProductRepository, mc intercomm.MagygramClient, xc intercomm.XmlDbClient) service_contracts.ProductService {
+	return &productService{r, mc, xc }
 }
 
 var (
@@ -33,7 +33,26 @@ var (
 	FileRequestPrefix = "/api/media/"
 )
 
-func (p productService) GetProductCampaignStatistics(ctx context.Context) ([]*model.CampaignStatisticResponse, error) {
+func (p productService) GetAllProductCampaignStatisticsReports(ctx context.Context) ([]*model.CampaignStatisticReport, error) {
+
+	var retList []*model.CampaignStatisticReport
+	resp, err := p.XmlDbClient.GetAllDocument()
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(len(resp.XmlDatabaseCollections.Resources))
+	for _, res := range resp.XmlDatabaseCollections.Resources {
+		report, err := p.XmlDbClient.GetDocumentById(res.Name)
+		fmt.Println(report.FileId)
+		if err == nil {
+			retList = append(retList, report)
+		}
+	}
+
+	return retList, nil
+}
+
+func (p productService) GetProductCampaignStatistics(ctx context.Context) (*model.CampaignStatisticReport, error) {
 	stats, err :=  p.MagygramClient.GetCampaignStatistics()
 	list := model.CampaignStatisticReport{
 		XMLName:   xml.Name{},
@@ -75,9 +94,15 @@ func (p productService) GetProductCampaignStatistics(ctx context.Context) ([]*mo
 	list.Campaigns = campaigns
 	file, _ := xml.MarshalIndent(list, "", "	")
 
-	_ = ioutil.WriteFile("./probica.xml", file, 0644)
+	err = p.XmlDbClient.CreateDocument(file, list.FileId)
+	if err != nil {
+		return nil, err
+	}
 
-	return stats, err
+
+	//_ = ioutil.WriteFile("./probica.xml", file, 0644)
+
+	return &list, err
 }
 
 func (p productService) CreateProductCampaign(ctx context.Context, campaignReq *model.CampaignRequest) error {
