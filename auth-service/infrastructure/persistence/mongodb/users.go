@@ -27,7 +27,9 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) (*mongo.I
 func (r *userRepository) Update(ctx context.Context, user *model.User) (*mongo.UpdateResult, error) {
 	return r.Col.UpdateOne(ctx, bson.M{"_id":  user.Id},bson.D{{"$set", bson.D{{"email" , user.Email},
 		{"active" , user.Active},
-		{"password" , user.Password},}}})
+		{"password" , user.Password},
+		{"agent_token" , user.AgentToken},
+		{"totp_token" , user.TotpToken}}}})
 }
 
 func (r *userRepository) GetByID(ctx context.Context, id string) (*model.User, error) {

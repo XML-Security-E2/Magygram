@@ -5,12 +5,14 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import Stories from "react-insta-stories";
 import { StoryContext } from "../../contexts/StoryContext";
 import StoryCampaignOptionsModal from "./StoryCampaignOptionsModal";
+import { storyService } from "../../services/StoryService";
 
 const StoryCampaignModal = () => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
 	const [website, setWebsite] = useState("");
 	const [contentType, setContentType] = useState("");
+	const [storyId, setStoryId] = useState("");
 
 	const handleModalClose = () => {
 		dispatch({ type: modalConstants.HIDE_STORY_AGENT_CAMPAIGN_MODAL });
@@ -22,6 +24,7 @@ const StoryCampaignModal = () => {
 
 		setContentType(story.contentType);
 		setWebsite(story.website);
+		setStoryId(story.header.storyId);
 	};
 
 	const onAllStoriesEnd = () => {
@@ -31,6 +34,16 @@ const StoryCampaignModal = () => {
 
 	const handleOpenOptionsModal = () => {
 		dispatch({ type: modalConstants.SHOW_STORY_AGENT_OPTIONS_MODAL });
+	};
+
+	const handleClickOnWebsite = async () => {
+		await storyService.clickOnStoryCampaignWebsite(storyId).then(handleOpenWebsite());
+	};
+
+	const handleOpenWebsite = () => {
+		return new Promise(function () {
+			window.open("https://" + website, "_blank");
+		});
 	};
 
 	return (
@@ -45,9 +58,9 @@ const StoryCampaignModal = () => {
 				<Stories currentIndex={0} width="100%" stories={storyState.agentCampaignStoryModal.stories} onAllStoriesEnd={onAllStoriesEnd} onStoryStart={onStoryStart} />
 				{contentType === "CAMPAIGN" && (
 					<div className="d-flex align-items-center" style={{ "background-color": "#111111" }}>
-						<a type="button" className="btn btn-link border-0 text-white" href={"https://" + website} target="_blank">
+						<button type="button" className="btn btn-link text-white border-0" onClick={handleClickOnWebsite}>
 							Visit {website}
-						</a>
+						</button>
 					</div>
 				)}
 				<StoryCampaignOptionsModal storyId={storyState.agentCampaignStoryModal.storyId} />

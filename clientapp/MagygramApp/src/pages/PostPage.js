@@ -9,6 +9,7 @@ import NotificationContextProvider from "../contexts/NotificationContext";
 import FollowRecommendation from "../components/FollowRecommendation";
 import MessageContextProvider from "../contexts/MessageContext";
 import PostWrapper from "../components/PostWrapper";
+import SendPostAsMessageModal from "../components/modals/SendPostAsMessageModal";
 
 const PostPage = (props) => {
 	const search = props.location.search;
@@ -26,6 +27,8 @@ const PostPage = (props) => {
 							<CreateStoryModal />
 							<AddPostToFavouritesModal />
 							<MessageContextProvider>
+								<SendPostAsMessageModal />
+
 								<div>
 									<div className="mt-4">
 										<div className="container d-flex justify-content-center">

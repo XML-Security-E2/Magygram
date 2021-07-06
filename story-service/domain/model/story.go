@@ -150,6 +150,17 @@ type StoryResponse struct {
 	FirstUnvisitedStory int
 }
 
+type IdMediaWebsiteResponse struct {
+	Id string
+	Media Media
+	Website string
+	Likes int
+	Dislikes int
+	Comments int
+	StoryViews int
+}
+
+
 type MediaContent struct{
 	Url string
 	MediaType string

@@ -2,23 +2,24 @@ package saga
 
 import (
 	"encoding/json"
-	"github.com/go-redis/redis"
 	"log"
 	"user-service/conf"
+
+	"github.com/go-redis/redis"
 )
 
 const (
-	UserChannel    string = "UserChannel"
-	AuthChannel    string = "AuthChannel"
+	UserChannel         string = "UserChannel"
+	AuthChannel         string = "AuthChannel"
 	RelationshipChannel string = "RelationshipChannel"
-	ReplyChannel    string = "ReplyChannel"
-	ServiceUser    string = "User"
-	ServiceAuth    string = "Auth"
+	ReplyChannel        string = "ReplyChannel"
+	ServiceUser         string = "User"
+	ServiceAuth         string = "Auth"
 	ServiceRelationship string = "Relationship"
-	ActionStart     string = "Start"
-	ActionDone      string = "DoneMsg"
-	ActionError     string = "ErrorMsg"
-	ActionRollback  string = "RollbackMsg"
+	ActionStart         string = "Start"
+	ActionDone          string = "DoneMsg"
+	ActionError         string = "ErrorMsg"
+	ActionRollback      string = "RollbackMsg"
 )
 
 type Orchestrator struct {
@@ -29,7 +30,7 @@ type Orchestrator struct {
 func NewOrchestrator() *Orchestrator {
 	var err error
 	// create client and ping redis
-	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host+":"+ conf.Current.RedisDatabase.Port, Password: "", DB: 0})
+	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host + ":" + conf.Current.RedisDatabase.Port, Password: "", DB: 0})
 	if _, err = client.Ping().Result(); err != nil {
 		log.Fatalf("error creating redis client %s", err)
 	}

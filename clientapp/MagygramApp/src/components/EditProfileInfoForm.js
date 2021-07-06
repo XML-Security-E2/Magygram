@@ -3,7 +3,7 @@ import { useState } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { userService } from "../services/UserService";
 
-const EditProfileInfoForm = ({show}) => {
+const EditProfileInfoForm = ({ show }) => {
 	const imgStyle = { transform: "scale(1.5)", width: "100%", position: "absolute", left: "0" };
 	const { userState, dispatch } = useContext(UserContext);
 
@@ -17,6 +17,7 @@ const EditProfileInfoForm = ({show}) => {
 	const [image, setImage] = useState("");
 	const [showedImage, setShowedImage] = useState(userState.userProfile.user.imageUrl);
 	const [selectedImage, setSelectedImage] = useState(false);
+	const [birthDate, setBirthDate] = useState(new Date(userState.userProfile.user.birthDate));
 
 	const [website, setWebsite] = useState(userState.userProfile.user.website);
 	const [number, setNumber] = useState(userState.userProfile.user.number);
@@ -52,6 +53,7 @@ const EditProfileInfoForm = ({show}) => {
 		setGender(userState.userProfile.user.gender);
 		setNumber(userState.userProfile.user.number);
 		setShowedImage(userState.userProfile.user.imageUrl);
+		setBirthDate(new Date(userState.userProfile.user.birthDate));
 	}, [userState.userProfile.user]);
 
 	useEffect(() => {
@@ -72,6 +74,7 @@ const EditProfileInfoForm = ({show}) => {
 			bio,
 			number,
 			gender,
+			birthDate: birthDate.getTime(),
 		};
 
 		userService.editUser(localStorage.getItem("userId"), userRequestDTO, dispatch);
@@ -163,8 +166,22 @@ const EditProfileInfoForm = ({show}) => {
 						<label for="bio" className="col-sm-3 col-form-label">
 							<b>Bio</b>
 						</label>
-						<div class="col-sm-9">
+						<div className="col-sm-9">
 							<input className="form-control" type="text" id="bio" name="bioInput" placeholder="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
+						</div>
+					</div>
+					<div className="form-group row">
+						<label for="bio" className="col-sm-3 col-form-label">
+							<b>Birth date</b>
+						</label>
+						<div className="col-sm-9">
+							<input
+								type="date"
+								className="form-control"
+								value={birthDate.toISOString().split("T")[0]}
+								max={new Date().toISOString().split("T")[0]}
+								onChange={(e) => setBirthDate(new Date(e.target.value))}
+							/>
 						</div>
 					</div>
 
@@ -176,18 +193,40 @@ const EditProfileInfoForm = ({show}) => {
 							<input className="form-control" type="text" id="website" name="numberInput" placeholder="Number" value={number} onChange={(e) => setNumber(e.target.value)} />
 						</div>
 					</div>
-					<div className="form-group row">
+					<div className="form-group row d-flex align-items-center">
 						<label for="gender" className="col-sm-3 col-form-label">
 							<b>Gender</b>
 						</label>
-						<div class="col-sm-9">
-							<select id="gender" className="form-control" value={gender} onChange={(e) => setGender(e.target.value)}>
-								<option value="" disabled>
-									Select gender
-								</option>
-								<option value="MALE"> Male</option>
-								<option value="FEMALE"> Female</option>
-							</select>
+
+						<div className="col-sm-9">
+							<div className="form-check form-check-inline ">
+								<input
+									className="form-check-input"
+									type="radio"
+									name="exampleRadios1"
+									id="exampleRadios5"
+									value="MALE"
+									checked={gender === "MALE"}
+									onChange={() => setGender("MALE")}
+								/>
+								<label className="form-check-label" for="exampleRadios5">
+									Male
+								</label>
+							</div>
+							<div className="form-check form-check-inline ml-2">
+								<input
+									className="form-check-input"
+									type="radio"
+									name="exampleRadios1"
+									id="exampleRadios4"
+									value="FEMALE"
+									checked={gender === "FEMALE"}
+									onChange={() => setGender("FEMALE")}
+								/>
+								<label className="form-check-label" for="exampleRadios4">
+									Female
+								</label>
+							</div>
 						</div>
 					</div>
 					<br />

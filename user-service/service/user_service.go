@@ -248,6 +248,7 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 	user.Website = userRequest.Website
 	user.Bio = userRequest.Bio
 	user.Gender = userRequest.Gender
+	user.BirthDate = time.Unix(0, userRequest.BirthDate*int64(time.Millisecond))
 	if err = validator.New().Struct(user); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name,
 			"surname":  userRequest.Surname,
@@ -523,12 +524,14 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 
 func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error) {
 	agentRegistrationDTO := model.AgentRegistrationDTO{
-		Name:     agentRequest.Name,
-		Surname:  agentRequest.Surname,
-		Email:    agentRequest.Email,
-		Website:  agentRequest.WebSite,
-		Username: agentRequest.Username,
-		Password: "",
+		Username:  agentRequest.Username,
+		Name:      agentRequest.Name,
+		Email:     agentRequest.Email,
+		Surname:   agentRequest.Surname,
+		Website:   agentRequest.WebSite,
+		Password:  "",
+		BirthDate: agentRequest.BirthDate,
+		Gender:    agentRequest.Gender,
 	}
 
 	user, _ := model.NewAgent(&agentRegistrationDTO)
@@ -762,6 +765,24 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 	}, nil
 }
 
+func (u *userService) GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.TargetGroup, error) {
+	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return &model.TargetGroup{
+		Id:     userId,
+		Age:    time.Now().Year() - user.BirthDate.Year(),
+		Gender: user.Gender,
+	}, nil
+}
+
 func (u *userService) GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error) {
 	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
@@ -881,6 +902,7 @@ func (u *userService) GetUserProfileById(ctx context.Context, bearer string, use
 		SentFollowRequest:    sentReq,
 		PrivacySettings:      user.PrivacySettings,
 		NotificationSettings: notificationSettings,
+		BirthDate:            user.BirthDate,
 	}
 	return retVal, nil
 }

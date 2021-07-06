@@ -22,4 +22,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/story/user-info", h.UpdateUserInfo)
 	e.GET("/api/story/:storyId/getForAdmin", h.GetStoryForAdmin, h.LoggingMiddleware)
 
+	e.POST("/api/story/media/first/preview", h.GetStoryMediaAndWebsiteByIds)
+
 }

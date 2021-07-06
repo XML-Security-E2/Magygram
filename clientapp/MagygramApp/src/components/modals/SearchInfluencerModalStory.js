@@ -55,17 +55,37 @@ const SearchInfluencerModalStory = () => {
 	};
 	const handleSend = () => {
 		
-		let username = search
-		console.log(search)
-		let requestDTO = {
-			contentId: storyState.searchInfluencer.storyId,
-            contentType: "STORY",
-			username: usernameSearch,
-			price: price,
-			status: "PENDING",
-		};
-		console.log(requestDTO)
-		postService.sendCampaign(requestDTO,dispatch)
+        var userId = localStorage.getItem("userId")
+		var users;
+		var following = false;
+		Axios.get(`/api/users/${userId}/following`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			users = res.data;
+			console.log(users);
+				
+			for (const [index, value] of users.entries()) {
+				console.log(usernameSearch)
+				if(value.userInfo.username === usernameSearch){
+					following = true;
+					console.log(value.userInfo.username)
+				}
+			}
+			if(following){
+				let requestDTO = {
+                    contentId: storyState.searchInfluencer.storyId,
+                    contentType: "STORY",
+                    username: usernameSearch,
+                    price: price,
+                    status: "PENDING",
+                };
+				console.log(requestDTO)
+				postService.sendCampaign(requestDTO,dispatch)
+			}else{
+				alert("You need to follow this influencer to send him campaign request")
+			}
+		})
+		.catch((err) => {
+		});
 	};
 
 	return (

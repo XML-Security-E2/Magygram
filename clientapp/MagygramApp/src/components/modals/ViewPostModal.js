@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext,useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
@@ -11,16 +11,24 @@ import PostCommentInputModalView from "../PostCommentInputModalView";
 import PostLikesAndDislikesModalView from "../PostLikesAndDislikesModalView";
 import OptionsModal from "./OptionsModal";
 import SearchInfluencerModal from "./SearchInfluencerModal";
-import { getUserInfo } from "../../helpers/auth-header";
-import { postConstants } from "../../constants/PostConstants";
+import { getUserInfo, hasRoles } from "../../helpers/auth-header";
 
 const ViewPostModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
+	const [agent, setAgent] = useState("");
 	const style = { width: "450px" };
 
 	const LikePost = (postId) => {
 		postService.likePost(postId, getUserInfo(), dispatch);
 	};
+
+
+	useEffect(() => {
+		if(postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && hasRoles(["agent"]))
+			setAgent(false)
+		else
+			setAgent(true)	
+	});
 
 	const UnlikePost = (postId) => {
 		postService.unlikePost(postId, getUserInfo(), dispatch);
@@ -83,6 +91,16 @@ const ViewPostModal = () => {
 		window.location = "#/profile?userId=" + userId;
 	};
 
+	const handleClickOnWebsite = async () => {
+		await postService.clickOnPostCampaignWebsite(postState.viewPostModal.post.Id).then(handleOpenWebsite());
+	};
+
+	const handleOpenWebsite = () => {
+		return new Promise(function () {
+			window.open("https://" + postState.viewAgentCampaignPostModal.post.Website, "_blank");
+		});
+	};
+
 	return (
 		<Modal size="xl" show={postState.viewPostModal.showModal} aria-labelledby="contained-modal-title-vcenter" centered onHide={handleModalClose}>
 			<Modal.Body>
@@ -110,16 +128,18 @@ const ViewPostModal = () => {
 							{postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && (
 								<div className="border-bottom d-flex align-items-center">
 									<span className="text-dark ml-2">Sponsored</span>
-									<a type="button" className="btn btn-link border-0" href={"https://" + postState.viewAgentCampaignPostModal.post.Website} target="_blank">
+									<button type="button" className="btn btn-link border-0" onClick={handleClickOnWebsite}>
 										Visit {postState.viewAgentCampaignPostModal.post.Website}
-									</a>
+									</button>
 								</div>
 							)}
 							<hr></hr>
-							<div>
-								<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>
-									<i className="icofont-subscribe mr-1"></i>Product placement
-								</button>
+							<div >
+								{ !agent &&
+									<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>
+										<i className="icofont-subscribe mr-1"></i>Product placement
+									</button>
+								}
 							</div>
 							<PostCommentsModalView
 								imageUrl={postState.viewPostModal.post.UserInfo.ImageURL}

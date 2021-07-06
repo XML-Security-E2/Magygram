@@ -37,4 +37,6 @@ type PostService interface {
 	EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
 	EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
 	EditCommentedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error
+
+	GetPostsMediaAndWebsiteByIds(ctx context.Context, ids *model.FollowedUsersResponse) ([]*model.IdMediaWebsiteResponse, error)
 }

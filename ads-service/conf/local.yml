@@ -32,3 +32,13 @@ relationshipservice:
   protocol: "https://"
   domain: "localhost"
   port: "463"
+
+postservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "462"
+
+storyservice:
+  protocol: "https://"
+  domain: "localhost"
+  port: "464"

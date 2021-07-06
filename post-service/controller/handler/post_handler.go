@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
-	"github.com/sirupsen/logrus"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -17,8 +14,11 @@ import (
 	"post-service/tracer"
 	"strconv"
 	"time"
-)
 
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
+	"github.com/sirupsen/logrus"
+)
 
 type PostHandler interface {
 	CreatePost(c echo.Context) error
@@ -51,6 +51,7 @@ type PostHandler interface {
 	EditCommentedByInfo(c echo.Context) error
 	GetPostForMessagesById(c echo.Context) error
 	GetUsersPostCampaigns(c echo.Context) error
+	GetPostsMediaAndWebsiteByIds(c echo.Context) error
 }
 
 type postHandler struct {
@@ -87,6 +88,25 @@ func (p postHandler) DeletePost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, "")
+}
+
+func (p postHandler) GetPostsMediaAndWebsiteByIds(c echo.Context) error {
+	request := &model.FollowedUsersResponse{}
+
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := p.PostService.GetPostsMediaAndWebsiteByIds(ctx, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
 }
 
 func (p postHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -159,15 +179,15 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 
 	dateF := c.FormValue("startDate")
 	dateFr, _ := strconv.ParseInt(dateF, 10, 64)
-	dateFrom := time.Unix(0, dateFr * int64(time.Millisecond))
+	dateFrom := time.Unix(0, dateFr*int64(time.Millisecond))
 
 	dateT := c.FormValue("endDate")
 	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
-	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+	dateTo := time.Unix(0, dateTt*int64(time.Millisecond))
 
 	exposeD := c.FormValue("exposeOnceDate")
 	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
-	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+	exposeDate := time.Unix(0, exposeDa*int64(time.Millisecond))
 
 	displayT := c.FormValue("displayTime")
 	displayTime, _ := strconv.Atoi(displayT)
@@ -182,25 +202,25 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 	}
 
 	postRequest := &model.PostRequest{
-		Description:              description,
-		Location:                 location,
-		Media:                    headers,
-		Tags:                     tags,
+		Description: description,
+		Location:    location,
+		Media:       headers,
+		Tags:        tags,
 	}
 
 	campaignRequest := &model.CampaignRequest{
 		MinDisplaysForRepeatedly: minDisplays,
 		Frequency:                model.CampaignFrequency(frequency),
-		TargetGroup:              model.TargetGroup{
+		TargetGroup: model.TargetGroup{
 			MinAge: minAge,
 			MaxAge: maxAge,
 			Gender: model.GenderType(gender),
 		},
-		DateFrom:                 dateFrom,
-		DateTo:                   dateTo,
-		Type: "POST",
-		DisplayTime: displayTime,
-		ContentId: "",
+		DateFrom:       dateFrom,
+		DateTo:         dateTo,
+		Type:           "POST",
+		DisplayTime:    displayTime,
+		ContentId:      "",
 		ExposeOnceDate: exposeDate,
 	}
 
@@ -233,7 +253,7 @@ func (p postHandler) GetUsersPostCampaigns(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
-	posts, err := p.PostService.GetUserPostCampaigns(ctx,bearer)
+	posts, err := p.PostService.GetUserPostCampaigns(ctx, bearer)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -261,12 +281,12 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
-	posts, err := p.PostService.GetPostsForTimeline(ctx,bearer)
+	posts, err := p.PostService.GetPostsForTimeline(ctx, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if posts==nil{
+	if posts == nil {
 		return c.JSON(http.StatusOK, []model.PostResponse{})
 	}
 	return c.JSON(http.StatusOK, posts)
@@ -438,7 +458,7 @@ func (p postHandler) EditPost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	err := p.PostService.EditPost(ctx, bearer, editRequest)
-	if err != nil{
+	if err != nil {
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -466,7 +486,7 @@ func (p postHandler) GetUsersPosts(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	posts, err := p.PostService.GetUsersPosts(ctx, bearer, userId)
-	if err != nil{
+	if err != nil {
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -501,7 +521,6 @@ func (p postHandler) GetUsersPostsCount(c echo.Context) error {
 	return c.JSON(http.StatusOK, postsCount)
 }
 
-
 func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("PostHandlerGetPostForUserTimelineByHashTag", p.tracer, c.Request())
 	defer span.Finish()
@@ -513,22 +532,22 @@ func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
 
 	ctx := c.Request().Context()
 	if ctx == nil {
-	ctx = context.Background()
+		ctx = context.Background()
 	}
 	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
-	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag,bearer)
+	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag, bearer)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
-	if hashTagsPosts == nil{
+	if hashTagsPosts == nil {
 		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
 	}
-	c.Response().Header().Set("Content-Type" , "text/javascript")
-		return c.JSON(http.StatusOK, hashTagsPosts)
+	c.Response().Header().Set("Content-Type", "text/javascript")
+	return c.JSON(http.StatusOK, hashTagsPosts)
 }
 
 func (p postHandler) GetPostForMessagesById(c echo.Context) error {
@@ -548,7 +567,7 @@ func (p postHandler) GetPostForMessagesById(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	post, userInfo, err := p.PostService.GetPostForMessagesById(ctx, bearer, postId)
-	if err != nil{
+	if err != nil {
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -557,7 +576,8 @@ func (p postHandler) GetPostForMessagesById(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, post)}
+	return c.JSON(http.StatusOK, post)
+}
 
 func (p postHandler) GetPostById(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("PostHandlerGetPostById", p.tracer, c.Request())
@@ -604,7 +624,7 @@ func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
-	c.Response().Header().Set("Content-Type" , "text/javascript")
+	c.Response().Header().Set("Content-Type", "text/javascript")
 	return c.JSON(http.StatusOK, hashTagsInfo)
 }
 
@@ -629,11 +649,11 @@ func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
-	if hashTagsPosts == nil{
+	if hashTagsPosts == nil {
 		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
 	}
 
-	c.Response().Header().Set("Content-Type" , "text/javascript")
+	c.Response().Header().Set("Content-Type", "text/javascript")
 	return c.JSON(http.StatusOK, hashTagsPosts)
 }
 
@@ -658,7 +678,7 @@ func (p postHandler) SearchPostsByLocation(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
-	c.Response().Header().Set("Content-Type" , "text/javascript")
+	c.Response().Header().Set("Content-Type", "text/javascript")
 	return c.JSON(http.StatusOK, hashTagsInfo)
 }
 
@@ -683,11 +703,11 @@ func (p postHandler) GetPostForGuestTimelineByLocation(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
-	if locationPosts == nil{
+	if locationPosts == nil {
 		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
 	}
 
-	c.Response().Header().Set("Content-Type" , "text/javascript")
+	c.Response().Header().Set("Content-Type", "text/javascript")
 	return c.JSON(http.StatusOK, locationPosts)
 }
 
@@ -707,16 +727,16 @@ func (p postHandler) GetPostForUserTimelineByLocation(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
-	locationPosts, err := p.PostService.GetPostForUserTimelineByLocation(ctx, location,bearer)
+	locationPosts, err := p.PostService.GetPostForUserTimelineByLocation(ctx, location, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
-	if locationPosts == nil{
+	if locationPosts == nil {
 		return c.JSON(http.StatusOK, []*model.GuestTimelinePostResponse{})
 	}
 
-	c.Response().Header().Set("Content-Type" , "text/javascript")
+	c.Response().Header().Set("Content-Type", "text/javascript")
 	return c.JSON(http.StatusOK, locationPosts)
 }
 
@@ -757,7 +777,7 @@ func (p postHandler) GetLikedPosts(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	posts, err := p.PostService.GetUserLikedPosts(ctx, bearer)
-	if err != nil{
+	if err != nil {
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -784,7 +804,7 @@ func (p postHandler) GetDislikedPosts(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	posts, err := p.PostService.GetUserDislikedPosts(ctx, bearer)
-	if err != nil{
+	if err != nil {
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())

@@ -284,7 +284,7 @@ func (v verificationService) DeleteCampaignRequest(ctx context.Context, requestI
 
 	request.IsDeleted=true
 	fmt.Println(request)
-	v.CampaignRequestsRepository.CreateRequest(ctx,request)
+	v.CampaignRequestsRepository.DeleteRequest(ctx,request)
 
 	return nil
 }

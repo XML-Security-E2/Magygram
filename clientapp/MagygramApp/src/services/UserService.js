@@ -37,36 +37,36 @@ export const userService = {
 	reportUser,
 	registerAgentByAdmin,
 	getCampaignsForUser,
+	getCampaignAPITokenForAgent,
+	generateNewToken,
+	deleteToken,
 };
 
-async function getCampaignsForUser(requestId,dispatch) {
-
+async function getCampaignsForUser(requestId, dispatch) {
 	dispatch(request());
 	await Axios.get(`/api/requests/campaign/${requestId}/get`, { validateStatus: () => true, headers: authHeader() })
-			.then((res) => {
-				console.log(res.data);
-				if (res.status === 200) {
-					dispatch(success(res.data));
-				} else {
-					dispatch(failure());
-				}
-			})
-			.catch((err) => {
+		.then((res) => {
+			console.log(res.data);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
 				dispatch(failure());
-			});
+			}
+		})
+		.catch((err) => {
+			dispatch(failure());
+		});
 
-
-		function request() {
-			return { type: userConstants.SET_USER_CAMPAIGNS_REQUEST };
-		}
-		function success(data) {
-			return { type: userConstants.SET_USER_CAMPAIGNS, campaigns: data,  };
-		}
-		function failure() {
-			return { type: userConstants.SET_USER_FOLLOWING_FAILURE };
-		}
+	function request() {
+		return { type: userConstants.SET_USER_CAMPAIGNS_REQUEST };
+	}
+	function success(data) {
+		return { type: userConstants.SET_USER_CAMPAIGNS, campaigns: data };
+	}
+	function failure() {
+		return { type: userConstants.SET_USER_FOLLOWING_FAILURE };
+	}
 }
-
 
 function reportUser(reportDTO, dispatch) {
 	dispatch(request());
@@ -636,7 +636,7 @@ async function getUserProfileByUserId(userId, dispatch) {
 			console.log(res.data);
 			if (res.status === 200) {
 				dispatch(success(res.data, userId));
-				localStorage.setItem('category',res.data.category);
+				localStorage.setItem("category", res.data.category);
 			} else {
 				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
 			}
@@ -701,11 +701,16 @@ function validatePasswords(password, repeatedPassword) {
 function validateUser(user, dispatch) {
 	const [passwordValid, passwordErrorMessage] = validatePasswords(user.password, user.repeatedPassword);
 
+	let minBirthDate = new Date(new Date().setFullYear(new Date().getFullYear() - 16));
+
 	if (user.name.length < 2) {
 		dispatch(validatioFailure("Name must contain minimum two letters"));
 		return false;
 	} else if (user.surname.length < 2) {
 		dispatch(validatioFailure("Surname must contain minimum two letters"));
+		return false;
+	} else if (user.birthDate > minBirthDate.getTime()) {
+		dispatch(validatioFailure("You need to be at least 16 years old"));
 		return false;
 	} else if (passwordValid === false) {
 		dispatch(validatioFailure(passwordErrorMessage));
@@ -847,11 +852,16 @@ function registerAgent(agent, dispatch) {
 function validateAgent(user, dispatch) {
 	const [passwordValid, passwordErrorMessage] = validatePasswords(user.password, user.repeatedPassword);
 
+	let minBirthDate = new Date(new Date().setFullYear(new Date().getFullYear() - 16));
+
 	if (user.name.length < 2) {
 		dispatch(validatioFailure("Name must contain minimum two letters"));
 		return false;
 	} else if (user.surname.length < 2) {
 		dispatch(validatioFailure("Surname must contain minimum two letters"));
+		return false;
+	} else if (user.birthDate > minBirthDate.getTime()) {
+		dispatch(validatioFailure("You need to be at least 16 years old"));
 		return false;
 	} else if (passwordValid === false) {
 		dispatch(validatioFailure(passwordErrorMessage));
@@ -868,10 +878,10 @@ function validateAgent(user, dispatch) {
 	return true;
 }
 
-function IsUserVerifiedById(userId,dispatch) {
+function IsUserVerifiedById(userId, dispatch) {
 	dispatch(request());
 
-	Axios.get(`/api/users/isverified/`+ userId, { validateStatus: () => true, headers: authHeader() })
+	Axios.get(`/api/users/isverified/` + userId, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			if (res.status === 200) {
 				dispatch(success(res.data));
@@ -939,4 +949,76 @@ function validateAgentByAdmin(user, dispatch) {
 	}
 
 	return true;
+}
+
+function getCampaignAPITokenForAgent(dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/auth/get-campaign-jwt-token`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.GET_CAMPAIGN_JWT_TOKEN_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.GET_CAMPAIGN_JWT_TOKEN_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.GET_CAMPAIGN_JWT_TOKEN_FAILURE, error };
+	}
+}
+
+function generateNewToken(dispatch) {
+	dispatch(request());
+
+	Axios.get(`/api/auth/generate-campaign-jwt-token`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.GENERATE_CAMPAIGN_JWT_TOKEN_FAILURE, error };
+	}
+}
+
+function deleteToken(dispatch) {
+	dispatch(request());
+
+	Axios.delete(`/api/auth/delete-campaign-jwt-token`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			if (res.status === 200) {
+				dispatch(success(""));
+			} else {
+				dispatch(failure("Usled internog problema trenutno nije moguce logovanje"));
+			}
+		})
+		.catch((err) => console.error(err));
+
+	function request() {
+		return { type: userConstants.DELETE_CAMPAIGN_JWT_TOKEN_REQUEST };
+	}
+	function success(result) {
+		return { type: userConstants.DELETE_CAMPAIGN_JWT_TOKEN_SUCCESS, result };
+	}
+	function failure(error) {
+		return { type: userConstants.DELETE_CAMPAIGN_JWT_TOKEN_FAILURE, error };
+	}
 }

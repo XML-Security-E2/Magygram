@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"story-service/domain/model"
@@ -17,6 +14,10 @@ import (
 	"story-service/tracer"
 	"strconv"
 	"time"
+
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
+	"github.com/sirupsen/logrus"
 )
 
 type StoryHandler interface {
@@ -34,12 +35,13 @@ type StoryHandler interface {
 	UpdateUserInfo(c echo.Context) error
 	GetStoryForUserMessage(c echo.Context) error
 	GetUserStoryCampaign(c echo.Context) error
+	GetStoryMediaAndWebsiteByIds(c echo.Context) error
 }
 
 type storyHandler struct {
 	StoryService service_contracts.StoryService
-	tracer      opentracing.Tracer
-	closer      io.Closer
+	tracer       opentracing.Tracer
+	closer       io.Closer
 }
 
 func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
@@ -116,12 +118,30 @@ func (p storyHandler) DeleteStory(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")
 }
 
-
 func (p storyHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		logger.LoggingEntry = logger.Logger.WithFields(logrus.Fields{"request_ip": c.RealIP()})
 		return next(c)
 	}
+}
+
+func (p storyHandler) GetStoryMediaAndWebsiteByIds(c echo.Context) error {
+	request := &model.FollowedUsersResponse{}
+
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+	fmt.Println(len(request.Users))
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	retVal, err := p.StoryService.GetStoryMediaAndWebsiteByIds(ctx, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	return c.JSON(http.StatusOK, retVal)
 }
 
 func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
@@ -147,15 +167,15 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 
 	dateF := c.FormValue("startDate")
 	dateFr, _ := strconv.ParseInt(dateF, 10, 64)
-	dateFrom := time.Unix(0, dateFr * int64(time.Millisecond))
+	dateFrom := time.Unix(0, dateFr*int64(time.Millisecond))
 
 	dateT := c.FormValue("endDate")
 	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
-	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+	dateTo := time.Unix(0, dateTt*int64(time.Millisecond))
 
 	exposeD := c.FormValue("exposeOnceDate")
 	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
-	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+	exposeDate := time.Unix(0, exposeDa*int64(time.Millisecond))
 
 	displayT := c.FormValue("displayTime")
 	displayTime, _ := strconv.Atoi(displayT)
@@ -174,16 +194,16 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 	campaignRequest := &model.CampaignRequest{
 		MinDisplaysForRepeatedly: minDisplays,
 		Frequency:                model.CampaignFrequency(frequency),
-		TargetGroup:              model.TargetGroup{
+		TargetGroup: model.TargetGroup{
 			MinAge: minAge,
 			MaxAge: maxAge,
 			Gender: model.GenderType(gender),
 		},
-		DateFrom:                 dateFrom,
-		DateTo:                   dateTo,
-		Type: "STORY",
-		DisplayTime: displayTime,
-		ContentId: "",
+		DateFrom:       dateFrom,
+		DateTo:         dateTo,
+		Type:           "STORY",
+		DisplayTime:    displayTime,
+		ContentId:      "",
 		ExposeOnceDate: exposeDate,
 	}
 
@@ -240,12 +260,12 @@ func (p storyHandler) GetStoriesForStoryline(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
-	stories, err := p.StoryService.GetStoriesForStoryline(ctx,bearer)
+	stories, err := p.StoryService.GetStoriesForStoryline(ctx, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if stories==nil{
+	if stories == nil {
 		return c.JSON(http.StatusOK, []model.StoryResponse{})
 	}
 
@@ -268,7 +288,7 @@ func (p storyHandler) GetStoriesForUser(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
-	stories, err := p.StoryService.GetStoriesForUser(ctx,userId,bearer)
+	stories, err := p.StoryService.GetStoriesForUser(ctx, userId, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -292,7 +312,7 @@ func (p storyHandler) VisitedStoryByUser(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
-	err := p.StoryService.VisitedStoryByUser(ctx,storyId,bearer);
+	err := p.StoryService.VisitedStoryByUser(ctx, storyId, bearer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -317,7 +337,7 @@ func (p storyHandler) GetStoryForUserMessage(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	story, userInfo, err := p.StoryService.GetStoryForUserMessage(ctx, bearer, storyId)
-	if err != nil{
+	if err != nil {
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -350,7 +370,7 @@ func (p storyHandler) GetAllUserStories(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if stories==nil{
+	if stories == nil {
 		return c.JSON(http.StatusOK, []model.StoryResponse{})
 	}
 	fmt.Println("test3")
@@ -384,7 +404,6 @@ func (p storyHandler) GetStoryHighlight(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, highlight)
 }
-
 
 func (p storyHandler) HaveActiveStoriesLoggedUser(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("StoryHandlerHaveActiveStoriesLoggedUser", p.tracer, c.Request())

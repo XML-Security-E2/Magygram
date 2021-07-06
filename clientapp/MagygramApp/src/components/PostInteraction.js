@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { modalConstants } from "../constants/ModalConstants";
 import { MessageContext } from "../contexts/MessageContext";
 import { hasRoles } from "../helpers/auth-header";
+import { postService } from "../services/PostService";
 
 const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePost, showCollectionModal, addToDefaultCollection, deleteFromCollections }) => {
 	const { dispatch } = useContext(MessageContext);
@@ -18,14 +19,24 @@ const PostInteraction = ({ post, LikePost, DislikePost, UnlikePost, UndislikePos
 		deleteFromCollections(postId);
 	};
 
+	const handleClickOnWebsite = async () => {
+		await postService.clickOnPostCampaignWebsite(post.Id).then(handleOpenWebsite());
+	};
+
+	const handleOpenWebsite = () => {
+		return new Promise(function () {
+			window.open("https://" + post.Website, "_blank");
+		});
+	};
+
 	return (
 		<React.Fragment>
 			<div>
-				<div hidden={post.ContentType !== "CAMPAIGN"} className="border-bottom" style={{ cursor: "pointer" }} onClick={() => window.open("https://" + post.Website, "_blank")}>
+				<div hidden={post.ContentType !== "CAMPAIGN"} className="border-bottom" style={{ cursor: "pointer" }}>
 					<div>
-						<a type="button" className="btn btn-link border-0" href={"https://" + post.Website} target="_blank">
+						<button type="button" className="btn btn-link border-0" onClick={handleClickOnWebsite} target="_blank">
 							Visit {post.Website}
-						</a>
+						</button>
 					</div>
 				</div>
 				<div className="d-flex flex-row justify-content-center pl-3 pr-3 pt-3 pb-1">
