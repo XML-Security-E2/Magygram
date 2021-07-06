@@ -10,6 +10,7 @@ import PageNotFound from "./pages/PageNotFound";
 import { ProtectedRoute } from "./router/ProtectedRouter";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import CreateCampaignPage from "./pages/CreateCampaignPage";
+import CampaignsStatisticsPage from "./pages/CampaignsStatisticsPage";
 
 function App() {
 	return (
@@ -22,6 +23,7 @@ function App() {
 				<ProtectedRoute roles={[]} redirectTo="/" path="/reset-password/:id" component={ResetPasswordPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/blocked-user/:id" component={UserActivateRequestPage} />
 				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/create-campaign" component={CreateCampaignPage} />
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/campaign-stats" component={CampaignsStatisticsPage} />
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 
 				<Route path="/404" component={PageNotFound} />

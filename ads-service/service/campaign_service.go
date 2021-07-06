@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator"
+	"sort"
 	"time"
 )
 
@@ -22,10 +23,40 @@ type campaignService struct {
 	intercomm.PostClient
 }
 
+var (
+	Stats_to_return = 15
+)
+
 func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient, sc intercomm.StoryClient, pc intercomm.PostClient) service_contracts.CampaignService {
 	return &campaignService{r , ic,curr, ac, uc, sc, pc}
 }
 
+func (c campaignService) GetCampaignStatisticsFromAgentApi(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
+	postStats, err := c.GetPostCampaignStatistic(ctx, bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	storyStats, err := c.GetStoryCampaignStatistic(ctx, bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, story := range storyStats {
+		postStats = append(postStats, story)
+	}
+
+	sort.Slice(postStats, func(i, j int) bool {
+		return postStats[i].UserViews > (postStats[j].UserViews)
+	})
+
+	if len(postStats) <= Stats_to_return {
+		return postStats, nil
+	}
+	remove := postStats[:Stats_to_return]
+
+	return remove, nil
+}
 
 func (c campaignService) GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)

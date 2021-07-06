@@ -2,8 +2,12 @@ package service
 
 import (
 	"context"
+	"encoding/xml"
+	"fmt"
 	"github.com/beevik/guid"
 	"io"
+	"io/ioutil"
+	"magyAgent/conf"
 	"magyAgent/domain/model"
 	"magyAgent/domain/repository"
 	"magyAgent/domain/service-contracts"
@@ -12,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type productService struct {
@@ -27,6 +32,53 @@ var (
 	FileDirectory = "files"
 	FileRequestPrefix = "/api/media/"
 )
+
+func (p productService) GetProductCampaignStatistics(ctx context.Context) ([]*model.CampaignStatisticResponse, error) {
+	stats, err :=  p.MagygramClient.GetCampaignStatistics()
+	list := model.CampaignStatisticReport{
+		XMLName:   xml.Name{},
+		FileId:    guid.New().String(),
+		Campaigns: nil,
+		DateCreating: time.Now(),
+	}
+
+	var campaigns []model.CampaignStatisticInfo
+	for _, stat := range stats {
+		media := stat.Media
+		media.Url = fmt.Sprintf("%s%s:%s", conf.Current.Magygram.Protocol, conf.Current.Magygram.Domain, conf.Current.Magygram.Port) + media.Url
+		stat.Media = media
+
+		campaigns = append(campaigns, model.CampaignStatisticInfo{
+			ExposeOnceDate:           stat.ExposeOnceDate,
+			MinDisplaysForRepeatedly: stat.MinDisplaysForRepeatedly,
+			Type:                     stat.Type,
+			Frequency:                stat.Frequency,
+			UserViews:                stat.UserViews,
+			WebsiteClicks:            stat.WebsiteClicks,
+			TargetGroup:              stat.TargetGroup,
+			DateFrom:                 stat.DateFrom,
+			DateTo:                   stat.DateTo,
+			DisplayTime:              stat.DisplayTime,
+			CampaignStatus:           stat.CampaignStatus,
+			InfluencerUsername:       stat.InfluencerUsername,
+			Media:                    stat.Media,
+			Website:                  stat.Website,
+			Likes:                    stat.Likes,
+			Dislikes:                 stat.Dislikes,
+			Comments:                 stat.Comments,
+			StoryViews:               stat.StoryViews,
+			DailyAverage:             stat.DailyAverage,
+			Activity:                 stat.Activity,
+		})
+	}
+
+	list.Campaigns = campaigns
+	file, _ := xml.MarshalIndent(list, "", "	")
+
+	_ = ioutil.WriteFile("./probica.xml", file, 0644)
+
+	return stats, err
+}
 
 func (p productService) CreateProductCampaign(ctx context.Context, campaignReq *model.CampaignRequest) error {
 

@@ -30,4 +30,5 @@ type CampaignService interface {
 	UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error
 
 	CreateCampaignFromAgentApi(ctx context.Context, bearer string, campaignReq *model.CampaignApiRequest) error
+	GetCampaignStatisticsFromAgentApi(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
 }

@@ -31,6 +31,7 @@ type CampaignHandler interface {
 	UpdatePostCampaignVisitor(c echo.Context) error
 	UpdateStoryCampaignVisitor(c echo.Context) error
 	CreateCampaignFromAgentApi(c echo.Context) error
+	GetCampaignStatisticsFromAgentApi(c echo.Context) error
 }
 
 type campaignHandler struct {
@@ -41,8 +42,20 @@ func NewCampaignHandler(p service_contracts.CampaignService) CampaignHandler {
 	return &campaignHandler{p}
 }
 
-//writer.WriteField("targetGroup", string(target))
-//writer.WriteField("campaignType", string(request.Type))
+func (ch campaignHandler) GetCampaignStatisticsFromAgentApi(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	stats, err := ch.CampaignService.GetCampaignStatisticsFromAgentApi(ctx, bearer)
+	fmt.Println(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, stats)
+}
 
 func (ch campaignHandler) CreateCampaignFromAgentApi(c echo.Context) error {
 

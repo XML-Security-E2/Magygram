@@ -17,6 +17,7 @@ type ProductHandler interface {
 	DeleteProductById(c echo.Context) error
 	GetAllProducts(c echo.Context) error
 	CreateProductCampaign(c echo.Context) error
+	GetProductCampaignStatistics(c echo.Context) error
 }
 
 func NewProductHandler(a service_contracts.ProductService) ProductHandler {
@@ -25,6 +26,24 @@ func NewProductHandler(a service_contracts.ProductService) ProductHandler {
 
 type productHandler struct {
 	ProductService service_contracts.ProductService
+}
+
+func (p productHandler) GetProductCampaignStatistics(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bearer := c.Request().Header.Get("Authorization")
+	if bearer == "" {
+		return c.JSON(http.StatusUnauthorized, "")
+	}
+
+	statistics, err := p.ProductService.GetProductCampaignStatistics(ctx)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, statistics)
 }
 
 func (p productHandler) CreateProductCampaign(c echo.Context) error {

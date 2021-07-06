@@ -2,10 +2,12 @@ package intercomm
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"io"
+	"io/ioutil"
 	"magyAgent/conf"
 	"magyAgent/domain/model"
 	"mime/multipart"
@@ -17,6 +19,7 @@ import (
 
 type MagygramClient interface {
 	CreateCampaign(request *model.CampaignApiRequest) error
+	GetCampaignStatistics() ([]*model.CampaignStatisticResponse, error)
 }
 
 type magygramClient struct {
@@ -86,4 +89,30 @@ func (m magygramClient) CreateCampaign(request *model.CampaignApiRequest) error 
 	}
 
 	return nil
+}
+
+func (m magygramClient) GetCampaignStatistics() ([]*model.CampaignStatisticResponse, error) {
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/statistics", baseMagygramUrl), nil)
+	req.Header.Add("Authorization", "Bearer " + conf.Current.Server.Apikey)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			return []*model.CampaignStatisticResponse{}, err
+		}
+
+		return []*model.CampaignStatisticResponse{}, errors.New("unauthorized")
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []*model.CampaignStatisticResponse{}, err
+	}
+	var statistic []*model.CampaignStatisticResponse
+	json.Unmarshal(bodyBytes, &statistic)
+
+	return statistic, nil
 }

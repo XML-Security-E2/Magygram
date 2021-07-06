@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { modalConstants } from "../constants/ModalConstants";
 import { OrderContext } from "../contexts/OrderContext";
 import { hasRoles } from "../helpers/auth-header";
+import { productService } from "../services/ProductService";
 import { userService } from "../services/UserService";
 import ShoppingCartList from "./ShoppingCartList";
 
@@ -25,6 +26,10 @@ const Header = () => {
 
 	const backToHome = () => {
 		window.location = "#/";
+	};
+
+	const getStats = () => {
+		window.location = "#/campaign-stats";
 	};
 
 	return (
@@ -69,6 +74,11 @@ const Header = () => {
 						<i className="fa fa-user" style={iconStyle} id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" />
 
 						<ul style={{ width: "200px", marginLeft: "15px" }} className="dropdown-menu" aria-labelledby="dropdownMenu1">
+							<li>
+								<button className=" btn shadow-none" onClick={getStats}>
+									Stats
+								</button>
+							</li>
 							<li>
 								<button className=" btn shadow-none" onClick={() => userService.logout()}>
 									Logout

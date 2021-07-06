@@ -1,18 +1,7 @@
 import React from "react";
-import { postService } from "../../services/PostService";
 import { Link } from "react-router-dom";
 
 const CampaignStatisticItem = ({ statistics }) => {
-	const handleClickOnPostWebsite = async () => {
-		await postService.clickOnPostCampaignWebsite(statistics.id).then(handleOpenWebsite());
-	};
-
-	const handleOpenWebsite = () => {
-		return new Promise(function () {
-			window.open("https://" + statistics.website, "_blank");
-		});
-	};
-
 	return (
 		<React.Fragment>
 			{statistics.campaignType === "POST" &&
@@ -40,7 +29,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 									</div>
 									<div className="row d-flex align-items-center">
 										<b>Website: </b>
-										<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
+										<button type="button" className="btn btn-link border-0" onClick={() => window.open("https://" + statistics.website, "_blank")}>
 											{statistics.website}
 										</button>
 									</div>
@@ -76,7 +65,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 									</div>
 									<div className="row d-flex align-items-center">
 										<b>Website: </b>
-										<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
+										<button type="button" className="btn btn-link border-0" onClick={() => window.open("https://" + statistics.website, "_blank")}>
 											{statistics.website}
 										</button>
 									</div>
@@ -154,7 +143,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 								</div>
 								<div className="row d-flex align-items-center">
 									<b>Website: </b>
-									<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
+									<button type="button" className="btn btn-link border-0" onClick={() => window.open("https://" + statistics.website, "_blank")}>
 										{statistics.website}
 									</button>
 								</div>
@@ -232,7 +221,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 									</div>
 									<div className="row d-flex align-items-center">
 										<b>Website: </b>
-										<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
+										<button type="button" className="btn btn-link border-0" onClick={() => window.open("https://" + statistics.website, "_blank")}>
 											{statistics.website}
 										</button>
 									</div>
@@ -268,7 +257,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 									</div>
 									<div className="row d-flex align-items-center">
 										<b>Website: </b>
-										<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
+										<button type="button" className="btn btn-link border-0" onClick={() => window.open("https://" + statistics.website, "_blank")}>
 											{statistics.website}
 										</button>
 									</div>
@@ -340,7 +329,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 								</div>
 								<div className="row d-flex align-items-center">
 									<b>Website: </b>
-									<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
+									<button type="button" className="btn btn-link border-0" onClick={() => window.open("https://" + statistics.website, "_blank")}>
 										{statistics.website}
 									</button>
 								</div>

@@ -239,6 +239,21 @@ export const productReducer = (state, action) => {
 			prodCpy.createCampaign.successMessage = "";
 			return prodCpy;
 
+		case productConstants.SET_CAMPAIGNS_STATS_REQUEST:
+			return {
+				...state,
+				campaigns: [],
+			};
+
+		case productConstants.SET_CAMPAIGNS_STATS_SUCCESS:
+			return {
+				...state,
+				campaigns: action.campaigns,
+			};
+
+		case productConstants.SET_CAMPAIGNS_STATS_FAILURE:
+			return state;
+
 		default:
 			return state;
 	}

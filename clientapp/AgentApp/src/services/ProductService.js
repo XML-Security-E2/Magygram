@@ -10,6 +10,7 @@ export const productService = {
 	updateProductImage,
 	deleteProduct,
 	createCampaign,
+	getCampaignStatistics,
 };
 
 async function findAllProducts(dispatch) {
@@ -37,6 +38,34 @@ async function findAllProducts(dispatch) {
 	}
 	function failure(message) {
 		return { type: productConstants.SET_PRODUCTS_FAILURE, errorMessage: message };
+	}
+}
+
+async function getCampaignStatistics(dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/products/campaign/statistics`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: productConstants.SET_CAMPAIGNS_STATS_REQUEST };
+	}
+	function success(data) {
+		return { type: productConstants.SET_CAMPAIGNS_STATS_SUCCESS, campaigns: data };
+	}
+	function failure() {
+		return { type: productConstants.SET_CAMPAIGNS_STATS_FAILURE };
 	}
 }
 
