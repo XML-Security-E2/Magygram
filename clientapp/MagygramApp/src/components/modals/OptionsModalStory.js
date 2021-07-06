@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { StoryContext } from "../../contexts/StoryContext";
@@ -11,9 +11,10 @@ import { storyService } from "../../services/StoryService";
 import SuccessAlert from "../SuccessAlert";
 import FailureAlert from "../FailureAlert";
 
-const OptionsModalStory = () => {
+const OptionsModalStory = ({contentType}) => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
+	const [agent, setAgent] = useState("");
 	const [reportReasons, setReportReasons] = useState([]);
 	const [hiddenForm, setHiddenForm] = useState(true);
 
@@ -51,6 +52,13 @@ const OptionsModalStory = () => {
 		console.log(a);
 	};
 
+
+	useEffect(() => {
+		if(contentType === "CAMPAIGN" && hasRoles(["agent"]))
+			setAgent(false)
+		else
+			setAgent(true)	
+	});
 
 	const handleDelete = ()=>{
 		let requestId =  storyState.storyId;
@@ -98,9 +106,11 @@ const OptionsModalStory = () => {
 					</button>
 				</div>
 				<div className="row">
-					<button type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={searchInfluencer}>
-						Product placement
-					</button>
+					{ !agent &&
+						<button hidden={((contentType !== "CAMPAIGN") || (hasRoles["admin"]))} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={searchInfluencer}>
+							Product placement
+						</button>
+					}
 				</div>
 				<div className="row">
 					<button hidden={!hasRoles(["admin"])} type="button" className="btn btn-link btn-fw text-danger w-100 border-0"  onClick={handleDelete}>

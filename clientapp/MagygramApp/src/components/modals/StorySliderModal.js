@@ -110,7 +110,7 @@ const StorySliderModal = () => {
 						<i className="fa fa-paper-plane-o text-white" aria-hidden="true" style={{ fontSize: "20px" }}></i>
 					</button>
 				</div>
-				<OptionsModalStory />
+				<OptionsModalStory contentType={contentType}/>
 				<SendStoryAsMessageModal storyId={storyId} />
 			</Modal.Body>
 		</Modal>

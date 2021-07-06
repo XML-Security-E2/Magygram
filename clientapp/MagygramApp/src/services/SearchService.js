@@ -62,7 +62,7 @@ function userSearchTags(value, callback) {
 function influencerSearchTags(value, callback) {
 	var options;
 
-	Axios.get(`/api/users/search/${value}/user`, { validateStatus: () => true, headers: authHeader() })
+	Axios.get(`/api/users/search/${value}/influencer`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
