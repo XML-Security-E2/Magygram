@@ -37,6 +37,9 @@ func (v *campaignRequest) GetAllRequests(ctx context.Context, requestId string) 
 	return results, nil
 }
 func (v campaignRequest) DeleteRequest(ctx context.Context, request *model.CampaignRequest) (*mongo.UpdateResult, error) {
+	fmt.Println("BLA")
+	fmt.Println(request.Id)
+
 	return v.Col.UpdateOne(ctx, bson.M{"_id":  request.Id},bson.D{{"$set", bson.D{
 		{"deleted" , true}}}})
 }
