@@ -385,3 +385,4 @@ time="2021-07-04T14:36:04+02:00" level=info msg="Follow request accepted" func="
 time="2021-07-05T23:33:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
 time="2021-07-06T11:09:21+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
 time="2021-07-06T11:38:26+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=60b13002-f559-4c09-80fa-a6e7f7f0690e request_ip="::1" subject_id=ca66e598-34df-4736-9c23-c3e2e8389968
+time="2021-07-06T13:07:14+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463

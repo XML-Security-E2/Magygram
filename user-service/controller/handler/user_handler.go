@@ -476,7 +476,7 @@ func (h *userHandler) SearchForUsersByUsername(c echo.Context) error {
 
 func (h *userHandler) SearchForInfluencerByUsername(c echo.Context) error {
 	username := c.Param("username")
-
+	fmt.Println(username)
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()

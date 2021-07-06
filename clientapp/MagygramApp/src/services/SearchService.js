@@ -66,8 +66,7 @@ function influencerSearchTags(value, callback) {
 		.then((res) => {
 			console.log(res.data);
 			if (res.status === 200) {
-				options = res.data.filter((option) => option.privacySettings.isTaggable === true);
-				options = options.map((option) => ({ value: option.Username, label: option.Username, id: option.Id }));
+				options = res.data.map((option) => ({ value: option.Username, label: option.Username, id: option.Id }));
 				callback(options);
 			}
 		})
