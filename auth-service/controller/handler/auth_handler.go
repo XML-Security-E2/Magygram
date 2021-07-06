@@ -225,7 +225,14 @@ func (a authHandler) GetLoggedUserId(c echo.Context) error {
 
 func (a authHandler) GenerateNewAgentCampaignJWTToken(c echo.Context) error {
 	expireTime := time.Now().Add(time.Hour*8760).Unix() * 1000 // 1 year
-	token, err := generateAgentCampaignJWTToken(expireTime)
+
+	bearer := c.Request().Header.Get("Authorization")
+	userId := getUserId(bearer)
+	if userId == ""{
+		return ErrHttpGenericMessage
+	}
+
+	token, err := generateAgentCampaignJWTToken(expireTime, userId)
 	if err != nil {
 		return ErrHttpGenericMessage
 	}
@@ -235,7 +242,7 @@ func (a authHandler) GenerateNewAgentCampaignJWTToken(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	bearer := c.Request().Header.Get("Authorization")
+
 
 	err = a.AuthService.UpdateAgentCampaignJWTToken(ctx, bearer, token)
 	if err != nil {
@@ -245,7 +252,32 @@ func (a authHandler) GenerateNewAgentCampaignJWTToken(c echo.Context) error {
 	return c.JSON(http.StatusOK, token)
 }
 
-func generateAgentCampaignJWTToken(expireTime int64) (string, error) {
+func getUserId(authStringHeader string) string {
+	if authStringHeader == "" {
+		return ""
+	}
+	authHeader := strings.Split(authStringHeader, "Bearer ")
+	jwtToken := authHeader[1]
+
+	token, err := jwt.Parse(jwtToken, func (token *jwt.Token) (interface{}, error){
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(conf.Current.Server.Secret), nil
+	})
+
+	if err != nil {
+		return ""
+	}
+
+	userId := ""
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userId, _ = claims["id"].(string)
+	}
+	return userId
+}
+
+func generateAgentCampaignJWTToken(expireTime int64, userId string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	var roles = []model.Role{{Name: "campaign_role", Permissions: []model.Permission{
 		{"create_campaign"},
@@ -257,6 +289,7 @@ func generateAgentCampaignJWTToken(expireTime int64) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["roles"] = string(rolesString)
 	claims["exp"] = expireTime
+	claims["id"] = userId
 
 	return token.SignedString([]byte(conf.Current.Server.Secret))
 }

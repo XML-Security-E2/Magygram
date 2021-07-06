@@ -427,6 +427,50 @@ func (c campaignService) GetAllActiveAgentsStoryCampaigns(ctx context.Context, b
 	return getContentIdsFromCampaigns(campaigns), nil
 }
 
+func (c campaignService) CreateCampaignFromAgentApi(ctx context.Context, bearer string, campaignReq *model.CampaignApiRequest) error {
+	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		fmt.Println("LA111")
+		return err
+	}
+	fmt.Println(loggedId)
+	var contentId string
+	if campaignReq.Type == "POST" {
+		contentId, err = c.PostClient.CreatePostCampagin(bearer, campaignReq.Media)
+	} else {
+		contentId, err = c.StoryClient.CreateStoryCampagin(bearer, campaignReq.Media)
+	}
+
+	if err != nil {
+		return err
+	}
+	fmt.Println(campaignReq.TargetGroup.Gender)
+
+	campaign, err := model.NewCampaign(&model.CampaignRequest{
+		ContentId:                contentId,
+		ExposeOnceDate:           campaignReq.ExposeOnceDate,
+		MinDisplaysForRepeatedly: campaignReq.MinDisplaysForRepeatedly,
+		Type:                     campaignReq.Type,
+		Frequency:                campaignReq.Frequency,
+		TargetGroup:              campaignReq.TargetGroup,
+		DateFrom:                 campaignReq.DateFrom,
+		DateTo:                   campaignReq.DateTo,
+		DisplayTime:              campaignReq.DisplayTime,
+	}, loggedId)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	_, err = c.CampaignRepository.Create(ctx, campaign)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func (c campaignService) CreateCampaign(ctx context.Context, bearer string, campaignRequest *model.CampaignRequest) (string, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {

@@ -181,6 +181,18 @@ export const productReducer = (state, action) => {
 			prodCpy.updateProduct.errorMessage = action.errorMessage;
 			return prodCpy;
 
+		case modalConstants.SHOW_OPTIONS_MODAL:
+			prodCpy = { ...state };
+			prodCpy.optionsModal.showModal = true;
+			prodCpy.optionsModal.productId = action.productId;
+			return prodCpy;
+
+		case modalConstants.HIDE_OPTIONS_MODAL:
+			prodCpy = { ...state };
+			prodCpy.optionsModal.showModal = false;
+			prodCpy.optionsModal.productId = "";
+			return prodCpy;
+
 		case productConstants.DELETE_PRODUCT_REQUEST:
 			return state;
 
@@ -198,6 +210,35 @@ export const productReducer = (state, action) => {
 
 		case productConstants.DELETE_PRODUCT_FAILURE:
 			return state;
+
+		case productConstants.CREATE_CAMPAIGN_REQUEST:
+			return {
+				...state,
+				createCampaign: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case productConstants.CREATE_CAMPAIGN_SUCCESS:
+			prodCpy = { ...state };
+			prodCpy.createCampaign.showError = false;
+			prodCpy.createCampaign.errorMessage = "";
+			prodCpy.createCampaign.showSuccessMessage = true;
+			prodCpy.createCampaign.successMessage = action.successMessage;
+
+			return prodCpy;
+
+		case productConstants.CREATE_CAMPAIGN_FAILURE:
+			prodCpy = { ...state };
+			prodCpy.createCampaign.showError = true;
+			prodCpy.createCampaign.errorMessage = action.errorMessage;
+			prodCpy.createCampaign.showSuccessMessage = false;
+			prodCpy.createCampaign.successMessage = "";
+			return prodCpy;
+
 		default:
 			return state;
 	}

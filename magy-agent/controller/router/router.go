@@ -20,6 +20,9 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/:userId", h.GetUserById)
 
 	e.POST("/api/products", h.CreateProduct)
+
+	e.POST("/api/products/campaign", h.CreateProductCampaign)
+
 	e.PUT("/api/products/:productId", h.UpdateProduct)
 	e.PUT("/api/products/:productId/image", h.UpdateProductImage)
 	e.GET("/api/products/:productId", h.GetProductById)

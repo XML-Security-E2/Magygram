@@ -9,6 +9,7 @@ export const productService = {
 	updateProductInfo,
 	updateProductImage,
 	deleteProduct,
+	createCampaign,
 };
 
 async function findAllProducts(dispatch) {
@@ -39,9 +40,36 @@ async function findAllProducts(dispatch) {
 	}
 }
 
+function createCampaign(campaignDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/products/campaign`, campaignDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 201) {
+				dispatch(success("Campaign successfully created"));
+			} else {
+				dispatch(failure("Error while creating campaign"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: productConstants.CREATE_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: productConstants.CREATE_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: productConstants.CREATE_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
 function createProduct(productDTO, dispatch) {
 	let formData = new FormData();
-	formData.append("image", productDTO.image, "img");
+	formData.append("image", productDTO.image);
 	formData.append("name", productDTO.name);
 	formData.append("price", productDTO.price);
 

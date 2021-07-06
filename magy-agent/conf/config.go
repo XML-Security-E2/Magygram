@@ -10,6 +10,8 @@ type Config struct {
 		Port string
 		Host string
 		Secret string
+		Handshake string
+		Apikey string
 	}
 	Database struct {
 		Host     string
@@ -24,6 +26,12 @@ type Config struct {
 		Host 	 string
 		Port 	 string
 	}
+
+	Magygram struct {
+		Protocol   string
+		Domain string
+		Port 	 string
+	}
 }
 
 var Current *Config
@@ -31,7 +39,7 @@ var Current *Config
 func NewConfig(runServer bool) {
 	var C Config
 	Current = &C
-	viper.AddConfigPath(".\\conf")
+	viper.AddConfigPath("./conf")
 	viper.SetConfigType("yml")
 
 	if runServer {

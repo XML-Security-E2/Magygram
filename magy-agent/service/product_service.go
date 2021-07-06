@@ -7,23 +7,49 @@ import (
 	"magyAgent/domain/model"
 	"magyAgent/domain/repository"
 	"magyAgent/domain/service-contracts"
+	"magyAgent/service/intercomm"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type productService struct {
 	repository.ProductRepository
+	intercomm.MagygramClient
 }
 
-func NewProductService(r repository.ProductRepository) service_contracts.ProductService {
-	return &productService{r }
+func NewProductService(r repository.ProductRepository, mc intercomm.MagygramClient) service_contracts.ProductService {
+	return &productService{r, mc }
 }
 
 var (
 	FileDirectory = "files"
 	FileRequestPrefix = "/api/media/"
 )
+
+func (p productService) CreateProductCampaign(ctx context.Context, campaignReq *model.CampaignRequest) error {
+
+	product, err := p.ProductRepository.GetById(ctx, campaignReq.ProductId)
+	if err != nil {
+		return err
+	}
+
+	path := strings.Replace(product.ImageURL, FileRequestPrefix, "./" + FileDirectory + "/", -1)
+
+
+	return p.MagygramClient.CreateCampaign(&model.CampaignApiRequest{
+		MinDisplaysForRepeatedly: campaignReq.MinDisplaysForRepeatedly,
+		Frequency:                campaignReq.Frequency,
+		TargetGroup:              campaignReq.TargetGroup,
+		DisplayTime:              campaignReq.DisplayTime,
+		DateFrom:                 campaignReq.DateFrom,
+		DateTo:                   campaignReq.DateTo,
+		ExposeOnceDate:           campaignReq.ExposeOnceDate,
+		Type:                     campaignReq.Type,
+		FilePath:                 path,
+	})
+}
 
 func (p productService) CreateProduct(ctx context.Context, productReq *model.ProductRequest) (*model.Product, error) {
 	fileName , err := saveFile(productReq.Image)

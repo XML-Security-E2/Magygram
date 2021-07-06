@@ -2,11 +2,11 @@ server :
   port : "470"
   host : "localhost"
   secret : "MagyGram"
-  handshake: "ms-handshake"
+  handshake : "ms-handshake"
   Apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTcwNjEwOTUwMDAsImlkIjoiMjMzNWYyNjEtYmU1NC00ZjY5LWIzNGUtNjU0YjQ5OTY2MTZhIiwicm9sZXMiOiJbe1wibmFtZVwiOlwiY2FtcGFpZ25fcm9sZVwiLFwicGVybWlzc2lvbnNcIjpbe1wibmFtZVwiOlwiY3JlYXRlX2NhbXBhaWduXCJ9LHtcIm5hbWVcIjpcImdldF9hZ2VudF9jYW1wYWlnblwifSx7XCJuYW1lXCI6XCJnZXRfbW9uaXRvcmluZ19mb3JfY2FtcGFpZ25cIn1dfV0ifQ.WyTRvuPl1jO_0bObFpunqYiOXUlgr-t-GJE1m8jK-hQ"
 
 database :
-  host : "localhost"
+  host : "postgres-db"
   port : "5432"
   user : "postgres"
   password : "root"
@@ -19,6 +19,6 @@ mail :
   port : "587"
 
 magygram:
-  protocol: "https://"
-  domain: "localhost"
+  protocol: "http://"
+  domain: "gateway"
   port: "8085"

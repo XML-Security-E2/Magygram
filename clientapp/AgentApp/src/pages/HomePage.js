@@ -6,6 +6,7 @@ import EditProductModal from "../components/modals/EditProductModal";
 import ProductList from "../components/ProductList";
 import OrderContextProvider from "../contexts/OrderContext";
 import ProductContextProvider from "../contexts/ProductContext";
+import OptionsModal from "../components/modals/OptionsModal";
 
 const HomePage = () => {
 	return (
@@ -20,6 +21,7 @@ const HomePage = () => {
 									<ProductList />
 									<CreateProductModal />
 									<EditProductModal />
+									<OptionsModal />
 								</div>
 							</div>
 						</div>

@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import PageNotFound from "./pages/PageNotFound";
 import { ProtectedRoute } from "./router/ProtectedRouter";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import CreateCampaignPage from "./pages/CreateCampaignPage";
 
 function App() {
 	return (
@@ -20,6 +21,7 @@ function App() {
 				<ProtectedRoute roles={[]} redirectTo="/" path="/registration" component={RegistrationPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/reset-password/:id" component={ResetPasswordPage} />
 				<ProtectedRoute roles={[]} redirectTo="/" path="/blocked-user/:id" component={UserActivateRequestPage} />
+				<ProtectedRoute roles={["agent"]} redirectTo="/unauthorized" path="/create-campaign" component={CreateCampaignPage} />
 				<Route path="/unauthorized" component={UnauthorizedPage} />
 
 				<Route path="/404" component={PageNotFound} />

@@ -26,6 +26,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/ads/campaign/post", h.GetAllActiveAgentsPostCampaigns)
 	e.GET("/api/ads/campaign/story", h.GetAllActiveAgentsStoryCampaigns)
 
+	e.POST("/api/ads/campaign/agent", h.CreateCampaignFromAgentApi)
+
 	e.POST("/api/ads/campaign/influencer", h.CreateInfluencerCampaign)
 
 	e.PUT("/api/ads/campaign", h.UpdateCampaignRequest)

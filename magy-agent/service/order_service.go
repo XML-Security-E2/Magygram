@@ -36,6 +36,10 @@ func (o orderService) CreateOrder(ctx context.Context, orderReq *model.OrderRequ
 			return nil, errors.New("invalid product id")
 		}
 
+		if product.Quantity < item.Count {
+			return nil, errors.New("product " + product.Name + " quantity not available")
+		}
+
 		order.Items = append(order.Items, &model.OrderItem{
 			OrderId:         order.Id,
 			ProductId:       product.Id,
@@ -44,5 +48,16 @@ func (o orderService) CreateOrder(ctx context.Context, orderReq *model.OrderRequ
 			PricePerProduct: product.Price,
 		})
 	}
+
+	for _, item := range orderReq.Items {
+		product, err := o.ProductRepository.GetById(ctx, item.ProductId)
+		if err != nil || product == nil {
+			return nil, errors.New("invalid product id")
+		}
+
+		product.Quantity = product.Quantity - item.Count
+		o.ProductRepository.Update(ctx, product)
+	}
+
 	return o.OrderRepository.Create(ctx, order)
 }

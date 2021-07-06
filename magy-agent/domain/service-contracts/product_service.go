@@ -13,4 +13,5 @@ type ProductService interface {
 	GetProductById(ctx context.Context, id string) (*model.Product, error)
 	DeleteProductById(ctx context.Context, id string) error
 	GetAllProducts(ctx context.Context) (*[]model.Product, error)
+	CreateProductCampaign(ctx context.Context, campaignReq *model.CampaignRequest) error
 }

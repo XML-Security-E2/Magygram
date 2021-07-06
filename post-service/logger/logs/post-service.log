@@ -817,3 +817,6 @@ time="2021-07-04T14:06:13+02:00" level=info msg="Server started" func=main.main 
 time="2021-07-04T14:22:08+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/post_service.go:707" post_owner_id=e3c8a92a-359e-4d93-9a1c-1d61b07e52c2 request_ip=127.0.0.1 user_id=7b3465b8-c75e-43ad-bd33-e5e26a8d9c7f
 time="2021-07-04T14:35:57+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Nikola/Desktop/XML/Magygram/post-service/service/post_service.go:707" post_owner_id=e3c8a92a-359e-4d93-9a1c-1d61b07e52c2 request_ip=127.0.0.1 user_id=7b3465b8-c75e-43ad-bd33-e5e26a8d9c7f
 >>>>>>> develop
+time="2021-07-06T00:39:11+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-06T00:53:10+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-06T01:20:10+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
