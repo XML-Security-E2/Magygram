@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext,useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
@@ -11,15 +11,24 @@ import PostCommentInputModalView from "../PostCommentInputModalView";
 import PostLikesAndDislikesModalView from "../PostLikesAndDislikesModalView";
 import OptionsModal from "./OptionsModal";
 import SearchInfluencerModal from "./SearchInfluencerModal";
-import { getUserInfo } from "../../helpers/auth-header";
+import { getUserInfo, hasRoles } from "../../helpers/auth-header";
 
 const ViewPostModal = () => {
 	const { postState, dispatch } = useContext(PostContext);
+	const [agent, setAgent] = useState("");
 	const style = { width: "450px" };
 
 	const LikePost = (postId) => {
 		postService.likePost(postId, getUserInfo(), dispatch);
 	};
+
+
+	useEffect(() => {
+		if(postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && hasRoles(["agent"]))
+			setAgent(false)
+		else
+			setAgent(true)	
+	});
 
 	const UnlikePost = (postId) => {
 		postService.unlikePost(postId, getUserInfo(), dispatch);
@@ -125,10 +134,12 @@ const ViewPostModal = () => {
 								</div>
 							)}
 							<hr></hr>
-							<div>
-								<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>
-									<i className="icofont-subscribe mr-1"></i>Product placement
-								</button>
+							<div >
+								{ !agent &&
+									<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>
+										<i className="icofont-subscribe mr-1"></i>Product placement
+									</button>
+								}
 							</div>
 							<PostCommentsModalView
 								imageUrl={postState.viewPostModal.post.UserInfo.ImageURL}
