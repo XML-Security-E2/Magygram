@@ -283,3 +283,4 @@ time="2021-07-06T00:39:12+02:00" level=info msg="Server started" func=main.main 
 time="2021-07-06T01:06:49+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-07-06T14:18:46+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-07-06T19:55:24+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-07-07T12:21:54+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
