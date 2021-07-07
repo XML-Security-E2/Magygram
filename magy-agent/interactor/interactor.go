@@ -7,6 +7,7 @@ import (
 	"magyAgent/domain/service-contracts"
 	"magyAgent/infrastructure/persistence/pgsql"
 	"magyAgent/service"
+	"magyAgent/service/intercomm"
 )
 
 type Interactor interface {
@@ -18,10 +19,14 @@ type Interactor interface {
 	NewAuthService() service_contracts.AuthService
 	NewProductService() service_contracts.ProductService
 	NewOrderService() service_contracts.OrderService
+	NewExportService() service.ExportService
 	NewAccountActivationService() service_contracts.AccountActivationService
 	NewAuthHandler() handler.AuthHandler
 	NewProductHandler() handler.ProductHandler
 	NewOrderHandler() handler.OrderHandler
+	NewMagygramClient() intercomm.MagygramClient
+	NewMediaClient() intercomm.MediaClient
+	NewXmlDbClient() intercomm.XmlDbClient
 	NewAppHandler() handler.AppHandler
 }
 
@@ -46,6 +51,22 @@ func (i *interactor) NewAppHandler() handler.AppHandler {
 	appHandler.ProductHandler = i.NewProductHandler()
 	appHandler.OrderHandler = i.NewOrderHandler()
 	return appHandler
+}
+
+func (i *interactor) NewExportService() service.ExportService {
+	return service.NewExportService(i.NewMediaClient())
+}
+
+func (i *interactor) NewMediaClient() intercomm.MediaClient {
+	return intercomm.NewMediaClient()
+}
+
+func (i *interactor) NewXmlDbClient() intercomm.XmlDbClient {
+	return intercomm.NewXmlDbClient()
+}
+
+func (i *interactor) NewMagygramClient() intercomm.MagygramClient {
+	return intercomm.NewMagygramClient()
 }
 
 func (i *interactor) NewOrderRepository() repository.OrderRepository {
@@ -101,5 +122,5 @@ func (i *interactor) NewProductRepository() repository.ProductRepository {
 }
 
 func (i *interactor) NewProductService() service_contracts.ProductService {
-	return service.NewProductService(i.NewProductRepository())
+	return service.NewProductService(i.NewProductRepository(), i.NewMagygramClient(), i.NewXmlDbClient(), i.NewExportService())
 }

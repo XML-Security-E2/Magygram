@@ -4,10 +4,14 @@ go 1.16
 
 require (
 	github.com/beevik/guid v0.0.0-20170504223318-d0ea8faecee0
+	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible // indirect
+	github.com/google/uuid v1.2.0 // indirect
+	github.com/johnfercher/maroto v0.33.0 // indirect
+	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect

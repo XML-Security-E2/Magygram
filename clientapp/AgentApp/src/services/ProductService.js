@@ -9,7 +9,54 @@ export const productService = {
 	updateProductInfo,
 	updateProductImage,
 	deleteProduct,
+	createCampaign,
+	getCampaignStatistics,
+	getGeneratedCampaignStatisticsReports,
+	downloadReport,
 };
+
+async function downloadReport(reportName) {
+	const FileDownload = require("js-file-download");
+
+	await Axios.get(`/api/products/campaign/reports/download/${reportName}`, { validateStatus: () => true, headers: authHeader(), responseType: "blob" })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				FileDownload(res.data, "report.pdf");
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+}
+
+async function getGeneratedCampaignStatisticsReports(dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/products/campaign/reports`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure("Error while fetching data"));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: productConstants.SET_CAMPAIGN_REPORTS_REQUEST };
+	}
+	function success(data) {
+		return { type: productConstants.SET_CAMPAIGN_REPORTS_SUCCESS, reports: data };
+	}
+	function failure(message) {
+		return { type: productConstants.SET_CAMPAIGN_REPORTS_FAILURE, errorMessage: message };
+	}
+}
 
 async function findAllProducts(dispatch) {
 	dispatch(request());
@@ -39,9 +86,64 @@ async function findAllProducts(dispatch) {
 	}
 }
 
+async function getCampaignStatistics(dispatch) {
+	dispatch(request());
+
+	await Axios.get(`/api/products/campaign/statistics`, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				dispatch(success(res.data));
+			} else {
+				dispatch(failure());
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			dispatch(failure());
+		});
+
+	function request() {
+		return { type: productConstants.SET_CAMPAIGNS_STATS_REQUEST };
+	}
+	function success(data) {
+		return { type: productConstants.SET_CAMPAIGNS_STATS_SUCCESS, report: data };
+	}
+	function failure() {
+		return { type: productConstants.SET_CAMPAIGNS_STATS_FAILURE };
+	}
+}
+
+function createCampaign(campaignDTO, dispatch) {
+	dispatch(request());
+
+	Axios.post(`/api/products/campaign`, campaignDTO, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 201) {
+				dispatch(success("Campaign successfully created"));
+			} else {
+				dispatch(failure("Error while creating campaign"));
+			}
+		})
+		.catch((err) => {
+			dispatch(failure("Error"));
+		});
+
+	function request() {
+		return { type: productConstants.CREATE_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: productConstants.CREATE_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: productConstants.CREATE_CAMPAIGN_FAILURE, errorMessage: message };
+	}
+}
+
 function createProduct(productDTO, dispatch) {
 	let formData = new FormData();
-	formData.append("image", productDTO.image, "img");
+	formData.append("image", productDTO.image);
 	formData.append("name", productDTO.name);
 	formData.append("price", productDTO.price);
 
