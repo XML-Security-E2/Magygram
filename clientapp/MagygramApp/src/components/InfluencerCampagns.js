@@ -56,6 +56,35 @@ const InfluencerCampagns = ({show}) => {
 			]
 		  });
 	}
+	const acceptVerificationRequest = (requestId)=>{
+		confirmAlert({
+			message: 'Are you sure to do this?',
+			buttons: [
+			  {
+				label: 'Yes',
+				onClick: () => {
+                    Axios.put(`/api/requests/campaign/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
+                    .then((res) => {
+                        console.log(res);
+                        if (res.status === 200) {
+                            console.log("Report request has been deleted");
+                            window.location.reload()
+                        } else {
+                            console.log("ERROR")
+                        }
+                    })
+                    .catch((err) => {
+                        console.log("ERROR")
+                    });
+            
+                }
+			  },
+			  {
+				label: 'No',
+			  }
+			]
+		  });
+	}
 
 	return (
 		<React.Fragment>
@@ -80,7 +109,12 @@ const InfluencerCampagns = ({show}) => {
                                 	</td>
 									<td className="text-right">
 										<div className="mt-2">
-											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>deleteVerificationRequest(request.Id)}><i className="icofont-subscribe mr-1"></i>Delete report</button>
+											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>deleteVerificationRequest(request.Id)}><i className="icofont-subscribe mr-1"></i>Delete request</button>
+										                                  
+										</div>
+
+										<div className="mt-2">
+											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequest(request.Id)}><i className="icofont-subscribe mr-1"></i>Accept request</button>
 										                                  
 										</div>
 									</td>
