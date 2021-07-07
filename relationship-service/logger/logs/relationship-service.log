@@ -400,3 +400,5 @@ time="2021-07-06T18:20:47+02:00" level=info msg="User unfollowed" func="relation
 time="2021-07-06T18:22:09+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=ca66e598-34df-4736-9c23-c3e2e8389968 request_ip="::1" subject_id=60b13002-f559-4c09-80fa-a6e7f7f0690e
 >>>>>>> develop
 time="2021-07-06T22:31:30+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-07T09:47:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-07T11:09:22+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463

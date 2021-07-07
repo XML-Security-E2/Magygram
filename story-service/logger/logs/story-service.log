@@ -286,3 +286,5 @@ time="2021-07-06T11:37:38+02:00" level=info msg="Story created" func=story-servi
 time="2021-07-06T13:07:37+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-07-06T16:04:54+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/story-service/main.go:73" host=localhost port=464
 time="2021-07-06T22:34:08+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-07-07T11:12:43+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/story-service/main.go:73" host=localhost port=464
+time="2021-07-07T11:39:44+02:00" level=info msg="Story created" func=story-service/service.storyService.CreatePost file="C:/Users/zindo/Desktop/Magygram/story-service/service/story_service.go:150" request_ip=127.0.0.1 story_id=9efa0779-a0e0-494e-870c-66a3a6067d51 user_id=2016938c-e8a9-4218-b4c2-302a76d75cef

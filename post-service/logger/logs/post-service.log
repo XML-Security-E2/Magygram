@@ -835,3 +835,5 @@ time="2021-07-06T18:15:38+02:00" level=warning msg="Unauthorized access" func=po
 time="2021-07-06T18:19:43+02:00" level=warning msg="Unauthorized access" func=post-service/service.postService.checkIfUserContentIsAccessible file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:733" post_owner_id=ca66e598-34df-4736-9c23-c3e2e8389968 request_ip=127.0.0.1 user_id=60b13002-f559-4c09-80fa-a6e7f7f0690e
 >>>>>>> develop
 time="2021-07-06T22:31:07+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-07T11:12:19+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:74" host=localhost port=462
+time="2021-07-07T11:39:31+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/zindo/Desktop/Magygram/post-service/service/post_service.go:119" post_id=5b259b3c-69a2-4f5a-8e76-c0fbbf1005b4 request_ip=127.0.0.1 user_id=2016938c-e8a9-4218-b4c2-302a76d75cef

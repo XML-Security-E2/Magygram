@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -17,32 +18,25 @@ import (
 
 // Init returns an instance of Jaeger Tracer.
 func Init(service string) (opentracing.Tracer, io.Closer) {
-	cfg, err := config.FromEnv()
-	if err != nil {
-		fmt.Println(err.Error())
-		return nil, nil
+	// Without docker, easier to test
+	cfg := &config.Configuration{
+		ServiceName: service,
+		// "const" sampler is a binary sampling strategy: 0=never sample, 1=always sample.
+		Sampler: &config.SamplerConfig{
+			Type:  jaeger.SamplerTypeConst,
+			Param: 1,
+		},
+
+		// Log the emitted spans to stdout.
+		Reporter: &config.ReporterConfig{
+			LogSpans: true,
+		},
 	}
 
-	cfg.ServiceName = "auth-service"
-	cfg.Sampler.Type = jaeger.SamplerTypeConst
-	cfg.Sampler.Param = 1
-	cfg.Reporter.LogSpans = true
+	if os.Getenv("IS_PRODUCTION") == "true" {
+		cfg.Reporter.LocalAgentHostPort = "tracing:6831"
+	}
 
-	//Without docker, easier to test
-	// cfg := &config.Configuration{
-	// 	ServiceName: service,
-
-	// 	// "const" sampler is a binary sampling strategy: 0=never sample, 1=always sample.
-	// 	Sampler: &config.SamplerConfig{
-	// 		Type:  jaeger.SamplerTypeConst,
-	// 		Param: 1,
-	// 	},
-
-	// 	// Log the emitted spans to stdout.
-	// 	Reporter: &config.ReporterConfig{
-	// 		LogSpans: true,
-	// 	},
-	// }
 	jLogger := jaegerlog.StdLogger
 	jMetricsFactory := metrics.NullFactory
 	tracer, closer, err := cfg.NewTracer(
