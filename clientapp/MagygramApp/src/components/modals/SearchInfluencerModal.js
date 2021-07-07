@@ -59,6 +59,8 @@ const SearchInfluencerModal = () => {
 		var following = false;
 		Axios.get(`/api/users/${userId}/following`, { validateStatus: () => true, headers: authHeader() })
 		.then((res) => {
+			if(res.data === null)
+				alert("You need to follow this influencer to send him campaign request")
 			users = res.data;
 			console.log(users);
 				

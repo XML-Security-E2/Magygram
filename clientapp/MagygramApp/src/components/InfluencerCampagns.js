@@ -12,6 +12,7 @@ import PostContextProvider from "../contexts/PostContext";
 import StoryContextProvider from "../contexts/StoryContext";
 import ReportedPost from "./ReportedPost";
 import ReportedStory from "./ReportedStoryInfluencer";
+import { postService } from "../services/PostService";
 
 const InfluencerCampagns = ({show}) => {
 
@@ -56,34 +57,97 @@ const InfluencerCampagns = ({show}) => {
 			]
 		  });
 	}
-	const acceptVerificationRequest = (requestId)=>{
-		confirmAlert({
-			message: 'Are you sure to do this?',
-			buttons: [
-			  {
-				label: 'Yes',
-				onClick: () => {
-                    Axios.put(`/api/requests/campaign/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
-                    .then((res) => {
-                        console.log(res);
-                        if (res.status === 200) {
-                            console.log("Report request has been deleted");
-                            window.location.reload()
-                        } else {
-                            console.log("ERROR")
-                        }
-                    })
-                    .catch((err) => {
-                        console.log("ERROR")
-                    });
-            
-                }
-			  },
-			  {
-				label: 'No',
-			  }
-			]
-		  });
+	const acceptVerificationRequest = (requestId, id)=>{
+		
+			let influencerDTO = {
+				contentId: requestId,
+				ownerId: "60b13002-f559-4c09-80fa-a6e7f7f0690e",
+				campaignType: "POST",
+				userId: localStorage.getItem("userId"),
+				username: localStorage.getItem("username"),
+			};
+
+			let influencerPostDTO = {
+				postIdInfl: requestId,
+				userId: localStorage.getItem("userId"),
+				username: localStorage.getItem("username"),
+			};
+			Axios.post(`/api/ads/campaign/create/influencer`, influencerDTO, { validateStatus: () => true, headers: authHeader() })
+				.then((res) => {
+					console.log(res)
+					console.log(influencerPostDTO)
+					Axios.put(`/api/posts/campaign/influencer`,influencerPostDTO, { validateStatus: () => true, headers: authHeader() })
+						.then((res) => {
+							console.log(res)
+							 Axios.put(`/api/requests/campaign/${id}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
+								.then((res) => {
+									console.log(res);
+									if (res.status === 200) {
+										window.location = "#/profile?userId=" + localStorage.getItem("userId");
+									} else {
+										console.log("ERROR")
+									}
+								})
+								.catch((err) => {
+									console.log("ERROR")
+								});
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+					
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+	
+
+	}
+	const acceptVerificationRequestStory = (requestId,id)=>{
+		
+		let influencerDTO = {
+			contentId: requestId,
+			ownerId: "60b13002-f559-4c09-80fa-a6e7f7f0690e",
+			campaignType: "STORY",
+			userId: localStorage.getItem("userId"),
+			username: localStorage.getItem("username"),
+		};
+
+		let influencerPostDTO = {
+			postIdInfl: requestId,
+			userId: localStorage.getItem("userId"),
+			username: localStorage.getItem("username"),
+		};
+		Axios.post(`/api/ads/campaign/create/influencer`, influencerDTO, { validateStatus: () => true, headers: authHeader() })
+			.then((res) => {
+				console.log(res)
+				console.log(influencerPostDTO)
+				Axios.put(`/api/story/campaign/influencer`,influencerPostDTO, { validateStatus: () => true, headers: authHeader() })
+					.then((res) => {
+						console.log(res)
+							 Axios.put(`/api/requests/campaign/${id}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
+								.then((res) => {
+									console.log(res);
+									if (res.status === 200) {
+										window.location = "/#";
+									} else {
+										console.log("ERROR")
+									}
+								})
+								.catch((err) => {
+									console.log("ERROR")
+								});
+						
+					})
+					.catch((err) => {
+						console.log(err);
+					});
+				
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+
 	}
 
 	return (
@@ -113,8 +177,12 @@ const InfluencerCampagns = ({show}) => {
 										                                  
 										</div>
 
-										<div className="mt-2">
-											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequest(request.Id)}><i className="icofont-subscribe mr-1"></i>Accept request</button>
+										<div hidden={(request.ContentType === "STORY")} className="mt-2">
+											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequest(request.ContentId,request.Id)}><i className="icofont-subscribe mr-1"></i>Accept post</button>
+										                                  
+										</div>
+										<div hidden={(request.ContentType === "POST")} className="mt-2">
+											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequestStory(request.ContentId,request.Id)}><i className="icofont-subscribe mr-1"></i>Accept story</button>
 										                                  
 										</div>
 									</td>

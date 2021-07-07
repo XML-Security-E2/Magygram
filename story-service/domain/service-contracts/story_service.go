@@ -11,6 +11,7 @@ type StoryService interface {
 	CreateStoryCampaignFromApi(ctx context.Context, bearer string, storyContent *multipart.FileHeader) (string, error)
 	CreateStoryCampaign(ctx context.Context, bearer string, storyContent *multipart.FileHeader, tags []model.Tag, campaignReq *model.CampaignRequest) (string, error)
 	GetAllUserStoryCampaigns(ctx context.Context, bearer string) ([]*model.UsersStoryResponseWithUserInfo , error)
+	CreateStoryInfluencer(ctx context.Context, bearer string, request *model.InfluencerRequest) (string, error)
 
 	GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse , error)
 	GetStoriesForUser(ctx context.Context, userId string, bearer string) (*model.StoryResponse , error)

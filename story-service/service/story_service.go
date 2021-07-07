@@ -97,6 +97,51 @@ func (p storyService) GetStoryMediaAndWebsiteByIds(ctx context.Context, ids *mod
 	return resp, nil
 }
 
+func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, request  *model.InfluencerRequest) (string, error) {
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil { return "", err}
+
+	agentPost, err := p.StoryRepository.GetByID(ctx, request.PostIdInfluencer)
+	if err != nil {
+		return "", err
+	}
+
+	post, err := model.NewStoryInfluencer(agentPost, *userInfo)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
+		return "", err}
+
+	if err := validator.New().Struct(post); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
+		return "", err
+	}
+
+	result, err := p.StoryRepository.Create(ctx, post)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userInfo.Id}).Error("Story database create failure")
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  agentPost.UserInfo.ImageURL,
+		Type:      intercomm.PublishedStory,
+	})
+	if err != nil {
+		return "", err
+	}
+
+
+	if postId, ok := result.InsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_id": post.Id, "user_id" : userInfo.Id}).Info("Story created")
+		return postId, nil
+	}
+
+	return "", err
+}
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
 	if err != nil { return "", err}
