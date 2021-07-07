@@ -264,10 +264,14 @@ export const productReducer = (state, action) => {
 			};
 
 		case productConstants.SET_CAMPAIGN_REPORTS_SUCCESS:
-			return {
-				...state,
-				reports: action.reports,
-			};
+			prodCpy = { ...state };
+
+			if (action.reports !== null) {
+				prodCpy.reports = action.reports;
+			} else {
+				prodCpy.reports = [];
+			}
+			return prodCpy;
 
 		case productConstants.SET_CAMPAIGN_REPORTS_FAILURE:
 			return state;

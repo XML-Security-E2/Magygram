@@ -1,12 +1,17 @@
 import React, { useContext } from "react";
 import { productConstants } from "../constants/ProductConstants";
 import { ProductContext } from "../contexts/ProductContext";
+import { productService } from "../services/ProductService";
 
 const CampaignStatisticReportItem = ({ report }) => {
 	const { dispatch } = useContext(ProductContext);
 
 	const setShowedCampaigns = () => {
 		dispatch({ type: productConstants.CHANGE_SHOWED_CAMPAIGNS, campaigns: report.campaigns });
+	};
+
+	const downloadFIle = () => {
+		productService.downloadReport(report.fileId + ".xml");
 	};
 
 	return (
@@ -24,7 +29,7 @@ const CampaignStatisticReportItem = ({ report }) => {
 						})}
 					</div>
 					<div className="col-4">
-						<button type="button" className="btn btn-outline-secondary">
+						<button type="button" className="btn btn-outline-secondary" onClick={downloadFIle}>
 							Generate PDF
 						</button>
 					</div>

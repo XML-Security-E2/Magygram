@@ -19,6 +19,7 @@ type ProductHandler interface {
 	CreateProductCampaign(c echo.Context) error
 	GetProductCampaignStatistics(c echo.Context) error
 	GetProductCampaignStatisticsReports(c echo.Context) error
+	DownloadPdfReport(c echo.Context) error
 }
 
 func NewProductHandler(a service_contracts.ProductService) ProductHandler {
@@ -27,6 +28,23 @@ func NewProductHandler(a service_contracts.ProductService) ProductHandler {
 
 type productHandler struct {
 	ProductService service_contracts.ProductService
+}
+
+func (p productHandler) DownloadPdfReport(c echo.Context) error {
+	reportName := c.Param("reportName")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	bytees, err := p.ProductService.GetDocumentByIdInPdf(ctx, reportName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+
+	return c.Blob(http.StatusOK,"application/pdf", bytees)
 }
 
 func (p productHandler) GetProductCampaignStatisticsReports(c echo.Context) error {

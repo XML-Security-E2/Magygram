@@ -17,4 +17,5 @@ type ProductService interface {
 	GetProductCampaignStatistics(ctx context.Context) (*model.CampaignStatisticReport, error)
 
 	GetAllProductCampaignStatisticsReports(ctx context.Context) ([]*model.CampaignStatisticReport, error)
+	GetDocumentByIdInPdf(ctx context.Context, filename string) ([]byte, error)
 }

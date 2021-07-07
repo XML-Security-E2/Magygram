@@ -24,6 +24,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/products/campaign", h.CreateProductCampaign)
 	e.GET("/api/products/campaign/statistics", h.GetProductCampaignStatistics)
 	e.GET("/api/products/campaign/reports", h.GetProductCampaignStatisticsReports)
+	e.GET("/api/products/campaign/reports/download/:reportName", h.DownloadPdfReport)
 
 	e.PUT("/api/products/:productId", h.UpdateProduct)
 	e.PUT("/api/products/:productId/image", h.UpdateProductImage)

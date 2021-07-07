@@ -12,7 +12,23 @@ export const productService = {
 	createCampaign,
 	getCampaignStatistics,
 	getGeneratedCampaignStatisticsReports,
+	downloadReport,
 };
+
+async function downloadReport(reportName) {
+	const FileDownload = require("js-file-download");
+
+	await Axios.get(`/api/products/campaign/reports/download/${reportName}`, { validateStatus: () => true, headers: authHeader(), responseType: "blob" })
+		.then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				FileDownload(res.data, "report.pdf");
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+}
 
 async function getGeneratedCampaignStatisticsReports(dispatch) {
 	dispatch(request());

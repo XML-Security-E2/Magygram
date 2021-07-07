@@ -22,16 +22,31 @@ type productService struct {
 	repository.ProductRepository
 	intercomm.MagygramClient
 	intercomm.XmlDbClient
+	ExportService
 }
 
-func NewProductService(r repository.ProductRepository, mc intercomm.MagygramClient, xc intercomm.XmlDbClient) service_contracts.ProductService {
-	return &productService{r, mc, xc }
+func NewProductService(r repository.ProductRepository, mc intercomm.MagygramClient, xc intercomm.XmlDbClient, es ExportService) service_contracts.ProductService {
+	return &productService{r, mc, xc, es }
 }
 
 var (
 	FileDirectory = "files"
 	FileRequestPrefix = "/api/media/"
 )
+
+func (p productService) GetDocumentByIdInPdf(ctx context.Context, filename string) ([]byte, error) {
+	report, err := p.XmlDbClient.GetDocumentById(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	bytes, err := p.ExportService.ExportToPdf(report)
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.Bytes(), nil
+}
 
 func (p productService) GetAllProductCampaignStatisticsReports(ctx context.Context) ([]*model.CampaignStatisticReport, error) {
 
@@ -40,10 +55,10 @@ func (p productService) GetAllProductCampaignStatisticsReports(ctx context.Conte
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(len(resp.XmlDatabaseCollections.Resources))
+
 	for _, res := range resp.XmlDatabaseCollections.Resources {
 		report, err := p.XmlDbClient.GetDocumentById(res.Name)
-		fmt.Println(report.FileId)
+
 		if err == nil {
 			retList = append(retList, report)
 		}
