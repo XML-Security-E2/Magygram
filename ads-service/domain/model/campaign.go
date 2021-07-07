@@ -23,6 +23,13 @@ type InfluencerCampaignCreateRequest struct {
 	OwnerId string `json:"ownerId"`
 	Type ContentType `json:"campaignType"`
 }
+type InfluencerCampaignProductCreateRequest struct {
+	ContentId string `json:"contentId"`
+	OwnerId string `json:"ownerId"`
+	Type ContentType `json:"campaignType"`
+	UserId string `json:"userId"`
+	Username string `json:"username"`
+}
 
 type CampaignStatisticResponse struct {
 	Id string `json:"id"`
@@ -308,6 +315,23 @@ func NewInfluencerCampaign(campaignRequest *InfluencerCampaignCreateRequest, use
 		Id:          guid.New().String(),
 		UserId:      userId,
 		Username:    username,
+		OwnerId:     campaignRequest.OwnerId,
+		ContentId:   campaignRequest.ContentId,
+		DailySeenBy: []UserGroupStatisticWrapper{},
+		SeenBy:      []string{},
+		Type:        campaignRequest.Type,
+		WebsiteClickCount: 0,
+	}, nil
+}
+func NewInfluencerCampaignProduct(campaignRequest *InfluencerCampaignProductCreateRequest) (*InfluencerCampaign, error) {
+	if err := validateContentTypeEnums(campaignRequest.Type); err != nil {
+		return nil, err
+	}
+
+	return &InfluencerCampaign{
+		Id:          guid.New().String(),
+		UserId:      campaignRequest.UserId,
+		Username:    campaignRequest.Username,
 		OwnerId:     campaignRequest.OwnerId,
 		ContentId:   campaignRequest.ContentId,
 		DailySeenBy: []UserGroupStatisticWrapper{},

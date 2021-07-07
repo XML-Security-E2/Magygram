@@ -10,6 +10,7 @@ type PostService interface {
 	GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse , error)
 	GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error)
 	CreatePost(ctx context.Context, bearer string,  post *model.PostRequest) (string, error)
+	CreatePostInfluencer(ctx context.Context, bearer string, request *model.InfluencerRequest) (string, error)
 	CreatePostCampaign(ctx context.Context, bearer string,  post *model.PostRequest, campaignReq *model.CampaignRequest) (string, error)
 	GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error)
 

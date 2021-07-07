@@ -114,6 +114,59 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	return "", err
 }
 
+func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, request  *model.InfluencerRequest) (string, error) {
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	if err != nil { return "", err}
+
+	agentPost, err := p.PostRepository.GetByID(ctx, request.PostIdInfluencer)
+	if err != nil {
+		return "", err
+	}
+
+	post, err := model.NewPostInfluencer(agentPost, *userInfo)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"tags": post.Tags,
+													 "description" : post.Description,
+													 "location" : post.Location}).Warn("Post creating validation failure")
+
+		return "", err}
+
+	if err = validator.New().Struct(post); err!= nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"tags": agentPost.Tags,
+			"description" : agentPost.Description,
+			"location" : agentPost.Location}).Warn("Post creating validation failure")
+		return "", err
+	}
+
+	result, err := p.PostRepository.Create(ctx, post)
+	if err != nil {
+		logger.LoggingEntry.WithFields(logrus.Fields{"tags": agentPost.Tags,
+													 "description" : agentPost.Description,
+													 "location" : agentPost.Location}).Error("Post database create failure")
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedPost,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if postId, ok := result.InsertedID.(string); ok {
+		logger.LoggingEntry.WithFields(logrus.Fields{"post_id": post.Id, "user_id" : userInfo.Id}).Info("Post created")
+		return postId, nil
+	}
+
+	return "", err
+}
+
 func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
 	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
 	if err != nil { return "", err}

@@ -268,6 +268,26 @@ func (c campaignService) GetStoryCampaignStatistic(ctx context.Context, bearer s
 	return statResponse, nil}
 
 
+func (c campaignService) GetCampaignByPostIdInfulencer(ctx context.Context, contentId string) (*model.CampaignRetreiveRequest, error) {
+
+	campaign, err := c.CampaignRepository.GetFutureByContentIDAndType(ctx, contentId, "POST")
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(campaign)
+	return &model.CampaignRetreiveRequest{
+		Id:                       campaign.Id,
+		MinDisplaysForRepeatedly: campaign.MinDisplaysForRepeatedly,
+		Type:                     campaign.Type,
+		Frequency:                campaign.Frequency,
+		TargetGroup:              campaign.TargetGroup,
+		DateFrom:                 campaign.DateFrom,
+		DateTo:                   campaign.DateTo,
+		DisplayTime:              campaign.DisplayTime,
+		ExposeOnceDate:           campaign.ExposeOnceDate,
+	}, nil}
+
 func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
@@ -604,6 +624,7 @@ func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer st
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("USO2")
 
 	//mozda posle nece trebati provera
 	//_, err = c.CampaignRepository.GetByID(ctx, campaignRequest.ParentCampaignId)
@@ -612,6 +633,27 @@ func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer st
 	//}
 
 	campaign, err := model.NewInfluencerCampaign(campaignRequest, logged.Id, logged.Username)
+	if err != nil {
+		return "", err
+	}
+
+	if err = validator.New().Struct(campaign); err!= nil {
+		return "", err
+	}
+
+	_, err = c.InfluencerCampaignRepository.Create(ctx, campaign)
+	if err != nil {
+		return "", err
+	}
+
+	return campaign.Id, nil
+}
+
+
+func (c campaignService) CreateCampaignForInfluencer(ctx context.Context, campaignRequest *model.InfluencerCampaignProductCreateRequest) (string, error) {
+
+
+	campaign, err := model.NewInfluencerCampaignProduct(campaignRequest)
 	if err != nil {
 		return "", err
 	}

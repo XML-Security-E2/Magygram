@@ -14,6 +14,7 @@ import (
 type CampaignHandler interface {
 	CreateCampaign(c echo.Context) error
 	CreateInfluencerCampaign(c echo.Context) error
+	CreateInfluencerCampaignProduct(c echo.Context) error
 	UpdateCampaignRequest(c echo.Context) error
 	GetAllActiveAgentsPostCampaigns(c echo.Context) error
 	GetAllActiveAgentsStoryCampaigns(c echo.Context) error
@@ -30,6 +31,7 @@ type CampaignHandler interface {
 	GetStoryCampaignStatistic(c echo.Context) error
 	UpdatePostCampaignVisitor(c echo.Context) error
 	UpdateStoryCampaignVisitor(c echo.Context) error
+	GetCampaignByPostIdInfulencer(c echo.Context) error
 }
 
 type campaignHandler struct {
@@ -171,6 +173,21 @@ func (ch campaignHandler) GetStoryCampaignSuggestion(c echo.Context) error {
 	return c.JSON(http.StatusOK, campaign)
 }
 
+func (ch campaignHandler) GetCampaignByPostIdInfulencer(c echo.Context) error {
+	contentId := c.Param("contentId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	campaign, err := ch.CampaignService.GetCampaignByPostIdInfulencer(ctx, contentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, campaign)}
+
 func (ch campaignHandler) GetCampaignByPostId(c echo.Context) error {
 	contentId := c.Param("contentId")
 
@@ -302,6 +319,7 @@ func (ch campaignHandler) CreateCampaign(c echo.Context) error {
 
 func (ch campaignHandler) CreateInfluencerCampaign(c echo.Context) error {
 	campaignRequest := &model.InfluencerCampaignCreateRequest{}
+	fmt.Println("USO1")
 	if err := c.Bind(campaignRequest); err != nil {
 		return err
 	}
@@ -313,6 +331,25 @@ func (ch campaignHandler) CreateInfluencerCampaign(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	campaignId, err := ch.CampaignService.CreateInfluencerCampaign(ctx, bearer, campaignRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, campaignId)
+}
+func (ch campaignHandler) CreateInfluencerCampaignProduct(c echo.Context) error {
+	campaignRequest := &model.InfluencerCampaignProductCreateRequest{}
+	fmt.Println("USO1")
+	if err := c.Bind(campaignRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	campaignId, err := ch.CampaignService.CreateCampaignForInfluencer(ctx, campaignRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

@@ -15,6 +15,7 @@ export const postService = {
 	deletePostFromCollection,
 	createPost,
 	createPostCampaign,
+	createInfluencerCampaign,
 	editPost,
 	likePost,
 	unlikePost,
@@ -446,6 +447,35 @@ function createPost(postDTO, dispatch) {
 	}
 	function failure(message) {
 		return { type: postConstants.CREATE_POST_FAILURE, errorMessage: message };
+	}
+}
+function createInfluencerCampaign(postCampaignDTO, dispatch) {
+	const formData = fetchFormData(postCampaignDTO);
+	dispatch(request());
+	console.log(formData);
+
+	Axios.post(`/api/posts/campaign/influencer`, formData, { validateStatus: () => true, headers: authHeader() })
+		.then((res) => {
+			console.log(res);
+
+			if (res.status === 201) {
+				dispatch(success("Influencer campaign successfully created"));
+			} else {
+				dispatch(failure(res.data.message));
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	function request() {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_REQUEST };
+	}
+	function success(message) {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_SUCCESS, successMessage: message };
+	}
+	function failure(message) {
+		return { type: postConstants.CREATE_POST_CAMPAIGN_FAILURE, errorMessage: message };
 	}
 }
 
