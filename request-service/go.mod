@@ -9,6 +9,7 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pelletier/go-toml v1.9.2 // indirect
+	github.com/prometheus/client_golang v0.9.3
 	github.com/spf13/viper v1.7.1
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible

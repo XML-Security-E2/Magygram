@@ -12,6 +12,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/neo4j/neo4j-go-driver/v4 v4.3.0
 	github.com/opentracing/opentracing-go v1.2.0
+	github.com/prometheus/client_golang v0.9.3
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/viper v1.7.1
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
