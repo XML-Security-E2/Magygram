@@ -21,6 +21,7 @@ type PostHandler interface {
 	CreatePost(c echo.Context) error
 	CreatePostCampaign(c echo.Context) error
 	CreatePostCampaignInfluencer(c echo.Context) error
+	CreatePostCampaignFromApi(c echo.Context) error
 	GetPostsForTimeline(c echo.Context) error
 	LikePost(c echo.Context) error
 	UnlikePost(c echo.Context) error
@@ -140,6 +141,7 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, postId)
 }
 
+
 func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
 
 	fmt.Println("USO")
@@ -163,6 +165,35 @@ func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
 	return c.JSON(http.StatusOK, postId)
 
 }
+
+
+func (p postHandler) CreatePostCampaignFromApi(c echo.Context) error {
+
+	headers, err := c.FormFile("images")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	postRequest := &model.PostRequest{
+		Description:              "",
+		Location:                 "",
+		Media:                    []*multipart.FileHeader{headers},
+		Tags:                     []model.Tag{},
+	}
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	postId, err := p.PostService.CreatePostCampaignFromApi(ctx, bearer, postRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, postId)
+}
+
 
 func (p postHandler) CreatePostCampaign(c echo.Context) error {
 

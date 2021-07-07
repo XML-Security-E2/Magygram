@@ -19,6 +19,7 @@ import (
 type StoryHandler interface {
 	CreateStory(c echo.Context) error
 	CreateStoryCampaign(c echo.Context) error
+	CreateStoryCampaignFromApi(c echo.Context) error
 	GetStoriesForStoryline(c echo.Context) error
 	GetStoryForAdmin(c echo.Context) error
 	GetStoriesForUser(c echo.Context) error
@@ -197,6 +198,28 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 	}
 
 	storyId, err := p.StoryService.CreateStoryCampaign(ctx, bearer, headers, tags, campaignRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, storyId)
+}
+
+func (p storyHandler) CreateStoryCampaignFromApi(c echo.Context) error {
+
+	headers, err := c.FormFile("images")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	storyId, err := p.StoryService.CreateStoryCampaignFromApi(ctx, bearer, headers)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

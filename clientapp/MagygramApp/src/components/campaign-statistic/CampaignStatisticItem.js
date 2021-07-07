@@ -3,26 +3,6 @@ import { postService } from "../../services/PostService";
 import { Link } from "react-router-dom";
 
 const CampaignStatisticItem = ({ statistics }) => {
-	//     Comments: 0
-	// Dislikes: 0
-	// Likes: 1
-	// StoryViews: 0
-	// activity: "UNACTIVE"
-	// campaignStatus: "REGULAR"
-	// campaignType: "POST"
-	// dateFrom: "2021-07-05T00:00:01Z"
-	// dateTo: "2021-07-06T00:00:01Z"
-	// displayTime: 12
-	// exposeOnceDate: "2021-07-03T00:00:01Z"
-	// frequency: "REPEATEDLY"
-	// id: "2abccff0-1ea1-414f-bf10-1bc1029f5376"
-	// influencerUsername: ""
-	// media: {Url: "/api/media/772f596e-8b4f-45db-883c-d4b53d012dec.jpg", MediaType: "IMAGE"}
-	// minDisplaysForRepeatedly: 1
-	// targetGroup: {minAge: 16, maxAge: 32, gender: "MALE"}
-	// userViews: 2
-	// website: "www.agentic.com"
-	// websiteClicks: 0
 	const handleClickOnPostWebsite = async () => {
 		await postService.clickOnPostCampaignWebsite(statistics.id).then(handleOpenWebsite());
 	};

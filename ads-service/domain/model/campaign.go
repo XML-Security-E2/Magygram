@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"mime/multipart"
 	"time"
 )
 
@@ -149,6 +150,18 @@ type CampaignRequest struct {
 	DateFrom time.Time `json:"dateFrom"`
 	DateTo time.Time `json:"dateTo"`
 	DisplayTime int `json:"displayTime"`
+}
+
+type CampaignApiRequest struct {
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DisplayTime int `json:"displayTime"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	ExposeOnceDate time.Time `json:"exposeOnceDate"`
+	Type ContentType `json:"campaignType"`
+	Media *multipart.FileHeader `json:"media"`
 }
 
 type CampaignRetreiveRequest struct {

@@ -23,18 +23,26 @@ const Header = () => {
 		return sum;
 	};
 
+	const backToHome = () => {
+		window.location = "#/";
+	};
+
+	const getStats = () => {
+		window.location = "#/campaign-stats";
+	};
+
 	return (
 		<nav className="navbar navbar-light navbar-expand-md navigation-clean" style={navStyle}>
 			<div className="container">
 				<div>
-					<img src="assets/img/logotest.png" alt="NistagramLogo" />
+					<img onClick={() => backToHome()} src="assets/img/logotest.png" alt="NistagramLogo" />
 				</div>
 				<button className="navbar-toggler" data-toggle="collapse">
 					<span className="sr-only">Toggle navigation</span>
 					<span className="navbar-toggler-icon"></span>
 				</button>
 				<div className="d-flex align-items-center">
-					<div className="dropdown" hidden={hasRoles(["admin"])}>
+					<div className="dropdown" hidden={hasRoles(["admin", "agent"])}>
 						<i className="fa fa-shopping-cart" style={iconStyle} id="dropdownMenu2" data-toggle="dropdown" />
 						<span className="ml-1 bg-primary rounded text-white pl-1 pr-1">{orderState.shoppingCart.items.length}</span>
 						<ul style={{ width: "300px", marginLeft: "15px", minWidth: "350px" }} className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
@@ -65,6 +73,11 @@ const Header = () => {
 						<i className="fa fa-user" style={iconStyle} id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" />
 
 						<ul style={{ width: "200px", marginLeft: "15px" }} className="dropdown-menu" aria-labelledby="dropdownMenu1">
+							<li>
+								<button className=" btn shadow-none" onClick={getStats}>
+									Stats
+								</button>
+							</li>
 							<li>
 								<button className=" btn shadow-none" onClick={() => userService.logout()}>
 									Logout

@@ -185,6 +185,46 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 	return "", err
 }
 
+func (p storyService) CreateStoryCampaignFromApi(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
+	if err != nil { return "", err}
+
+	media, err := p.MediaClient.SaveMedia(file)
+	if err != nil { return "", err}
+
+	post, err := model.NewStory(model.UserInfo{
+		Id:       userInfo.Id,
+		Username: userInfo.Username,
+		ImageURL: userInfo.ImageURL,
+	}, "CAMPAIGN", media, []model.Tag{}, userInfo.Website)
+	if err != nil {
+		return "", err}
+
+	if err := validator.New().Struct(post); err!= nil {
+		return "", err
+	}
+
+	_, err = p.StoryRepository.Create(ctx, post)
+	if err != nil {
+		return "", err}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedStory,
+	})
+	if err != nil {
+		return "", err
+	}
+
+
+	return post.Id, nil
+}
+
+
 func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag, campaignReq *model.CampaignRequest) (string, error) {
 	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
 	if err != nil { return "", err}

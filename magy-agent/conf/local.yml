@@ -2,6 +2,8 @@ server :
   port : "470"
   host : "localhost"
   secret : "MagyGram"
+  handshake: "ms-handshake"
+  Apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTcwNjEwOTUwMDAsImlkIjoiMjMzNWYyNjEtYmU1NC00ZjY5LWIzNGUtNjU0YjQ5OTY2MTZhIiwicm9sZXMiOiJbe1wibmFtZVwiOlwiY2FtcGFpZ25fcm9sZVwiLFwicGVybWlzc2lvbnNcIjpbe1wibmFtZVwiOlwiY3JlYXRlX2NhbXBhaWduXCJ9LHtcIm5hbWVcIjpcImdldF9hZ2VudF9jYW1wYWlnblwifSx7XCJuYW1lXCI6XCJnZXRfbW9uaXRvcmluZ19mb3JfY2FtcGFpZ25cIn1dfV0ifQ.WyTRvuPl1jO_0bObFpunqYiOXUlgr-t-GJE1m8jK-hQ"
 
 database :
   host : "localhost"
@@ -16,3 +18,14 @@ mail :
   host : "smtp.gmail.com"
   port : "587"
 
+magygram:
+  protocol: "https://"
+  domain: "localhost"
+  port: "8085"
+
+xmldb:
+  protocol: "http://"
+  domain: "localhost"
+  username: "admin"
+  password: ""
+  port: "8081"

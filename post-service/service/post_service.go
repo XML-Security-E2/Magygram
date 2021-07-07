@@ -114,6 +114,47 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 	return "", err
 }
 
+func (p postService) CreatePostCampaignFromApi(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
+	if err != nil { return "", err}
+
+	media, err := p.MediaClient.SaveMedia(postRequest.Media)
+	if err != nil { return "", err}
+
+	postRequest.Description = "You can check our products at our website: " + userInfo.Website
+
+	post, err := model.NewPost(postRequest, model.UserInfo{
+		Id:       userInfo.Id,
+		Username: userInfo.Username,
+		ImageURL: userInfo.ImageURL,
+	}, "CAMPAIGN", media, userInfo.Website)
+	if err != nil {return "", err}
+
+	if err = validator.New().Struct(post); err!= nil {
+		return "", err
+	}
+
+	_, err = p.PostRepository.Create(ctx, post)
+	if err != nil {
+		return "", err
+	}
+
+	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+		Username:  userInfo.Username,
+		UserId:    userInfo.Id,
+		UserFromId:userInfo.Id,
+		NotifyUrl: "TODO",
+		ImageUrl:  post.UserInfo.ImageURL,
+		Type:      intercomm.PublishedPost,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return post.Id, nil
+}
+
 func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, request  *model.InfluencerRequest) (string, error) {
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
@@ -127,8 +168,8 @@ func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, re
 	post, err := model.NewPostInfluencer(agentPost, *userInfo)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": post.Tags,
-													 "description" : post.Description,
-													 "location" : post.Location}).Warn("Post creating validation failure")
+			"description" : post.Description,
+			"location" : post.Location}).Warn("Post creating validation failure")
 
 		return "", err}
 
@@ -142,8 +183,8 @@ func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, re
 	result, err := p.PostRepository.Create(ctx, post)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": agentPost.Tags,
-													 "description" : agentPost.Description,
-													 "location" : agentPost.Location}).Error("Post database create failure")
+			"description" : agentPost.Description,
+			"location" : agentPost.Location}).Error("Post database create failure")
 		return "", err}
 
 	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
@@ -166,7 +207,6 @@ func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, re
 
 	return "", err
 }
-
 func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
 	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
 	if err != nil { return "", err}

@@ -8,6 +8,8 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/posts", h.CreatePost, h.LoggingMiddleware)
 	e.POST("/api/posts/campaign", h.CreatePostCampaign)
+	e.POST("/api/posts/campaign/agent", h.CreatePostCampaignFromApi)
+
 	e.GET("/api/posts/campaign", h.GetUsersPostCampaigns)
 
 	e.PUT("/api/posts", h.EditPost, h.LoggingMiddleware)
