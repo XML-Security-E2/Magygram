@@ -1,8 +1,10 @@
 package router
 
 import (
-	"github.com/labstack/echo"
 	"story-service/controller/handler"
+
+	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -23,5 +25,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/story/:storyId/getForAdmin", h.GetStoryForAdmin, h.LoggingMiddleware)
 
 	e.POST("/api/story/media/first/preview", h.GetStoryMediaAndWebsiteByIds)
+	e.GET("/api/story/metrics", echo.WrapHandler(promhttp.Handler()))
 
 }

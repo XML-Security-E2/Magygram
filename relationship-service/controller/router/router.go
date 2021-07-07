@@ -1,8 +1,10 @@
 package router
 
 import (
-	"github.com/labstack/echo"
 	"relationship-service/controller/handler"
+
+	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -20,4 +22,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/relationship/unmute", h.Unmute)
 	e.POST("/api/relationship/is-muted", h.IsMuted)
 	e.GET("/api/relationship/recommended-users/:userId", h.ReturnRecommendedUsers)
+	e.GET("/api/relationship/metrics", echo.WrapHandler(promhttp.Handler()))
 }

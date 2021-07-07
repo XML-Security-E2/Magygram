@@ -1,10 +1,51 @@
 global:
-  scrape_interval: 15s
-  scrape_timeout: 10s
+  scrape_interval: 5s
 
 scrape_configs:
-  - job_name: services
-    metrics_path: /metrics
+  - job_name: auth-service
+    metrics_path: /api/auth/metrics
     static_configs:
       - targets:
-          - 'prometheus:9090'
+          - 'gateway:8085'
+
+  - job_name: user-service
+    metrics_path: /api/users/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'
+
+  - job_name: relationship-service
+    metrics_path: /api/relationship/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'
+
+  - job_name: post-service
+    metrics_path: /api/posts/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'
+
+  - job_name: story-service
+    metrics_path: /api/story/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'
+
+  - job_name: media-service
+    metrics_path: /api/media/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'
+
+  - job_name: request-service
+    metrics_path: /api/requests/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'
+
+  - job_name: message-service
+    metrics_path: /api/messages/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'

@@ -94,6 +94,9 @@ func main() {
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
+
 	//Log rotation test
 	//for i := 0; i < 32000; i++ {
 	//	logger.Logger.WithFields(logrus.Fields{

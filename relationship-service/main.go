@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
-	"os"
 	"flag"
 	"github.com/labstack/echo"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
+	"github.com/sirupsen/logrus"
+	"os"
 	"relationship-service/conf"
 	"relationship-service/controller/middleware"
 	"relationship-service/controller/router"
@@ -34,6 +34,9 @@ func main(){
 
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
+
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
 
 	logger.Logger.WithFields(logrus.Fields{
 		"host": conf.Current.Server.Host,

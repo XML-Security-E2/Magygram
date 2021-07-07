@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"story-service/domain/model"
-	"story-service/domain/service-contracts"
 	"story-service/domain/service-contracts/exceptions/expired"
 	"story-service/domain/service-contracts/exceptions/unauthorized"
 	"story-service/logger"
@@ -45,7 +44,7 @@ type storyHandler struct {
 }
 
 func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
-	tracer, closer := tracer.Init("post-service")
+	tracer, closer := tracer.Init("story-service")
 	opentracing.SetGlobalTracer(tracer)
 	return &storyHandler{p, tracer, closer}
 }

@@ -3,13 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"github.com/labstack/echo"
 	"message-service/conf"
 	"message-service/controller/hub"
+	"message-service/controller/middleware"
 	"message-service/controller/router"
 	"message-service/interactor"
 	"os"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/labstack/echo"
 )
 
 var Db *redis.Client
@@ -19,14 +21,14 @@ var MessageNotifyHub *hub.MessageNotificationsHub
 
 var runServer = flag.Bool("message-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
 
-func main()  {
+func main() {
 
 	conf.NewConfig(*runServer)
 
 	Db = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", conf.Current.Database.Host, conf.Current.Database.Port),
 		Password: conf.Current.Database.Password, // no password set
-		DB:       conf.Current.Database.Database,  // use default DB
+		DB:       conf.Current.Database.Database, // use default DB
 	})
 
 	//err := Db.Set(context.TODO(), "key/123", "dusan", 0).Err()
@@ -73,9 +75,12 @@ func main()  {
 	router.NewRouter(e, h)
 	//middleware.NewMiddleware(e)
 
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
+
 	if os.Getenv("IS_PRODUCTION") == "true" {
-		e.Start(":"+ conf.Current.Server.Port)
+		e.Start(":" + conf.Current.Server.Port)
 	} else {
-		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+		e.Logger.Fatal(e.StartTLS(":"+conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 	}
 }

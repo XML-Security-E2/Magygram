@@ -7,11 +7,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/labstack/echo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
 )
 
 var runServer = flag.Bool("ads-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
@@ -63,9 +64,12 @@ func main() {
 
 	router.NewRouter(e, h)
 
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
+
 	if os.Getenv("IS_PRODUCTION") == "true" {
-		e.Start(":"+ conf.Current.Server.Port)
+		e.Start(":" + conf.Current.Server.Port)
 	} else {
-		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+		e.Logger.Fatal(e.StartTLS(":"+conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 	}
 }
