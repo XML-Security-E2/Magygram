@@ -61,6 +61,7 @@ func (u userHandler) RegisterUser(c echo.Context) error {
 
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -72,6 +73,7 @@ func (u userHandler) RegisterUser(c echo.Context) error {
 
 	_, bufer, err := u.UserService.RegisterUser(ctx, userRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -97,6 +99,7 @@ func (u userHandler) ActivateUser(c echo.Context) error {
 
 	activated, err := u.UserService.ActivateUser(ctx, userId)
 	if err != nil || activated == false{
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "User can not be activated.")
 	}
 
@@ -104,8 +107,15 @@ func (u userHandler) ActivateUser(c echo.Context) error {
 }
 
 func (u userHandler) ResetPassword(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerResetPassword", u.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling reset password at %s\n", c.Path())),
+	)
+
 	changeNewPasswordRequest := &model.PasswordChangeRequest{}
 	if err := c.Bind(changeNewPasswordRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -114,6 +124,7 @@ func (u userHandler) ResetPassword(c echo.Context) error {
 	successful, err := u.UserService.ResetPassword(ctx, changeNewPasswordRequest)
 
 	if err != nil || !successful {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -122,8 +133,15 @@ func (u userHandler) ResetPassword(c echo.Context) error {
 
 
 func (u userHandler) RegisterAgent(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerRegisterAgent", u.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling register agent at %s\n", c.Path())),
+	)
+
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -134,6 +152,7 @@ func (u userHandler) RegisterAgent(c echo.Context) error {
 
 	_, bufer, err := u.UserService.RegisterAgent(ctx, userRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

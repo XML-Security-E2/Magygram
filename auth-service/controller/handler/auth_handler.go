@@ -55,6 +55,12 @@ func (a authHandler) AuthLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFu
 }
 
 func (a authHandler) LoginFirstStage(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("AuthHandlerLoginFirstStage", a.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling login first stage at %s\n", c.Path())),
+	)
+
 	loginRequest := &model.LoginRequest{}
 	if err := c.Bind(loginRequest); err != nil {
 		return err
@@ -64,10 +70,12 @@ func (a authHandler) LoginFirstStage(c echo.Context) error {
 	user, err := a.AuthService.AuthenticateUser(ctx, loginRequest)
 
 	if err != nil && user == nil {
+		tracer.LogError(span, err)
 		return ErrWrongCredentials
 	}
 
 	if err != nil && user != nil {
+		tracer.LogError(span, err)
 		return c.JSON(http.StatusForbidden, map[string]string{
 			"userId": user.Id,
 		})
@@ -78,6 +86,7 @@ func (a authHandler) LoginFirstStage(c echo.Context) error {
 	expireTime := time.Now().Add(time.Hour).Unix() * 1000
 	token, err := generateToken(user, expireTime)
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
@@ -90,6 +99,12 @@ func (a authHandler) LoginFirstStage(c echo.Context) error {
 }
 
 func (a authHandler) LoginSecondStage(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("AuthHandlerLoginSecondStage", a.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling login second stage at %s\n", c.Path())),
+	)
+
 	loginRequest := &model.LoginTwoFactoryRequest{}
 	if err := c.Bind(loginRequest); err != nil {
 		return err
@@ -99,10 +114,12 @@ func (a authHandler) LoginSecondStage(c echo.Context) error {
 	user, err := a.AuthService.AuthenticateTwoFactoryUser(ctx, loginRequest)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
 	if user == nil {
+		tracer.LogError(span, err)
 		return c.JSON(http.StatusForbidden, "")
 	}
 
@@ -223,6 +240,7 @@ func (a authHandler) GetLoggedUserId(c echo.Context) error {
 	})
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
@@ -235,9 +253,16 @@ func (a authHandler) GetLoggedUserId(c echo.Context) error {
 }
 
 func (a authHandler) GenerateNewAgentCampaignJWTToken(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("AuthHandlerGenerateNewAgentCampaignJWTToken", a.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling generate new agent campaign jwt token at %s\n", c.Path())),
+	)
+
 	expireTime := time.Now().Add(time.Hour*8760).Unix() * 1000 // 1 year
 	token, err := generateAgentCampaignJWTToken(expireTime)
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
@@ -250,6 +275,7 @@ func (a authHandler) GenerateNewAgentCampaignJWTToken(c echo.Context) error {
 
 	err = a.AuthService.UpdateAgentCampaignJWTToken(ctx, bearer, token)
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
@@ -273,6 +299,12 @@ func generateAgentCampaignJWTToken(expireTime int64) (string, error) {
 }
 
 func (a authHandler) DeleteCampaignJWTToken(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("AuthHandlerDeleteCampaignJWTToken", a.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling delete campaign jwt token at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -281,6 +313,7 @@ func (a authHandler) DeleteCampaignJWTToken(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := a.AuthService.DeleteCampaignJWTToken(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
@@ -288,16 +321,21 @@ func (a authHandler) DeleteCampaignJWTToken(c echo.Context) error {
 }
 
 func (a authHandler) GetCampaignJWTToken(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("AuthHandlerGetCampaignJWTToken", a.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get campaign jwt token at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	log.Println("TESTT")
-
 	bearer := c.Request().Header.Get("Authorization")
 	jwtToken, err := a.AuthService.GetCampaignJWTToken(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
