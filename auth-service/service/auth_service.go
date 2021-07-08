@@ -6,6 +6,7 @@ import (
 	"auth-service/domain/repository"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"auth-service/tracer"
 	"context"
 	"errors"
 	"fmt"
@@ -32,6 +33,9 @@ func NewAuthService(r repository.LoginEventRepository,u service_contracts.UserSe
 }
 
 func (a authService) AuthenticateUser(ctx context.Context, loginRequest *model.LoginRequest) (*model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateUser")
+	defer span.Finish()
+
 	user, err := a.UserService.GetByEmail(ctx, loginRequest.Email)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email": loginRequest.Email}).Warn("Invalid email address")
@@ -53,6 +57,9 @@ func (a authService) AuthenticateUser(ctx context.Context, loginRequest *model.L
 }
 
 func (a authService) AuthenticateTwoFactoryUser(ctx context.Context, loginRequest *model.LoginTwoFactoryRequest) (*model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceAuthenticateTwoFactoryUser")
+	defer span.Finish()
+
 	user, err := a.UserService.GetByEmail(ctx, loginRequest.Email)
 
 	valid := totp.Validate(loginRequest.Token, user.TotpToken)
@@ -81,6 +88,9 @@ func equalPasswords(hashedPwd string, passwordRequest string) bool {
 }
 
 func (a authService) HasUserPermission(ctx context.Context, desiredPermission string, userId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceHasUserPermission")
+	defer span.Finish()
+
 	roles, err := a.UserService.GetAllRolesByUserId(ctx, userId)
 	if err != nil {
 		return false, errors.New("invalid email address")
@@ -96,6 +106,9 @@ func (a authService) HasUserPermission(ctx context.Context, desiredPermission st
 }
 
 func (a authService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceHandleLoginEventAndAccountActivation")
+	defer span.Finish()
+
 	if successful {
 		_, err := a.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
 		if err != nil {
@@ -124,6 +137,9 @@ func (a authService) HandleLoginEventAndAccountActivation(ctx context.Context, u
 }
 
 func (a authService) UpdateAgentCampaignJWTToken(ctx context.Context, bearer string, token string) error {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceUpdateAgentCampaignJWTToken")
+	defer span.Finish()
+
 	userId,err := getLoggedUserId(bearer)
 	if err!=nil{
 		return errors.New("Jwt token decode problem")
@@ -168,6 +184,9 @@ func getLoggedUserId(bearer string) (string, error) {
 }
 
 func (a authService) DeleteCampaignJWTToken(ctx context.Context, bearer string) error {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceDeleteCampaignJWTToken")
+	defer span.Finish()
+
 	userId,err := getLoggedUserId(bearer)
 	if err!=nil{
 		return errors.New("Jwt token decode problem")
@@ -189,6 +208,9 @@ func (a authService) DeleteCampaignJWTToken(ctx context.Context, bearer string) 
 }
 
 func (a authService) GetCampaignJWTToken(ctx context.Context, bearer string) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthServiceGetCampaignJWTToken")
+	defer span.Finish()
+
 	userId,err := getLoggedUserId(bearer)
 	if err!=nil{
 		return "", errors.New("Jwt token decode problem")

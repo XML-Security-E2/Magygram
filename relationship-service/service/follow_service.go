@@ -47,6 +47,7 @@ func NewFollowService(r neo4jdb.FollowRepository, userClient intercomm.UserClien
 func (f *followService) Mute(ctx context.Context, mute *model.Mute) error {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceMute")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	if err := validator.New().Struct(mute); err != nil {
 		return err
@@ -60,6 +61,7 @@ func (f *followService) Mute(ctx context.Context, mute *model.Mute) error {
 func (f *followService) Unmute(ctx context.Context, mute *model.Mute) error {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceUnmute")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	if err := validator.New().Struct(mute); err != nil {
 		return err
@@ -107,6 +109,7 @@ func (f *followService) FollowRequest(ctx context.Context, followRequest *model.
 func (f *followService) Unfollow(ctx context.Context, followRequest *model.FollowRequest) error {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceUnfollow")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	err := f.FollowRepository.Unfollow(followRequest)
 	if err != nil {
@@ -125,6 +128,7 @@ func (f *followService) Unfollow(ctx context.Context, followRequest *model.Follo
 func (f *followService) IsUserFollowed(ctx context.Context, followRequest *model.FollowRequest) (interface{}, error) {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceIsUserFollowed")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	if err := validator.New().Struct(followRequest); err != nil {
 		return false, err
@@ -143,6 +147,7 @@ func (f *followService) IsUserFollowed(ctx context.Context, followRequest *model
 func (f *followService) IsMuted(ctx context.Context, mute *model.Mute) (interface{}, error) {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceIsUserIsMuted")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	if err := validator.New().Struct(mute); err != nil {
 		return false, err
@@ -159,6 +164,7 @@ func (f *followService) IsMuted(ctx context.Context, mute *model.Mute) (interfac
 func (f *followService) CreateUser(ctx context.Context, user *model.User) error {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceCreateUser")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	if err := validator.New().Struct(user); err != nil {
 		return err
@@ -198,6 +204,7 @@ func (f *followService) AcceptFollowRequest(ctx context.Context, bearer string, 
 func (f *followService) ReturnFollowedUsers(ctx context.Context, user *model.User) (interface{}, error) {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnFollowedUsers")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := f.FollowRepository.ReturnFollowedUsers(user)
 	if err != nil {
@@ -210,6 +217,7 @@ func (f *followService) ReturnFollowedUsers(ctx context.Context, user *model.Use
 func (f *followService) ReturnUnmutedFollowedUsers(ctx context.Context, user *model.User) (interface{}, error) {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnUnmutedFollowedUsers")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := f.FollowRepository.ReturnUnmutedFollowedUsers(user)
 	if err != nil {
@@ -222,6 +230,7 @@ func (f *followService) ReturnUnmutedFollowedUsers(ctx context.Context, user *mo
 func (f *followService) ReturnFollowingUsers(ctx context.Context, user *model.User) (interface{}, error) {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnFollowingUsers")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := f.FollowRepository.ReturnFollowingUsers(user)
 	if err != nil {
@@ -270,6 +279,7 @@ func (f *followService) ReturnFollowRequestsForUser(ctx context.Context, bearer 
 func (f *followService) ReturnRecommendedUsers(ctx context.Context, user *model.User) (interface{}, error) {
 	span := tracer.StartSpanFromContext(ctx, "FollowServiceReturnRecommendedUsers")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := f.FollowRepository.ReturnRecommendedUsers(user)
 	if err != nil {

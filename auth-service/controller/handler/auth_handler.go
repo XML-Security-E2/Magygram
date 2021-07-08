@@ -9,8 +9,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"io"
 	"log"
 	"net/http"
@@ -43,15 +41,6 @@ type authHandler struct {
 	closer      io.Closer
 }
 
-var (
-	getLoggedUserIdSuccessRequestCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "AuthHandlerGetLoggedUserIdSuccessRequestCounter",
-	})
-	getLoggedUserIdErrorRequestCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "AuthHandlerGetLoggedUserIdErrorRequestCounter",
-	})
-)
-
 func NewAuthHandler(a service_contracts.AuthService) AuthHandler {
 	tracer, closer := tracer.Init("auth-service")
 	opentracing.SetGlobalTracer(tracer)
@@ -74,6 +63,7 @@ func (a authHandler) LoginFirstStage(c echo.Context) error {
 
 	loginRequest := &model.LoginRequest{}
 	if err := c.Bind(loginRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -118,6 +108,7 @@ func (a authHandler) LoginSecondStage(c echo.Context) error {
 
 	loginRequest := &model.LoginTwoFactoryRequest{}
 	if err := c.Bind(loginRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -137,6 +128,7 @@ func (a authHandler) LoginSecondStage(c echo.Context) error {
 	expireTime := time.Now().Add(time.Hour).Unix() * 1000
 	token, err := generateToken(user, expireTime)
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrHttpGenericMessage
 	}
 
@@ -238,7 +230,6 @@ func (a authHandler) GetLoggedUserId(c echo.Context) error {
 	authStringHeader := c.Request().Header.Get("Authorization")
 
 	if authStringHeader == "" {
-		getLoggedUserIdErrorRequestCounter.Inc()
 		return ErrUnauthorized
 	}
 	authHeader := strings.Split(authStringHeader, "Bearer ")
@@ -253,16 +244,13 @@ func (a authHandler) GetLoggedUserId(c echo.Context) error {
 
 	if err != nil {
 		tracer.LogError(span, err)
-		getLoggedUserIdErrorRequestCounter.Inc()
 		return ErrHttpGenericMessage
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userId, _ := claims["id"].(string)
-		getLoggedUserIdSuccessRequestCounter.Inc()
 		return c.JSON(http.StatusOK, userId)
 	} else {
-		getLoggedUserIdErrorRequestCounter.Inc()
 		return ErrUnauthorized
 	}
 }
