@@ -208,6 +208,7 @@ func (c campaignRepository) GetUnseenContentIdsCampaignsForUser(ctx context.Cont
 			return nil, err
 		}
 	}
+	fmt.Println(len(results))
 	if len(results) > 0 {
 		for _, res := range results {
 			for _, dates := range res.DailySeenBy {
