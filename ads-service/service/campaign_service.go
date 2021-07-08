@@ -394,7 +394,17 @@ func (c campaignService) DeleteCampaignByStoryId(ctx context.Context, bearer str
 func (c campaignService) ClickOnStoryCampaignWebsite(ctx context.Context, contentId string) error {
 	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
 	if err != nil {
-		return err
+		camp, err := c.InfluencerCampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
+		if err != nil {
+			return err
+		}
+		camp.WebsiteClickCount = camp.WebsiteClickCount + 1
+		_, err = c.InfluencerCampaignRepository.Update(ctx, camp)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	campaign.WebsiteClickCount = campaign.WebsiteClickCount + 1
@@ -409,7 +419,17 @@ func (c campaignService) ClickOnStoryCampaignWebsite(ctx context.Context, conten
 func (c campaignService) ClickOnPostCampaignWebsite(ctx context.Context, contentId string) error {
 	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
 	if err != nil {
-		return err
+		camp, err := c.InfluencerCampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
+		if err != nil {
+			return err
+		}
+		camp.WebsiteClickCount = camp.WebsiteClickCount + 1
+		_, err = c.InfluencerCampaignRepository.Update(ctx, camp)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	campaign.WebsiteClickCount = campaign.WebsiteClickCount + 1
@@ -793,12 +813,52 @@ func (c campaignService) UpdateCampaignVisitor(ctx context.Context, bearer strin
 	}
 
 	campaignReq, err := c.CampaignRepository.GetByContentIDAndType(ctx, id, campaignType)
-	if err != nil {
-		return errors.New("database connection problem")
-	}
-
 	y,m,d := time.Now().Date()
 	today := time.Date(y,m,d,0,0,0,0, time.UTC)
+
+	if err != nil {
+		campaign, err := c.InfluencerCampaignRepository.GetByContentIDAndType(ctx, id, campaignType)
+		if err != nil {
+			return errors.New("database connection problem")
+		}
+
+		if !isSeenByUser(campaign.SeenBy, logged.Id) {
+			campaign.SeenBy = append(campaign.SeenBy, logged.Id)
+		}
+
+		if !isSeenByUserToday(campaign.DailySeenBy, logged.Id, today){
+			if hasDay(campaign.DailySeenBy, today) {
+				idx := 0
+				for i, seen := range campaign.DailySeenBy {
+					if seen.Date == today {
+						idx = i
+						break
+					}
+				}
+				campaign.DailySeenBy[idx].SeenBy = append(campaign.DailySeenBy[idx].SeenBy, model.UserGroupStatistic{
+					Id:  logged.Id,
+					Age: logged.Age,
+				})
+			} else {
+				campaign.DailySeenBy = append(campaign.DailySeenBy, model.UserGroupStatisticWrapper{
+					Date:   today,
+					SeenBy: []model.UserGroupStatistic{{
+						Id:  logged.Id,
+						Age: logged.Age,
+					}},
+				})
+			}
+		}
+
+		_, err = c.InfluencerCampaignRepository.Update(ctx, campaign)
+		if err != nil {
+			return errors.New("database connection problem")
+		}
+
+		return nil
+	}
+
+
 
 	if !isSeenByUser(campaignReq.SeenBy, logged.Id) {
 		campaignReq.SeenBy = append(campaignReq.SeenBy, logged.Id)

@@ -21,6 +21,12 @@ func (i influencerCampaignRepository) Create(ctx context.Context, campaign *mode
 	return i.Col.InsertOne(ctx, campaign)
 }
 
+func (i influencerCampaignRepository) Update(ctx context.Context, campaign *model.InfluencerCampaign) (*mongo.UpdateResult, error) {
+	return i.Col.UpdateOne(ctx, bson.M{"_id":  campaign.Id},bson.D{{"$set", bson.D{
+															{"seen_by" , campaign.SeenBy},
+															{"daily_seen_by", campaign.DailySeenBy},
+															{"website_click_count", campaign.WebsiteClickCount}}}})}
+
 func (i influencerCampaignRepository) GetByID(ctx context.Context, id string) (*model.InfluencerCampaign, error) {
 	var campaign = model.InfluencerCampaign{}
 	err := i.Col.FindOne(ctx, bson.M{"_id": id}).Decode(&campaign)
@@ -55,4 +61,17 @@ func (i influencerCampaignRepository) GetAllByOwnerID(ctx context.Context, id st
 		}
 	}
 	return results, nil
+}
+
+func (i influencerCampaignRepository) GetByContentIDAndType(ctx context.Context, contentId string, campaignType string) (*model.InfluencerCampaign, error) {
+	var campaign = model.InfluencerCampaign{}
+	err := i.Col.FindOne(ctx, bson.M{"content_id": contentId,
+		"campaign_type": campaignType}).Decode(&campaign)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("ErrNoDocuments")
+		}
+		return nil, err
+	}
+	return &campaign, nil
 }
