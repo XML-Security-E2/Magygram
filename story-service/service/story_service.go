@@ -145,7 +145,7 @@ func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, 
 		return postId, nil
 	}
 
-	return "", err
+	return agentPost.Id, err
 }
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
 	span := tracer.StartSpanFromContext(ctx, "StoryServiceCreatePost")
