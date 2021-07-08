@@ -73,6 +73,7 @@ const SearchInfluencerModalStory = () => {
 			if(following){
 				let requestDTO = {
                     contentId: storyState.searchInfluencer.storyId,
+					agentId: userId,
                     contentType: "STORY",
                     username: usernameSearch,
                     price: price,

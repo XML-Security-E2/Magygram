@@ -57,11 +57,11 @@ const InfluencerCampagns = ({show}) => {
 			]
 		  });
 	}
-	const acceptVerificationRequest = (requestId, id)=>{
+	const acceptVerificationRequest = (requestId, id,agentId)=>{
 		
 			let influencerDTO = {
 				contentId: requestId,
-				ownerId: "60b13002-f559-4c09-80fa-a6e7f7f0690e",
+				ownerId: agentId,
 				campaignType: "POST",
 				userId: localStorage.getItem("userId"),
 				username: localStorage.getItem("username"),
@@ -103,11 +103,11 @@ const InfluencerCampagns = ({show}) => {
 	
 
 	}
-	const acceptVerificationRequestStory = (requestId,id)=>{
+	const acceptVerificationRequestStory = (requestId,id,agentId)=>{
 		
 		let influencerDTO = {
 			contentId: requestId,
-			ownerId: "60b13002-f559-4c09-80fa-a6e7f7f0690e",
+			ownerId: agentId,
 			campaignType: "STORY",
 			userId: localStorage.getItem("userId"),
 			username: localStorage.getItem("username"),
@@ -178,11 +178,11 @@ const InfluencerCampagns = ({show}) => {
 										</div>
 
 										<div hidden={(request.ContentType === "STORY")} className="mt-2">
-											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequest(request.ContentId,request.Id)}><i className="icofont-subscribe mr-1"></i>Accept post</button>
+											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequest(request.ContentId,request.Id, request.AgentId)}><i className="icofont-subscribe mr-1"></i>Accept post</button>
 										                                  
 										</div>
 										<div hidden={(request.ContentType === "POST")} className="mt-2">
-											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequestStory(request.ContentId,request.Id)}><i className="icofont-subscribe mr-1"></i>Accept story</button>
+											<button style={{height:'40px'},{verticalAlign:'center'}} className="btn btn-outline-secondary" type="button" onClick={()=>acceptVerificationRequestStory(request.ContentId,request.Id,  request.AgentId)}><i className="icofont-subscribe mr-1"></i>Accept story</button>
 										                                  
 										</div>
 									</td>
