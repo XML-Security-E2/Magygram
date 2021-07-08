@@ -59,24 +59,24 @@ const InfluencerCampagns = ({show}) => {
 	}
 	const acceptVerificationRequest = (requestId, id,agentId)=>{
 		
-			let influencerDTO = {
-				contentId: requestId,
-				ownerId: agentId,
-				campaignType: "POST",
-				userId: localStorage.getItem("userId"),
-				username: localStorage.getItem("username"),
-			};
+			
 
 			let influencerPostDTO = {
 				postIdInfl: requestId,
 				userId: localStorage.getItem("userId"),
 				username: localStorage.getItem("username"),
 			};
-			Axios.post(`/api/ads/campaign/create/influencer`, influencerDTO, { validateStatus: () => true, headers: authHeader() })
+			Axios.put(`/api/posts/campaign/influencer`, influencerPostDTO, { validateStatus: () => true, headers: authHeader() })
 				.then((res) => {
-					console.log(res)
-					console.log(influencerPostDTO)
-					Axios.put(`/api/posts/campaign/influencer`,influencerPostDTO, { validateStatus: () => true, headers: authHeader() })
+					console.log(res.data)
+					let influencerDTO = {
+						contentId: res.data,
+						ownerId: agentId,
+						campaignType: "POST",
+						userId: localStorage.getItem("userId"),
+						username: localStorage.getItem("username"),
+					};
+					Axios.post(`/api/ads/campaign/create/influencer`,influencerDTO, { validateStatus: () => true, headers: authHeader() })
 						.then((res) => {
 							console.log(res)
 							 Axios.put(`/api/requests/campaign/${id}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
@@ -105,24 +105,23 @@ const InfluencerCampagns = ({show}) => {
 	}
 	const acceptVerificationRequestStory = (requestId,id,agentId)=>{
 		
-		let influencerDTO = {
-			contentId: requestId,
-			ownerId: agentId,
-			campaignType: "STORY",
-			userId: localStorage.getItem("userId"),
-			username: localStorage.getItem("username"),
-		};
-
 		let influencerPostDTO = {
 			postIdInfl: requestId,
 			userId: localStorage.getItem("userId"),
 			username: localStorage.getItem("username"),
 		};
-		Axios.post(`/api/ads/campaign/create/influencer`, influencerDTO, { validateStatus: () => true, headers: authHeader() })
+		Axios.put(`/api/story/campaign/influencer`, influencerPostDTO, { validateStatus: () => true, headers: authHeader() })
 			.then((res) => {
 				console.log(res)
-				console.log(influencerPostDTO)
-				Axios.put(`/api/story/campaign/influencer`,influencerPostDTO, { validateStatus: () => true, headers: authHeader() })
+				let influencerDTO = {
+					contentId: res.data,
+					ownerId: agentId,
+					campaignType: "STORY",
+					userId: localStorage.getItem("userId"),
+					username: localStorage.getItem("username"),
+				};
+		
+				Axios.post(`/api/ads/campaign/create/influencer`,influencerDTO, { validateStatus: () => true, headers: authHeader() })
 					.then((res) => {
 						console.log(res)
 							 Axios.put(`/api/requests/campaign/${id}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
