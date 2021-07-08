@@ -1,6 +1,7 @@
 package intercomm
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,10 +9,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"request-service/conf"
+	"request-service/tracer"
 )
 
 type AuthClient interface {
-	GetLoggedUserId(bearer string) (string,error)
+	GetLoggedUserId(ctx context.Context, bearer string) (string,error)
 }
 
 
@@ -26,12 +28,15 @@ var (
 	baseUrl = ""
 )
 
-func (a authClient) GetLoggedUserId(bearer string) (string,error) {
+func (a authClient) GetLoggedUserId(ctx context.Context, bearer string) (string,error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientGetLoggedUserId")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged-user", baseUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged-user", baseUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
+	"io"
 	"message-service/controller/hub"
 	"message-service/domain/model"
 	"message-service/domain/service-contracts"
+	"message-service/tracer"
 	"net/http"
 )
 
@@ -22,13 +25,23 @@ type NotificationHandler interface {
 type notificationHandler struct {
 	NotificationService service_contracts.NotificationService
 	Hub *hub.NotifyHub
+	tracer      opentracing.Tracer
+	closer      io.Closer
 }
 
 func NewNotificationHandler(p service_contracts.NotificationService, h *hub.NotifyHub) NotificationHandler {
-	return &notificationHandler{p, h}
+	tracer, closer := tracer.Init("message-service")
+	opentracing.SetGlobalTracer(tracer)
+	return &notificationHandler{p, h, tracer, closer}
 }
 
 func (n notificationHandler) CreateNotification(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("NotificationHandlerCreateNotification", n.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create notification at %s\n", c.Path())),
+	)
+
 	notificationRequest := &model.NotificationRequest{}
 	if err := c.Bind(notificationRequest); err != nil {
 		return err
@@ -38,6 +51,7 @@ func (n notificationHandler) CreateNotification(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	notify, err := n.NotificationService.CreatePostInteractionNotification(ctx, notificationRequest)
 	if err != nil {
@@ -58,6 +72,12 @@ func (n notificationHandler) CreateNotification(c echo.Context) error {
 }
 
 func (n notificationHandler) CreateNotifications(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("NotificationHandlerCreateNotifications", n.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create notifications at %s\n", c.Path())),
+	)
+
 	notificationRequest := &model.NotificationRequest{}
 	if err := c.Bind(notificationRequest); err != nil {
 		return err
@@ -67,6 +87,7 @@ func (n notificationHandler) CreateNotifications(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userInfos, err := n.NotificationService.CreatePostOrStoryNotification(ctx, notificationRequest)
 	if err != nil {
@@ -87,11 +108,17 @@ func (n notificationHandler) CreateNotifications(c echo.Context) error {
 }
 
 func (n notificationHandler) GetAllNotViewedNotificationsForUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("NotificationHandlerGetAllNotViewedNotificationsForUser", n.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get all not viewed notifications for user at %s\n", c.Path())),
+	)
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -103,13 +130,19 @@ func (n notificationHandler) GetAllNotViewedNotificationsForUser(c echo.Context)
 }
 
 func (n notificationHandler) HandleNotifyWs(c echo.Context) error {
-	fmt.Println("USAO")
+	span := tracer.StartSpanFromRequest("NotificationHandlerHandleNotifyWs", n.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling notify at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	notifications, _ := n.NotificationService.GetAllNotViewedForUser(ctx, userId)
 	a := 0
@@ -122,10 +155,17 @@ func (n notificationHandler) HandleNotifyWs(c echo.Context) error {
 }
 
 func (n notificationHandler) GetAllNotificationsForUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("NotificationHandlerGetAllNotificationsForUser", n.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get all notifications for user at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -137,10 +177,17 @@ func (n notificationHandler) GetAllNotificationsForUser(c echo.Context) error {
 }
 
 func (n notificationHandler) ViewNotifications(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("NotificationHandlerViewNotifications", n.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling view notifications at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 	err := n.NotificationService.ViewUsersNotifications(ctx, bearer)

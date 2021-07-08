@@ -7,6 +7,7 @@ import (
 	"request-service/domain/repository"
 	"request-service/domain/service-contracts"
 	"request-service/service/intercomm"
+	"request-service/tracer"
 )
 
 type agentRegistrationRequestService struct {
@@ -20,6 +21,10 @@ func NewAgentRegistrationRequestService(vr repository.AgentRegistrationRequests,
 }
 
 func (a agentRegistrationRequestService) CreateVerificationRequest(ctx context.Context, request model.AgentRegistrationRequestDTO) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceCreateVerificationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, _ := a.AgentRegistrationRequests.GetByUsernamePendingRequest(ctx, request.Username)
 	if user != nil {
 		return "", errors.New("Request for user with this username exist")
@@ -48,6 +53,10 @@ func (a agentRegistrationRequestService) CreateVerificationRequest(ctx context.C
 }
 
 func (a agentRegistrationRequestService) GetAgentRegistrationRequests(ctx context.Context) ([]*model.AgentRegistrationRequestResponseDTO, error) {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceGetAgentRegistrationRequests")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	var agentRegistrationRequest []*model.AgentRegistrationRequest
 
 	agentRegistrationRequest, err := a.AgentRegistrationRequests.GetAllPendingRequests(ctx)
@@ -78,6 +87,10 @@ func mapAgentRegistrationRequestToAgentRegistrationRequestResponseDTO(requests [
 }
 
 func (a agentRegistrationRequestService) ApproveAgentRegistrationRequest(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceApproveAgentRegistrationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	result, err := a.AgentRegistrationRequests.GetById(ctx, requestId)
 	if err!=nil {
 		return errors.New("Request not found")
@@ -99,7 +112,7 @@ func (a agentRegistrationRequestService) ApproveAgentRegistrationRequest(ctx con
 		Website: result.Website,
 	}
 
-	err = a.UserClient.RegisterAgent(agentRegistrationDTO)
+	err = a.UserClient.RegisterAgent(ctx, agentRegistrationDTO)
 	if err!=nil{
 		return err
 	}
@@ -110,6 +123,10 @@ func (a agentRegistrationRequestService) ApproveAgentRegistrationRequest(ctx con
 }
 
 func (a agentRegistrationRequestService) RejectAgentRegistrationRequest(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceRejectAgentRegistrationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	result, err := a.AgentRegistrationRequests.GetById(ctx, requestId)
 	if err!=nil {
 		return errors.New("Request not found")

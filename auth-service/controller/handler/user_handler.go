@@ -4,11 +4,14 @@ import (
 	"auth-service/domain/model"
 	"auth-service/domain/service-contracts"
 	"auth-service/logger"
+	"auth-service/tracer"
 	"bytes"
 	"context"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 )
 
@@ -29,11 +32,14 @@ var (
 
 type userHandler struct {
 	UserService service_contracts.UserService
+	tracer      opentracing.Tracer
+	closer      io.Closer
 }
 
-
 func NewUserHandler(u service_contracts.UserService) UserHandler {
-	return &userHandler{u}
+	tracer, closer := tracer.Init("auth-service")
+	opentracing.SetGlobalTracer(tracer)
+	return &userHandler{u, tracer, closer}
 }
 
 func (u userHandler) UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -47,8 +53,15 @@ func (u userHandler) RegisterUser(c echo.Context) error {
 	fmt.Println(c.Request().Header.Get("X-Forwarded-For"))// capitalisation )
 	fmt.Println(c.Request().Header.Get("proba-proba"))// capitalisation )
 
+	span := tracer.StartSpanFromRequest("UserHandlerRegisterUser", u.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling register user at %s\n", c.Path())),
+	)
+
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -56,9 +69,11 @@ func (u userHandler) RegisterUser(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	_, bufer, err := u.UserService.RegisterUser(ctx, userRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -68,15 +83,23 @@ func (u userHandler) RegisterUser(c echo.Context) error {
 }
 
 func (u userHandler) ActivateUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerActivateUser", u.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling activate user at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	activated, err := u.UserService.ActivateUser(ctx, userId)
 	if err != nil || activated == false{
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "User can not be activated.")
 	}
 
@@ -84,8 +107,15 @@ func (u userHandler) ActivateUser(c echo.Context) error {
 }
 
 func (u userHandler) ResetPassword(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerResetPassword", u.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling reset password at %s\n", c.Path())),
+	)
+
 	changeNewPasswordRequest := &model.PasswordChangeRequest{}
 	if err := c.Bind(changeNewPasswordRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -94,6 +124,7 @@ func (u userHandler) ResetPassword(c echo.Context) error {
 	successful, err := u.UserService.ResetPassword(ctx, changeNewPasswordRequest)
 
 	if err != nil || !successful {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -102,8 +133,15 @@ func (u userHandler) ResetPassword(c echo.Context) error {
 
 
 func (u userHandler) RegisterAgent(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerRegisterAgent", u.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling register agent at %s\n", c.Path())),
+	)
+
 	userRequest := &model.UserRequest{}
 	if err := c.Bind(userRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -114,6 +152,7 @@ func (u userHandler) RegisterAgent(c echo.Context) error {
 
 	_, bufer, err := u.UserService.RegisterAgent(ctx, userRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

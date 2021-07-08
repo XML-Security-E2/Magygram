@@ -1,8 +1,10 @@
 package router
 
 import (
-	"github.com/labstack/echo"
 	"post-service/controller/handler"
+
+	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -42,7 +44,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.PUT("/api/posts/disliked-by/user-info", h.EditDislikedByInfo)
 	e.PUT("/api/posts/commented/user-info", h.EditCommentedByInfo)
 
-
 	e.POST("/api/posts/media/first/preview", h.GetPostsMediaAndWebsiteByIds)
+	e.GET("/api/posts/metrics", echo.WrapHandler(promhttp.Handler()))
 
 }

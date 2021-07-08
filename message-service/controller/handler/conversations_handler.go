@@ -2,11 +2,15 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
+	"io"
 	"message-service/controller/hub"
 	"message-service/domain/model"
 	"message-service/domain/service-contracts"
 	"message-service/domain/service-contracts/exceptions/denied"
+	"message-service/tracer"
 	"net/http"
 )
 
@@ -29,14 +33,23 @@ type conversationHandler struct {
 	ConversationService service_contracts.ConversationService
 	Hub *hub.MessageHub
 	NotifyHub *hub.MessageNotificationsHub
-
+	tracer      opentracing.Tracer
+	closer      io.Closer
 }
 
 func NewConversationHandler(p service_contracts.ConversationService, h *hub.MessageHub, nh *hub.MessageNotificationsHub) ConversationHandler {
-	return &conversationHandler{p, h, nh}
+	tracer, closer := tracer.Init("message-service")
+	opentracing.SetGlobalTracer(tracer)
+	return &conversationHandler{p, h, nh, tracer, closer}
 }
 
 func (ch conversationHandler) ViewMediaMessages(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerViewMediaMessages", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling view media messages at %s\n", c.Path())),
+	)
+
 	conversationId := c.Param("conversationId")
 	messageId := c.Param("messageId")
 
@@ -44,6 +57,7 @@ func (ch conversationHandler) ViewMediaMessages(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -55,12 +69,19 @@ func (ch conversationHandler) ViewMediaMessages(c echo.Context) error {
 	return c.JSON(http.StatusOK, "")}
 
 func (ch conversationHandler) ViewMessages(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerViewMessages", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling view messages at %s\n", c.Path())),
+	)
+
 	conversationId := c.Param("conversationId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -80,6 +101,12 @@ func (ch conversationHandler) ViewMessages(c echo.Context) error {
 }
 
 func (ch conversationHandler) SendMessage(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerSendMessage", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling send message at %s\n", c.Path())),
+	)
+
 	messageTo := c.FormValue("messageTo")
 	messageType := c.FormValue("messageType")
 	text := c.FormValue("text")
@@ -99,6 +126,7 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -120,10 +148,17 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 }
 
 func (ch conversationHandler) GetAllConversationsForUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerGetAllConversationsForUser", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get all conversations for user at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -136,12 +171,19 @@ func (ch conversationHandler) GetAllConversationsForUser(c echo.Context) error {
 }
 
 func (ch conversationHandler) GetAllMessagesFromUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerGetAllMessagesFromUser", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get all messages for user at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -154,12 +196,19 @@ func (ch conversationHandler) GetAllMessagesFromUser(c echo.Context) error {
 }
 
 func (ch conversationHandler) GetAllMessagesFromUserFromRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerGetAllMessagesFromUserFromRequest", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get all messages from user from request at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -172,10 +221,17 @@ func (ch conversationHandler) GetAllMessagesFromUserFromRequest(c echo.Context) 
 }
 
 func (ch conversationHandler) GetAllMessageRequestsForUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerGetAllMessageRequestsForUser", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get all message requests for user at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -188,12 +244,19 @@ func (ch conversationHandler) GetAllMessageRequestsForUser(c echo.Context) error
 }
 
 func (ch conversationHandler) AcceptConversationRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerAcceptConversationRequest", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling accept conversation request at %s\n", c.Path())),
+	)
+
 	requestId := c.Param("requestId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -211,12 +274,19 @@ func (ch conversationHandler) AcceptConversationRequest(c echo.Context) error {
 }
 
 func (ch conversationHandler) DenyConversationRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerDenyConversationRequest", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling deny conversation request at %s\n", c.Path())),
+	)
+
 	requestId := c.Param("requestId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -234,12 +304,19 @@ func (ch conversationHandler) DenyConversationRequest(c echo.Context) error {
 }
 
 func (ch conversationHandler) DeleteConversationRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerDeleteConversationRequest", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling delete conversation request at %s\n", c.Path())),
+	)
+
 	requestId := c.Param("requestId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	bearer := c.Request().Header.Get("Authorization")
 
@@ -257,12 +334,19 @@ func (ch conversationHandler) DeleteConversationRequest(c echo.Context) error {
 }
 
 func (ch conversationHandler) HandleNotifyMessagesWs(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerHandleNotifyMessagesWs", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling notify messages at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	notifications, _ := ch.ConversationService.GetAllNotViewedConversationsForUser(ctx, userId)
 	a := 0
@@ -275,12 +359,19 @@ func (ch conversationHandler) HandleNotifyMessagesWs(c echo.Context) error {
 }
 
 func (ch conversationHandler) HandleMessagesWs(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("ConversationHandlerHandleMessagesWs", ch.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling messages at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	hub.ServeMessageWs(ch.Hub, c.Response().Writer, c.Request(), userId)
 

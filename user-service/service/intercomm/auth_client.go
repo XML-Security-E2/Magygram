@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,12 +14,13 @@ import (
 	"user-service/conf"
 	"user-service/domain/model"
 	"user-service/logger"
+	"user-service/tracer"
 )
 
 type AuthClient interface {
 	RegisterUser(user *model.User, password string, passwordRepeat string) (*http.Response, error )
-	ActivateUser(userId string) error
-	GetLoggedUserId(bearer string) (string,error)
+	ActivateUser(ctx context.Context, userId string) error
+	GetLoggedUserId(ctx context.Context, bearer string) (string,error)
 	ChangePassword(userId string, password string, passwordRepeat string) error
 	HasRole(bearer string, role string) (bool,error)
 	RegisterAgent(user *model.User, password string) error
@@ -53,12 +55,15 @@ var (
 	baseUrl = ""
 )
 
-func (a authClient) GetLoggedUserId(bearer string) (string,error) {
+func (a authClient) GetLoggedUserId(ctx context.Context, bearer string) (string,error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientGetLoggedUserId")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged-user", baseUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged-user", baseUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -158,15 +163,17 @@ func (a authClient) RegisterAgent(user *model.User, password string) error {
 	return nil
 }
 
-func (a authClient) ActivateUser(userId string) error {
+func (a authClient) ActivateUser(ctx context.Context, userId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientActivateUser")
+	defer span.Finish()
 
-
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId),
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId),
 								  nil)
 	//resp, err := http.Get(fmt.Sprintf("%s%s:%s/api/users/activate/%s", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port, userId))
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

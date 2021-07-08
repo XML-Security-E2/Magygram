@@ -1,8 +1,10 @@
 package router
 
 import (
-	"github.com/labstack/echo"
 	"request-service/controller/handler"
+
+	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -21,4 +23,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/requests/agent-registration", h.GetAgentRegistrationRequests)
 	e.PUT("/api/requests/agent-registration/:requestId/approve", h.ApproveAgentRegistrationRequest)
 	e.PUT("/api/requests/agent-registration/:requestId/reject", h.RejectAgentRegistrationRequest)
+	e.GET("/api/requests/metrics", echo.WrapHandler(promhttp.Handler()))
 }

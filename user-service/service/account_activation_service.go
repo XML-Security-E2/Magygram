@@ -10,6 +10,7 @@ import (
 	"user-service/domain/repository"
 	"user-service/domain/service-contracts"
 	"user-service/logger"
+	"user-service/tracer"
 )
 
 type accountActivationService struct {
@@ -30,6 +31,9 @@ func (a *accountActivationService) Create(ctx context.Context, userId string) (s
 	return result.InsertedID.(string), err
 }
 func (a *accountActivationService) UseAccountActivation(ctx context.Context, id string) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "AccountActivationServiceUseAccountActivation")
+	defer span.Finish()
+
 	accActivation, err := a.AccountActivationRepository.GetById(ctx, id)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"activation_id" : id}).Warn("Invalid account activation")
@@ -57,6 +61,9 @@ func (a *accountActivationService) IsActivationValid(accActivation *model.Accoun
 }
 
 func (a *accountActivationService) GetValidActivationById(ctx context.Context, id string) (*model.AccountActivation, error) {
+	span := tracer.StartSpanFromContext(ctx, "AccountActivationServiceGetValidActivationById")
+	defer span.Finish()
+
 	accActivation, err := a.AccountActivationRepository.GetById(ctx, id)
 	if err != nil || !a.IsActivationValid(accActivation) {
 		logger.LoggingEntry.WithFields(logrus.Fields{"activation_id" : id}).Warn("Invalid account activation")

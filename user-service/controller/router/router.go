@@ -1,8 +1,10 @@
 package router
 
 import (
-	"github.com/labstack/echo"
 	"user-service/controller/handler"
+
+	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -51,7 +53,6 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/users/:userId/highlights", h.GetProfileHighlights, h.HighlightsLoggingMiddleware)
 	e.GET("/api/users/:userId/highlights/:name", h.GetProfileHighlightsByHighlightName, h.HighlightsLoggingMiddleware)
 
-
 	e.POST("/api/users/collections", h.CreateCollection, h.CollectionsLoggingMiddleware)
 	e.POST("/api/users/collections/posts", h.AddPostToCollection, h.CollectionsLoggingMiddleware)
 	e.GET("/api/users/collections/:collectionName/posts", h.GetCollectionPosts, h.CollectionsLoggingMiddleware)
@@ -83,5 +84,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.GET("/api/users/follow-recommendation", h.GetFollowRecommendation)
 	e.POST("/api/users/register-agent-by-admin", h.RegisterAgentByAdmin, h.UserLoggingMiddleware)
-
+	e.GET("/api/users/metrics", echo.WrapHandler(promhttp.Handler()))
 }

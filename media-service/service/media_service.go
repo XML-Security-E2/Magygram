@@ -7,6 +7,7 @@ import (
 	"io"
 	"media-service/domain/model"
 	"media-service/logger"
+	"media-service/tracer"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -32,10 +33,14 @@ func NewMediaService() MediaService {
 }
 
 func (m mediaService) SaveMedia(ctx context.Context, files []*multipart.FileHeader) ([]model.Media, error) {
+	span := tracer.StartSpanFromContext(ctx, "MediaServiceSaveMedia")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	var mediaIds []model.Media
 	var mediaIdLog []string
 	for _, file := range files {
-		media , err := saveFile(file)
+		media , err := saveFile(ctx, file)
 		if err != nil {
 			logger.LoggingEntry.Error("Error while saving file")
 			return nil, err
@@ -49,7 +54,10 @@ func (m mediaService) SaveMedia(ctx context.Context, files []*multipart.FileHead
 	return mediaIds, nil
 }
 
-func saveFile(file *multipart.FileHeader) (*model.Media, error) {
+func saveFile(ctx context.Context, file *multipart.FileHeader) (*model.Media, error) {
+	span := tracer.StartSpanFromContext(ctx, "MediaServiceSaveFile")
+	defer span.Finish()
+
 	src, err := file.Open()
 	if err != nil {
 		return nil, err

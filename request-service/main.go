@@ -4,15 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/labstack/echo"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"request-service/conf"
 	"request-service/controller/middleware"
 	"request-service/controller/router"
 	"request-service/interactor"
 	"time"
+
+	"github.com/labstack/echo"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var runServer = flag.Bool("request-service", os.Getenv("IS_PRODUCTION") == "true", "production is -server option require")
@@ -59,15 +60,18 @@ func main() {
 	agentRegistrationRequestCol := client.Database(*mongoDatabase).Collection("agent-registration-requests")
 
 	e := echo.New()
-	i := interactor.NewInteractor(verificationRequestCol,reportContentCol,agentRegistrationRequestCol,campaignContentCol)
+	i := interactor.NewInteractor(verificationRequestCol, reportContentCol, agentRegistrationRequestCol, campaignContentCol)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
+
 	if os.Getenv("IS_PRODUCTION") == "true" {
-		e.Start(":"+ conf.Current.Server.Port)
+		e.Start(":" + conf.Current.Server.Port)
 	} else {
-		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
+		e.Logger.Fatal(e.StartTLS(":"+conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 	}
 }

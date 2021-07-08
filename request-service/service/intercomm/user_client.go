@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,11 +10,12 @@ import (
 	"net/http"
 	"request-service/conf"
 	"request-service/domain/model"
+	"request-service/tracer"
 )
 
 type UserClient interface {
-	VerifyAccount(verifyAccountDTO model.VerifyAccountDTO) error
-	RegisterAgent(agentRegistrationDTO model.AgentRegistrationDTO) error
+	VerifyAccount(ctx context.Context, verifyAccountDTO model.VerifyAccountDTO) error
+	RegisterAgent(ctx context.Context, agentRegistrationDTO model.AgentRegistrationDTO) error
 }
 
 type userClient struct {}
@@ -28,17 +30,21 @@ var (
 	baseUsersUrl = ""
 )
 
-func (u userClient) VerifyAccount(verifyAccountDTO model.VerifyAccountDTO) error {
+func (u userClient) VerifyAccount(ctx context.Context, verifyAccountDTO model.VerifyAccountDTO) error {
+	span := tracer.StartSpanFromContext(ctx, "UserClientVerifyAccount")
+	defer span.Finish()
+
 	json, err := json.Marshal(verifyAccountDTO)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/verify", baseUsersUrl), bytes.NewBuffer(json))
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/verify", baseUsersUrl), bytes.NewBuffer(json))
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 
@@ -51,17 +57,21 @@ func (u userClient) VerifyAccount(verifyAccountDTO model.VerifyAccountDTO) error
 	return nil
 }
 
-func (u userClient) RegisterAgent(agentRegistrationDTO model.AgentRegistrationDTO) error {
+func (u userClient) RegisterAgent(ctx context.Context, agentRegistrationDTO model.AgentRegistrationDTO) error {
+	span := tracer.StartSpanFromContext(ctx, "UserClientRegisterAgent")
+	defer span.Finish()
+
 	json, err := json.Marshal(agentRegistrationDTO)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/agent", baseUsersUrl), bytes.NewBuffer(json))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/agent", baseUsersUrl), bytes.NewBuffer(json))
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 

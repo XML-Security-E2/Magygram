@@ -138,6 +138,9 @@ func main() {
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
+
 	logger.Logger.WithFields(logrus.Fields{
 		"host": conf.Current.Server.Host,
 		"port":   conf.Current.Server.Port,

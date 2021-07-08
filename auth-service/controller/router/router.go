@@ -3,6 +3,7 @@ package router
 import (
 	"auth-service/controller/handler"
 	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -18,4 +19,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/auth/generate-campaign-jwt-token", h.GenerateNewAgentCampaignJWTToken, h.AuthLoggingMiddleware)
 	e.DELETE("/api/auth/delete-campaign-jwt-token", h.DeleteCampaignJWTToken, h.AuthLoggingMiddleware)
 	e.GET("/api/auth/get-campaign-jwt-token", h.GetCampaignJWTToken, h.AuthLoggingMiddleware)
+	e.GET("/api/auth/metrics", echo.WrapHandler(promhttp.Handler()))
 }

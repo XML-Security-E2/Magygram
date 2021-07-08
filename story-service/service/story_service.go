@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator"
-	"github.com/sirupsen/logrus"
 	"log"
 	"mime/multipart"
 	"story-service/domain/model"
@@ -15,8 +13,12 @@ import (
 	"story-service/domain/service-contracts/exceptions/unauthorized"
 	"story-service/logger"
 	"story-service/service/intercomm"
+	"story-service/tracer"
 	"strconv"
 	"time"
+
+	"github.com/go-playground/validator"
+	"github.com/sirupsen/logrus"
 )
 
 type storyService struct {
@@ -30,19 +32,22 @@ type storyService struct {
 }
 
 func (p storyService) DeleteStory(ctx context.Context, bearer string, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceDeleteStory")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	retVal, err := p.AuthClient.HasRole(bearer,"delete_story")
-	if err != nil{
+	retVal, err := p.AuthClient.HasRole(ctx, bearer, "delete_story")
+	if err != nil {
 		return errors.New("auth service not found")
 	}
 
 	request, err := p.StoryRepository.GetByID(ctx, requestId)
-	if err!=nil {
+	if err != nil {
 		return errors.New("story not found")
 	}
 
 	if !retVal {
-		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 		if err != nil {
 			return err
 		}
@@ -51,7 +56,7 @@ func (p storyService) DeleteStory(ctx context.Context, bearer string, requestId 
 		}
 	}
 
-	err = p.AdsClient.DeleteCampaign(bearer, request.Id)
+	err = p.AdsClient.DeleteCampaign(ctx, bearer, request.Id)
 	if err != nil {
 		return err
 	}
@@ -66,9 +71,9 @@ func (p storyService) DeleteStory(ctx context.Context, bearer string, requestId 
 	return nil
 }
 
-func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient, adscli 	intercomm.AdsClient,
-						) service_contracts.StoryService {
-	return &storyService{r , ic, uc,ac,rc, mc, adscli}
+func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc intercomm.UserClient, ac intercomm.AuthClient, rc intercomm.RelationshipClient, mc intercomm.MessageClient, adscli intercomm.AdsClient,
+) service_contracts.StoryService {
+	return &storyService{r, ic, uc, ac, rc, mc, adscli}
 }
 
 func (p storyService) GetStoryMediaAndWebsiteByIds(ctx context.Context, ids *model.FollowedUsersResponse) ([]*model.IdMediaWebsiteResponse, error) {
@@ -99,7 +104,7 @@ func (p storyService) GetStoryMediaAndWebsiteByIds(ctx context.Context, ids *mod
 
 func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, request  *model.InfluencerRequest) (string, error) {
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil { return "", err}
 
 	agentPost, err := p.StoryRepository.GetByID(ctx, request.PostIdInfluencer)
@@ -122,7 +127,7 @@ func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, 
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userInfo.Id}).Error("Story database create failure")
 		return "", err}
 
-	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    userInfo.Id,
 		UserFromId:userInfo.Id,
@@ -143,42 +148,51 @@ func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, 
 	return "", err
 }
 func (p storyService) CreatePost(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag) (string, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
-	if err != nil { return "", err}
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceCreatePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	media, err := p.MediaClient.SaveMedia(file)
-	if err != nil { return "", err}
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
+	if err != nil {
+		return "", err
+	}
+
+	media, err := p.MediaClient.SaveMedia(ctx, file)
+	if err != nil {
+		return "", err
+	}
 
 	post, err := model.NewStory(*userInfo, "REGULAR", media, tags, "")
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
-		return "", err}
+		return "", err
+	}
 
-	if err := validator.New().Struct(post); err!= nil {
+	if err := validator.New().Struct(post); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
 		return "", err
 	}
 
 	result, err := p.StoryRepository.Create(ctx, post)
 	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userInfo.Id}).Error("Story database create failure")
-		return "", err}
+		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Error("Story database create failure")
+		return "", err
+	}
 
-	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    userInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  post.UserInfo.ImageURL,
-		Type:      intercomm.PublishedStory,
+	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
+		Username:   userInfo.Username,
+		UserId:     userInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   post.UserInfo.ImageURL,
+		Type:       intercomm.PublishedStory,
 	})
 	if err != nil {
 		return "", err
 	}
 
-
 	if postId, ok := result.InsertedID.(string); ok {
-		logger.LoggingEntry.WithFields(logrus.Fields{"story_id": post.Id, "user_id" : userInfo.Id}).Info("Story created")
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_id": post.Id, "user_id": userInfo.Id}).Info("Story created")
 		return postId, nil
 	}
 
@@ -186,10 +200,10 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 }
 
 func (p storyService) CreateStoryCampaignFromApi(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
-	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(ctx, bearer)
 	if err != nil { return "", err}
 
-	media, err := p.MediaClient.SaveMedia(file)
+	media, err := p.MediaClient.SaveMedia(ctx, file)
 	if err != nil { return "", err}
 
 	post, err := model.NewStory(model.UserInfo{
@@ -208,7 +222,7 @@ func (p storyService) CreateStoryCampaignFromApi(ctx context.Context, bearer str
 	if err != nil {
 		return "", err}
 
-	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
+	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
 		Username:  userInfo.Username,
 		UserId:    userInfo.Id,
 		UserFromId:userInfo.Id,
@@ -226,11 +240,19 @@ func (p storyService) CreateStoryCampaignFromApi(ctx context.Context, bearer str
 
 
 func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, file *multipart.FileHeader, tags []model.Tag, campaignReq *model.CampaignRequest) (string, error) {
-	userInfo, err := p.UserClient.GetLoggedAgentInfo(bearer)
-	if err != nil { return "", err}
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceCreateStoryCampaign")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	media, err := p.MediaClient.SaveMedia(file)
-	if err != nil { return "", err}
+	userInfo, err := p.UserClient.GetLoggedAgentInfo(ctx, bearer)
+	if err != nil {
+		return "", err
+	}
+
+	media, err := p.MediaClient.SaveMedia(ctx, file)
+	if err != nil {
+		return "", err
+	}
 
 	post, err := model.NewStory(model.UserInfo{
 		Id:       userInfo.Id,
@@ -238,35 +260,36 @@ func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, fi
 		ImageURL: userInfo.ImageURL,
 	}, "CAMPAIGN", media, tags, userInfo.Website)
 	if err != nil {
-		return "", err}
+		return "", err
+	}
 
-	if err := validator.New().Struct(post); err!= nil {
+	if err := validator.New().Struct(post); err != nil {
 		return "", err
 	}
 
 	campaignReq.ContentId = post.Id
 
-	err = p.AdsClient.CreatePostCampaign(bearer, campaignReq)
+	err = p.AdsClient.CreatePostCampaign(ctx, bearer, campaignReq)
 	if err != nil {
 		return "", err
 	}
 
 	result, err := p.StoryRepository.Create(ctx, post)
 	if err != nil {
-		return "", err}
+		return "", err
+	}
 
-	err = p.MessageClient.CreateNotifications(&intercomm.NotificationRequest{
-		Username:  userInfo.Username,
-		UserId:    userInfo.Id,
-		UserFromId:userInfo.Id,
-		NotifyUrl: "TODO",
-		ImageUrl:  post.UserInfo.ImageURL,
-		Type:      intercomm.PublishedStory,
+	err = p.MessageClient.CreateNotifications(ctx, &intercomm.NotificationRequest{
+		Username:   userInfo.Username,
+		UserId:     userInfo.Id,
+		UserFromId: userInfo.Id,
+		NotifyUrl:  "TODO",
+		ImageUrl:   post.UserInfo.ImageURL,
+		Type:       intercomm.PublishedStory,
 	})
 	if err != nil {
 		return "", err
 	}
-
 
 	if postId, ok := result.InsertedID.(string); ok {
 		return postId, nil
@@ -276,8 +299,11 @@ func (p storyService) CreateStoryCampaign(ctx context.Context, bearer string, fi
 }
 
 func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer string) ([]*model.UsersStoryResponseWithUserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetAllUserStoryCampaigns")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	storyIds, err := p.AdsClient.GetAllActiveAgentsStoryCampaigns(bearer)
+	storyIds, err := p.AdsClient.GetAllActiveAgentsStoryCampaigns(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -290,12 +316,12 @@ func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer strin
 		}
 
 		stories = append(stories, &model.UsersStoryResponseWithUserInfo{
-			Id: story.Id,
+			Id:          story.Id,
 			ContentType: story.ContentType,
-			Media:      story.Media,
+			Media:       story.Media,
 			DateTime:    "",
-			UserInfo:   story.UserInfo,
-			Website:    story.Website,
+			UserInfo:    story.UserInfo,
+			Website:     story.Website,
 		})
 	}
 
@@ -303,43 +329,48 @@ func (p storyService) GetAllUserStoryCampaigns(ctx context.Context, bearer strin
 }
 
 func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string) ([]*model.StoryInfoResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetStoriesForStoryline")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+	//TODO 1: napraviti getStory za usera koji eliminise njegove storije a onda izbrisati iz mapStories proveru
+	log.Println("test")
 	var stories []*model.Story
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
 
 	var followedUsers model.FollowedUsersResponse
-	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(userInfo.Id)
+	followedUsers, err = p.RelationshipClient.GetUnmutedFollowedUsers(ctx, userInfo.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, userId := range followedUsers.Users {
 		var userStories []*model.Story
-		userStories, _ = p.StoryRepository.GetActiveStoriesForUser(ctx,userId)
-		stories= append(stories, userStories...)
+		userStories, _ = p.StoryRepository.GetActiveStoriesForUser(ctx, userId)
+		stories = append(stories, userStories...)
 	}
 
-	for _, story := range stories{
-		if story.ContentType=="CAMPAIGN"{
-			p.AdsClient.UpdateCampaignVisitor(bearer,story.Id)
+	for _, story := range stories {
+		if story.ContentType == "CAMPAIGN" {
+			p.AdsClient.UpdateCampaignVisitor(bearer, story.Id)
 		}
 	}
 
 	storiesMap := makeStoriesMapFromArray(stories, userInfo)
 
-	if len(storiesMap)==0{
+	if len(storiesMap) == 0 {
 		return []*model.StoryInfoResponse{}, nil
 	}
 
-	campaignCount := int64(len(storiesMap)/3) // broj postova sortiranih, na svaki 5i
+	campaignCount := int64(len(storiesMap) / 3) // broj postova sortiranih, na svaki 5i
 
 	if int(campaignCount) == 0 {
-		campaignCount=1
+		campaignCount = 1
 	}
 
-	campaignStoryIds, err := p.AdsClient.GetStoryCampaignSuggestion(bearer,strconv.Itoa(int(campaignCount)))
+	campaignStoryIds, err := p.AdsClient.GetStoryCampaignSuggestion(bearer, strconv.Itoa(int(campaignCount)))
 
 	log.Println("TEST")
 	log.Println(campaignCount)
@@ -347,12 +378,12 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 
 	var index int = 0
 
-	if len(campaignStoryIds)!=0{
+	if len(campaignStoryIds) != 0 {
 		var storyNumberBeforeCampaign int32
-		if len(campaignStoryIds)==1{
-			storyNumberBeforeCampaign =  int32(len(storiesMap)/2)+1
-		}else{
-			storyNumberBeforeCampaign =  int32(len(storiesMap)/(len(campaignStoryIds)))
+		if len(campaignStoryIds) == 1 {
+			storyNumberBeforeCampaign = int32(len(storiesMap)/2) + 1
+		} else {
+			storyNumberBeforeCampaign = int32(len(storiesMap) / (len(campaignStoryIds)))
 		}
 
 		retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
@@ -362,14 +393,16 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 		var retStories []*model.StoryInfoResponse
 
 		for sortedIndex, story := range retVal {
-			if (sortedIndex+1) % int(storyNumberBeforeCampaign)==0{
-				value, err := p.StoryRepository.GetByID(ctx,campaignStoryIds[index])
-				if err!= nil{
+			if (sortedIndex+1)%int(storyNumberBeforeCampaign) == 0 {
+				value, err := p.StoryRepository.GetByID(ctx, campaignStoryIds[index])
+				if err != nil {
 					return nil, errors.New("Campaign not exist")
 				}
 
-				res, err := model.NewStoryInfoResponse(value,false)
-				if err != nil { return nil,err}
+				res, err := model.NewStoryInfoResponse(value, false)
+				if err != nil {
+					return nil, err
+				}
 
 				retStories = append(retStories, res)
 				index++
@@ -379,7 +412,7 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 		}
 
 		return retStories, nil
-	}else{
+	} else {
 		retVal := mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap, userInfo.Id)
 
 		retVal = sortFirstUnvisited(retVal)
@@ -389,33 +422,36 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 }
 
 func (p storyService) GetStoryForUserMessage(ctx context.Context, bearer string, storyId string) (*model.UsersStoryResponseWithUserInfo, *model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetStoryForUserMessage")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	story, err := p.StoryRepository.GetByID(ctx, storyId)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if !p.checkIfUserContentIsAccessible(bearer, story.UserInfo.Id) {
+	if !p.checkIfUserContentIsAccessible(ctx, bearer, story.UserInfo.Id) {
 		return nil, &story.UserInfo, &unauthorized.UnauthorizedAccessError{Msg: "User not authorized"}
 	}
 
-	if story.CreatedTime.AddDate(0,0,1).Before(time.Now()) {
+	if story.CreatedTime.AddDate(0, 0, 1).Before(time.Now()) {
 		return nil, &story.UserInfo, &expired.StoryError{Msg: "Story expired"}
 	}
 
 	resp := &model.UsersStoryResponseWithUserInfo{
-		Id: story.Id,
+		Id:          story.Id,
 		ContentType: story.ContentType,
-		Media:      story.Media,
+		Media:       story.Media,
 		DateTime:    "",
-		UserInfo:   story.UserInfo,
-		Website:    story.Website,
+		UserInfo:    story.UserInfo,
+		Website:     story.Website,
 	}
 	return resp, nil, nil
 }
 
-func (p storyService) checkIfUserContentIsAccessible(bearer string, storyOwnerId string) bool {
-	isPrivate, err := p.UserClient.IsUserPrivate(storyOwnerId)
+func (p storyService) checkIfUserContentIsAccessible(ctx context.Context, bearer string, storyOwnerId string) bool {
+	isPrivate, err := p.UserClient.IsUserPrivate(ctx, storyOwnerId)
 	if err != nil {
 		return false
 	}
@@ -424,12 +460,12 @@ func (p storyService) checkIfUserContentIsAccessible(bearer string, storyOwnerId
 		if bearer == "" {
 			return false
 		}
-		userId, err := p.AuthClient.GetLoggedUserId(bearer)
+		userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 		if err != nil {
 			return false
 		}
 		if userId != storyOwnerId {
-			followedUsers, err := p.RelationshipClient.GetFollowedUsers(userId)
+			followedUsers, err := p.RelationshipClient.GetFollowedUsers(ctx, userId)
 			if err != nil {
 				return false
 			}
@@ -450,10 +486,10 @@ func sortFirstUnvisited(stories []*model.StoryInfoResponse) []*model.StoryInfoRe
 	var unvisited []*model.StoryInfoResponse
 
 	for _, story := range stories {
-		if story.Visited==true{
-			visited= append(visited, story)
-		}else{
-			unvisited= append(unvisited,story)
+		if story.Visited == true {
+			visited = append(visited, story)
+		} else {
+			unvisited = append(unvisited, story)
 		}
 	}
 
@@ -465,27 +501,30 @@ func mapStoriesFromMapToResponseStoriesInfoDTO(storiesMap map[string][]*model.St
 
 	for _, element := range storiesMap {
 		visited, _ := hasUserVisitedStories(element, userId)
-		res, err := model.NewStoryInfoResponse(element[0],visited)
-		if err != nil { return nil}
+		res, err := model.NewStoryInfoResponse(element[0], visited)
+		if err != nil {
+			return nil
+		}
 		retVal = append(retVal, res)
 	}
 	return retVal
 
 }
+
 //TODO 3: mora userId da bude u svakom, ako u jednom nije visited je false
 func hasUserVisitedStories(stories []*model.Story, id string) (bool, int) {
-	for index, story := range stories{
-		if !hasUserVisitStory(story, id){
-			return false,index
+	for index, story := range stories {
+		if !hasUserVisitStory(story, id) {
+			return false, index
 		}
 	}
 
-	return true,0
+	return true, 0
 }
 
 func hasUserVisitStory(story *model.Story, id string) bool {
-	for _, storyVisitor := range story.VisitedBy{
-		if storyVisitor.Id==id{
+	for _, storyVisitor := range story.VisitedBy {
+		if storyVisitor.Id == id {
 			return true
 		}
 	}
@@ -494,20 +533,23 @@ func hasUserVisitStory(story *model.Story, id string) bool {
 
 func makeStoriesMapFromArray(stories []*model.Story, userInfo *model.UserInfo) map[string][]*model.Story {
 	elementMap := make(map[string][]*model.Story)
-	for i := 0; i < len(stories); i +=1 {
-		if stories[i].UserInfo.Id!=userInfo.Id { // TODO 2: eliminise svoje storije, to obrisati kada se odradi TODO1
+	for i := 0; i < len(stories); i += 1 {
+		if stories[i].UserInfo.Id != userInfo.Id { // TODO 2: eliminise svoje storije, to obrisati kada se odradi TODO1
 
-			elementMap[stories[i].UserInfo.Id]=append(elementMap[stories[i].UserInfo.Id], stories[i])
+			elementMap[stories[i].UserInfo.Id] = append(elementMap[stories[i].UserInfo.Id], stories[i])
 		}
 	}
 	return elementMap
 }
 
-
 func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bearer string) (*model.StoryResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetStoriesForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	result, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userId)
 	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"story_owner_id" : userId}).Warn("Error while getting user stories")
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_owner_id": userId}).Warn("Error while getting user stories")
 		return nil, err
 	}
 	fmt.Println(len(result))
@@ -515,12 +557,12 @@ func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bear
 	var media []model.MediaContent
 	media = mapStoriesToMediaArray(result)
 
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 
 	if err != nil {
 		return nil, err
 	}
-	_, index := hasUserVisitedStories(result,userInfo.Id)
+	_, index := hasUserVisitedStories(result, userInfo.Id)
 
 	res, err := model.NewStoryResponse(result[0], media, index)
 	if err != nil {
@@ -531,6 +573,10 @@ func (p storyService) GetStoriesForUser(ctx context.Context, userId string, bear
 }
 
 func (p storyService) GetStoryForAdmin(ctx context.Context, storyId string) (*model.StoryResponseForAdmin, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetStoryForAdmin")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	result, err := p.StoryRepository.GetByID(ctx, storyId)
 	if err != nil {
 		return nil, errors.New("invalid story id")
@@ -555,9 +601,12 @@ func (p storyService) GetStoryForAdmin(ctx context.Context, storyId string) (*mo
 	return res, nil
 }
 
-
 func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*model.UsersStoryResponse, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetAllUserStories")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -565,15 +614,15 @@ func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*
 	var userStories []*model.UsersStoryResponse
 	result, err := p.StoryRepository.GetStoriesForUser(ctx, userInfo.Id)
 	if err != nil {
-		logger.LoggingEntry.WithFields(logrus.Fields{"story_owner_id" : userInfo.Id}).Warn("Error while getting user stories")
+		logger.LoggingEntry.WithFields(logrus.Fields{"story_owner_id": userInfo.Id}).Warn("Error while getting user stories")
 		return nil, err
 	}
 
 	for _, story := range result {
 		userStories = append(userStories, &model.UsersStoryResponse{
-			Id: story.Id,
+			Id:          story.Id,
 			ContentType: story.ContentType,
-			Media:      story.Media,
+			Media:       story.Media,
 			DateTime:    "",
 		})
 	}
@@ -582,7 +631,11 @@ func (p storyService) GetAllUserStories(ctx context.Context, bearer string) ([]*
 }
 
 func (p storyService) GetStoryHighlight(ctx context.Context, bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error) {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetStoryHighlight")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -598,9 +651,9 @@ func (p storyService) GetStoryHighlight(ctx context.Context, bearer string, requ
 			return nil, err
 		}
 		if story.UserInfo.Id != userId {
-			logger.LoggingEntry.WithFields(logrus.Fields{"logged_user_id" : userId,
-														 "story_owner_id" : story.UserInfo.Id,
-														 "story_id" : storyId}).Warn("Unauthorized to use story as highlights")
+			logger.LoggingEntry.WithFields(logrus.Fields{"logged_user_id": userId,
+				"story_owner_id": story.UserInfo.Id,
+				"story_id":       storyId}).Warn("Unauthorized to use story as highlights")
 			return nil, errors.New("desired stories cannot be in users highlights")
 		}
 		highlights.Media = append(highlights.Media, model.IdWithMedia{
@@ -617,9 +670,12 @@ func (p storyService) GetStoryHighlight(ctx context.Context, bearer string, requ
 	return highlights, nil
 }
 
-
 func (p storyService) VisitedStoryByUser(ctx context.Context, storyId string, bearer string) error {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceVisitedStoryByUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -629,8 +685,8 @@ func (p storyService) VisitedStoryByUser(ctx context.Context, storyId string, be
 		return err
 	}
 
-	if !hasUserVisitStory(story,userInfo.Id){
-		story.VisitedBy=append(story.VisitedBy, *userInfo)
+	if !hasUserVisitStory(story, userInfo.Id) {
+		story.VisitedBy = append(story.VisitedBy, *userInfo)
 	}
 
 	p.StoryRepository.Update(ctx, story)
@@ -660,9 +716,13 @@ func mapStoriesToMediaArray(result []*model.Story) []model.MediaContent {
 }
 
 func (p storyService) HaveActiveStoriesLoggedUser(ctx context.Context, bearer string) (bool, error) {
-	userInfo, err := p.UserClient.GetLoggedUserInfo(bearer)
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceHaveActiveStoriesLoggedUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
-		return false,err
+		return false, err
 	}
 
 	result, err := p.StoryRepository.GetActiveStoriesForUser(ctx, userInfo.Id)
@@ -670,20 +730,23 @@ func (p storyService) HaveActiveStoriesLoggedUser(ctx context.Context, bearer st
 		return false, err
 	}
 
-	if len(result)==0{
-		return false,nil
+	if len(result) == 0 {
+		return false, nil
 	}
 
 	return true, nil
 }
 
 func (p storyService) EditStoryOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error {
-	userId, err := p.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceEditStoryOwnerInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
 	fmt.Println(userId)
-
 
 	if userId != userInfo.Id {
 		return errors.New("unauthorized edit")

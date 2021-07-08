@@ -2,7 +2,9 @@ package router
 
 import (
 	"ads-service/controller/handler"
+
 	"github.com/labstack/echo"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
@@ -37,5 +39,5 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	e.PUT("/api/ads/campaign/post/visited/:postId", h.UpdatePostCampaignVisitor)
 	e.PUT("/api/ads/campaign/story/visited/:storyId", h.UpdateStoryCampaignVisitor)
-
+	e.GET("/api/ads/metrics", echo.WrapHandler(promhttp.Handler()))
 }

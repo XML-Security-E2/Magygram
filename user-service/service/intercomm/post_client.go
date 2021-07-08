@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,11 +13,12 @@ import (
 	"user-service/conf"
 	"user-service/domain/model"
 	"user-service/logger"
+	"user-service/tracer"
 )
 
 type PostClient interface {
 	GetPostsFirstImage(postId string) (*model.Media, error)
-	GetUsersPostsCount(userId string) (int, error)
+	GetUsersPostsCount(ctx context.Context, userId string) (int, error)
 	EditPostOwnerInfo(bearer string, userInfo model.UserInfo) error
 	EditLikedByInfo(bearer string,userInfo model.UserInfoEdit) error
 	EditDislikedByInfo(bearer string, userInfo model.UserInfoEdit) error
@@ -145,11 +147,14 @@ func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
 	return &postImage, nil
 }
 
-func (a postClient) GetUsersPostsCount(userId string) (int, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/count", basePostUrl, userId), nil)
+func (a postClient) GetUsersPostsCount(ctx context.Context, userId string) (int, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostClientGetUsersPostsCount")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/%s/count", basePostUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
-
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

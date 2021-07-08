@@ -2,6 +2,7 @@
 package intercomm
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,11 +13,12 @@ import (
 	"post-service/conf"
 	"post-service/domain/model"
 	"post-service/logger"
+	"post-service/tracer"
 )
 
 type RelationshipClient interface {
-	GetFollowedUsers(userId string) (model.FollowedUsersResponse, error)
-	GetUnmutedFollowedUsers(userId string) (model.FollowedUsersResponse, error)
+	GetFollowedUsers(ctx context.Context, userId string) (model.FollowedUsersResponse, error)
+	GetUnmutedFollowedUsers(ctx context.Context, userId string) (model.FollowedUsersResponse, error)
 }
 
 type relationshipClient struct {
@@ -32,11 +34,14 @@ func NewRelationshipClient() RelationshipClient {
 	return &relationshipClient{}
 }
 
-func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsersResponse, error) {
+func (r relationshipClient) GetFollowedUsers(ctx context.Context, userId string) (model.FollowedUsersResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "RelationshipClientGetFollowedUsers")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/followed-users/%s", baseRelationshipUrl, userId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/followed-users/%s", baseRelationshipUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -62,11 +67,14 @@ func (r relationshipClient) GetFollowedUsers(userId string) (model.FollowedUsers
 	return users, nil
 }
 
-func (r relationshipClient) GetUnmutedFollowedUsers(userId string) (model.FollowedUsersResponse, error) {
+func (r relationshipClient) GetUnmutedFollowedUsers(ctx context.Context, userId string) (model.FollowedUsersResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "RelationshipClientGetUnmutedFollowedUsers")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/unmuted-followed-users/%s", baseRelationshipUrl, userId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/unmuted-followed-users/%s", baseRelationshipUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

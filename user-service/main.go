@@ -4,11 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"time"
 	"user-service/conf"
@@ -17,6 +12,12 @@ import (
 	"user-service/interactor"
 	"user-service/logger"
 	"user-service/saga"
+
+	"github.com/labstack/echo"
+	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 
@@ -93,6 +94,9 @@ func main() {
 	router.NewRouter(e, h)
 	middleware.NewMiddleware(e)
 
+	metricsMiddleware := middleware.NewMetricsMiddleware()
+	e.Use(metricsMiddleware.Metrics)
+
 	//Log rotation test
 	//for i := 0; i < 32000; i++ {
 	//	logger.Logger.WithFields(logrus.Fields{
@@ -109,6 +113,5 @@ func main() {
 	} else {
 		e.Logger.Fatal(e.StartTLS(":" + conf.Current.Server.Port, "certificate.pem", "certificate-key.pem"))
 	}
-
 
 }

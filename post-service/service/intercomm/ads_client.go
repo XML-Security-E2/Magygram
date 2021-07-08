@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,10 +12,11 @@ import (
 	"net/http"
 	"post-service/conf"
 	"post-service/domain/model"
+	"post-service/tracer"
 )
 
 type AdsClient interface {
-	CreatePostCampaign(bearer string, campaignReq *model.CampaignRequest) error
+	CreatePostCampaign(ctx context.Context, bearer string, campaignReq *model.CampaignRequest) error
 	GetAllActiveAgentsPostCampaigns(bearer string) ([]string,error)
 	DeleteCampaign(bearer string, postId string) error
 	GetPostCampaignSuggestion(bearer string,count string) ([]string,error)
@@ -37,17 +39,21 @@ type errMessage struct {
 	Message string `json:"message"`
 }
 
-func (a adsClient) CreatePostCampaign(bearer string, campaignReq *model.CampaignRequest) error {
+func (a adsClient) CreatePostCampaign(ctx context.Context, bearer string, campaignReq *model.CampaignRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientCreatePostCampaign")
+	defer span.Finish()
+
 	jsonStr, err:= json.Marshal(campaignReq)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/campaign", baseAdsUrl), bytes.NewReader(jsonStr))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/campaign", baseAdsUrl), bytes.NewReader(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

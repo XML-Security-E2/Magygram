@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"mime/multipart"
 	"regexp"
@@ -19,6 +17,11 @@ import (
 	"user-service/logger"
 	"user-service/saga"
 	"user-service/service/intercomm"
+
+	"github.com/go-redis/redis"
+	"golang.org/x/crypto/bcrypt"
+
+	"user-service/tracer"
 
 	"github.com/beevik/guid"
 	"github.com/go-playground/validator"
@@ -40,17 +43,17 @@ type userService struct {
 }
 
 var (
-	MaxUnsuccessfulLogins = 3
-	ImageBytes []byte= nil
-	RedisClient *redis.Client = nil
+	MaxUnsuccessfulLogins               = 3
+	ImageBytes            []byte        = nil
+	RedisClient           *redis.Client = nil
 )
 
 func NewAuthService(r repository.UserRepository, nrr repository.NotificationRulesRepository, a service_contracts.AccountActivationService, ic intercomm.AuthClient, rp service_contracts.ResetPasswordService, rC intercomm.RelationshipClient, pc intercomm.PostClient, mc intercomm.MediaClient, msc intercomm.MessageClient, sclient intercomm.StoryClient, orchestrator saga.Orchestrator) service_contracts.UserService {
-	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc,sclient, orchestrator}
+	return &userService{r, nrr, a, rp, ic, rC, pc, mc, msc, sclient, orchestrator}
 }
 
 func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -67,12 +70,12 @@ func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer 
 }
 
 func (u *userService) ChangeUsersNotificationsSettings(ctx context.Context, bearer string, settingsReq *model.SettingsRequest, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
 
-	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -153,7 +156,7 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 		if user.NotificationSettings.NotifyLike == model.FromEveryOne {
 			return true, nil
 		} else if user.NotificationSettings.NotifyLike == model.FromPeopleIFollow {
-			followedUsers, err := u.RelationshipClient.GetFollowedUsers(user.Id)
+			followedUsers, err := u.RelationshipClient.GetFollowedUsers(ctx, user.Id)
 			if err == nil {
 				for _, followedUser := range followedUsers.Users {
 					if followedUser == userFromId {
@@ -169,7 +172,7 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 		if user.NotificationSettings.NotifyDislike == model.FromEveryOne {
 			return true, nil
 		} else if user.NotificationSettings.NotifyDislike == model.FromPeopleIFollow {
-			followedUsers, err := u.RelationshipClient.GetFollowedUsers(user.Id)
+			followedUsers, err := u.RelationshipClient.GetFollowedUsers(ctx, user.Id)
 			if err == nil {
 				for _, followedUser := range followedUsers.Users {
 					if followedUser == userFromId {
@@ -185,7 +188,7 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 		if user.NotificationSettings.NotifyComment == model.FromEveryOne {
 			return true, nil
 		} else if user.NotificationSettings.NotifyComment == model.FromPeopleIFollow {
-			followedUsers, err := u.RelationshipClient.GetFollowedUsers(user.Id)
+			followedUsers, err := u.RelationshipClient.GetFollowedUsers(ctx, user.Id)
 			if err == nil {
 				for _, followedUser := range followedUsers.Users {
 					if followedUser == userFromId {
@@ -221,7 +224,7 @@ func (u userService) DeleteUser(ctx context.Context, requestId string) error {
 }
 
 func (u *userService) EditUser(ctx context.Context, bearer string, userId string, userRequest *model.EditUserRequest) (string, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -245,7 +248,7 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 	user.Website = userRequest.Website
 	user.Bio = userRequest.Bio
 	user.Gender = userRequest.Gender
-	user.BirthDate = time.Unix(0, userRequest.BirthDate * int64(time.Millisecond))
+	user.BirthDate = time.Unix(0, userRequest.BirthDate*int64(time.Millisecond))
 	if err = validator.New().Struct(user); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name,
 			"surname":  userRequest.Surname,
@@ -282,7 +285,7 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 }
 
 func (u *userService) EditUserImage(ctx context.Context, bearer string, userId string, userImage []*multipart.FileHeader) (string, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -318,7 +321,6 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 	if err != nil {
 		return "", err
 	}
-
 
 	logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userId}).Info("User profile picture updated")
 
@@ -389,7 +391,7 @@ func (u *userService) editSharedUserInfo(bearer string, user *model.User, userna
 }
 
 func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettingsUpdateReq) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -442,7 +444,7 @@ func (u *userService) EditUsersNotifications(ctx context.Context, bearer string,
 }
 
 func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer string, privacySettingsReq *model.PrivacySettings) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -464,6 +466,9 @@ func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer strin
 }
 
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) ([]byte, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceRegisterUser")
+	defer span.Finish()
+
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname": userRequest.Surname, "email": userRequest.Email, "username": userRequest.Username}).Warn("User registration validation failure")
@@ -473,13 +478,14 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 	result, err := u.UserRepository.Create(ctx, user)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"name": userRequest.Name, "surname": userRequest.Surname, "email": userRequest.Email, "username": userRequest.Username}).Error("User database create failure")
+		tracer.LogError(span, err)
 		return nil, err
 	}
 
 	sagaUserRequest := saga.UserRequest{
-		Id: user.Id,
-		Email: user.Email,
-		Password: userRequest.Password,
+		Id:               user.Id,
+		Email:            user.Email,
+		Password:         userRequest.Password,
 		RepeatedPassword: userRequest.RepeatedPassword,
 	}
 
@@ -564,15 +570,17 @@ func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *mo
 	return user.Id, err
 }
 
-
 func (u *userService) ActivateUser(ctx context.Context, activationId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceActivateUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	accActivation, err := u.AccountActivationService.GetValidActivationById(ctx, activationId)
 	if accActivation == nil || err != nil {
 		return false, err
 	}
 
-	err = u.AuthClient.ActivateUser(accActivation.UserId)
+	err = u.AuthClient.ActivateUser(ctx, accActivation.UserId)
 	if err != nil {
 		return false, err
 	}
@@ -661,6 +669,9 @@ func (u *userService) GetUserEmailIfUserExist(ctx context.Context, userId string
 }
 
 func (u *userService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserById")
+	defer span.Finish()
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {
@@ -672,7 +683,11 @@ func (u *userService) GetUserById(ctx context.Context, userId string) (*model.Us
 }
 
 func (u *userService) SearchForUsersByUsername(ctx context.Context, username string, bearer string) ([]model.User, error) {
-	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceSearchForUsersByUsername")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -687,7 +702,11 @@ func (u *userService) SearchForUsersByUsername(ctx context.Context, username str
 }
 
 func (u *userService) SearchForInfluencerByUsername(ctx context.Context, username string, bearer string) ([]model.User, error) {
-	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceSearchForInfluencerByUsername")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -721,12 +740,15 @@ func (u *userService) GetUsersInfo(ctx context.Context, userId string) (*model.U
 		Id:       userId,
 		Username: user.Username,
 		ImageURL: user.ImageUrl,
-	}, nil}
-
+	}, nil
+}
 
 func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetLoggedUserInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
-	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -744,7 +766,7 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 }
 
 func (u *userService) GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.TargetGroup, error) {
-	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -755,15 +777,14 @@ func (u *userService) GetLoggedUserTargetGroup(ctx context.Context, bearer strin
 	}
 
 	return &model.TargetGroup{
-		Id: userId,
-		Age: time.Now().Year() - user.BirthDate.Year(),
+		Id:     userId,
+		Age:    time.Now().Year() - user.BirthDate.Year(),
 		Gender: user.Gender,
 	}, nil
 }
 
-
 func (u *userService) GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error) {
-	userId, err := u.AuthClient.GetLoggedUserId(bearer)
+	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -778,32 +799,35 @@ func (u *userService) GetLoggedAgentInfo(ctx context.Context, bearer string) (*m
 		Username: user.Username,
 		ImageURL: user.ImageUrl,
 		Website:  user.Website,
-	}, nil}
+	}, nil
+}
 
 func (u *userService) GetUserProfileById(ctx context.Context, bearer string, userId string) (*model.UserProfileResponse, error) {
-
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserProfileById")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 	log.Println(userId)
 
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
-	followingUsers, err := u.RelationshipClient.GetFollowedUsers(userId)
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	postsCount, err := u.PostClient.GetUsersPostsCount(userId)
+	postsCount, err := u.PostClient.GetUsersPostsCount(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	loggedId, _ := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, _ := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	following := false
 	if loggedId != "" {
 		following = doesUserFollow(followedUsers, loggedId)
@@ -819,8 +843,8 @@ func (u *userService) GetUserProfileById(ctx context.Context, bearer string, use
 	muted := false
 	blocked := false
 	if userId != loggedId {
-		sentReq, _ = u.RelationshipClient.ReturnFollowRequestsForUser(bearer, userId)
-		muted, _ = u.RelationshipClient.IsMuted(model.Mute{SubjectId: loggedId, ObjectId: userId})
+		sentReq, _ = u.RelationshipClient.ReturnFollowRequestsForUser(ctx, bearer, userId)
+		muted, _ = u.RelationshipClient.IsMuted(ctx, model.Mute{SubjectId: loggedId, ObjectId: userId})
 		blocked, _ = u.UserRepository.IsBlocked(ctx, loggedId, userId)
 	}
 
@@ -878,7 +902,7 @@ func (u *userService) GetUserProfileById(ctx context.Context, bearer string, use
 		SentFollowRequest:    sentReq,
 		PrivacySettings:      user.PrivacySettings,
 		NotificationSettings: notificationSettings,
-		BirthDate: 			  user.BirthDate,
+		BirthDate:            user.BirthDate,
 	}
 	return retVal, nil
 }
@@ -904,7 +928,11 @@ func (p userService) checkIfUserInfoIsAccessible(bearer string, owner *model.Use
 }
 
 func (u *userService) GetFollowedUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetFollowedUsers")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -914,12 +942,12 @@ func (u *userService) GetFollowedUsers(ctx context.Context, bearer string, userI
 		return nil, errors.New("invalid user id")
 	}
 
-	followingUsers, err := u.RelationshipClient.GetFollowedUsers(loggedId)
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(ctx, loggedId)
 	if err != nil {
 		return nil, err
 	}
 
-	followedUsers, err := u.RelationshipClient.GetFollowingUsers(userId)
+	followedUsers, err := u.RelationshipClient.GetFollowingUsers(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -963,7 +991,11 @@ func doesUserFollow(followingUsers model.FollowedUsersResponse, followedId strin
 }
 
 func (u *userService) GetFollowingUsers(ctx context.Context, bearer string, userId string) ([]*model.UserFollowingResponse, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetFollowingUsers")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -973,12 +1005,12 @@ func (u *userService) GetFollowingUsers(ctx context.Context, bearer string, user
 		return nil, errors.New("invalid user id")
 	}
 
-	followingUsers, err := u.RelationshipClient.GetFollowedUsers(loggedId)
+	followingUsers, err := u.RelationshipClient.GetFollowedUsers(ctx, loggedId)
 	if err != nil {
 		return nil, err
 	}
 
-	followingUsersRet, err := u.RelationshipClient.GetFollowedUsers(userId)
+	followingUsersRet, err := u.RelationshipClient.GetFollowedUsers(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -1013,14 +1045,18 @@ func (u *userService) GetFollowingUsers(ctx context.Context, bearer string, user
 }
 
 func (u *userService) FollowUser(ctx context.Context, bearer string, userId string) (bool, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceFollowUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return false, err
 	}
 
 	user, _ := u.UserRepository.GetByID(ctx, loggedId)
 
-	followRequest, err := u.RelationshipClient.FollowRequest(&model.FollowRequest{
+	followRequest, err := u.RelationshipClient.FollowRequest(ctx, &model.FollowRequest{
 		SubjectId: loggedId,
 		ObjectId:  userId,
 	})
@@ -1048,12 +1084,16 @@ func (u *userService) FollowUser(ctx context.Context, bearer string, userId stri
 }
 
 func (u *userService) UnfollowUser(ctx context.Context, bearer string, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUnfollowUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
 
-	err = u.RelationshipClient.Unfollow(&model.FollowRequest{
+	err = u.RelationshipClient.Unfollow(ctx, &model.FollowRequest{
 		SubjectId: loggedId,
 		ObjectId:  userId,
 	})
@@ -1061,12 +1101,16 @@ func (u *userService) UnfollowUser(ctx context.Context, bearer string, userId st
 }
 
 func (u *userService) MuteUser(ctx context.Context, bearer string, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceMuteUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
 
-	err = u.RelationshipClient.Mute(&model.Mute{
+	err = u.RelationshipClient.Mute(ctx, &model.Mute{
 		SubjectId: loggedId,
 		ObjectId:  userId,
 	})
@@ -1075,12 +1119,16 @@ func (u *userService) MuteUser(ctx context.Context, bearer string, userId string
 }
 
 func (u *userService) UnmuteUser(ctx context.Context, bearer string, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUnmuteUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
 
-	err = u.RelationshipClient.Unmute(&model.Mute{
+	err = u.RelationshipClient.Unmute(ctx, &model.Mute{
 		SubjectId: loggedId,
 		ObjectId:  userId,
 	})
@@ -1089,27 +1137,37 @@ func (u *userService) UnmuteUser(ctx context.Context, bearer string, userId stri
 }
 
 func (u *userService) BlockUser(ctx context.Context, bearer string, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceBlockUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 	user, err := u.UserRepository.GetByID(ctx, loggedId)
 	user.BlockedUsers = append(user.BlockedUsers, userId)
 	if _, err = u.UserRepository.Update(ctx, user); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
-	if err = u.RelationshipClient.Unfollow(&model.FollowRequest{SubjectId: loggedId, ObjectId: userId}); err != nil {
+	if err = u.RelationshipClient.Unfollow(ctx, &model.FollowRequest{SubjectId: loggedId, ObjectId: userId}); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
-	if err = u.RelationshipClient.Unfollow(&model.FollowRequest{SubjectId: userId, ObjectId: loggedId}); err != nil {
+	if err = u.RelationshipClient.Unfollow(ctx, &model.FollowRequest{SubjectId: userId, ObjectId: loggedId}); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 	return err
 }
 
 func (u *userService) UnblockUser(ctx context.Context, bearer string, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUnblockUser")
+	defer span.Finish()
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 	user, err := u.UserRepository.GetByID(ctx, loggedId)
@@ -1132,7 +1190,11 @@ func isUserBlocked(user *model.User, userId string) (bool, int) {
 }
 
 func (u *userService) GetFollowRequests(ctx context.Context, bearer string) ([]*model.UserFollowingResponse, error) {
-	requestsFrom, err := u.RelationshipClient.ReturnFollowRequests(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetFollowRequests")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	requestsFrom, err := u.RelationshipClient.ReturnFollowRequests(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -1160,14 +1222,18 @@ func (u *userService) GetFollowRequests(ctx context.Context, bearer string) ([]*
 }
 
 func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, userId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "UserServiceAcceptFollowRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
 
 	user, _ := u.UserRepository.GetByID(ctx, loggedId)
 
-	err = u.RelationshipClient.AcceptFollowRequest(bearer, userId)
+	err = u.RelationshipClient.AcceptFollowRequest(ctx, bearer, userId)
 	if err != nil {
 		return err
 	}
@@ -1184,7 +1250,7 @@ func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, us
 }
 
 func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -1211,7 +1277,7 @@ func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId
 }
 
 func (u *userService) AddComment(ctx context.Context, bearer string, postId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -1244,7 +1310,7 @@ func didUserCommentedPost(user *model.User, postId string) bool {
 }
 
 func (u *userService) UpdateDislikedPost(ctx context.Context, bearer string, postId string) error {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
 	}
@@ -1289,7 +1355,7 @@ func didUserLikedPost(user *model.User, postId string) (bool, int) {
 }
 
 func (u *userService) GetUserLikedPost(ctx context.Context, bearer string) ([]string, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return []string{}, err
 	}
@@ -1303,7 +1369,7 @@ func (u *userService) GetUserLikedPost(ctx context.Context, bearer string) ([]st
 }
 
 func (u *userService) GetUserDislikedPost(ctx context.Context, bearer string) ([]string, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return []string{}, err
 	}
@@ -1334,7 +1400,7 @@ func (u *userService) VerifyUser(ctx context.Context, dto *model.VerifyAccountDT
 }
 
 func (u *userService) CheckIfUserVerified(ctx context.Context, bearer string) (bool, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return false, err
 	}
@@ -1357,9 +1423,8 @@ func (u *userService) CheckIfUserVerifiedById(ctx context.Context, userId string
 	return user.IsVerified, nil
 }
 
-
 func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string) (*model.FollowRecommendationResponse, error) {
-	loggedId, err := u.AuthClient.GetLoggedUserId(bearer)
+	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -1371,7 +1436,6 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	}
 	log.Println("test1")
 
-
 	var recommendedUsers model.RecommendedUsersResponse
 	recommendedUsers, err = u.RelationshipClient.GetRecommendedUsers(loggedId)
 	if err != nil {
@@ -1379,10 +1443,10 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	}
 
 	retVal := model.FollowRecommendationResponse{
-		Name: user.Name,
-		Surname: user.Surname,
-		ImageURL: user.ImageUrl,
-		Username: user.Username,
+		Name:             user.Name,
+		Surname:          user.Surname,
+		ImageURL:         user.ImageUrl,
+		Username:         user.Username,
 		RecommendedUsers: []*model.RecommendUserInfo{},
 	}
 
@@ -1393,16 +1457,16 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 		}
 
 		var newUserInfo = &model.RecommendUserInfo{
-			Id:       userId,
-			Username: user.Username,
-			ImageURL: user.ImageUrl,
+			Id:            userId,
+			Username:      user.Username,
+			ImageURL:      user.ImageUrl,
 			SendedRequest: false,
-			Followed:false,
+			Followed:      false,
 		}
-		retVal.RecommendedUsers=append(retVal.RecommendedUsers, newUserInfo)
+		retVal.RecommendedUsers = append(retVal.RecommendedUsers, newUserInfo)
 	}
 
-	return &retVal,nil
+	return &retVal, nil
 }
 
 func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *model.AgentRegistrationDTO) (string, error) {
@@ -1459,14 +1523,12 @@ func (u *userService) RedisConnection(finished chan bool) {
 	// create client and ping redis
 	var err error
 
-
-	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host+":"+ conf.Current.RedisDatabase.Port, Password: "", DB: 0})
+	client := redis.NewClient(&redis.Options{Addr: conf.Current.RedisDatabase.Host + ":" + conf.Current.RedisDatabase.Port, Password: "", DB: 0})
 	if _, err = client.Ping().Result(); err != nil {
 		log.Fatalf("error creating redis client %s", err)
 	}
 
-	RedisClient=client
-
+	RedisClient = client
 
 	// subscribe to the required channels
 	pubsub := client.Subscribe(saga.UserChannel, saga.ReplyChannel)
@@ -1491,7 +1553,7 @@ func (u *userService) RedisConnection(finished chan bool) {
 			case saga.UserChannel:
 				// Happy Flow
 				if m.Action == saga.ActionStart {
-					if m.SenderService == saga.ServiceRelationship{
+					if m.SenderService == saga.ServiceRelationship {
 						ImageBytes = m.ImageByte
 						finished <- true
 					}
@@ -1508,7 +1570,6 @@ func (u *userService) RedisConnection(finished chan bool) {
 		}
 	}
 }
-
 
 func sendToReplyChannel(client *redis.Client, m *saga.RegisterUserMessage, action string, service string, senderService string) {
 	var err error

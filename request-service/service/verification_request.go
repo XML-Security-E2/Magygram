@@ -10,6 +10,7 @@ import (
 	"request-service/domain/repository"
 	"request-service/domain/service-contracts"
 	"request-service/service/intercomm"
+	"request-service/tracer"
 	"strings"
 )
 
@@ -27,12 +28,16 @@ func NewVerificationServiceService(vr repository.VerificationRequestsRepository,
 }
 
 func (v verificationService) CreateVerificationRequest(ctx context.Context, verificationRequsetDTO model.VerificationRequestDTO, bearer string, documentImage []*multipart.FileHeader) (string, error) {
-	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceCreateVerificationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := v.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
 
-	media, err := v.MediaClient.SaveMedia(documentImage)
+	media, err := v.MediaClient.SaveMedia(ctx, documentImage)
 	if err != nil { return "", err}
 
 	if len(media) == 0 {
@@ -56,6 +61,9 @@ func (v verificationService) CreateVerificationRequest(ctx context.Context, veri
 	return "",err
 }
 func (v verificationService) CreateCampaignRequest(ctx context.Context, bearer string,  campaignRequestDTO *model.CampaignRequestDTO)  (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceCreateCampaignRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	campaignRequest, err := model.NewCampaignRequest(campaignRequestDTO)
 	if err != nil {
@@ -75,7 +83,11 @@ func (v verificationService) CreateCampaignRequest(ctx context.Context, bearer s
 
 
 func (v verificationService) CreateReportRequest(ctx context.Context, bearer string, reportRequestDTO *model.ReportRequestDTO) (string, error) {
-	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceCreateReportRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := v.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -106,6 +118,10 @@ func (v verificationService) CreateReportRequest(ctx context.Context, bearer str
 	return "",err
 }
 func (v verificationService) GetCampaignRequests(ctx context.Context, requestId string) ([]*model.CampaignRequestResponseDTO, error) {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceGetCampaignRequests")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	var campaignRequest []*model.CampaignRequest
 
 	campaignRequest, err := v.CampaignRequestsRepository.GetAllRequests(ctx, requestId)
@@ -137,6 +153,10 @@ func mapCampaignRequestToCampaignRequestDTO(requests []*model.CampaignRequest) [
 
 
 func (v verificationService) GetReportRequests(ctx context.Context) ([]*model.ReportRequestResponseDTO, error) {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceGetReportRequests")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	var reportRequest []*model.ReportRequest
 
 	reportRequest, err := v.ReportRequestsRepository.GetAllReports(ctx)
@@ -165,6 +185,10 @@ func mapReportRequestToReportRequestDTO(requests []*model.ReportRequest) []*mode
 }
 
 func (v verificationService) GetVerificationRequests(ctx context.Context) ([]*model.VerificationRequestResponseDTO, error) {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceGetVerificationRequests")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	var verificationRequest []*model.VerificationRequest
 
 	verificationRequest, err := v.VerificationRequestsRepository.GetAllPendingRequests(ctx)
@@ -195,6 +219,10 @@ func mapVerificationRequestToVerificationRequestResponseDTO(requests []*model.Ve
 }
 
 func (v verificationService) ApproveVerificationRequest(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceApproveVerificationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	request, err := v.VerificationRequestsRepository.GetVerificationRequestById(ctx, requestId)
 	if err!=nil {
 		return errors.New("Request not found")
@@ -212,7 +240,7 @@ func (v verificationService) ApproveVerificationRequest(ctx context.Context, req
 	}
 
 	log.Println("test")
-	err = v.UserClient.VerifyAccount(verifyDTO)
+	err = v.UserClient.VerifyAccount(ctx, verifyDTO)
 	if err!=nil{
 		return err
 	}
@@ -223,6 +251,10 @@ func (v verificationService) ApproveVerificationRequest(ctx context.Context, req
 }
 
 func (v verificationService) RejectVerificationRequest(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceRejectVerificationRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	request, err := v.VerificationRequestsRepository.GetVerificationRequestById(ctx, requestId)
 	if err!=nil {
 		return errors.New("Request not found")
@@ -240,6 +272,10 @@ func (v verificationService) RejectVerificationRequest(ctx context.Context, requ
 	return nil
 }
 func (v verificationService) DeleteCampaignRequest(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceDeleteCampaignRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	request, err := v.CampaignRequestsRepository.GetRequestById(ctx, requestId)
 	fmt.Println(request)
 	if err!=nil {
@@ -254,6 +290,10 @@ func (v verificationService) DeleteCampaignRequest(ctx context.Context, requestI
 }
 
 func (v verificationService) DeleteReportRequest(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceDeleteReportRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	request, err := v.ReportRequestsRepository.GetReportRequestById(ctx, requestId)
 
 	if err!=nil {
@@ -269,7 +309,11 @@ func (v verificationService) DeleteReportRequest(ctx context.Context, requestId 
 
 
 func (v verificationService) HasUserPendingRequest(ctx context.Context, bearer string) (bool, error) {
-	loggedId, err := v.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "RequestServiceHasUserPendingRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := v.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return false, err
 	}
