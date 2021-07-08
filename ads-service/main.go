@@ -2,6 +2,7 @@ package main
 
 import (
 	"ads-service/conf"
+	"ads-service/controller/middleware"
 	"ads-service/controller/router"
 	"ads-service/interactor"
 	"context"

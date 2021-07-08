@@ -140,6 +140,7 @@ func mapCampaignRequestToCampaignRequestDTO(requests []*model.CampaignRequest) [
 	for _, request := range requests{
 		var result = model.CampaignRequestResponseDTO{ Id: request.Id,
 			ContentId:      request.ContentId,
+			AgentId:      request.AgentId,
 			ContentType:    request.ContentType,
 			Influencer:   request.Influencer,
 			Status: request.Status,
