@@ -38,6 +38,9 @@ func NewPostService(r repository.PostRepository, ic intercomm.MediaClient, uc in
 }
 
 func (p postService) GetPostsMediaAndWebsiteByIds(ctx context.Context, ids *model.FollowedUsersResponse) ([]*model.IdMediaWebsiteResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostsMediaAndWebsiteByIds")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	var resp []*model.IdMediaWebsiteResponse
 
@@ -124,6 +127,10 @@ func (p postService) CreatePost(ctx context.Context, bearer string, postRequest 
 }
 
 func (p postService) CreatePostCampaignFromApi(ctx context.Context, bearer string, postRequest *model.PostRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceCreatePostCampaignFromApi")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedAgentInfo(ctx, bearer)
 	if err != nil { return "", err}
 
@@ -165,6 +172,9 @@ func (p postService) CreatePostCampaignFromApi(ctx context.Context, bearer strin
 }
 
 func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, request  *model.InfluencerRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceCreatePostInfluencer")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil { return "", err}
@@ -314,7 +324,7 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 
 	for _, post := range posts {
 		if post.ContentType == "CAMPAIGN" {
-			p.AdsClient.UpdateCampaignVisitor(bearer, post.Id)
+			p.AdsClient.UpdateCampaignVisitor(ctx, bearer, post.Id)
 		}
 	}
 
@@ -322,7 +332,7 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 
 	campaignCount := int64(len(sortedPosts) / 5) // broj postova sortiranih, na svaki 5i
 
-	campaignPostIds, err := p.AdsClient.GetPostCampaignSuggestion(bearer, strconv.Itoa(int(campaignCount)))
+	campaignPostIds, err := p.AdsClient.GetPostCampaignSuggestion(ctx, bearer, strconv.Itoa(int(campaignCount)))
 
 	log.Println("TEST")
 	log.Println(campaignCount)
@@ -352,12 +362,12 @@ func (p postService) GetPostsForTimeline(ctx context.Context, bearer string) ([]
 			retPosts = append(retPosts, post)
 		}
 
-		retVal := p.mapPostsToResponsePostDTO(bearer, retPosts, userInfo.Id)
+		retVal := p.mapPostsToResponsePostDTO(ctx, bearer, retPosts, userInfo.Id)
 
 		return retVal, nil
 
 	} else {
-		retVal := p.mapPostsToResponsePostDTO(bearer, sortedPosts, userInfo.Id)
+		retVal := p.mapPostsToResponsePostDTO(ctx, bearer, sortedPosts, userInfo.Id)
 
 		return retVal, nil
 	}
@@ -378,6 +388,9 @@ func sortPostPerTime(ctx context.Context, posts []*model.Post) []*model.Post {
 }
 
 func (p postService) DeletePost(ctx context.Context, bearer string, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceDeletePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := p.AuthClient.HasRole(ctx, bearer, "delete_posts")
 	if err != nil {
@@ -399,7 +412,7 @@ func (p postService) DeletePost(ctx context.Context, bearer string, requestId st
 		}
 	}
 
-	err = p.AdsClient.DeleteCampaign(bearer, request.Id)
+	err = p.AdsClient.DeleteCampaign(ctx, bearer, request.Id)
 	if err != nil {
 		return err
 	}
@@ -415,6 +428,10 @@ func (p postService) DeletePost(ctx context.Context, bearer string, requestId st
 }
 
 func (p postService) LikePost(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceLikePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
@@ -432,7 +449,7 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 
 	result.LikedBy = append(result.LikedBy, res)
 
-	err = p.UserClient.UpdateLikedPosts(bearer, postId)
+	err = p.UserClient.UpdateLikedPosts(ctx, bearer, postId)
 	if err != nil {
 		return err
 	}
@@ -463,6 +480,10 @@ func (p postService) LikePost(ctx context.Context, bearer string, postId string)
 }
 
 func (p postService) UnlikePost(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceUnlikePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
@@ -475,7 +496,7 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 
 	result.LikedBy = findAndDeleteLikedBy(result, userInfo)
 
-	err = p.UserClient.UpdateLikedPosts(bearer, postId)
+	err = p.UserClient.UpdateLikedPosts(ctx, bearer, postId)
 	if err != nil {
 		return err
 	}
@@ -493,6 +514,10 @@ func (p postService) UnlikePost(ctx context.Context, bearer string, postId strin
 }
 
 func (p postService) DislikePost(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceDislikePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return err
@@ -510,7 +535,7 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 
 	result.DislikedBy = append(result.DislikedBy, res)
 
-	err = p.UserClient.UpdateDislikedPosts(bearer, postId)
+	err = p.UserClient.UpdateDislikedPosts(ctx, bearer, postId)
 	if err != nil {
 		return err
 	}
@@ -541,6 +566,9 @@ func (p postService) DislikePost(ctx context.Context, bearer string, postId stri
 }
 
 func (p postService) UndislikePost(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceUndislikePost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
@@ -555,7 +583,7 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 
 	result.DislikedBy = findAndDeleteDislikedBy(result, userInfo)
 
-	err = p.UserClient.UpdateDislikedPosts(bearer, postId)
+	err = p.UserClient.UpdateDislikedPosts(ctx, bearer, postId)
 	if err != nil {
 		return err
 	}
@@ -573,6 +601,10 @@ func (p postService) UndislikePost(ctx context.Context, bearer string, postId st
 }
 
 func (p postService) AddComment(ctx context.Context, postId string, content string, bearer string, tags []model.Tag) (*model.Comment, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceAddComment")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -593,7 +625,7 @@ func (p postService) AddComment(ctx context.Context, postId string, content stri
 
 	result.Comments = append(result.Comments, res)
 
-	err = p.UserClient.AddComment(bearer, postId)
+	err = p.UserClient.AddComment(ctx, bearer, postId)
 	if err != nil {
 		return nil, err
 	}
@@ -646,10 +678,10 @@ func findAndDeleteLikedBy(result *model.Post, info *model.UserInfo) []model.User
 	return result.LikedBy[:index]
 }
 
-func (p postService) mapPostsToResponsePostDTO(bearer string, result []*model.Post, userId string) []*model.PostResponse {
+func (p postService) mapPostsToResponsePostDTO(ctx context.Context, bearer string, result []*model.Post, userId string) []*model.PostResponse {
 	var retVal []*model.PostResponse
 
-	postIdFavourites, err := p.UserClient.MapPostsToFavourites(bearer, getIdsFromPosts(result))
+	postIdFavourites, err := p.UserClient.MapPostsToFavourites(ctx, bearer, getIdsFromPosts(result))
 	if err != nil {
 		return nil
 	}
@@ -727,6 +759,9 @@ func hasUserDislikedPost(post *model.Post, usedId string) bool {
 }
 
 func (p postService) GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostsFirstImage")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	post, err := p.PostRepository.GetByID(ctx, postId)
 
@@ -740,6 +775,10 @@ func (p postService) GetPostsFirstImage(ctx context.Context, postId string) (*mo
 }
 
 func (p postService) EditPost(ctx context.Context, bearer string, postRequest *model.PostEditRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceEditPost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	post, err := p.PostRepository.GetByID(ctx, postRequest.Id)
 	if err != nil {
 		return errors.New("invalid post id")
@@ -777,6 +816,10 @@ func (p postService) EditPost(ctx context.Context, bearer string, postRequest *m
 }
 
 func (p postService) CheckIfUsersPostFromBearer(ctx context.Context, bearer string, postOwnerId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceCheckIfUsersPostFromBearer")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"post_owner_id": postOwnerId}).Warn("Unauthorized access")
@@ -874,6 +917,10 @@ func (p postService) GetUsersPostsCount(ctx context.Context, postOwnerId string)
 }
 
 func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, postId string) (*model.PostResponse, *model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostForMessagesById")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, nil, err
@@ -894,7 +941,7 @@ func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, 
 			return nil, &post.UserInfo, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 		}
 
-		postIdFavourite, err := p.UserClient.MapPostsToFavourites(bearer, []string{post.Id})
+		postIdFavourite, err := p.UserClient.MapPostsToFavourites(ctx, bearer, []string{post.Id})
 		if err != nil {
 			return nil, nil, err
 		}
@@ -916,6 +963,10 @@ func (p postService) GetPostForMessagesById(ctx context.Context, bearer string, 
 }
 
 func (p postService) GetPostById(ctx context.Context, bearer string, postId string) (*model.PostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostById")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -936,7 +987,7 @@ func (p postService) GetPostById(ctx context.Context, bearer string, postId stri
 			return nil, &exceptions.UnauthorizedAccessError{Msg: "User not authorized"}
 		}
 
-		postIdFavourite, err := p.UserClient.MapPostsToFavourites(bearer, []string{post.Id})
+		postIdFavourite, err := p.UserClient.MapPostsToFavourites(ctx, bearer, []string{post.Id})
 		if err != nil {
 			return nil, err
 		}
@@ -958,6 +1009,10 @@ func (p postService) GetPostById(ctx context.Context, bearer string, postId stri
 }
 
 func (p postService) SearchForPostsByHashTagByGuest(ctx context.Context, hashTagValue string) ([]*model.HashTageSearchResponseDTO, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceSearchForPostsByHashTagByGuest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	posts, err := p.PostRepository.GetPostsThatContainHashTag(ctx, hashTagValue)
 	if err != nil {
 		return nil, errors.New("Couldn't find any posts")
@@ -1000,6 +1055,10 @@ func makeHashTagMap(posts []*model.Post, hashTagValue string) map[string]int {
 }
 
 func (p postService) GetPostsByHashTagForGuest(ctx context.Context, hashtag string) ([]*model.GuestTimelinePostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostsByHashTagForGuest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
 
 	if err != nil {
@@ -1043,6 +1102,10 @@ func (p postService) mapPostsForGuestTimelineToResponseGuestTimelinePostDTO(post
 }
 
 func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashtag string, bearer string) ([]*model.PostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostForUserTimelineByHashTag")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	posts, err := p.PostRepository.GetPostsByHashTag(ctx, hashtag)
 	if err != nil {
 		return nil, err
@@ -1076,13 +1139,17 @@ func (p postService) GetPostForUserTimelineByHashTag(ctx context.Context, hashta
 				publicPosts = append(publicPosts, post)
 			}
 		}
-		retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+		retVal := p.mapPostsToResponsePostDTO(ctx, bearer, publicPosts, userInfo.Id)
 
 		return retVal, nil
 	}
 }
 
 func (p postService) SearchPostsByLocation(ctx context.Context, locationValue string) ([]*model.LocationSearchResponseDTO, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceSearchPostsByLocation")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	posts, err := p.PostRepository.GetPostsThatContainLocation(ctx, locationValue)
 	if err != nil {
 		return nil, errors.New("Couldn't find any posts")
@@ -1123,6 +1190,10 @@ func mapLocationMapToLocationResponseDTO(hashTagMap map[string]int) []*model.Loc
 }
 
 func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, location string) ([]*model.GuestTimelinePostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostForGuestTimelineByLocation")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	posts, err := p.PostRepository.GetPostsByLocation(ctx, location)
 
 	if err != nil {
@@ -1150,6 +1221,10 @@ func (p postService) GetPostForGuestTimelineByLocation(ctx context.Context, loca
 }
 
 func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, location string, bearer string) ([]*model.PostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostForUserTimelineByLocation")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	posts, err := p.PostRepository.GetPostsByLocation(ctx, location)
 	if err != nil {
 		return nil, err
@@ -1182,7 +1257,7 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 			}
 		}
 
-		retVal := p.mapPostsToResponsePostDTO(bearer, publicPosts, userInfo.Id)
+		retVal := p.mapPostsToResponsePostDTO(ctx, bearer, publicPosts, userInfo.Id)
 
 		return retVal, nil
 	}
@@ -1190,6 +1265,10 @@ func (p postService) GetPostForUserTimelineByLocation(ctx context.Context, locat
 }
 
 func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*model.GuestTimelinePostResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetPostByIdForGuest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	post, err := p.PostRepository.GetByID(ctx, postId)
 	if err != nil {
 		return nil, errors.New("invalid post id")
@@ -1201,7 +1280,11 @@ func (p postService) GetPostByIdForGuest(ctx context.Context, postId string) (*m
 }
 
 func (p postService) GetUserPostCampaigns(ctx context.Context, bearer string) ([]*model.PostProfileResponse, error) {
-	posts, err := p.AdsClient.GetAllActiveAgentsPostCampaigns(bearer)
+	span := tracer.StartSpanFromContext(ctx, "PostServiceGetUserPostCampaigns")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	posts, err := p.AdsClient.GetAllActiveAgentsPostCampaigns(ctx, bearer)
 	if err != nil {
 		return []*model.PostProfileResponse{}, err
 	}
@@ -1275,6 +1358,10 @@ func (p postService) GetUserDislikedPosts(ctx context.Context, bearer string) ([
 }
 
 func (p postService) EditPostOwnerInfo(ctx context.Context, bearer string, userInfo *model.UserInfo) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceEditPostOwnerInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -1302,6 +1389,10 @@ func (p postService) EditPostOwnerInfo(ctx context.Context, bearer string, userI
 }
 
 func (p postService) EditLikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceEditLikedByInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -1332,6 +1423,10 @@ func (p postService) EditLikedByInfo(ctx context.Context, bearer string, userInf
 }
 
 func (p postService) EditDislikedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceEditDislikedByInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -1361,6 +1456,10 @@ func (p postService) EditDislikedByInfo(ctx context.Context, bearer string, user
 }
 
 func (p postService) EditCommentedByInfo(ctx context.Context, bearer string, userInfoEdit *model.UserInfoEdit) error {
+	span := tracer.StartSpanFromContext(ctx, "PostServiceEditCommentedByInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := p.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err

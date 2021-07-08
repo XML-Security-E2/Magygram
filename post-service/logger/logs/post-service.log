@@ -917,3 +917,4 @@ time="2021-07-07T21:16:13+02:00" level=info msg="Server started" func=main.main 
 >>>>>>> develop
 time="2021-07-08T02:05:10+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:78" host=localhost port=462
 time="2021-07-08T02:11:48+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePost file="C:/Users/zindo/Desktop/Magygram/post-service/service/post_service.go:119" post_id=d5761a9e-526f-4e66-821e-4f5205a89b99 request_ip=127.0.0.1 user_id=ad842d0d-4558-4be3-bb8d-51e2e27a9ddf
+time="2021-07-08T14:02:05+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/post-service/main.go:78" host=localhost port=462

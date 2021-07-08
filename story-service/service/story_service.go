@@ -77,6 +77,9 @@ func NewStoryService(r repository.StoryRepository, ic intercomm.MediaClient, uc 
 }
 
 func (p storyService) GetStoryMediaAndWebsiteByIds(ctx context.Context, ids *model.FollowedUsersResponse) ([]*model.IdMediaWebsiteResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceGetStoryMediaAndWebsiteByIds")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	var resp []*model.IdMediaWebsiteResponse
 
@@ -103,6 +106,9 @@ func (p storyService) GetStoryMediaAndWebsiteByIds(ctx context.Context, ids *mod
 }
 
 func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, request  *model.InfluencerRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceCreateStoryInfluencer")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userInfo, err := p.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil { return "", err}
@@ -200,6 +206,10 @@ func (p storyService) CreatePost(ctx context.Context, bearer string, file *multi
 }
 
 func (p storyService) CreateStoryCampaignFromApi(ctx context.Context, bearer string, file *multipart.FileHeader) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceCreateStoryCampaignFromApi")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userInfo, err := p.UserClient.GetLoggedAgentInfo(ctx, bearer)
 	if err != nil { return "", err}
 
@@ -354,7 +364,7 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 
 	for _, story := range stories {
 		if story.ContentType == "CAMPAIGN" {
-			p.AdsClient.UpdateCampaignVisitor(bearer, story.Id)
+			p.AdsClient.UpdateCampaignVisitor(ctx, bearer, story.Id)
 		}
 	}
 
@@ -370,7 +380,7 @@ func (p storyService) GetStoriesForStoryline(ctx context.Context, bearer string)
 		campaignCount = 1
 	}
 
-	campaignStoryIds, err := p.AdsClient.GetStoryCampaignSuggestion(bearer, strconv.Itoa(int(campaignCount)))
+	campaignStoryIds, err := p.AdsClient.GetStoryCampaignSuggestion(ctx, bearer, strconv.Itoa(int(campaignCount)))
 
 	log.Println("TEST")
 	log.Println(campaignCount)
@@ -451,6 +461,10 @@ func (p storyService) GetStoryForUserMessage(ctx context.Context, bearer string,
 }
 
 func (p storyService) checkIfUserContentIsAccessible(ctx context.Context, bearer string, storyOwnerId string) bool {
+	span := tracer.StartSpanFromContext(ctx, "StoryServiceCheckIfUserContentIsAccessible")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	isPrivate, err := p.UserClient.IsUserPrivate(ctx, storyOwnerId)
 	if err != nil {
 		return false

@@ -19,11 +19,11 @@ import (
 type UserClient interface {
 	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo,error)
 	GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo,error)
-	MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
+	MapPostsToFavourites(ctx context.Context, bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
 	IsUserPrivate(ctx context.Context, userId string) (bool, error)
-	UpdateLikedPosts(bearer string, postId string) error
-	AddComment(bearer string, postId string) error
-	UpdateDislikedPosts(bearer string, postId string) error
+	UpdateLikedPosts(ctx context.Context, bearer string, postId string) error
+	AddComment(ctx context.Context, bearer string, postId string) error
+	UpdateDislikedPosts(ctx context.Context, bearer string, postId string) error
 	GetLikedPosts(ctx context.Context, bearer string) ([]string, error)
 	GetDislikedPosts(ctx context.Context, bearer string) ([]string, error)
 }
@@ -40,11 +40,15 @@ var (
 )
 
 
-func (u userClient) AddComment(bearer string, postId string) error {
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/comment/%s", baseUsersUrl, postId), nil)
+func (u userClient) AddComment(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserClientAddComment")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/post/comment/%s", baseUsersUrl, postId), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -114,11 +118,15 @@ func (u userClient) GetLoggedAgentInfo(ctx context.Context, bearer string) (*mod
 
 	return &userInfo, nil}
 
-func (u userClient) UpdateLikedPosts(bearer string, postId string) error {
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/like/" + postId, baseUsersUrl), nil)
+func (u userClient) UpdateLikedPosts(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserClientUpdateLikedPosts")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/post/like/" + postId, baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -129,11 +137,15 @@ func (u userClient) UpdateLikedPosts(bearer string, postId string) error {
 	return nil
 }
 
-func (u userClient) UpdateDislikedPosts(bearer string, postId string) error {
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/post/dislike/" + postId, baseUsersUrl), nil)
+func (u userClient) UpdateDislikedPosts(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserClientUpdateDislikedPosts")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/post/dislike/" + postId, baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -144,18 +156,21 @@ func (u userClient) UpdateDislikedPosts(bearer string, postId string) error {
 	return nil
 }
 
-func (u userClient) MapPostsToFavourites(bearer string, postIds []string) ([]*model.PostIdFavouritesFlag, error) {
+func (u userClient) MapPostsToFavourites(ctx context.Context, bearer string, postIds []string) ([]*model.PostIdFavouritesFlag, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientMapPostsToFavourites")
+	defer span.Finish()
 
 	jsonStr, err:= json.Marshal(postIds)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/collections/check-favourites", baseUsersUrl), bytes.NewReader(jsonStr))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/collections/check-favourites", baseUsersUrl), bytes.NewReader(jsonStr))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
