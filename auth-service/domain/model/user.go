@@ -58,11 +58,14 @@ func NewUser(userRequest *UserRequest, token string) (*User, error) {
 		Password: hashAndSalt,
 		Roles: []Role{{Name: "user", Permissions: []Permission{
 			{"create_post"},
+			{"create_post_influencer"},
+			{"create_story_influencer"},
 			{"edit_profile"},
 			{"edit_profile_photo"},
 			{"get_logged_info"},
 			{"view_user_profile"},
 			{"view_followers"},
+			{"influencer_campaign"},
 			{"view_following"},
 			{"get_follow_request"},
 			{"accept_follow_request"},
@@ -108,6 +111,8 @@ func NewAgent(userRequest *UserRequest, token string) (*User, error) {
 		Password: userRequest.Password,
 		Roles: []Role{{Name: "user", Permissions: []Permission{
 			{"create_post"},
+			{"create_post_influencer"},
+			{"create_story_influencer"},
 			{"edit_profile"},
 			{"edit_profile_photo"},
 			{"get_logged_info"},

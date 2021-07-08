@@ -14,6 +14,7 @@ import (
 type CampaignHandler interface {
 	CreateCampaign(c echo.Context) error
 	CreateInfluencerCampaign(c echo.Context) error
+	CreateInfluencerCampaignProduct(c echo.Context) error
 	UpdateCampaignRequest(c echo.Context) error
 	GetAllActiveAgentsPostCampaigns(c echo.Context) error
 	GetAllActiveAgentsStoryCampaigns(c echo.Context) error
@@ -30,15 +31,98 @@ type CampaignHandler interface {
 	GetStoryCampaignStatistic(c echo.Context) error
 	UpdatePostCampaignVisitor(c echo.Context) error
 	UpdateStoryCampaignVisitor(c echo.Context) error
+	GetCampaignByPostIdInfulencer(c echo.Context) error
+	CreateCampaignFromAgentApi(c echo.Context) error
+	GetCampaignStatisticsFromAgentApi(c echo.Context) error
 }
 
 type campaignHandler struct {
 	CampaignService service_contracts.CampaignService
 }
 
-
 func NewCampaignHandler(p service_contracts.CampaignService) CampaignHandler {
 	return &campaignHandler{p}
+}
+
+func (ch campaignHandler) GetCampaignStatisticsFromAgentApi(c echo.Context) error {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	stats, err := ch.CampaignService.GetCampaignStatisticsFromAgentApi(ctx, bearer)
+	fmt.Println(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, stats)
+}
+
+func (ch campaignHandler) CreateCampaignFromAgentApi(c echo.Context) error {
+
+	minD := c.FormValue("minDisplaysForRepeatedly")
+	minDisplays, _ := strconv.Atoi(minD)
+
+	frequency := c.FormValue("frequency")
+
+	minA := c.FormValue("minAge")
+	minAge, _ := strconv.Atoi(minA)
+	maxA := c.FormValue("maxAge")
+	maxAge, _ := strconv.Atoi(maxA)
+	gender := c.FormValue("gender")
+
+	dateF := c.FormValue("dateFrom")
+	dateFr, _ := strconv.ParseInt(dateF, 10, 64)
+	dateFrom := time.Unix(0, dateFr * int64(time.Millisecond))
+
+	dateT := c.FormValue("dateTo")
+	dateTt, _ := strconv.ParseInt(dateT, 10, 64)
+	dateTo := time.Unix(0, dateTt * int64(time.Millisecond))
+
+	exposeD := c.FormValue("exposeOnceDate")
+	exposeDa, _ := strconv.ParseInt(exposeD, 10, 64)
+	exposeDate := time.Unix(0, exposeDa * int64(time.Millisecond))
+
+	displayT := c.FormValue("displayTime")
+	displayTime, _ := strconv.Atoi(displayT)
+
+	campaignType := c.FormValue("campaignType")
+
+	headers, err := c.FormFile("images")
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	req := &model.CampaignApiRequest{
+		MinDisplaysForRepeatedly: minDisplays,
+		Frequency:                model.CampaignFrequency(frequency),
+		TargetGroup:              model.TargetGroup{
+			MinAge: minAge,
+			MaxAge: maxAge,
+			Gender: model.GenderType(gender),
+		},
+		DisplayTime:              displayTime,
+		DateFrom:                 dateFrom,
+		DateTo:                   dateTo,
+		ExposeOnceDate:           exposeDate,
+		Type:                     model.ContentType(campaignType),
+		Media:                    headers,
+	}
+
+	err = ch.CampaignService.CreateCampaignFromAgentApi(ctx, bearer, req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, "")
 }
 
 func (ch campaignHandler) GetPostCampaignStatistic(c echo.Context) error {
@@ -171,6 +255,21 @@ func (ch campaignHandler) GetStoryCampaignSuggestion(c echo.Context) error {
 	return c.JSON(http.StatusOK, campaign)
 }
 
+func (ch campaignHandler) GetCampaignByPostIdInfulencer(c echo.Context) error {
+	contentId := c.Param("contentId")
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	campaign, err := ch.CampaignService.GetCampaignByPostIdInfulencer(ctx, contentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, campaign)}
+
 func (ch campaignHandler) GetCampaignByPostId(c echo.Context) error {
 	contentId := c.Param("contentId")
 
@@ -302,6 +401,7 @@ func (ch campaignHandler) CreateCampaign(c echo.Context) error {
 
 func (ch campaignHandler) CreateInfluencerCampaign(c echo.Context) error {
 	campaignRequest := &model.InfluencerCampaignCreateRequest{}
+	fmt.Println("USO1")
 	if err := c.Bind(campaignRequest); err != nil {
 		return err
 	}
@@ -313,6 +413,25 @@ func (ch campaignHandler) CreateInfluencerCampaign(c echo.Context) error {
 
 	bearer := c.Request().Header.Get("Authorization")
 	campaignId, err := ch.CampaignService.CreateInfluencerCampaign(ctx, bearer, campaignRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, campaignId)
+}
+func (ch campaignHandler) CreateInfluencerCampaignProduct(c echo.Context) error {
+	campaignRequest := &model.InfluencerCampaignProductCreateRequest{}
+	fmt.Println("USO1")
+	if err := c.Bind(campaignRequest); err != nil {
+		return err
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	campaignId, err := ch.CampaignService.CreateCampaignForInfluencer(ctx, campaignRequest)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

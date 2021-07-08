@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator"
+	"sort"
 	"time"
 )
 
@@ -22,10 +23,40 @@ type campaignService struct {
 	intercomm.PostClient
 }
 
+var (
+	Stats_to_return = 15
+)
+
 func NewCampaignService(r repository.CampaignRepository, ic repository.InfluencerCampaignRepository, curr repository.CampaignUpdateRequestsRepository, ac intercomm.AuthClient, uc intercomm.UserClient, sc intercomm.StoryClient, pc intercomm.PostClient) service_contracts.CampaignService {
 	return &campaignService{r , ic,curr, ac, uc, sc, pc}
 }
 
+func (c campaignService) GetCampaignStatisticsFromAgentApi(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
+	postStats, err := c.GetPostCampaignStatistic(ctx, bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	storyStats, err := c.GetStoryCampaignStatistic(ctx, bearer)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, story := range storyStats {
+		postStats = append(postStats, story)
+	}
+
+	sort.Slice(postStats, func(i, j int) bool {
+		return postStats[i].UserViews > (postStats[j].UserViews)
+	})
+
+	if len(postStats) <= Stats_to_return {
+		return postStats, nil
+	}
+	remove := postStats[:Stats_to_return]
+
+	return remove, nil
+}
 
 func (c campaignService) GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
@@ -268,6 +299,26 @@ func (c campaignService) GetStoryCampaignStatistic(ctx context.Context, bearer s
 	return statResponse, nil}
 
 
+func (c campaignService) GetCampaignByPostIdInfulencer(ctx context.Context, contentId string) (*model.CampaignRetreiveRequest, error) {
+
+	campaign, err := c.CampaignRepository.GetFutureByContentIDAndType(ctx, contentId, "POST")
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(campaign)
+	return &model.CampaignRetreiveRequest{
+		Id:                       campaign.Id,
+		MinDisplaysForRepeatedly: campaign.MinDisplaysForRepeatedly,
+		Type:                     campaign.Type,
+		Frequency:                campaign.Frequency,
+		TargetGroup:              campaign.TargetGroup,
+		DateFrom:                 campaign.DateFrom,
+		DateTo:                   campaign.DateTo,
+		DisplayTime:              campaign.DisplayTime,
+		ExposeOnceDate:           campaign.ExposeOnceDate,
+	}, nil}
+
 func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
 	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
 	if err != nil {
@@ -425,6 +476,50 @@ func (c campaignService) GetAllActiveAgentsStoryCampaigns(ctx context.Context, b
 	}
 
 	return getContentIdsFromCampaigns(campaigns), nil
+}
+
+func (c campaignService) CreateCampaignFromAgentApi(ctx context.Context, bearer string, campaignReq *model.CampaignApiRequest) error {
+	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	if err != nil {
+		fmt.Println("LA111")
+		return err
+	}
+	fmt.Println(loggedId)
+	var contentId string
+	if campaignReq.Type == "POST" {
+		contentId, err = c.PostClient.CreatePostCampagin(bearer, campaignReq.Media)
+	} else {
+		contentId, err = c.StoryClient.CreateStoryCampagin(bearer, campaignReq.Media)
+	}
+
+	if err != nil {
+		return err
+	}
+	fmt.Println(campaignReq.TargetGroup.Gender)
+
+	campaign, err := model.NewCampaign(&model.CampaignRequest{
+		ContentId:                contentId,
+		ExposeOnceDate:           campaignReq.ExposeOnceDate,
+		MinDisplaysForRepeatedly: campaignReq.MinDisplaysForRepeatedly,
+		Type:                     campaignReq.Type,
+		Frequency:                campaignReq.Frequency,
+		TargetGroup:              campaignReq.TargetGroup,
+		DateFrom:                 campaignReq.DateFrom,
+		DateTo:                   campaignReq.DateTo,
+		DisplayTime:              campaignReq.DisplayTime,
+	}, loggedId)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	_, err = c.CampaignRepository.Create(ctx, campaign)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func (c campaignService) CreateCampaign(ctx context.Context, bearer string, campaignRequest *model.CampaignRequest) (string, error) {
@@ -604,6 +699,7 @@ func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer st
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("USO2")
 
 	//mozda posle nece trebati provera
 	//_, err = c.CampaignRepository.GetByID(ctx, campaignRequest.ParentCampaignId)
@@ -612,6 +708,27 @@ func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer st
 	//}
 
 	campaign, err := model.NewInfluencerCampaign(campaignRequest, logged.Id, logged.Username)
+	if err != nil {
+		return "", err
+	}
+
+	if err = validator.New().Struct(campaign); err!= nil {
+		return "", err
+	}
+
+	_, err = c.InfluencerCampaignRepository.Create(ctx, campaign)
+	if err != nil {
+		return "", err
+	}
+
+	return campaign.Id, nil
+}
+
+
+func (c campaignService) CreateCampaignForInfluencer(ctx context.Context, campaignRequest *model.InfluencerCampaignProductCreateRequest) (string, error) {
+
+
+	campaign, err := model.NewInfluencerCampaignProduct(campaignRequest)
 	if err != nil {
 		return "", err
 	}

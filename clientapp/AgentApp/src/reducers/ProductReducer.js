@@ -181,6 +181,18 @@ export const productReducer = (state, action) => {
 			prodCpy.updateProduct.errorMessage = action.errorMessage;
 			return prodCpy;
 
+		case modalConstants.SHOW_OPTIONS_MODAL:
+			prodCpy = { ...state };
+			prodCpy.optionsModal.showModal = true;
+			prodCpy.optionsModal.productId = action.productId;
+			return prodCpy;
+
+		case modalConstants.HIDE_OPTIONS_MODAL:
+			prodCpy = { ...state };
+			prodCpy.optionsModal.showModal = false;
+			prodCpy.optionsModal.productId = "";
+			return prodCpy;
+
 		case productConstants.DELETE_PRODUCT_REQUEST:
 			return state;
 
@@ -198,6 +210,78 @@ export const productReducer = (state, action) => {
 
 		case productConstants.DELETE_PRODUCT_FAILURE:
 			return state;
+
+		case productConstants.CREATE_CAMPAIGN_REQUEST:
+			return {
+				...state,
+				createCampaign: {
+					showError: false,
+					errorMessage: "",
+					showSuccessMessage: false,
+					successMessage: "",
+				},
+			};
+
+		case productConstants.CREATE_CAMPAIGN_SUCCESS:
+			prodCpy = { ...state };
+			prodCpy.createCampaign.showError = false;
+			prodCpy.createCampaign.errorMessage = "";
+			prodCpy.createCampaign.showSuccessMessage = true;
+			prodCpy.createCampaign.successMessage = action.successMessage;
+
+			return prodCpy;
+
+		case productConstants.CREATE_CAMPAIGN_FAILURE:
+			prodCpy = { ...state };
+			prodCpy.createCampaign.showError = true;
+			prodCpy.createCampaign.errorMessage = action.errorMessage;
+			prodCpy.createCampaign.showSuccessMessage = false;
+			prodCpy.createCampaign.successMessage = "";
+			return prodCpy;
+
+		case productConstants.SET_CAMPAIGNS_STATS_REQUEST:
+			return {
+				...state,
+				showedCampaigns: [],
+			};
+
+		case productConstants.SET_CAMPAIGNS_STATS_SUCCESS:
+			prodCpy = { ...state };
+
+			prodCpy.showedCampaigns = action.report.campaigns;
+			if (prodCpy.reports.find((report) => report.fileId === action.report.fileId) === undefined) {
+				prodCpy.reports.push(action.report);
+			}
+			return prodCpy;
+
+		case productConstants.SET_CAMPAIGNS_STATS_FAILURE:
+			return state;
+
+		case productConstants.SET_CAMPAIGN_REPORTS_REQUEST:
+			return {
+				...state,
+				reports: [],
+			};
+
+		case productConstants.SET_CAMPAIGN_REPORTS_SUCCESS:
+			prodCpy = { ...state };
+
+			if (action.reports !== null) {
+				prodCpy.reports = action.reports;
+			} else {
+				prodCpy.reports = [];
+			}
+			return prodCpy;
+
+		case productConstants.SET_CAMPAIGN_REPORTS_FAILURE:
+			return state;
+
+		case productConstants.CHANGE_SHOWED_CAMPAIGNS:
+			return {
+				...state,
+				showedCampaigns: action.campaigns,
+			};
+
 		default:
 			return state;
 	}

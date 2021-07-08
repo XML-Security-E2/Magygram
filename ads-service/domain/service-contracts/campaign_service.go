@@ -8,12 +8,14 @@ import (
 type CampaignService interface {
 	CreateCampaign(ctx context.Context, bearer string, campaignRequest *model.CampaignRequest) (string , error)
 	CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignCreateRequest) (string , error)
+	CreateCampaignForInfluencer(ctx context.Context, campaignRequest *model.InfluencerCampaignProductCreateRequest) (string , error)
 	UpdateCampaignRequest(ctx context.Context, bearer string, campaignRequest *model.CampaignUpdateRequestDTO) (string , error)
 	GetAllActiveAgentsPostCampaigns(ctx context.Context, bearer string) ([]string, error)
 	GetAllActiveAgentsStoryCampaigns(ctx context.Context,bearer string) ([]string, error)
 	GetCampaignById(ctx context.Context, bearer string, campaignIds string) (*model.Campaign, error)
 
 	GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error)
+	GetCampaignByPostIdInfulencer(ctx context.Context, contentId string) (*model.CampaignRetreiveRequest, error)
 	GetCampaignByStoryId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error)
 
 	DeleteCampaignByPostId(ctx context.Context, bearer string, contentId string) error
@@ -28,4 +30,7 @@ type CampaignService interface {
 	GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
 	GetStoryCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
 	UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error
+
+	CreateCampaignFromAgentApi(ctx context.Context, bearer string, campaignReq *model.CampaignApiRequest) error
+	GetCampaignStatisticsFromAgentApi(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error)
 }

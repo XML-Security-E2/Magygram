@@ -23,6 +23,7 @@ import (
 type StoryHandler interface {
 	CreateStory(c echo.Context) error
 	CreateStoryCampaign(c echo.Context) error
+	CreateStoryCampaignFromApi(c echo.Context) error
 	GetStoriesForStoryline(c echo.Context) error
 	GetStoryForAdmin(c echo.Context) error
 	GetStoriesForUser(c echo.Context) error
@@ -36,6 +37,7 @@ type StoryHandler interface {
 	GetStoryForUserMessage(c echo.Context) error
 	GetUserStoryCampaign(c echo.Context) error
 	GetStoryMediaAndWebsiteByIds(c echo.Context) error
+	CreateStoryCampaignInfluencer(c echo.Context) error
 }
 
 type storyHandler struct {
@@ -48,6 +50,30 @@ func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 	tracer, closer := tracer.Init("story-service")
 	opentracing.SetGlobalTracer(tracer)
 	return &storyHandler{p, tracer, closer}
+}
+
+func (p storyHandler) CreateStoryCampaignInfluencer(c echo.Context) error {
+
+	fmt.Println("USO")
+	request := &model.InfluencerRequest{}
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+	fmt.Println(request)
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+	fmt.Println(bearer)
+
+	postId, err := p.StoryService.CreateStoryInfluencer(ctx, bearer, request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, postId)
+
 }
 
 func (p storyHandler) GetUserStoryCampaign(c echo.Context) error {
@@ -208,6 +234,28 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 	}
 
 	storyId, err := p.StoryService.CreateStoryCampaign(ctx, bearer, headers, tags, campaignRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, storyId)
+}
+
+func (p storyHandler) CreateStoryCampaignFromApi(c echo.Context) error {
+
+	headers, err := c.FormFile("images")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	bearer := c.Request().Header.Get("Authorization")
+
+	storyId, err := p.StoryService.CreateStoryCampaignFromApi(ctx, bearer, headers)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

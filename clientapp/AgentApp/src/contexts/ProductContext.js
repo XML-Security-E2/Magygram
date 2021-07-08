@@ -32,6 +32,18 @@ const ProductContextProvider = (props) => {
 				imageUrl: "",
 			},
 		},
+		optionsModal: {
+			showModal: false,
+			productId: "",
+		},
+		createCampaign: {
+			showError: false,
+			errorMessage: "",
+			showSuccessMessage: false,
+			successMessage: "",
+		},
+		reports: [],
+		showedCampaigns: [],
 	});
 
 	return <ProductContext.Provider value={{ productState, dispatch }}>{props.children}</ProductContext.Provider>;

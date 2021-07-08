@@ -82,6 +82,12 @@ type TargetGroup struct {
 	Gender GenderType `json:"gender"`
 }
 
+type InfluencerRequest struct {
+	PostIdInfluencer string `json:"postIdInfl"`
+	UserId string `json:"userId"`
+	Username string `json:"username"`
+}
+
 type GenderType string
 
 const (
@@ -121,6 +127,25 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 		Comments: []Comment{},
 		IsDeleted: false,
 		WebSite: website,
+		CreatedTime: time.Now(),
+	}, nil
+}
+
+func NewPostInfluencer(postRequest *Post, postOwner UserInfo) (*Post, error) {
+
+	return &Post{Id: guid.New().String(),
+		Description:   postRequest.Description,
+		Location:    postRequest.Location,
+		HashTags: GetHashTagsFromDescription(postRequest.Description),
+		UserInfo: postOwner,
+		Media: postRequest.Media,
+		Tags: postRequest.Tags,
+		ContentType : postRequest.ContentType,
+		LikedBy: []UserInfo{},
+		DislikedBy: []UserInfo{},
+		Comments: []Comment{},
+		IsDeleted: false,
+		WebSite: postRequest.WebSite,
 		CreatedTime: time.Now(),
 	}, nil
 }

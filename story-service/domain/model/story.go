@@ -23,6 +23,12 @@ type Story struct {
 	IsDeleted bool `bson:"deleted"`
 }
 
+type InfluencerRequest struct {
+	PostIdInfluencer string `json:"postIdInfl"`
+	UserId string `json:"userId"`
+	Username string `json:"username"`
+}
+
 type ContentType string
 
 const(
@@ -83,6 +89,29 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag
 				Tags: tags,
 				IsDeleted: false,
 				Website: website,
+	}, nil
+}
+
+func NewStoryInfluencer( story *Story, postOwner UserInfo) (*Story, error) {
+	err := validateStoryTypeEnums(story.ContentType)
+	if err != nil {
+		return nil, err
+	}
+
+	err = validateMediaTypeEnums(story.Media)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Story{Id: guid.New().String(),
+		ContentType: story.ContentType,
+		Media: story.Media,
+		UserInfo: postOwner,
+		VisitedBy: []UserInfo{},
+		CreatedTime: time.Now(),
+		Tags: story.Tags,
+		IsDeleted: false,
+		Website: story.Website,
 	}, nil
 }
 

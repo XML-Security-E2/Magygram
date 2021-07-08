@@ -10,6 +10,8 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/posts", h.CreatePost, h.LoggingMiddleware)
 	e.POST("/api/posts/campaign", h.CreatePostCampaign)
+	e.POST("/api/posts/campaign/agent", h.CreatePostCampaignFromApi)
+
 	e.GET("/api/posts/campaign", h.GetUsersPostCampaigns)
 
 	e.PUT("/api/posts", h.EditPost, h.LoggingMiddleware)
@@ -18,6 +20,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/posts/messages/id/:postId", h.GetPostForMessagesById, h.LoggingMiddleware)
 
 	e.GET("/api/posts/:userId/count", h.GetUsersPostsCount, h.LoggingMiddleware) // iz ms
+	e.PUT("/api/posts/campaign/influencer", h.CreatePostCampaignInfluencer,h.LoggingMiddleware)
 	e.GET("/api/posts/:userId", h.GetUsersPosts, h.LoggingMiddleware)
 	e.PUT("/api/posts/:postId/like", h.LikePost, h.LoggingMiddleware)
 	e.PUT("/api/posts/:postId/unlike", h.UnlikePost, h.LoggingMiddleware)

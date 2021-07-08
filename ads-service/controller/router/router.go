@@ -11,6 +11,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.POST("/api/ads/campaign", h.CreateCampaign)
 	e.GET("/api/ads/campaign/:campaignId", h.GetCampaignById)
 	e.GET("/api/ads/campaign/post/:contentId", h.GetCampaignByPostId)
+	e.GET("/api/ads/campaign/post/influencer/:contentId", h.GetCampaignByPostIdInfulencer)
 	e.GET("/api/ads/campaign/story/:contentId", h.GetCampaignByStoryId)
 
 	e.DELETE("/api/ads/campaign/post/:contentId", h.DeleteCampaignByPostId)
@@ -28,7 +29,11 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/api/ads/campaign/post", h.GetAllActiveAgentsPostCampaigns)
 	e.GET("/api/ads/campaign/story", h.GetAllActiveAgentsStoryCampaigns)
 
+	e.POST("/api/ads/campaign/agent", h.CreateCampaignFromAgentApi)
+	e.GET("/api/ads/campaign/agent/statistics", h.GetCampaignStatisticsFromAgentApi)
+
 	e.POST("/api/ads/campaign/influencer", h.CreateInfluencerCampaign)
+	e.POST("/api/ads/campaign/create/influencer", h.CreateInfluencerCampaignProduct)
 
 	e.PUT("/api/ads/campaign", h.UpdateCampaignRequest)
 

@@ -385,6 +385,12 @@ time="2021-07-04T14:23:57+02:00" level=info msg="User unfollowed" func="relation
 time="2021-07-04T14:35:58+02:00" level=info msg="Follow request created" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:80" object_id=e3c8a92a-359e-4d93-9a1c-1d61b07e52c2 request_ip="::1" subject_id=7b3465b8-c75e-43ad-bd33-e5e26a8d9c7f
 time="2021-07-04T14:36:04+02:00" level=info msg="Follow request accepted" func="relationship-service/service.(*followService).AcceptFollowRequest" file="C:/Users/Nikola/Desktop/XML/Magygram/relationship-service/service/follow_service.go:166" object_id=e3c8a92a-359e-4d93-9a1c-1d61b07e52c2 request_ip="::1" subject_id=7b3465b8-c75e-43ad-bd33-e5e26a8d9c7f
 >>>>>>> develop
+<<<<<<< HEAD
+time="2021-07-06T00:42:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-06T02:02:57+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Dusan/Desktop/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
+time="2021-07-06T14:21:36+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-06T19:55:00+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+=======
 time="2021-07-05T23:33:06+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
 time="2021-07-06T11:09:21+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
 time="2021-07-06T11:38:26+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=60b13002-f559-4c09-80fa-a6e7f7f0690e request_ip="::1" subject_id=ca66e598-34df-4736-9c23-c3e2e8389968
@@ -398,7 +404,27 @@ time="2021-07-06T18:15:39+02:00" level=info msg="Follow request created" func="r
 time="2021-07-06T18:19:56+02:00" level=info msg="Follow request accepted" func="relationship-service/service.(*followService).AcceptFollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:166" object_id=ca66e598-34df-4736-9c23-c3e2e8389968 request_ip="::1" subject_id=60b13002-f559-4c09-80fa-a6e7f7f0690e
 time="2021-07-06T18:20:47+02:00" level=info msg="User unfollowed" func="relationship-service/service.(*followService).Unfollow" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:105" object_id=ca66e598-34df-4736-9c23-c3e2e8389968 request_ip="::1" subject_id=60b13002-f559-4c09-80fa-a6e7f7f0690e
 time="2021-07-06T18:22:09+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=ca66e598-34df-4736-9c23-c3e2e8389968 request_ip="::1" subject_id=60b13002-f559-4c09-80fa-a6e7f7f0690e
+<<<<<<< HEAD
 >>>>>>> develop
 time="2021-07-06T22:31:30+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
 time="2021-07-07T09:47:03+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
 time="2021-07-07T11:09:22+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:41" host=localhost port=463
+=======
+<<<<<<< HEAD
+time="2021-07-06T20:17:25+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-07T12:22:18+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
+time="2021-07-07T14:02:25+02:00" level=info msg="Follow request created" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:80" object_id=b9bad033-c5c8-420a-a1e0-7d42032f091d request_ip="::1" subject_id=66980a7f-7af1-4d0c-b84a-2729158332e3
+time="2021-07-07T14:02:32+02:00" level=info msg="Follow request accepted" func="relationship-service/service.(*followService).AcceptFollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:166" object_id=b9bad033-c5c8-420a-a1e0-7d42032f091d request_ip="::1" subject_id=66980a7f-7af1-4d0c-b84a-2729158332e3
+time="2021-07-07T16:16:19+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
+time="2021-07-07T16:49:40+02:00" level=error msg="Auth-service get logged user" func=relationship-service/service/intercomm.authClient.GetLoggedUserId file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/intercomm/auth_client.go:46" request_ip="::1"
+time="2021-07-07T17:24:38+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=66980a7f-7af1-4d0c-b84a-2729158332e3 request_ip="::1" subject_id=b9bad033-c5c8-420a-a1e0-7d42032f091d
+time="2021-07-07T17:35:19+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=f17cf74c-a289-4568-afca-6648e62f08c4 request_ip="::1" subject_id=66980a7f-7af1-4d0c-b84a-2729158332e3
+time="2021-07-07T17:44:49+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/service/follow_service.go:90" object_id=66980a7f-7af1-4d0c-b84a-2729158332e3 request_ip="::1" subject_id=f17cf74c-a289-4568-afca-6648e62f08c4
+=======
+>>>>>>> develop
+>>>>>>> develop
+time="2021-07-07T21:16:20+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/relationship-service/main.go:41" host=localhost port=463
+>>>>>>> develop
+time="2021-07-08T01:56:41+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:44" host=localhost port=463
+time="2021-07-08T01:57:17+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/relationship-service/main.go:44" host=localhost port=463
+time="2021-07-08T02:12:29+02:00" level=info msg="User followed" func="relationship-service/service.(*followService).FollowRequest" file="C:/Users/zindo/Desktop/Magygram/relationship-service/service/follow_service.go:102" object_id=ad842d0d-4558-4be3-bb8d-51e2e27a9ddf request_ip="::1" subject_id=2016938c-e8a9-4218-b4c2-302a76d75cef

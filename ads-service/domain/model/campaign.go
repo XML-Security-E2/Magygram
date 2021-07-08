@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/beevik/guid"
+	"mime/multipart"
 	"time"
 )
 
@@ -22,6 +23,13 @@ type InfluencerCampaignCreateRequest struct {
 	ContentId string `json:"contentId"`
 	OwnerId string `json:"ownerId"`
 	Type ContentType `json:"campaignType"`
+}
+type InfluencerCampaignProductCreateRequest struct {
+	ContentId string `json:"contentId"`
+	OwnerId string `json:"ownerId"`
+	Type ContentType `json:"campaignType"`
+	UserId string `json:"userId"`
+	Username string `json:"username"`
 }
 
 type CampaignStatisticResponse struct {
@@ -142,6 +150,18 @@ type CampaignRequest struct {
 	DateFrom time.Time `json:"dateFrom"`
 	DateTo time.Time `json:"dateTo"`
 	DisplayTime int `json:"displayTime"`
+}
+
+type CampaignApiRequest struct {
+	MinDisplaysForRepeatedly int `json:"minDisplaysForRepeatedly"`
+	Frequency CampaignFrequency `json:"frequency"`
+	TargetGroup TargetGroup `json:"targetGroup"`
+	DisplayTime int `json:"displayTime"`
+	DateFrom time.Time `json:"dateFrom"`
+	DateTo time.Time `json:"dateTo"`
+	ExposeOnceDate time.Time `json:"exposeOnceDate"`
+	Type ContentType `json:"campaignType"`
+	Media *multipart.FileHeader `json:"media"`
 }
 
 type CampaignRetreiveRequest struct {
@@ -308,6 +328,23 @@ func NewInfluencerCampaign(campaignRequest *InfluencerCampaignCreateRequest, use
 		Id:          guid.New().String(),
 		UserId:      userId,
 		Username:    username,
+		OwnerId:     campaignRequest.OwnerId,
+		ContentId:   campaignRequest.ContentId,
+		DailySeenBy: []UserGroupStatisticWrapper{},
+		SeenBy:      []string{},
+		Type:        campaignRequest.Type,
+		WebsiteClickCount: 0,
+	}, nil
+}
+func NewInfluencerCampaignProduct(campaignRequest *InfluencerCampaignProductCreateRequest) (*InfluencerCampaign, error) {
+	if err := validateContentTypeEnums(campaignRequest.Type); err != nil {
+		return nil, err
+	}
+
+	return &InfluencerCampaign{
+		Id:          guid.New().String(),
+		UserId:      campaignRequest.UserId,
+		Username:    campaignRequest.Username,
 		OwnerId:     campaignRequest.OwnerId,
 		ContentId:   campaignRequest.ContentId,
 		DailySeenBy: []UserGroupStatisticWrapper{},
