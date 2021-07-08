@@ -233,6 +233,9 @@ func (ch campaignHandler) GetPostCampaignSuggestion(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+	fmt.Println("ODJE SI")
+	fmt.Println(len(campaign))
+	fmt.Println(count)
 
 	return c.JSON(http.StatusOK, campaign)
 }

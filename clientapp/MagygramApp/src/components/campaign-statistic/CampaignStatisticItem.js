@@ -152,6 +152,10 @@ const CampaignStatisticItem = ({ statistics }) => {
 								<div className="row">
 									<h5>Campaign info</h5>
 								</div>
+
+								<div className="row">
+									<b className="mr-1">Campaign type: </b> {statistics.campaignType}
+								</div>
 								<div className="row d-flex align-items-center">
 									<b>Website: </b>
 									<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
@@ -159,7 +163,9 @@ const CampaignStatisticItem = ({ statistics }) => {
 									</button>
 								</div>
 
-								<div className="row">
+								<div className="row d-flex align-items-center">
+									<b>Influencer: </b>
+
 									<Link className="font-weight-bold btn btn-link" style={{ cursor: "pointer" }} to={"/profile?userId=" + statistics.influencerId}>
 										@{statistics.influencerUsername}
 									</Link>
@@ -189,20 +195,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 									<b className="mr-1">Comments: </b> {statistics.Comments}
 								</div>
 							</div>
-							<div className="col-2">
-								<div className="row">
-									<h5>Target group</h5>
-								</div>
-								<div className="row">
-									<b className="mr-1">Min age: </b> {statistics.targetGroup.minAge}
-								</div>
-								<div className="row">
-									<b className="mr-1">Max age: </b> {statistics.targetGroup.maxAge}
-								</div>
-								<div className="row">
-									<b className="mr-1">Gender: </b> {statistics.targetGroup.gender}
-								</div>
-							</div>
+							<div className="col-2"></div>
 						</div>
 					</div>
 				))}
@@ -338,6 +331,10 @@ const CampaignStatisticItem = ({ statistics }) => {
 								<div className="row">
 									<h5>Campaign info</h5>
 								</div>
+
+								<div className="row">
+									<b className="mr-1">Campaign type: </b> {statistics.campaignType}
+								</div>
 								<div className="row d-flex align-items-center">
 									<b>Website: </b>
 									<button type="button" className="btn btn-link border-0" onClick={handleClickOnPostWebsite}>
@@ -345,7 +342,8 @@ const CampaignStatisticItem = ({ statistics }) => {
 									</button>
 								</div>
 
-								<div className="row">
+								<div className="row d-flex align-items-center">
+									<b>Influencer: </b>
 									<Link className="font-weight-bold btn btn-link" style={{ cursor: "pointer" }} to={"/profile?userId=" + statistics.influencerId}>
 										@{statistics.influencerUsername}
 									</Link>
@@ -369,20 +367,7 @@ const CampaignStatisticItem = ({ statistics }) => {
 									<b className="mr-1">Story views: </b> {statistics.StoryViews}
 								</div>
 							</div>
-							<div className="col-2">
-								<div className="row">
-									<h5>Target group</h5>
-								</div>
-								<div className="row">
-									<b className="mr-1">Min age: </b> {statistics.targetGroup.minAge}
-								</div>
-								<div className="row">
-									<b className="mr-1">Max age: </b> {statistics.targetGroup.maxAge}
-								</div>
-								<div className="row">
-									<b className="mr-1">Gender: </b> {statistics.targetGroup.gender}
-								</div>
-							</div>
+							<div className="col-2"></div>
 						</div>
 					</div>
 				))}

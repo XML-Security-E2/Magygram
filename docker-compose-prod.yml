@@ -21,6 +21,16 @@ services:
         ports:
             - 3000:3000
 
+    magygram-agent-app:
+        image: magygram-agent-app
+        networks:
+            - backend
+        build:
+            context: ./clientapp/AgentApp
+            dockerfile: Dockerfile
+        ports:
+            - 3001:3000
+
     user-service:
         image: user-service
         build:
@@ -103,9 +113,33 @@ services:
         environment:
             - IS_PRODUCTION=true
 
+    ads-service:
+        image: ads-service
+        build:
+            context: ./ads-service
+            dockerfile: Dockerfile
+        networks:
+            - backend
+        environment:
+            - IS_PRODUCTION=true
+
+    magy-agent:
+        image: magy-agent
+        build:
+            context: ./magy-agent
+            dockerfile: Dockerfile
+        ports:
+            - 470:470
+        networks:
+            - backend
+        environment:
+            - IS_PRODUCTION=true
+
     mongo-db:
         image: mongo
         restart: always
+        ports:
+            - 27020:27017
         networks:
             - backend
         volumes:
@@ -123,7 +157,27 @@ services:
         image: redis
         networks:
             - backend
-    
+
+    postgres-db:
+        image: postgres:13
+        restart: always
+        networks:
+            - backend
+        environment:
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: postgres
+            POSTGRES_DB: magy-agent
+        volumes:
+            - postgres:/var/lib/postgresql/data
+
+    xml-db:
+        image: existdb/existdb:latest
+        ports:
+            - 8081:8080
+            - 8443:8443
+        networks:
+            - backend
+
     tracing:
         image: jaegertracing/all-in-one
         container_name: jaeger
@@ -140,11 +194,11 @@ services:
         image: prom/prometheus
         container_name: prometheus
         ports:
-        - 9090:9090
+            - 9091:9090
         restart: unless-stopped
         volumes:
-        - ./prometheus:/etc/prometheus
-        - prometheus-data:/prometheus
+            - ./prometheus:/etc/prometheus
+            - prometheus-data:/prometheus
         command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
         networks:
             - backend
@@ -153,19 +207,20 @@ services:
         image: grafana/grafana:8.0.4
         container_name: grafana
         volumes:
-          - grafana-data:/var/lib/grafana
-          - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+            - grafana-data:/var/lib/grafana
+            - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
         environment:
-          - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
-          - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-          - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+            - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+            - GF_USERS_ALLOW_SIGN_UP=false
         restart: unless-stopped
         ports:
-          - 3030:3000
+            - 3031:3000
         networks:
-          - backend
+            - backend
 
 volumes:
+    postgres:
     mongodbdata:
     prometheus-data:
     grafana-data:

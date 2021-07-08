@@ -224,7 +224,7 @@ func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, re
 		return postId, nil
 	}
 
-	return "", err
+	return post.Id, err
 }
 func (p postService) CreatePostCampaign(ctx context.Context, bearer string, postRequest *model.PostRequest, campaignReq *model.CampaignRequest) (string, error) {
 	span := tracer.StartSpanFromContext(ctx, "PostServiceCreatePostCampaign")

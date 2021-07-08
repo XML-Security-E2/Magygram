@@ -74,6 +74,7 @@ const SearchInfluencerModal = () => {
 			if(following){
 				let requestDTO = {
 					contentId: postState.viewPostModal.post.Id,
+					agentId: userId,
 					username: usernameSearch,
 					contentType: "POST",
 					price: price,
