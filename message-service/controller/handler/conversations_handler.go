@@ -3,8 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
 	"io"
 	"message-service/controller/hub"
 	"message-service/domain/model"
@@ -12,6 +10,9 @@ import (
 	"message-service/domain/service-contracts/exceptions/denied"
 	"message-service/tracer"
 	"net/http"
+
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 )
 
 type ConversationHandler interface {
@@ -31,10 +32,10 @@ type ConversationHandler interface {
 
 type conversationHandler struct {
 	ConversationService service_contracts.ConversationService
-	Hub *hub.MessageHub
-	NotifyHub *hub.MessageNotificationsHub
-	tracer      opentracing.Tracer
-	closer      io.Closer
+	Hub                 *hub.MessageHub
+	NotifyHub           *hub.MessageNotificationsHub
+	tracer              opentracing.Tracer
+	closer              io.Closer
 }
 
 func NewConversationHandler(p service_contracts.ConversationService, h *hub.MessageHub, nh *hub.MessageNotificationsHub) ConversationHandler {
@@ -63,10 +64,12 @@ func (ch conversationHandler) ViewMediaMessages(c echo.Context) error {
 
 	err := ch.ConversationService.ViewUserMediaMessages(ctx, bearer, conversationId, messageId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, "")}
+	return c.JSON(http.StatusOK, "")
+}
 
 func (ch conversationHandler) ViewMessages(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("ConversationHandlerViewMessages", ch.tracer, c.Request())
@@ -87,6 +90,7 @@ func (ch conversationHandler) ViewMessages(c echo.Context) error {
 
 	userId, err := ch.ConversationService.ViewUsersMessages(ctx, bearer, conversationId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -132,6 +136,7 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 
 	message, err := ch.ConversationService.SendMessage(ctx, bearer, messageRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -142,7 +147,7 @@ func (ch conversationHandler) SendMessage(c echo.Context) error {
 		Receiver: messageTo,
 	}
 
-	ch.Hub.Broadcast <-message
+	ch.Hub.Broadcast <- message
 
 	return c.JSON(http.StatusCreated, message)
 }
@@ -164,6 +169,7 @@ func (ch conversationHandler) GetAllConversationsForUser(c echo.Context) error {
 
 	conversations, err := ch.ConversationService.GetAllConversationsForUser(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -189,6 +195,7 @@ func (ch conversationHandler) GetAllMessagesFromUser(c echo.Context) error {
 
 	messages, err := ch.ConversationService.GetAllMessagesFromUser(ctx, bearer, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -214,6 +221,7 @@ func (ch conversationHandler) GetAllMessagesFromUserFromRequest(c echo.Context) 
 
 	messages, err := ch.ConversationService.GetAllMessagesFromUserFromRequest(ctx, bearer, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -237,6 +245,7 @@ func (ch conversationHandler) GetAllMessageRequestsForUser(c echo.Context) error
 
 	messages, err := ch.ConversationService.GetAllMessageRequestsForUser(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -261,7 +270,8 @@ func (ch conversationHandler) AcceptConversationRequest(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	err := ch.ConversationService.AcceptConversationRequest(ctx, bearer, requestId)
-	if err != nil{
+	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -291,7 +301,8 @@ func (ch conversationHandler) DenyConversationRequest(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	err := ch.ConversationService.DenyConversationRequest(ctx, bearer, requestId)
-	if err != nil{
+	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -321,7 +332,8 @@ func (ch conversationHandler) DeleteConversationRequest(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 
 	err := ch.ConversationService.DeleteConversationRequest(ctx, bearer, requestId)
-	if err != nil{
+	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())

@@ -3,6 +3,8 @@ package intercomm
 import (
 	"ads-service/conf"
 	"ads-service/domain/model"
+	"ads-service/tracer"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,8 +14,8 @@ import (
 )
 
 type UserClient interface {
-	GetLoggedUserTargetGroup(bearer string) (*model.UserTargetGroup,error)
-	GetLoggedUserInfo(bearer string) (*model.UserInfo,error)
+	GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.UserTargetGroup,error)
+	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo,error)
 }
 
 type userClient struct {}
@@ -27,12 +29,15 @@ var (
 	baseUsersUrl = ""
 )
 
-func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
+func (u userClient) GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetLoggedUserInfo")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -53,11 +58,15 @@ func (u userClient) GetLoggedUserInfo(bearer string) (*model.UserInfo, error) {
 	return &userInfo, nil
 }
 
-func (u userClient) GetLoggedUserTargetGroup(bearer string) (*model.UserTargetGroup, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged/target-group", baseUsersUrl), nil)
+func (u userClient) GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.UserTargetGroup, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserClientGetLoggedUserTargetGroup")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged/target-group", baseUsersUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

@@ -100,6 +100,9 @@ func (u userService) ActivateUser(ctx context.Context, userId string) (bool, err
 }
 
 func (u userService) HandleLoginEventAndAccountActivation(ctx context.Context, userEmail string, successful bool, eventType string) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceHandleLoginEventAndAccountActivation")
+	defer span.Finish()
+
 	if successful {
 		_, err := u.LoginEventRepository.Create(ctx, model.NewLoginEvent(userEmail, eventType, 0))
 		if err != nil {
@@ -110,6 +113,9 @@ func (u userService) HandleLoginEventAndAccountActivation(ctx context.Context, u
 }
 
 func (u userService) DeactivateUser(ctx context.Context, userEmail string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceDeactivateUser")
+	defer span.Finish()
+
 	user, err := u.UserRepository.GetByEmail(ctx, userEmail)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email": userEmail}).Warn("Invalid email address")
@@ -128,6 +134,9 @@ func (u userService) DeactivateUser(ctx context.Context, userEmail string) (bool
 }
 
 func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *model.PasswordChangeRequest) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceResetPassword")
+	defer span.Finish()
+
 	hashAndSalt, err := model.HashAndSaltPasswordIfStrongAndMatching(changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : changePasswordRequest.UserId}).Warn("Passwords not valid")
@@ -151,6 +160,9 @@ func (u userService) ResetPassword(ctx context.Context, changePasswordRequest *m
 }
 
 func (u userService) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetByEmail")
+	defer span.Finish()
+
 	user, err := u.UserRepository.GetByEmail(ctx, email)
 
 	if err != nil {
@@ -162,6 +174,9 @@ func (u userService) GetByEmail(ctx context.Context, email string) (*model.User,
 }
 
 func (u userService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserById")
+	defer span.Finish()
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {
@@ -172,10 +187,16 @@ func (u userService) GetUserById(ctx context.Context, userId string) (*model.Use
 }
 
 func (u userService) GetAllRolesByUserId(ctx context.Context, userId string) ([]model.Role, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetAllRolesByUserId")
+	defer span.Finish()
+
 	return u.UserRepository.GetAllRolesByUserId(ctx, userId)
 }
 
 func (u userService) RegisterAgent(ctx context.Context, userRequest *model.UserRequest) (string,[]byte, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceRegisterAgent")
+	defer span.Finish()
+
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "Magygram",
 		AccountName: userRequest.Email,
@@ -292,6 +313,9 @@ func sendToReplyChannel(client *redis.Client, m *saga.RegisterUserMessage, actio
 }
 
 func (u userService) Update(ctx context.Context, user *model.User) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUpdate")
+	defer span.Finish()
+
 	_, err := u.UserRepository.Update(ctx, user)
 	if err != nil {
 		errors.New("user not modified")

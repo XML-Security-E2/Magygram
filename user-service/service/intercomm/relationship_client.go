@@ -18,7 +18,7 @@ import (
 )
 
 type RelationshipClient interface {
-	CreateUser(user *model.User) error
+	CreateUser(ctx context.Context, user *model.User) error
 	GetFollowedUsers(ctx context.Context, userId string) (model.FollowedUsersResponse, error)
 	GetFollowingUsers(ctx context.Context, userId string) (model.FollowedUsersResponse, error)
 	FollowRequest(ctx context.Context, request *model.FollowRequest) (bool, error)
@@ -29,7 +29,7 @@ type RelationshipClient interface {
 	ReturnFollowRequests(ctx context.Context, bearer string) (model.FollowedUsersResponse, error)
 	AcceptFollowRequest(ctx context.Context, bearer string, userId string) error
 	IsMuted(ctx context.Context, mute model.Mute) (bool, error)
-	GetRecommendedUsers(userId string) (model.RecommendedUsersResponse, error)
+	GetRecommendedUsers(ctx context.Context, userId string) (model.RecommendedUsersResponse, error)
 }
 
 type relationshipClient struct{}
@@ -47,14 +47,18 @@ func NewRelationshipClient() RelationshipClient {
 	return &relationshipClient{}
 }
 
-func (r relationshipClient) CreateUser(user *model.User) error {
+func (r relationshipClient) CreateUser(ctx context.Context, user *model.User) error {
+	span := tracer.StartSpanFromContext(ctx, "RelationshipClientCreateUser")
+	defer span.Finish()
+
 	userRequest := &userRequest{Id: user.Id}
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
-	req, err := http.NewRequest("POST", baseRelationshipUrl+"/user", bytes.NewBuffer(jsonUserRequest))
+	req, err := http.NewRequestWithContext(ctx,"POST", baseRelationshipUrl+"/user", bytes.NewBuffer(jsonUserRequest))
 	req.Header.Add("Content-Type", "application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -384,11 +388,14 @@ func (r relationshipClient) IsMuted(ctx context.Context, mute model.Mute) (bool,
 	return isMuted, err
 }
 
-func (r relationshipClient) GetRecommendedUsers(userId string) (model.RecommendedUsersResponse, error) {
+func (r relationshipClient) GetRecommendedUsers(ctx context.Context, userId string) (model.RecommendedUsersResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "RelationshipClientGetRecommendedUsers")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/recommended-users/%s", baseRelationshipUrl, userId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/recommended-users/%s", baseRelationshipUrl, userId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

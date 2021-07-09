@@ -53,10 +53,15 @@ func NewStoryHandler(p service_contracts.StoryService) StoryHandler {
 }
 
 func (p storyHandler) CreateStoryCampaignInfluencer(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("StoryHandlerCreateStoryCampaignInfluencer", p.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create story campaign influencer at %s\n", c.Path())),
+	)
 
-	fmt.Println("USO")
 	request := &model.InfluencerRequest{}
 	if err := c.Bind(request); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 	fmt.Println(request)
@@ -64,11 +69,13 @@ func (p storyHandler) CreateStoryCampaignInfluencer(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 	fmt.Println(bearer)
 
 	postId, err := p.StoryService.CreateStoryInfluencer(ctx, bearer, request)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -92,6 +99,7 @@ func (p storyHandler) GetUserStoryCampaign(c echo.Context) error {
 
 	stories, err := p.StoryService.GetAllUserStoryCampaigns(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -115,6 +123,7 @@ func (p storyHandler) GetStoryForAdmin(c echo.Context) error {
 
 	post, err := p.StoryService.GetStoryForAdmin(ctx, storyId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -138,6 +147,7 @@ func (p storyHandler) DeleteStory(c echo.Context) error {
 
 	err := p.StoryService.DeleteStory(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -152,9 +162,16 @@ func (p storyHandler) LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc 
 }
 
 func (p storyHandler) GetStoryMediaAndWebsiteByIds(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("StoryHandlerGetStoryMediaAndWebsiteByIds", p.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get story media and website at %s\n", c.Path())),
+	)
+
 	request := &model.FollowedUsersResponse{}
 
 	if err := c.Bind(request); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 	fmt.Println(len(request.Users))
@@ -162,9 +179,11 @@ func (p storyHandler) GetStoryMediaAndWebsiteByIds(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := p.StoryService.GetStoryMediaAndWebsiteByIds(ctx, request)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, retVal)
@@ -207,6 +226,7 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 	displayTime, _ := strconv.Atoi(displayT)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -235,6 +255,7 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 
 	storyId, err := p.StoryService.CreateStoryCampaign(ctx, bearer, headers, tags, campaignRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -242,9 +263,15 @@ func (p storyHandler) CreateStoryCampaign(c echo.Context) error {
 }
 
 func (p storyHandler) CreateStoryCampaignFromApi(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("StoryHandlerCreateStoryCampaignFromApi", p.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create story campaign from api at %s\n", c.Path())),
+	)
 
 	headers, err := c.FormFile("images")
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -253,10 +280,12 @@ func (p storyHandler) CreateStoryCampaignFromApi(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	storyId, err := p.StoryService.CreateStoryCampaignFromApi(ctx, bearer, headers)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -276,6 +305,7 @@ func (p storyHandler) CreateStory(c echo.Context) error {
 	json.Unmarshal([]byte(tagsString), &tags)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -288,6 +318,7 @@ func (p storyHandler) CreateStory(c echo.Context) error {
 
 	storyId, err := p.StoryService.CreatePost(ctx, bearer, headers, tags)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -310,6 +341,7 @@ func (p storyHandler) GetStoriesForStoryline(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	stories, err := p.StoryService.GetStoriesForStoryline(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -338,6 +370,7 @@ func (p storyHandler) GetStoriesForUser(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	stories, err := p.StoryService.GetStoriesForUser(ctx, userId, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -362,6 +395,7 @@ func (p storyHandler) VisitedStoryByUser(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := p.StoryService.VisitedStoryByUser(ctx, storyId, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -386,6 +420,7 @@ func (p storyHandler) GetStoryForUserMessage(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	story, userInfo, err := p.StoryService.GetStoryForUserMessage(ctx, bearer, storyId)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -415,6 +450,7 @@ func (p storyHandler) GetAllUserStories(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	stories, err := p.StoryService.GetAllUserStories(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -435,6 +471,7 @@ func (p storyHandler) GetStoryHighlight(c echo.Context) error {
 
 	highRequest := &model.HighlightRequest{}
 	if err := c.Bind(highRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -447,6 +484,7 @@ func (p storyHandler) GetStoryHighlight(c echo.Context) error {
 
 	highlight, err := p.StoryService.GetStoryHighlight(ctx, bearer, highRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -468,6 +506,7 @@ func (p storyHandler) HaveActiveStoriesLoggedUser(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	retVal, err := p.StoryService.HaveActiveStoriesLoggedUser(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -483,6 +522,7 @@ func (p storyHandler) UpdateUserInfo(c echo.Context) error {
 
 	userInfo := &model.UserInfo{}
 	if err := c.Bind(userInfo); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -495,6 +535,7 @@ func (p storyHandler) UpdateUserInfo(c echo.Context) error {
 
 	err := p.StoryService.EditStoryOwnerInfo(ctx, bearer, userInfo)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

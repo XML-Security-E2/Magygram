@@ -2,15 +2,17 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"user-service/conf"
+	"user-service/tracer"
 )
 
 type MessageClient interface {
-	CreateNotification(request *NotificationRequest) error
+	CreateNotification(ctx context.Context, request *NotificationRequest) error
 }
 
 type NotificationRequest struct {
@@ -35,16 +37,20 @@ var (
 	AcceptedFollowRequest = "AcceptedFollowRequest"
 )
 
-func (m messageClient) CreateNotification(request *NotificationRequest) error {
+func (m messageClient) CreateNotification(ctx context.Context, request *NotificationRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "MessageClientCreateNotification")
+	defer span.Finish()
+
 	jsonStr, err:= json.Marshal(request)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", baseMessageUrl, bytes.NewReader(jsonStr))
+	req, err := http.NewRequestWithContext(ctx,"POST", baseMessageUrl, bytes.NewReader(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

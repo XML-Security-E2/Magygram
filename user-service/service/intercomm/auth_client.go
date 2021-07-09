@@ -18,12 +18,12 @@ import (
 )
 
 type AuthClient interface {
-	RegisterUser(user *model.User, password string, passwordRepeat string) (*http.Response, error )
+	RegisterUser(ctx context.Context, user *model.User, password string, passwordRepeat string) (*http.Response, error )
 	ActivateUser(ctx context.Context, userId string) error
 	GetLoggedUserId(ctx context.Context, bearer string) (string,error)
-	ChangePassword(userId string, password string, passwordRepeat string) error
-	HasRole(bearer string, role string) (bool,error)
-	RegisterAgent(user *model.User, password string) error
+	ChangePassword(ctx context.Context, userId string, password string, passwordRepeat string) error
+	HasRole(ctx context.Context, bearer string, role string) (bool,error)
+	RegisterAgent(ctx context.Context, user *model.User, password string) error
 }
 
 type userAuthRequest struct {
@@ -100,15 +100,19 @@ func getErrorMessageFromRequestBody(body io.ReadCloser) (string ,error){
 	return result.Message, nil
 }
 
-func (a authClient) RegisterUser(user *model.User, password string, passwordRepeat string) (*http.Response, error ){
+func (a authClient) RegisterUser(ctx context.Context, user *model.User, password string, passwordRepeat string) (*http.Response, error ){
+	span := tracer.StartSpanFromContext(ctx, "AuthClientRegisterUser")
+	defer span.Finish()
+
 	userRequest := &userAuthRequest{Id: user.Id, Email: user.Email, Password: password, RepeatedPassword: passwordRepeat}
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s%s:%s/api/users", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
 										bytes.NewBuffer(jsonUserRequest))
 	req.Header.Add("Content-Type","application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -135,15 +139,19 @@ func (a authClient) RegisterUser(user *model.User, password string, passwordRepe
 	return resp,nil
 }
 
-func (a authClient) RegisterAgent(user *model.User, password string) error {
+func (a authClient) RegisterAgent(ctx context.Context, user *model.User, password string) error {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientRegisterAgent")
+	defer span.Finish()
+
 	userRequest := &userAuthRequest{Id: user.Id, Email: user.Email, Password: password, RepeatedPassword: password}
 	jsonUserRequest, _ := json.Marshal(userRequest)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s:%s/api/users/agent", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s%s:%s/api/users/agent", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
 		bytes.NewBuffer(jsonUserRequest))
 	req.Header.Add("Content-Type","application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -191,17 +199,21 @@ func (a authClient) ActivateUser(ctx context.Context, userId string) error {
 }
 
 
-func (a authClient) ChangePassword(userId string, password string, passwordRepeat string) error {
+func (a authClient) ChangePassword(ctx context.Context, userId string, password string, passwordRepeat string) error {
+	span := tracer.StartSpanFromContext(ctx, "ChangePasswordChangePassword")
+	defer span.Finish()
+
 	passwordRequest := &passwordChangeRequest{UserId: userId, Password: password, PasswordRepeat: passwordRepeat}
 	jsonPasswordRequest, _ := json.Marshal(passwordRequest)
 
 	//resp, err := http.Post(fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port), "application/json", bytes.NewBuffer(jsonPasswordRequest))
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s%s:%s/api/users/reset-password", conf.Current.Authservice.Protocol, conf.Current.Authservice.Domain, conf.Current.Authservice.Port),
 										bytes.NewBuffer(jsonPasswordRequest))
 	req.Header.Add("Content-Type","application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -222,13 +234,16 @@ func (a authClient) ChangePassword(userId string, password string, passwordRepea
 	return nil
 }
 
-func (a authClient) HasRole(bearer string,role string) (bool,error) {
+func (a authClient) HasRole(ctx context.Context, bearer string,role string) (bool,error) {
+	span := tracer.StartSpanFromContext(ctx, "ChangePasswordHasRole")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/has-role", baseUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/has-role", baseUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	req.Header.Add("X-permissions", "[" + "\"" + role+ "\"" +"]")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

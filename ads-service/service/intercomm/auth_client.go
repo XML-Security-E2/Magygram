@@ -2,6 +2,8 @@ package intercomm
 
 import (
 	"ads-service/conf"
+	"ads-service/tracer"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,7 +13,7 @@ import (
 )
 
 type AuthClient interface {
-	GetLoggedUserId(bearer string) (string,error)
+	GetLoggedUserId(ctx context.Context, bearer string) (string,error)
 }
 
 type authClient struct {}
@@ -25,12 +27,15 @@ var (
 	baseAuthUrl = ""
 )
 
-func (a authClient) GetLoggedUserId(bearer string) (string,error) {
+func (a authClient) GetLoggedUserId(ctx context.Context, bearer string) (string,error) {
+	span := tracer.StartSpanFromContext(ctx, "AuthClientGetLoggedUserId")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged-user", baseAuthUrl), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/logged-user", baseAuthUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

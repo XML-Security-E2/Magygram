@@ -49,3 +49,9 @@ scrape_configs:
     static_configs:
       - targets:
           - 'gateway:8085'
+
+  - job_name: ads-service
+    metrics_path: /api/ads/metrics
+    static_configs:
+      - targets:
+          - 'gateway:8085'

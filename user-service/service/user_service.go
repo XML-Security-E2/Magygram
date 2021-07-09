@@ -53,6 +53,10 @@ func NewAuthService(r repository.UserRepository, nrr repository.NotificationRule
 }
 
 func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer string, userId string) (*model.SettingsRequest, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUsersNotificationsSettings")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -70,6 +74,10 @@ func (u *userService) GetUsersNotificationsSettings(ctx context.Context, bearer 
 }
 
 func (u *userService) ChangeUsersNotificationsSettings(ctx context.Context, bearer string, settingsReq *model.SettingsRequest, userId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceChangeUsersNotificationsSettings")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -103,6 +111,9 @@ func (u *userService) ChangeUsersNotificationsSettings(ctx context.Context, bear
 }
 
 func (u *userService) GetUsersForPostNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUsersForPostNotification")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	notifyIds, err := u.NotificationRulesRepository.GetNotifiersForPost(ctx, userId)
 	if err != nil || len(notifyIds) == 0 {
@@ -125,6 +136,9 @@ func (u *userService) GetUsersForPostNotification(ctx context.Context, userId st
 }
 
 func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId string) ([]*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUsersForStoryNotification")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	notifyIds, err := u.NotificationRulesRepository.GetNotifiersForStory(ctx, userId)
 	if err != nil || len(notifyIds) == 0 {
@@ -147,6 +161,10 @@ func (u *userService) GetUsersForStoryNotification(ctx context.Context, userId s
 }
 
 func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Context, userId string, userFromId string, interactionType string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCheckIfPostInteractionNotificationEnabled")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return false, errors.New("invalid user id")
@@ -211,6 +229,10 @@ func (u *userService) CheckIfPostInteractionNotificationEnabled(ctx context.Cont
 }
 
 func (u userService) DeleteUser(ctx context.Context, requestId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceDeleteUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	request, err := u.UserRepository.GetByID(ctx, requestId)
 	if err != nil {
 		return errors.New("Request not found")
@@ -224,6 +246,10 @@ func (u userService) DeleteUser(ctx context.Context, requestId string) error {
 }
 
 func (u *userService) EditUser(ctx context.Context, bearer string, userId string, userRequest *model.EditUserRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceEditUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
@@ -273,7 +299,7 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 	}
 	fmt.Println(temp)
 	if temp != userRequest.Username {
-		err = u.editSharedUserInfo(bearer, user, userRequest.Username, user.ImageUrl)
+		err = u.editSharedUserInfo(ctx, bearer, user, userRequest.Username, user.ImageUrl)
 		if err != nil {
 			return "", err
 		}
@@ -285,6 +311,10 @@ func (u *userService) EditUser(ctx context.Context, bearer string, userId string
 }
 
 func (u *userService) EditUserImage(ctx context.Context, bearer string, userId string, userImage []*multipart.FileHeader) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceEditUserImage")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
@@ -300,7 +330,7 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 		return "", errors.New("invalid user id")
 	}
 
-	media, err := u.MediaClient.SaveMedia(userImage)
+	media, err := u.MediaClient.SaveMedia(ctx, userImage)
 	if err != nil {
 		return "", err
 	}
@@ -316,7 +346,7 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 		return "", err
 	}
 
-	err = u.editSharedUserInfo(bearer, user, user.Username, user.ImageUrl)
+	err = u.editSharedUserInfo(ctx, bearer, user, user.Username, user.ImageUrl)
 
 	if err != nil {
 		return "", err
@@ -327,8 +357,8 @@ func (u *userService) EditUserImage(ctx context.Context, bearer string, userId s
 	return media[0].Url, err
 }
 
-func (u *userService) editSharedUserInfo(bearer string, user *model.User, username string, imageUrl string) error {
-	err := u.PostClient.EditPostOwnerInfo(bearer, model.UserInfo{
+func (u *userService) editSharedUserInfo(ctx context.Context, bearer string, user *model.User, username string, imageUrl string) error {
+	err := u.PostClient.EditPostOwnerInfo(ctx, bearer, model.UserInfo{
 		Id:       user.Id,
 		Username: username,
 		ImageURL: imageUrl,
@@ -338,7 +368,7 @@ func (u *userService) editSharedUserInfo(bearer string, user *model.User, userna
 		return err
 	}
 
-	err = u.StoryClient.EditStoryOwnerInfo(bearer, model.UserInfo{
+	err = u.StoryClient.EditStoryOwnerInfo(ctx, bearer, model.UserInfo{
 		Id:       user.Id,
 		Username: username,
 		ImageURL: imageUrl,
@@ -349,7 +379,7 @@ func (u *userService) editSharedUserInfo(bearer string, user *model.User, userna
 	}
 
 	if len(user.LikedPosts) > 0 {
-		err = u.PostClient.EditLikedByInfo(bearer, model.UserInfoEdit{
+		err = u.PostClient.EditLikedByInfo(ctx, bearer, model.UserInfoEdit{
 			Id:       user.Id,
 			Username: username,
 			ImageURL: imageUrl,
@@ -362,7 +392,7 @@ func (u *userService) editSharedUserInfo(bearer string, user *model.User, userna
 	}
 
 	if len(user.DislikedPosts) > 0 {
-		err = u.PostClient.EditDislikedByInfo(bearer, model.UserInfoEdit{
+		err = u.PostClient.EditDislikedByInfo(ctx, bearer, model.UserInfoEdit{
 			Id:       user.Id,
 			Username: username,
 			ImageURL: imageUrl,
@@ -375,7 +405,7 @@ func (u *userService) editSharedUserInfo(bearer string, user *model.User, userna
 	}
 
 	if len(user.CommentedPosts) > 0 {
-		err = u.PostClient.EditCommentedByInfo(bearer, model.UserInfoEdit{
+		err = u.PostClient.EditCommentedByInfo(ctx, bearer, model.UserInfoEdit{
 			Id:       user.Id,
 			Username: username,
 			ImageURL: imageUrl,
@@ -391,6 +421,10 @@ func (u *userService) editSharedUserInfo(bearer string, user *model.User, userna
 }
 
 func (u *userService) EditUsersNotifications(ctx context.Context, bearer string, notificationReq *model.NotificationSettingsUpdateReq) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceEditUsersNotifications")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -444,6 +478,10 @@ func (u *userService) EditUsersNotifications(ctx context.Context, bearer string,
 }
 
 func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer string, privacySettingsReq *model.PrivacySettings) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceEditUsersPrivacySettings")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -468,6 +506,7 @@ func (u *userService) EditUsersPrivacySettings(ctx context.Context, bearer strin
 func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserRequest) ([]byte, error) {
 	span := tracer.StartSpanFromContext(ctx, "UserServiceRegisterUser")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	user, _ := model.NewUser(userRequest)
 	if err := validator.New().Struct(user); err != nil {
@@ -523,6 +562,10 @@ func (u *userService) RegisterUser(ctx context.Context, userRequest *model.UserR
 }
 
 func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *model.AgentRequest) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceRegisterAgentByAdmin")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	agentRegistrationDTO := model.AgentRegistrationDTO{
 		Username:  agentRequest.Username,
 		Name:      agentRequest.Name,
@@ -549,12 +592,12 @@ func (u *userService) RegisterAgentByAdmin(ctx context.Context, agentRequest *mo
 		return "", err
 	}
 
-	err = u.AuthClient.RegisterAgent(user, hashAndSalt)
+	err = u.AuthClient.RegisterAgent(ctx, user, hashAndSalt)
 	if err != nil {
 		return "", err
 	}
 
-	err = u.RelationshipClient.CreateUser(user)
+	err = u.RelationshipClient.CreateUser(ctx, user)
 	if err != nil {
 		return "", err
 	}
@@ -596,6 +639,10 @@ func (u *userService) ActivateUser(ctx context.Context, activationId string) (bo
 }
 
 func (u *userService) ResendActivationLink(ctx context.Context, activateLinkRequest *model.ActivateLinkRequest) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceResendActivationLink")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, err := u.UserRepository.GetByEmail(ctx, activateLinkRequest.Email)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"email": activateLinkRequest.Email}).Warn("Invalid email address")
@@ -610,6 +657,10 @@ func (u *userService) ResendActivationLink(ctx context.Context, activateLinkRequ
 }
 
 func (u *userService) ResetPassword(ctx context.Context, userEmail string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceResetPassword")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, err := u.GetByEmail(ctx, userEmail)
 	//pokrivena invalid email
 	if err != nil {
@@ -625,6 +676,10 @@ func (u *userService) ResetPassword(ctx context.Context, userEmail string) (bool
 }
 
 func (u *userService) ResetPasswordActivation(ctx context.Context, activationId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceResetPasswordActivation")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	accReset, err := u.ResetPasswordService.GetValidActivationById(ctx, activationId)
 	if accReset == nil || err != nil {
 		return false, err
@@ -634,6 +689,9 @@ func (u *userService) ResetPasswordActivation(ctx context.Context, activationId 
 }
 
 func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordRequest *model.ChangeNewPasswordRequest) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceChangeNewPassword")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	accReset, err := u.ResetPasswordService.GetValidActivationById(ctx, changePasswordRequest.ResetPasswordId)
 	if accReset == nil || err != nil {
@@ -645,7 +703,7 @@ func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordReque
 		return false, err
 	}
 
-	err = u.AuthClient.ChangePassword(user.Id, changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
+	err = u.AuthClient.ChangePassword(ctx, user.Id, changePasswordRequest.Password, changePasswordRequest.PasswordRepeat)
 	if err != nil {
 		return false, err
 	}
@@ -660,6 +718,10 @@ func (u *userService) ChangeNewPassword(ctx context.Context, changePasswordReque
 }
 
 func (u *userService) GetUserEmailIfUserExist(ctx context.Context, userId string) (*model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserEmailIfUserExist")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
 	if err != nil {
@@ -671,6 +733,7 @@ func (u *userService) GetUserEmailIfUserExist(ctx context.Context, userId string
 func (u *userService) GetUserById(ctx context.Context, userId string) (*model.User, error) {
 	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserById")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	user, err := u.UserRepository.GetByID(ctx, userId)
 
@@ -721,6 +784,10 @@ func (u *userService) SearchForInfluencerByUsername(ctx context.Context, usernam
 }
 
 func (u *userService) SearchForUsersByUsernameByGuest(ctx context.Context, username string) ([]model.User, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceSearchForUsersByUsernameByGuest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	users, err := u.UserRepository.SearchForUsersByUsernameByGuest(ctx, username)
 
 	if err != nil {
@@ -731,6 +798,10 @@ func (u *userService) SearchForUsersByUsernameByGuest(ctx context.Context, usern
 }
 
 func (u *userService) GetUsersInfo(ctx context.Context, userId string) (*model.UserInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUsersInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
@@ -766,6 +837,10 @@ func (u *userService) GetLoggedUserInfo(ctx context.Context, bearer string) (*mo
 }
 
 func (u *userService) GetLoggedUserTargetGroup(ctx context.Context, bearer string) (*model.TargetGroup, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetLoggedUserTargetGroup")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -784,6 +859,10 @@ func (u *userService) GetLoggedUserTargetGroup(ctx context.Context, bearer strin
 }
 
 func (u *userService) GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetLoggedAgentInfo")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -1062,7 +1141,7 @@ func (u *userService) FollowUser(ctx context.Context, bearer string, userId stri
 	})
 	if err == nil {
 		if followRequest {
-			err = u.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+			err = u.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
 				Username:  user.Username,
 				UserId:    userId,
 				NotifyUrl: "TODO",
@@ -1070,7 +1149,7 @@ func (u *userService) FollowUser(ctx context.Context, bearer string, userId stri
 				Type:      intercomm.FollowRequest,
 			})
 		} else {
-			err = u.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+			err = u.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
 				Username:  user.Username,
 				UserId:    userId,
 				NotifyUrl: "TODO",
@@ -1238,7 +1317,7 @@ func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, us
 		return err
 	}
 
-	err = u.MessageClient.CreateNotification(&intercomm.NotificationRequest{
+	err = u.MessageClient.CreateNotification(ctx, &intercomm.NotificationRequest{
 		Username:  user.Username,
 		UserId:    userId,
 		NotifyUrl: "TODO",
@@ -1250,6 +1329,10 @@ func (u *userService) AcceptFollowRequest(ctx context.Context, bearer string, us
 }
 
 func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUpdateLikedPost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -1277,6 +1360,10 @@ func (u *userService) UpdateLikedPost(ctx context.Context, bearer string, postId
 }
 
 func (u *userService) AddComment(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceAddComment")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -1310,6 +1397,10 @@ func didUserCommentedPost(user *model.User, postId string) bool {
 }
 
 func (u *userService) UpdateDislikedPost(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUpdateDislikedPost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -1355,6 +1446,10 @@ func didUserLikedPost(user *model.User, postId string) (bool, int) {
 }
 
 func (u *userService) GetUserLikedPost(ctx context.Context, bearer string) ([]string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserLikedPost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return []string{}, err
@@ -1369,6 +1464,10 @@ func (u *userService) GetUserLikedPost(ctx context.Context, bearer string) ([]st
 }
 
 func (u *userService) GetUserDislikedPost(ctx context.Context, bearer string) ([]string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUserDislikedPost")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return []string{}, err
@@ -1383,6 +1482,10 @@ func (u *userService) GetUserDislikedPost(ctx context.Context, bearer string) ([
 }
 
 func (u *userService) VerifyUser(ctx context.Context, dto *model.VerifyAccountDTO) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceVerifyUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, err := u.UserRepository.GetByID(ctx, dto.UserId)
 	if err != nil {
 		return errors.New("invalid user id")
@@ -1400,6 +1503,10 @@ func (u *userService) VerifyUser(ctx context.Context, dto *model.VerifyAccountDT
 }
 
 func (u *userService) CheckIfUserVerified(ctx context.Context, bearer string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCheckIfUserVerified")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return false, err
@@ -1414,6 +1521,10 @@ func (u *userService) CheckIfUserVerified(ctx context.Context, bearer string) (b
 }
 
 func (u *userService) CheckIfUserVerifiedById(ctx context.Context, userId string) (bool, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCheckIfUserVerifiedById")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	log.Println(userId)
 	user, err := u.UserRepository.GetByID(ctx, userId)
 	if err != nil {
@@ -1424,6 +1535,10 @@ func (u *userService) CheckIfUserVerifiedById(ctx context.Context, userId string
 }
 
 func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string) (*model.FollowRecommendationResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetFollowRecommendation")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	loggedId, err := u.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -1437,7 +1552,7 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 	log.Println("test1")
 
 	var recommendedUsers model.RecommendedUsersResponse
-	recommendedUsers, err = u.RelationshipClient.GetRecommendedUsers(loggedId)
+	recommendedUsers, err = u.RelationshipClient.GetRecommendedUsers(ctx, loggedId)
 	if err != nil {
 		return nil, err
 	}
@@ -1470,6 +1585,10 @@ func (u *userService) GetFollowRecommendation(ctx context.Context, bearer string
 }
 
 func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *model.AgentRegistrationDTO) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceRegisterAgent")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	user, _ := model.NewAgent(agentRegistrationDTO)
 	if err := validator.New().Struct(user); err != nil {
 		return "", err
@@ -1480,12 +1599,12 @@ func (u *userService) RegisterAgent(ctx context.Context, agentRegistrationDTO *m
 		return "", err
 	}
 
-	err = u.AuthClient.RegisterAgent(user, agentRegistrationDTO.Password)
+	err = u.AuthClient.RegisterAgent(ctx, user, agentRegistrationDTO.Password)
 	if err != nil {
 		return "", err
 	}
 
-	err = u.RelationshipClient.CreateUser(user)
+	err = u.RelationshipClient.CreateUser(ctx, user)
 	if err != nil {
 		return "", err
 	}

@@ -5,6 +5,7 @@ import (
 	"ads-service/domain/repository"
 	"ads-service/domain/service-contracts"
 	"ads-service/service/intercomm"
+	"ads-service/tracer"
 	"context"
 	"errors"
 	"fmt"
@@ -32,6 +33,10 @@ func NewCampaignService(r repository.CampaignRepository, ic repository.Influence
 }
 
 func (c campaignService) GetCampaignStatisticsFromAgentApi(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetCampaignStatisticsFromAgentApi")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	postStats, err := c.GetPostCampaignStatistic(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -59,7 +64,11 @@ func (c campaignService) GetCampaignStatisticsFromAgentApi(ctx context.Context, 
 }
 
 func (c campaignService) GetPostCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetPostCampaignStatistic")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +88,7 @@ func (c campaignService) GetPostCampaignStatistic(ctx context.Context, bearer st
 	ids := createIdListFromCampaigns(campaigns)
 	newIds := createIdListFromInfluencerCampaigns(influecerCampaigns, &ids)
 
-	postMedia, err := c.PostClient.GetPostsFirstMedia(newIds)
+	postMedia, err := c.PostClient.GetPostsFirstMedia(ctx, newIds)
 
 	yf,mf,df := time.Now().Date()
 	timeef := time.Date(yf,mf,df,0,0,1,0, time.UTC)
@@ -194,7 +203,11 @@ func createIdListFromInfluencerCampaigns(campaigns []*model.InfluencerCampaign, 
 }
 
 func (c campaignService) GetStoryCampaignStatistic(ctx context.Context, bearer string) ([]*model.CampaignStatisticResponse, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetStoryCampaignStatistic")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +227,7 @@ func (c campaignService) GetStoryCampaignStatistic(ctx context.Context, bearer s
 	ids := createIdListFromCampaigns(campaigns)
 	newIds := createIdListFromInfluencerCampaigns(influecerCampaigns, &ids)
 
-	storyMedia, err := c.StoryClient.GetStoryMedia(newIds)
+	storyMedia, err := c.StoryClient.GetStoryMedia(ctx, newIds)
 
 	yf,mf,df := time.Now().Date()
 	timeef := time.Date(yf,mf,df,0,0,1,0, time.UTC)
@@ -300,6 +313,9 @@ func (c campaignService) GetStoryCampaignStatistic(ctx context.Context, bearer s
 
 
 func (c campaignService) GetCampaignByPostIdInfulencer(ctx context.Context, contentId string) (*model.CampaignRetreiveRequest, error) {
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetCampaignByPostIdInfulencer")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	campaign, err := c.CampaignRepository.GetFutureByContentIDAndType(ctx, contentId, "POST")
 	if err != nil {
@@ -320,7 +336,11 @@ func (c campaignService) GetCampaignByPostIdInfulencer(ctx context.Context, cont
 	}, nil}
 
 func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetCampaignByPostId")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -347,7 +367,11 @@ func (c campaignService) GetCampaignByPostId(ctx context.Context, bearer string,
 	}, nil}
 
 func (c campaignService) GetCampaignByStoryId(ctx context.Context, bearer string, contentId string) (*model.CampaignRetreiveRequest, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetCampaignByStoryId")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -374,6 +398,10 @@ func (c campaignService) GetCampaignByStoryId(ctx context.Context, bearer string
 }
 
 func (c campaignService) DeleteCampaignByPostId(ctx context.Context, bearer string, contentId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceDeleteCampaignByPostId")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
 	if err != nil {
 		return err
@@ -383,6 +411,10 @@ func (c campaignService) DeleteCampaignByPostId(ctx context.Context, bearer stri
 }
 
 func (c campaignService) DeleteCampaignByStoryId(ctx context.Context, bearer string, contentId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceDeleteCampaignByStoryId")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
 	if err != nil {
 		return err
@@ -392,6 +424,10 @@ func (c campaignService) DeleteCampaignByStoryId(ctx context.Context, bearer str
 }
 
 func (c campaignService) ClickOnStoryCampaignWebsite(ctx context.Context, contentId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceClickOnStoryCampaignWebsite")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
 	if err != nil {
 		camp, err := c.InfluencerCampaignRepository.GetByContentIDAndType(ctx, contentId, "STORY")
@@ -417,6 +453,10 @@ func (c campaignService) ClickOnStoryCampaignWebsite(ctx context.Context, conten
 }
 
 func (c campaignService) ClickOnPostCampaignWebsite(ctx context.Context, contentId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceClickOnPostCampaignWebsite")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	campaign, err := c.CampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
 	if err != nil {
 		camp, err := c.InfluencerCampaignRepository.GetByContentIDAndType(ctx, contentId, "POST")
@@ -442,7 +482,11 @@ func (c campaignService) ClickOnPostCampaignWebsite(ctx context.Context, content
 }
 
 func (c campaignService) GetCampaignById(ctx context.Context, bearer string, campaignId string) (*model.Campaign, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetCampaignById")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +504,11 @@ func (c campaignService) GetCampaignById(ctx context.Context, bearer string, cam
 }
 
 func (c campaignService) GetAllActiveAgentsPostCampaigns(ctx context.Context, bearer string) ([]string, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetAllActiveAgentsPostCampaigns")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -485,7 +533,11 @@ func getContentIdsFromCampaigns(campaigns []*model.Campaign) []string {
 }
 
 func (c campaignService) GetAllActiveAgentsStoryCampaigns(ctx context.Context, bearer string) ([]string, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetAllActiveAgentsStoryCampaigns")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
 	}
@@ -499,7 +551,11 @@ func (c campaignService) GetAllActiveAgentsStoryCampaigns(ctx context.Context, b
 }
 
 func (c campaignService) CreateCampaignFromAgentApi(ctx context.Context, bearer string, campaignReq *model.CampaignApiRequest) error {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceCreateCampaignFromAgentApi")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		fmt.Println("LA111")
 		return err
@@ -507,9 +563,9 @@ func (c campaignService) CreateCampaignFromAgentApi(ctx context.Context, bearer 
 	fmt.Println(loggedId)
 	var contentId string
 	if campaignReq.Type == "POST" {
-		contentId, err = c.PostClient.CreatePostCampagin(bearer, campaignReq.Media)
+		contentId, err = c.PostClient.CreatePostCampagin(ctx, bearer, campaignReq.Media)
 	} else {
-		contentId, err = c.StoryClient.CreateStoryCampagin(bearer, campaignReq.Media)
+		contentId, err = c.StoryClient.CreateStoryCampagin(ctx, bearer, campaignReq.Media)
 	}
 
 	if err != nil {
@@ -543,7 +599,11 @@ func (c campaignService) CreateCampaignFromAgentApi(ctx context.Context, bearer 
 }
 
 func (c campaignService) CreateCampaign(ctx context.Context, bearer string, campaignRequest *model.CampaignRequest) (string, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceCreateCampaign")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -562,7 +622,11 @@ func (c campaignService) CreateCampaign(ctx context.Context, bearer string, camp
 }
 
 func (c campaignService) GetUnseenPostIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error) {
-	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetUnseenPostIdsCampaignsForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(ctx, bearer)
 	if err != nil {
 		return []string{}, err
 	}
@@ -658,7 +722,11 @@ func isSeenByUserToday(seenBy []model.UserGroupStatisticWrapper, userId string, 
 }
 
 func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, bearer string, count int) ([]string, error){
-	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceGetUnseenStoryIdsCampaignsForUser")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	targetUser, err := c.UserClient.GetLoggedUserTargetGroup(ctx, bearer)
 	if err != nil {
 		return []string{}, err
 	}
@@ -715,7 +783,11 @@ func (c campaignService) GetUnseenStoryIdsCampaignsForUser(ctx context.Context, 
 
 
 func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer string, campaignRequest *model.InfluencerCampaignCreateRequest) (string, error) {
-	logged, err := c.UserClient.GetLoggedUserInfo(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceCreateInfluencerCampaign")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	logged, err := c.UserClient.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -746,7 +818,9 @@ func (c campaignService) CreateInfluencerCampaign(ctx context.Context, bearer st
 
 
 func (c campaignService) CreateCampaignForInfluencer(ctx context.Context, campaignRequest *model.InfluencerCampaignProductCreateRequest) (string, error) {
-
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceCreateCampaignForInfluencer")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	campaign, err := model.NewInfluencerCampaignProduct(campaignRequest)
 	if err != nil {
@@ -766,7 +840,11 @@ func (c campaignService) CreateCampaignForInfluencer(ctx context.Context, campai
 }
 
 func (c campaignService) UpdateCampaignRequest(ctx context.Context, bearer string, campaignRequest *model.CampaignUpdateRequestDTO) (string, error) {
-	loggedId, err := c.AuthClient.GetLoggedUserId(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceUpdateCampaignRequest")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	loggedId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return "", err
 	}
@@ -807,7 +885,11 @@ func (c campaignService) UpdateCampaignRequest(ctx context.Context, bearer strin
 }
 
 func (c campaignService) UpdateCampaignVisitor(ctx context.Context, bearer string, id string, campaignType string) error {
-	logged, err := c.UserClient.GetLoggedUserTargetGroup(bearer)
+	span := tracer.StartSpanFromContext(ctx, "AdsServiceUpdateCampaignVisitor")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
+	logged, err := c.UserClient.GetLoggedUserTargetGroup(ctx, bearer)
 	if err != nil {
 		return err
 	}

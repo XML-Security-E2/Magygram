@@ -926,6 +926,10 @@ time="2021-07-08T02:11:08+02:00" level=info msg="User activated" func=auth-servi
 time="2021-07-08T02:11:17+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/zindo/Desktop/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=zindovicstefan21@gmail.com
 time="2021-07-08T02:12:08+02:00" level=warning msg="Wrong password" func=auth-service/service.authService.AuthenticateUser file="C:/Users/zindo/Desktop/Magygram/auth-service/service/auth_service.go:45" request_ip=127.0.0.1 user_id=ad842d0d-4558-4be3-bb8d-51e2e27a9ddf
 time="2021-07-08T02:12:13+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/zindo/Desktop/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=zindovicstefan98@gmail.com
+<<<<<<< HEAD
+time="2021-07-08T15:13:07+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/auth-service/main.go:147" host=localhost port=461
+time="2021-07-08T15:24:38+02:00" level=info msg="Server started" func=main.main file="C:/Users/zindo/Desktop/Magygram/auth-service/main.go:147" host=localhost port=461
+=======
 time="2021-07-08T11:18:54+02:00" level=info msg="Server started" func=main.main file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/main.go:147" host=localhost port=461
 time="2021-07-08T11:25:33+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=22jel3001@gmail.com
 time="2021-07-08T11:27:32+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=jelenapetkovicksipy@gmail.com
@@ -960,4 +964,5 @@ time="2021-07-08T15:16:55+02:00" level=info msg="Successful first stage of login
 time="2021-07-08T15:17:10+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=jelenapetkovicksipy@gmail.com
 time="2021-07-08T15:22:00+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=22jel3001@gmail.com
 time="2021-07-08T15:22:18+02:00" level=info msg="Successful first stage of login" func=auth-service/service.authService.AuthenticateUser file="C:/Users/Jel/Desktop/magigram/Magygram/auth-service/service/auth_service.go:49" request_ip=127.0.0.1 user_email=jelenapetkovicksipy@gmail.com
+>>>>>>> develop
 >>>>>>> develop

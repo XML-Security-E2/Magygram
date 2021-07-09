@@ -86,6 +86,7 @@ func (p postHandler) DeletePost(c echo.Context) error {
 
 	err := p.PostService.DeletePost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -93,9 +94,16 @@ func (p postHandler) DeletePost(c echo.Context) error {
 }
 
 func (p postHandler) GetPostsMediaAndWebsiteByIds(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("PostHandlerGetPostsMediaAndWebsiteByIds", p.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get posts media and website by ids at %s\n", c.Path())),
+	)
+
 	request := &model.FollowedUsersResponse{}
 
 	if err := c.Bind(request); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -103,9 +111,11 @@ func (p postHandler) GetPostsMediaAndWebsiteByIds(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	retVal, err := p.PostService.GetPostsMediaAndWebsiteByIds(ctx, request)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, retVal)
@@ -154,18 +164,23 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	postId, err := p.PostService.CreatePost(ctx, bearer, postRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, postId)
 }
 
-
 func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("PostHandlerCreatePostCampaignInfluencer", p.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create post campaign influencer at %s\n", c.Path())),
+	)
 
-	fmt.Println("USO")
 	request := &model.InfluencerRequest{}
 	if err := c.Bind(request); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 	fmt.Println(request)
@@ -173,11 +188,13 @@ func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 	fmt.Println(bearer)
 
 	postId, err := p.PostService.CreatePostInfluencer(ctx, bearer, request)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -185,34 +202,40 @@ func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
 
 }
 
-
 func (p postHandler) CreatePostCampaignFromApi(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("PostHandlerCreatePostCampaignFromApi", p.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling create post campaign from api at %s\n", c.Path())),
+	)
 
 	headers, err := c.FormFile("images")
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	postRequest := &model.PostRequest{
-		Description:              "",
-		Location:                 "",
-		Media:                    []*multipart.FileHeader{headers},
-		Tags:                     []model.Tag{},
+		Description: "",
+		Location:    "",
+		Media:       []*multipart.FileHeader{headers},
+		Tags:        []model.Tag{},
 	}
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	postId, err := p.PostService.CreatePostCampaignFromApi(ctx, bearer, postRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, postId)
 }
-
 
 func (p postHandler) CreatePostCampaign(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("PostHandlerCreatePostCampaign", p.tracer, c.Request())
@@ -289,6 +312,7 @@ func (p postHandler) CreatePostCampaign(c echo.Context) error {
 
 	postId, err := p.PostService.CreatePostCampaign(ctx, bearer, postRequest, campaignRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -312,6 +336,7 @@ func (p postHandler) GetUsersPostCampaigns(c echo.Context) error {
 	posts, err := p.PostService.GetUserPostCampaigns(ctx, bearer)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -339,6 +364,7 @@ func (p postHandler) GetPostsForTimeline(c echo.Context) error {
 
 	posts, err := p.PostService.GetPostsForTimeline(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -366,6 +392,7 @@ func (p postHandler) LikePost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := p.PostService.LikePost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -390,6 +417,7 @@ func (p postHandler) UnlikePost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := p.PostService.UnlikePost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -414,6 +442,7 @@ func (p postHandler) DislikePost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := p.PostService.DislikePost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -438,6 +467,7 @@ func (p postHandler) UndislikePost(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := p.PostService.UndislikePost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -461,6 +491,7 @@ func (p postHandler) GetPostsFirstImage(c echo.Context) error {
 
 	postImage, err := p.PostService.GetPostsFirstImage(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, postImage)
@@ -475,6 +506,7 @@ func (p postHandler) AddComment(c echo.Context) error {
 
 	commentRequest := &model.CommentRequest{}
 	if err := c.Bind(commentRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -488,6 +520,7 @@ func (p postHandler) AddComment(c echo.Context) error {
 
 	retVal, err := p.PostService.AddComment(ctx, commentRequest.PostId, commentRequest.Content, bearer, commentRequest.Tags)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, retVal)
@@ -502,6 +535,7 @@ func (p postHandler) EditPost(c echo.Context) error {
 
 	editRequest := &model.PostEditRequest{}
 	if err := c.Bind(editRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -515,6 +549,7 @@ func (p postHandler) EditPost(c echo.Context) error {
 
 	err := p.PostService.EditPost(ctx, bearer, editRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -543,6 +578,7 @@ func (p postHandler) GetUsersPosts(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	posts, err := p.PostService.GetUsersPosts(ctx, bearer, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -571,6 +607,7 @@ func (p postHandler) GetUsersPostsCount(c echo.Context) error {
 
 	postsCount, err := p.PostService.GetUsersPostsCount(ctx, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -596,6 +633,7 @@ func (p postHandler) GetPostForUserTimelineByHashTag(c echo.Context) error {
 	hashTagsPosts, err := p.PostService.GetPostForUserTimelineByHashTag(ctx, hashTag, bearer)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -624,6 +662,7 @@ func (p postHandler) GetPostForMessagesById(c echo.Context) error {
 
 	post, userInfo, err := p.PostService.GetPostForMessagesById(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -653,6 +692,7 @@ func (p postHandler) GetPostById(c echo.Context) error {
 
 	post, err := p.PostService.GetPostById(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -677,6 +717,7 @@ func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
 	hashTagsInfo, err := p.PostService.SearchForPostsByHashTagByGuest(ctx, hashTag)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -702,6 +743,7 @@ func (p postHandler) GetPostForGuestLineByHashTag(c echo.Context) error {
 	hashTagsPosts, err := p.PostService.GetPostsByHashTagForGuest(ctx, hashTag)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -731,6 +773,7 @@ func (p postHandler) SearchPostsByLocation(c echo.Context) error {
 	hashTagsInfo, err := p.PostService.SearchPostsByLocation(ctx, hashTag)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -756,6 +799,7 @@ func (p postHandler) GetPostForGuestTimelineByLocation(c echo.Context) error {
 	locationPosts, err := p.PostService.GetPostForGuestTimelineByLocation(ctx, location)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -785,6 +829,7 @@ func (p postHandler) GetPostForUserTimelineByLocation(c echo.Context) error {
 
 	locationPosts, err := p.PostService.GetPostForUserTimelineByLocation(ctx, location, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -812,6 +857,7 @@ func (p postHandler) GetPostByIdForGuest(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 	post, err := p.PostService.GetPostByIdForGuest(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -834,6 +880,7 @@ func (p postHandler) GetLikedPosts(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	posts, err := p.PostService.GetUserLikedPosts(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -861,6 +908,7 @@ func (p postHandler) GetDislikedPosts(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	posts, err := p.PostService.GetUserDislikedPosts(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -881,6 +929,7 @@ func (p postHandler) EditPostOwnerInfo(c echo.Context) error {
 
 	userInfo := &model.UserInfo{}
 	if err := c.Bind(userInfo); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -893,6 +942,7 @@ func (p postHandler) EditPostOwnerInfo(c echo.Context) error {
 
 	err := p.PostService.EditPostOwnerInfo(ctx, bearer, userInfo)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -908,6 +958,7 @@ func (p postHandler) EditLikedByInfo(c echo.Context) error {
 
 	userInfo := &model.UserInfoEdit{}
 	if err := c.Bind(userInfo); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -920,6 +971,7 @@ func (p postHandler) EditLikedByInfo(c echo.Context) error {
 
 	err := p.PostService.EditLikedByInfo(ctx, bearer, userInfo)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -935,6 +987,7 @@ func (p postHandler) EditDislikedByInfo(c echo.Context) error {
 
 	userInfo := &model.UserInfoEdit{}
 	if err := c.Bind(userInfo); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -947,6 +1000,7 @@ func (p postHandler) EditDislikedByInfo(c echo.Context) error {
 
 	err := p.PostService.EditDislikedByInfo(ctx, bearer, userInfo)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -962,6 +1016,7 @@ func (p postHandler) EditCommentedByInfo(c echo.Context) error {
 
 	userInfo := &model.UserInfoEdit{}
 	if err := c.Bind(userInfo); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -974,6 +1029,7 @@ func (p postHandler) EditCommentedByInfo(c echo.Context) error {
 
 	err := p.PostService.EditCommentedByInfo(ctx, bearer, userInfo)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

@@ -17,10 +17,10 @@ import (
 
 type AdsClient interface {
 	CreatePostCampaign(ctx context.Context, bearer string, campaignReq *model.CampaignRequest) error
-	GetAllActiveAgentsPostCampaigns(bearer string) ([]string,error)
-	DeleteCampaign(bearer string, postId string) error
-	GetPostCampaignSuggestion(bearer string,count string) ([]string,error)
-	UpdateCampaignVisitor(bearer string,postId string) error
+	GetAllActiveAgentsPostCampaigns(ctx context.Context, bearer string) ([]string,error)
+	DeleteCampaign(ctx context.Context, bearer string, postId string) error
+	GetPostCampaignSuggestion(ctx context.Context, bearer string,count string) ([]string,error)
+	UpdateCampaignVisitor(ctx context.Context, bearer string,postId string) error
 }
 
 type adsClient struct {}
@@ -71,12 +71,15 @@ func (a adsClient) CreatePostCampaign(ctx context.Context, bearer string, campai
 	return nil
 }
 
-func (a adsClient) GetAllActiveAgentsPostCampaigns(bearer string) ([]string,error) {
+func (a adsClient) GetAllActiveAgentsPostCampaigns(ctx context.Context, bearer string) ([]string,error) {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientGetAllActiveAgentsPostCampaigns")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/campaign/post", baseAdsUrl), nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/campaign/post", baseAdsUrl), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -95,12 +98,15 @@ func (a adsClient) GetAllActiveAgentsPostCampaigns(bearer string) ([]string,erro
 	return campaigns, nil
 }
 
-func (a adsClient) DeleteCampaign(bearer string, postId string) error {
+func (a adsClient) DeleteCampaign(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientDeleteCampaign")
+	defer span.Finish()
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/campaign/post/%s", baseAdsUrl, postId), nil)
+	req, err := http.NewRequestWithContext(ctx,"DELETE", fmt.Sprintf("%s/campaign/post/%s", baseAdsUrl, postId), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -125,12 +131,16 @@ func getErrorMessageFromRequestBody(body io.ReadCloser) (string ,error){
 	return result.Message, nil
 }
 
-func (a adsClient) GetPostCampaignSuggestion(bearer string,count string) ([]string,error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/campaign/post/suggestion/" + count, baseAdsUrl), nil)
+func (a adsClient) GetPostCampaignSuggestion(ctx context.Context, bearer string,count string) ([]string,error) {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientGetPostCampaignSuggestion")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/campaign/post/suggestion/" + count, baseAdsUrl), nil)
 
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 
@@ -151,11 +161,15 @@ func (a adsClient) GetPostCampaignSuggestion(bearer string,count string) ([]stri
 	return campaigns, nil
 }
 
-func (a adsClient) UpdateCampaignVisitor(bearer string, postId string) error {
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/campaign/post/visited/%s", baseAdsUrl, postId), nil)
+func (a adsClient) UpdateCampaignVisitor(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "AdsClientUpdateCampaignVisitor")
+	defer span.Finish()
+
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/campaign/post/visited/%s", baseAdsUrl, postId), nil)
 	req.Header.Add("Authorization", bearer)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

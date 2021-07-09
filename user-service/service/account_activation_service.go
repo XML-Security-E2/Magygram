@@ -22,6 +22,10 @@ func NewAccountActivationService(r repository.AccountActivationRepository) servi
 }
 
 func (a *accountActivationService) Create(ctx context.Context, userId string) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "AccountActivationServiceCreate")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	result, err :=a.AccountActivationRepository.Create(ctx, model.NewAccountActivation(userId))
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Warn("Account activation unsuccessful creating")
@@ -33,6 +37,7 @@ func (a *accountActivationService) Create(ctx context.Context, userId string) (s
 func (a *accountActivationService) UseAccountActivation(ctx context.Context, id string) (string, error) {
 	span := tracer.StartSpanFromContext(ctx, "AccountActivationServiceUseAccountActivation")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	accActivation, err := a.AccountActivationRepository.GetById(ctx, id)
 	if err != nil {
@@ -63,6 +68,7 @@ func (a *accountActivationService) IsActivationValid(accActivation *model.Accoun
 func (a *accountActivationService) GetValidActivationById(ctx context.Context, id string) (*model.AccountActivation, error) {
 	span := tracer.StartSpanFromContext(ctx, "AccountActivationServiceGetValidActivationById")
 	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	accActivation, err := a.AccountActivationRepository.GetById(ctx, id)
 	if err != nil || !a.IsActivationValid(accActivation) {

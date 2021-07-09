@@ -3,13 +3,14 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
 	"io"
 	"net/http"
 	"request-service/domain/model"
-	"request-service/domain/service-contracts"
+	service_contracts "request-service/domain/service-contracts"
 	"request-service/tracer"
+
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 )
 
 type AgentRegistrationRequestHandler interface {
@@ -21,8 +22,8 @@ type AgentRegistrationRequestHandler interface {
 
 type agentRegistrationRequestHandler struct {
 	AgentRegistrationRequestService service_contracts.AgentRegistrationRequestService
-	tracer      opentracing.Tracer
-	closer      io.Closer
+	tracer                          opentracing.Tracer
+	closer                          io.Closer
 }
 
 func NewAgentRegistrationRequestHandler(a service_contracts.AgentRegistrationRequestService) AgentRegistrationRequestHandler {
@@ -40,6 +41,7 @@ func (a agentRegistrationRequestHandler) CreateAgentRegistrationRequest(c echo.C
 
 	agentRegistrationRequest := &model.AgentRegistrationRequestDTO{}
 	if err := c.Bind(agentRegistrationRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -52,6 +54,7 @@ func (a agentRegistrationRequestHandler) CreateAgentRegistrationRequest(c echo.C
 	request, err := a.AgentRegistrationRequestService.CreateVerificationRequest(ctx, *agentRegistrationRequest)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -73,6 +76,7 @@ func (a agentRegistrationRequestHandler) GetAgentRegistrationRequests(c echo.Con
 
 	retVal, err := a.AgentRegistrationRequestService.GetAgentRegistrationRequests(ctx)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -96,6 +100,7 @@ func (a agentRegistrationRequestHandler) ApproveAgentRegistrationRequest(c echo.
 
 	err := a.AgentRegistrationRequestService.ApproveAgentRegistrationRequest(ctx, requestId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -119,6 +124,7 @@ func (a agentRegistrationRequestHandler) RejectAgentRegistrationRequest(c echo.C
 
 	err := a.AgentRegistrationRequestService.RejectAgentRegistrationRequest(ctx, requestId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

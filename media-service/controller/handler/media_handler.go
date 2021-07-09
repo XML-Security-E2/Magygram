@@ -3,15 +3,16 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
-	"github.com/sirupsen/logrus"
 	"io"
 	"media-service/logger"
 	"media-service/service"
 	"media-service/tracer"
 	"mime/multipart"
 	"net/http"
+
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
+	"github.com/sirupsen/logrus"
 )
 
 type MediaHandler interface {
@@ -20,14 +21,14 @@ type MediaHandler interface {
 
 type mediaHandler struct {
 	MediaService service.MediaService
-	tracer      opentracing.Tracer
-	closer      io.Closer
+	tracer       opentracing.Tracer
+	closer       io.Closer
 }
 
 func NewMediaHandler(m service.MediaService) MediaHandler {
 	tracer, closer := tracer.Init("media-service")
 	opentracing.SetGlobalTracer(tracer)
-	return &mediaHandler{m, tracer,closer}
+	return &mediaHandler{m, tracer, closer}
 }
 
 func (m mediaHandler) SaveMedia(c echo.Context) error {
@@ -54,6 +55,7 @@ func (m mediaHandler) SaveMedia(c echo.Context) error {
 
 	media, err := m.MediaService.SaveMedia(ctx, headers)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

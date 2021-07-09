@@ -10,6 +10,7 @@ import (
 	"user-service/domain/repository"
 	service_contracts "user-service/domain/service-contracts"
 	"user-service/logger"
+	"user-service/tracer"
 )
 
 type resetPasswordService struct {
@@ -21,6 +22,10 @@ func NewResetPasswordService(r repository.ResetPasswordRepository) service_contr
 }
 
 func (a resetPasswordService) Create(ctx context.Context, userId string) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCreate")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	result, err :=a.ResetPasswordRepository.Create(ctx, model.NewResetPassword(userId))
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id" : userId}).Warn("Account password reset unsuccessful creating")
@@ -30,6 +35,10 @@ func (a resetPasswordService) Create(ctx context.Context, userId string) (string
 }
 
 func (a *resetPasswordService) UseAccountReset(ctx context.Context, id string) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceUseAccountReset")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	accActivation, err := a.ResetPasswordRepository.GetById(ctx, id)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"reset_password_id" : id}).Warn("Invalid account password reset")
@@ -56,6 +65,10 @@ func (a resetPasswordService) IsActivationValid(accActivation *model.ResetPasswo
 }
 
 func (a resetPasswordService) GetValidActivationById(ctx context.Context, id string) (*model.ResetPassword, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetValidActivationById")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	accActivation, err := a.ResetPasswordRepository.GetById(ctx, id)
 	if err != nil || !a.IsActivationValid(accActivation) {
 		logger.LoggingEntry.WithFields(logrus.Fields{"reset_password_id" : id}).Warn("Invalid reset password link")

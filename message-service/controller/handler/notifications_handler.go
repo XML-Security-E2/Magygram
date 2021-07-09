@@ -3,14 +3,15 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
 	"io"
 	"message-service/controller/hub"
 	"message-service/domain/model"
 	"message-service/domain/service-contracts"
 	"message-service/tracer"
 	"net/http"
+
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 )
 
 type NotificationHandler interface {
@@ -24,9 +25,9 @@ type NotificationHandler interface {
 
 type notificationHandler struct {
 	NotificationService service_contracts.NotificationService
-	Hub *hub.NotifyHub
-	tracer      opentracing.Tracer
-	closer      io.Closer
+	Hub                 *hub.NotifyHub
+	tracer              opentracing.Tracer
+	closer              io.Closer
 }
 
 func NewNotificationHandler(p service_contracts.NotificationService, h *hub.NotifyHub) NotificationHandler {
@@ -44,6 +45,7 @@ func (n notificationHandler) CreateNotification(c echo.Context) error {
 
 	notificationRequest := &model.NotificationRequest{}
 	if err := c.Bind(notificationRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -55,6 +57,7 @@ func (n notificationHandler) CreateNotification(c echo.Context) error {
 
 	notify, err := n.NotificationService.CreatePostInteractionNotification(ctx, notificationRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -80,6 +83,7 @@ func (n notificationHandler) CreateNotifications(c echo.Context) error {
 
 	notificationRequest := &model.NotificationRequest{}
 	if err := c.Bind(notificationRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -91,6 +95,7 @@ func (n notificationHandler) CreateNotifications(c echo.Context) error {
 
 	userInfos, err := n.NotificationService.CreatePostOrStoryNotification(ctx, notificationRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -124,6 +129,7 @@ func (n notificationHandler) GetAllNotViewedNotificationsForUser(c echo.Context)
 
 	retVal, err := n.NotificationService.GetAllNotViewedForLoggedUser(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, retVal)
@@ -171,6 +177,7 @@ func (n notificationHandler) GetAllNotificationsForUser(c echo.Context) error {
 
 	retVal, err := n.NotificationService.GetAllForUserSortedByTime(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, retVal)
@@ -192,6 +199,7 @@ func (n notificationHandler) ViewNotifications(c echo.Context) error {
 	bearer := c.Request().Header.Get("Authorization")
 	err := n.NotificationService.ViewUsersNotifications(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, "")
