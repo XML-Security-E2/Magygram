@@ -19,6 +19,8 @@ import (
 type UserClient interface {
 	GetLoggedUserInfo(ctx context.Context, bearer string) (*model.UserInfo,error)
 	GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo,error)
+	GetLoggedAgentInfoById(userId string) (*model.AgentInfo,error)
+
 	MapPostsToFavourites(ctx context.Context, bearer string, postIds []string) ([]*model.PostIdFavouritesFlag,error)
 	IsUserPrivate(ctx context.Context, userId string) (bool, error)
 	UpdateLikedPosts(ctx context.Context, bearer string, postId string) error
@@ -86,6 +88,29 @@ func (u userClient) GetLoggedUserInfo(ctx context.Context, bearer string) (*mode
 		return &model.UserInfo{}, err
 	}
 	var userInfo model.UserInfo
+	_ = json.Unmarshal(bodyBytes, &userInfo)
+
+	return &userInfo, nil
+}
+
+func (u userClient) GetLoggedAgentInfoById(userId string) (*model.AgentInfo, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/logged/agent/%s", baseUsersUrl, userId), nil)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
+	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != 200 {
+		if resp == nil {
+			return &model.AgentInfo{}, err
+		}
+		return &model.AgentInfo{}, errors.New("unauthorized")
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return &model.AgentInfo{}, err
+	}
+	var userInfo model.AgentInfo
 	_ = json.Unmarshal(bodyBytes, &userInfo)
 
 	return &userInfo, nil

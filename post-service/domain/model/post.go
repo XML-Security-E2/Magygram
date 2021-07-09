@@ -131,7 +131,7 @@ func NewPost(postRequest *PostRequest, postOwner UserInfo, postType ContentType,
 	}, nil
 }
 
-func NewPostInfluencer(postRequest *Post, postOwner UserInfo) (*Post, error) {
+func NewPostInfluencer(postRequest *Post, postOwner UserInfo, website string) (*Post, error) {
 
 	return &Post{Id: guid.New().String(),
 		Description:   postRequest.Description,
@@ -140,12 +140,12 @@ func NewPostInfluencer(postRequest *Post, postOwner UserInfo) (*Post, error) {
 		UserInfo: postOwner,
 		Media: postRequest.Media,
 		Tags: postRequest.Tags,
-		ContentType : postRequest.ContentType,
+		ContentType : "CAMPAIGN",
 		LikedBy: []UserInfo{},
 		DislikedBy: []UserInfo{},
 		Comments: []Comment{},
 		IsDeleted: false,
-		WebSite: postRequest.WebSite,
+		WebSite: website,
 		CreatedTime: time.Now(),
 	}, nil
 }

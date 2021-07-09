@@ -92,7 +92,7 @@ func NewStory(postOwner UserInfo, storyType ContentType, media Media, tags []Tag
 	}, nil
 }
 
-func NewStoryInfluencer( story *Story, postOwner UserInfo) (*Story, error) {
+func NewStoryInfluencer( story *Story, postOwner UserInfo, website string) (*Story, error) {
 	err := validateStoryTypeEnums(story.ContentType)
 	if err != nil {
 		return nil, err
@@ -104,14 +104,14 @@ func NewStoryInfluencer( story *Story, postOwner UserInfo) (*Story, error) {
 	}
 
 	return &Story{Id: guid.New().String(),
-		ContentType: story.ContentType,
+		ContentType: "CAMPAIGN",
 		Media: story.Media,
 		UserInfo: postOwner,
 		VisitedBy: []UserInfo{},
 		CreatedTime: time.Now(),
 		Tags: story.Tags,
 		IsDeleted: false,
-		Website: story.Website,
+		Website: website,
 	}, nil
 }
 

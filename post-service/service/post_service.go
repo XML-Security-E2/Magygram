@@ -184,7 +184,11 @@ func (p postService) CreatePostInfluencer(ctx context.Context, bearer string, re
 		return "", err
 	}
 
-	post, err := model.NewPostInfluencer(agentPost, *userInfo)
+	agentInfo, err := p.UserClient.GetLoggedAgentInfoById(agentPost.UserInfo.Id)
+	if err != nil { return "", err}
+
+	post, err := model.NewPostInfluencer(agentPost, *userInfo, agentInfo.Website)
+
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"tags": post.Tags,
 			"description" : post.Description,

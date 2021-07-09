@@ -1,4 +1,4 @@
-import React, { useContext,useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { modalConstants } from "../../constants/ModalConstants";
 import { PostContext } from "../../contexts/PostContext";
@@ -22,12 +22,9 @@ const ViewPostModal = () => {
 		postService.likePost(postId, getUserInfo(), dispatch);
 	};
 
-
 	useEffect(() => {
-		if(postState.viewAgentCampaignPostModal.post.ContentType === "CAMPAIGN" && hasRoles(["agent"]))
-			setAgent(false)
-		else
-			setAgent(true)	
+		if (hasRoles(["agent"])) setAgent(false);
+		else setAgent(true);
 	});
 
 	const UnlikePost = (postId) => {
@@ -134,12 +131,12 @@ const ViewPostModal = () => {
 								</div>
 							)}
 							<hr></hr>
-							<div >
-								{ !agent &&
+							<div>
+								{!agent && (
 									<button style={({ height: "40px" }, { verticalAlign: "center" })} className="btn btn-outline-secondary" type="button" onClick={() => searchInfluencer()}>
 										<i className="icofont-subscribe mr-1"></i>Product placement
 									</button>
-								}
+								)}
 							</div>
 							<PostCommentsModalView
 								imageUrl={postState.viewPostModal.post.UserInfo.ImageURL}

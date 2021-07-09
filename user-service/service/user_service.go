@@ -858,6 +858,21 @@ func (u *userService) GetLoggedUserTargetGroup(ctx context.Context, bearer strin
 	}, nil
 }
 
+func (u *userService) GetLoggedAgentInfoById(ctx context.Context, userId string) (*model.AgentInfo, error) {
+	user, err := u.UserRepository.GetByID(ctx, userId)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	return &model.AgentInfo{
+		Id:       userId,
+		Username: user.Username,
+		ImageURL: user.ImageUrl,
+		Website:  user.Website,
+	}, nil
+}
+
+
 func (u *userService) GetLoggedAgentInfo(ctx context.Context, bearer string) (*model.AgentInfo, error) {
 	span := tracer.StartSpanFromContext(ctx, "UserServiceGetLoggedAgentInfo")
 	defer span.Finish()
