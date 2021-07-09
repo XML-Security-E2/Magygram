@@ -7,35 +7,37 @@ import Header from "../components/Header";
 import UserContextProvider from "../contexts/UserContext";
 import SearchedPostTimeline from "../components/SearchedPostsTimeline";
 import NotificationContextProvider from "../contexts/NotificationContext";
+import MessageContextProvider from "../contexts/MessageContext";
 
 const SearchPostPage = (props) => {
-
 	return (
 		<React.Fragment>
-			<UserContextProvider>
-				<StoryContextProvider>
-					<PostContextProvider>
-						<NotificationContextProvider>
-							<Header />
-						</NotificationContextProvider>
-						<CreateStoryModal />
-						<AddPostToFavouritesModal />
-						<div>
-							<div class="mt-4">
-								<div class="container d-flex justify-content-center">
-									<div class="col-9">
-										<div class="row">
-											<div class="col-8">
-												<SearchedPostTimeline  id={props.match.params.id}/>
+			<MessageContextProvider>
+				<UserContextProvider>
+					<StoryContextProvider>
+						<PostContextProvider>
+							<NotificationContextProvider>
+								<Header />
+							</NotificationContextProvider>
+							<CreateStoryModal />
+							<AddPostToFavouritesModal />
+							<div>
+								<div class="mt-4">
+									<div class="container d-flex justify-content-center">
+										<div class="col-9">
+											<div class="row">
+												<div class="col-8">
+													<SearchedPostTimeline id={props.match.params.id} />
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-		    			</div>
-					</PostContextProvider>
-				</StoryContextProvider>
-			</UserContextProvider>
+						</PostContextProvider>
+					</StoryContextProvider>
+				</UserContextProvider>
+			</MessageContextProvider>
 		</React.Fragment>
 	);
 };

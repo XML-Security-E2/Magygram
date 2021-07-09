@@ -23,18 +23,20 @@ const CampaignStatisticList = () => {
 				<div className="col-12">
 					<h3 className="text-dark">Post campaigns</h3>
 				</div>
-				{adsState.postCampaigns.map((campaign) => {
-					return <CampaignStatisticItem statistics={campaign} />;
-				})}
+				{adsState.postCampaigns !== null &&
+					adsState.postCampaigns.map((campaign) => {
+						return <CampaignStatisticItem statistics={campaign} />;
+					})}
 			</div>
 			<div className="row mb-3">
 				<div className="col-12">
 					<h3 className="text-dark">Story campaigns</h3>
 				</div>
 
-				{adsState.storyCampaigns.map((campaign) => {
-					return <CampaignStatisticItem statistics={campaign} />;
-				})}
+				{adsState.storyCampaigns !== null &&
+					adsState.storyCampaigns.map((campaign) => {
+						return <CampaignStatisticItem statistics={campaign} />;
+					})}
 			</div>
 		</React.Fragment>
 	);
