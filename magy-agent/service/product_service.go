@@ -79,7 +79,7 @@ func (p productService) GetProductCampaignStatistics(ctx context.Context) (*mode
 	var campaigns []model.CampaignStatisticInfo
 	for _, stat := range stats {
 		media := stat.Media
-		media.Url = fmt.Sprintf("%s%s:%s", conf.Current.Magygram.Protocol, conf.Current.Magygram.Domain, conf.Current.Magygram.Port) + media.Url
+		media.Url = fmt.Sprintf("%s%s:%s", conf.Current.Magygram.Protocol, "localhost", conf.Current.Magygram.Port) + media.Url
 		stat.Media = media
 
 		campaigns = append(campaigns, model.CampaignStatisticInfo{

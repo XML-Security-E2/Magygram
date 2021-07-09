@@ -7,9 +7,12 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
+	"magyAgent/conf"
 	"magyAgent/domain/model"
 	"magyAgent/service/intercomm"
 	"strconv"
+	"os"
+	"strings"
 )
 
 type ExportService interface {
@@ -30,16 +33,18 @@ func (e exportService) ExportToPdf(report *model.CampaignStatisticReport) (bytes
 
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
 
-	m.RegisterHeader(func() {
-		m.Row(20, func() {
-			m.Col(4, func() {
-				_ = m.FileImage("./magygramLogo.png", props.Rect{
-					Center:  true,
-					Percent: 80,
+
+		m.RegisterHeader(func() {
+			m.Row(20, func() {
+				m.Col(4, func() {
+					_ = m.FileImage("./magygramlogo.png", props.Rect{
+						Center:  true,
+						Percent: 80,
+					})
 				})
 			})
 		})
-	})
+
 
 	m.Row(20, func() {
 		m.Col(8, func() {
@@ -54,8 +59,17 @@ func (e exportService) ExportToPdf(report *model.CampaignStatisticReport) (bytes
 
 
 	for _, item := range report.Campaigns {
-		media, _ := e.MediaClient.GetMedia(item.Media.Url)
-		str := b64.StdEncoding.EncodeToString(media)
+		str := ""
+		if os.Getenv("IS_PRODUCTION") == "true" {
+			strs := strings.Split(item.Media.Url, "/")
+			tmp := fmt.Sprintf("%s%s:%s/api/media/", conf.Current.Magygram.Protocol, conf.Current.Magygram.Domain, conf.Current.Magygram.Port) + strs[len(strs) - 1]
+			mediaa, _ := e.MediaClient.GetMedia(tmp)
+			str = b64.StdEncoding.EncodeToString(mediaa)
+		} else {
+			media, _ := e.MediaClient.GetMedia(item.Media.Url)
+			str = b64.StdEncoding.EncodeToString(media)
+		}
+
 		format := item.Media.Url[len(item.Media.Url) - 3 :len(item.Media.Url)]
 
 		m.Row(30, func() {
