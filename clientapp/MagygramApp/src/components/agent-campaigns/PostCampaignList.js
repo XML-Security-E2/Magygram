@@ -20,7 +20,7 @@ const PostCampaignList = () => {
 		<React.Fragment>
 			<h3 className="text-dark mt-5">Post campaigns</h3>
 			<div className="row ">
-				{postState.agentCampaignPosts.length > 0 ? (
+				{postState.agentCampaignPosts !== null && postState.agentCampaignPosts.length > 0 ? (
 					postState.agentCampaignPosts.map((post) => {
 						return (
 							<div className="col-3 mb-4" style={{ cursor: "pointer" }} onClick={() => getPostDetailsHandler(post.id)}>
