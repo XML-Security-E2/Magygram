@@ -944,3 +944,4 @@ time="2021-07-08T15:16:31+02:00" level=info msg="Post created" func=post-service
 time="2021-07-08T15:17:48+02:00" level=info msg="Post created" func=post-service/service.postService.CreatePostInfluencer file="C:/Users/Jel/Desktop/magigram/Magygram/post-service/service/post_service.go:213" post_id=093a2070-1cab-4afb-abff-df28e7f66c39 request_ip=127.0.0.1 user_id=f17cf74c-a289-4568-afca-6648e62f08c4
 >>>>>>> develop
 >>>>>>> develop
+time="2021-07-09T23:44:28+02:00" level=info msg="Server started" func=main.main file="C:/Users/Dusan/Desktop/Magygram/post-service/main.go:78" host=localhost port=462

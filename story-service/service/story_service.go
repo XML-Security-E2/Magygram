@@ -118,7 +118,10 @@ func (p storyService) CreateStoryInfluencer(ctx context.Context, bearer string, 
 		return "", err
 	}
 
-	post, err := model.NewStoryInfluencer(agentPost, *userInfo)
+	agentInfo, err := p.UserClient.GetLoggedAgentInfoById(agentPost.UserInfo.Id)
+	if err != nil { return "", err}
+
+	post, err := model.NewStoryInfluencer(agentPost, *userInfo, agentInfo.Website)
 	if err != nil {
 		logger.LoggingEntry.WithFields(logrus.Fields{"user_id": userInfo.Id}).Warn("Story creating validation failure")
 		return "", err}

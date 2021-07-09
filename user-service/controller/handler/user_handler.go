@@ -69,6 +69,7 @@ type UserHandler interface {
 	RegisterAgentByAdmin(c echo.Context) error
 	GetLoggedAgentInfo(c echo.Context) error
 	GetLoggedUserTargetGroup(c echo.Context) error
+	GetLoggedAgentInfoById(c echo.Context) error
 }
 
 var (
@@ -739,6 +740,23 @@ func (h *userHandler) GetLoggedUserTargetGroup(c echo.Context) error {
 	if err != nil {
 		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	return c.JSON(http.StatusOK, userInfo)
+}
+
+
+func (u *userHandler) GetLoggedAgentInfoById(c echo.Context) error {
+	userId := c.Param("userId")
+
+	ctx := c.Request().Context()
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	userInfo, err := u.UserService.GetLoggedAgentInfoById(ctx, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Unauthorized")
 	}
 
 	return c.JSON(http.StatusOK, userInfo)

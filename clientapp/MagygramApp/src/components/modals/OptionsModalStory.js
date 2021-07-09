@@ -11,7 +11,7 @@ import { storyService } from "../../services/StoryService";
 import SuccessAlert from "../SuccessAlert";
 import FailureAlert from "../FailureAlert";
 
-const OptionsModalStory = ({contentType}) => {
+const OptionsModalStory = ({ contentType }) => {
 	const { storyState, dispatch } = useContext(StoryContext);
 
 	const [agent, setAgent] = useState("");
@@ -52,31 +52,28 @@ const OptionsModalStory = ({contentType}) => {
 		console.log(a);
 	};
 
-
 	useEffect(() => {
-		if(contentType === "CAMPAIGN" && hasRoles(["agent"]))
-			setAgent(false)
-		else
-			setAgent(true)	
+		if (hasRoles(["agent"])) setAgent(false);
+		else setAgent(true);
 	});
 
-	const handleDelete = ()=>{
-		let requestId =  storyState.storyId;
+	const handleDelete = () => {
+		let requestId = storyState.storyId;
 		Axios.put(`/api/story/${requestId}/delete`, {}, { validateStatus: () => true, headers: authHeader() })
-		.then((res) => {
-			console.log(res);
-			if (res.status === 200) {
-				console.log("Post has been deleted");
-				alert("You have successfully deleted this post!")
-				dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
-			} else {
-				console.log("ERROR")
-			}
-		})
-		.catch((err) => {
-			console.log("ERROR")
-		});
-	}
+			.then((res) => {
+				console.log(res);
+				if (res.status === 200) {
+					console.log("Post has been deleted");
+					alert("You have successfully deleted this post!");
+					dispatch({ type: modalConstants.HIDE_POST_OPTIONS_MODAL });
+				} else {
+					console.log("ERROR");
+				}
+			})
+			.catch((err) => {
+				console.log("ERROR");
+			});
+	};
 
 	const searchInfluencer = () => {
 		dispatch({ type: storyConstants.SHOW_SEARCH_INFLUENCER_MODAL, storyId: storyState.storyId });
@@ -106,14 +103,14 @@ const OptionsModalStory = ({contentType}) => {
 					</button>
 				</div>
 				<div className="row">
-					{ !agent &&
-						<button hidden={((contentType !== "CAMPAIGN") || (hasRoles["admin"]))} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={searchInfluencer}>
+					{!agent && (
+						<button hidden={hasRoles["admin"]} type="button" className="btn btn-link btn-fw text-secondary w-100 border-0" onClick={searchInfluencer}>
 							Product placement
 						</button>
-					}
+					)}
 				</div>
 				<div className="row">
-					<button hidden={!hasRoles(["admin"])} type="button" className="btn btn-link btn-fw text-danger w-100 border-0"  onClick={handleDelete}>
+					<button hidden={!hasRoles(["admin"])} type="button" className="btn btn-link btn-fw text-danger w-100 border-0" onClick={handleDelete}>
 						Delete?
 					</button>
 				</div>
@@ -184,10 +181,9 @@ const OptionsModalStory = ({contentType}) => {
 								Report
 							</button>
 						</div>
-						
 					</div>
 				</form>
-				<SearchInfluencerModalStory/>
+				<SearchInfluencerModalStory />
 			</Modal.Body>
 		</Modal>
 	);
