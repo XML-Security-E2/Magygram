@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"request-service/domain/model"
+	service_contracts "request-service/domain/service-contracts"
 	"request-service/tracer"
 
 	"github.com/labstack/echo"

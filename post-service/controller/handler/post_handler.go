@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"post-service/domain/model"
+	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
 	"post-service/tracer"

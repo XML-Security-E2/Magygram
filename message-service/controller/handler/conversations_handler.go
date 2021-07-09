@@ -6,6 +6,7 @@ import (
 	"io"
 	"message-service/controller/hub"
 	"message-service/domain/model"
+	"message-service/domain/service-contracts"
 	"message-service/domain/service-contracts/exceptions/denied"
 	"message-service/tracer"
 	"net/http"
