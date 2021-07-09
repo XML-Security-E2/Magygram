@@ -11,6 +11,7 @@ import (
 	"user-service/domain/service-contracts/exceptions"
 	"user-service/logger"
 	"user-service/service/intercomm"
+	"user-service/tracer"
 )
 
 type highlightsService struct {
@@ -26,6 +27,10 @@ func NewHighlightsService(r repository.UserRepository, ic 	intercomm.AuthClient,
 
 
 func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, highlights *model.HighlightRequest) (*model.HighlightProfileResponse,error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCreateHighlights")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := h.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -43,7 +48,7 @@ func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, 
 
 	user.HighlightsStory[highlights.Name] = model.HighlightImageWithMedia{}
 
-	highlightsResp, err := h.StoryClient.GetStoryHighlightIfValid(bearer, highlights)
+	highlightsResp, err := h.StoryClient.GetStoryHighlightIfValid(ctx, bearer, highlights)
 	if err != nil {
 		return nil, err
 	}
@@ -69,13 +74,16 @@ func (h highlightsService) CreateHighlights(ctx context.Context, bearer string, 
 
 
 func (h highlightsService) GetProfileHighlights(ctx context.Context, bearer string, usrId string) ([]*model.HighlightProfileResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetProfileHighlights")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	owner, err := h.UserRepository.GetByID(ctx, usrId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
 
-	retVal, err := h.AuthClient.HasRole(bearer,"search_all_post_by_hashtag")
+	retVal, err := h.AuthClient.HasRole(ctx, bearer,"search_all_post_by_hashtag")
 	if err!=nil{
 		return nil, errors.New("auth service not found")
 	}
@@ -128,13 +136,16 @@ func (h highlightsService) checkIfUserContentIsAccessible(ctx context.Context, b
 }
 
 func (h highlightsService) GetProfileHighlightsByHighlightName(ctx context.Context, bearer string, name string, userId string) (*model.HighlightImageWithMedia, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetProfileHighlightsByHighlightName")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	owner, err := h.UserRepository.GetByID(ctx, userId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
 
-	retValRole, err := h.AuthClient.HasRole(bearer,"view_profile_highlights")
+	retValRole, err := h.AuthClient.HasRole(ctx, bearer,"view_profile_highlights")
 	if err!=nil{
 		return nil, errors.New("auth service not found")
 	}

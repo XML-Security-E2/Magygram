@@ -17,12 +17,12 @@ import (
 )
 
 type PostClient interface {
-	GetPostsFirstImage(postId string) (*model.Media, error)
+	GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error)
 	GetUsersPostsCount(ctx context.Context, userId string) (int, error)
-	EditPostOwnerInfo(bearer string, userInfo model.UserInfo) error
-	EditLikedByInfo(bearer string,userInfo model.UserInfoEdit) error
-	EditDislikedByInfo(bearer string, userInfo model.UserInfoEdit) error
-	EditCommentedByInfo(bearer string, userInfo model.UserInfoEdit) error
+	EditPostOwnerInfo(ctx context.Context, bearer string, userInfo model.UserInfo) error
+	EditLikedByInfo(ctx context.Context, bearer string,userInfo model.UserInfoEdit) error
+	EditDislikedByInfo(ctx context.Context, bearer string, userInfo model.UserInfoEdit) error
+	EditCommentedByInfo(ctx context.Context, bearer string, userInfo model.UserInfoEdit) error
 }
 
 type postClient struct {}
@@ -37,16 +37,19 @@ var (
 )
 
 
-func (a postClient) EditPostOwnerInfo(bearer string, userInfo model.UserInfo) error {
+func (a postClient) EditPostOwnerInfo(ctx context.Context, bearer string, userInfo model.UserInfo) error {
+	span := tracer.StartSpanFromContext(ctx, "PostClientEditPostOwnerInfo")
+	defer span.Finish()
+
 	jsonRequest, _ := json.Marshal(userInfo)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
-
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -57,16 +60,19 @@ func (a postClient) EditPostOwnerInfo(bearer string, userInfo model.UserInfo) er
 	return nil
 }
 
-func (a postClient) EditLikedByInfo(bearer string, userInfo model.UserInfoEdit) error {
+func (a postClient) EditLikedByInfo(ctx context.Context, bearer string, userInfo model.UserInfoEdit) error {
+	span := tracer.StartSpanFromContext(ctx, "PostClientEditLikedByInfo")
+	defer span.Finish()
+
 	jsonRequest, _ := json.Marshal(userInfo)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/liked-by/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/liked-by/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
-
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -77,16 +83,19 @@ func (a postClient) EditLikedByInfo(bearer string, userInfo model.UserInfoEdit) 
 	return nil
 }
 
-func (a postClient) EditDislikedByInfo(bearer string, userInfo model.UserInfoEdit) error {
+func (a postClient) EditDislikedByInfo(ctx context.Context, bearer string, userInfo model.UserInfoEdit) error {
+	span := tracer.StartSpanFromContext(ctx, "PostClientEditDislikedByInfo")
+	defer span.Finish()
+
 	jsonRequest, _ := json.Marshal(userInfo)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/disliked-by/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/disliked-by/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
-
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -99,12 +108,16 @@ func (a postClient) EditDislikedByInfo(bearer string, userInfo model.UserInfoEdi
 }
 
 
-func (a postClient) EditCommentedByInfo(bearer string, userInfo model.UserInfoEdit) error {
+func (a postClient) EditCommentedByInfo(ctx context.Context, bearer string, userInfo model.UserInfoEdit) error {
+	span := tracer.StartSpanFromContext(ctx, "PostClientEditCommentedByInfo")
+	defer span.Finish()
+
 	jsonRequest, _ := json.Marshal(userInfo)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/commented/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/commented/user-info", basePostUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
+	tracer.Inject(span, req)
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
@@ -119,11 +132,14 @@ func (a postClient) EditCommentedByInfo(bearer string, userInfo model.UserInfoEd
 	return nil
 }
 
-func (a postClient) GetPostsFirstImage(postId string) (*model.Media, error) {
+func (a postClient) GetPostsFirstImage(ctx context.Context, postId string) (*model.Media, error) {
+	span := tracer.StartSpanFromContext(ctx, "PostClientGetPostsFirstImage")
+	defer span.Finish()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/image", basePostUrl, postId), nil)
+	req, err := http.NewRequestWithContext(ctx,"GET", fmt.Sprintf("%s/%s/image", basePostUrl, postId), nil)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

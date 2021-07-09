@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"post-service/domain/model"
-	"post-service/domain/service-contracts"
 	"post-service/domain/service-contracts/exceptions"
 	"post-service/logger"
 	"post-service/tracer"
@@ -171,7 +170,6 @@ func (p postHandler) CreatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, postId)
 }
 
-
 func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("PostHandlerCreatePostCampaignInfluencer", p.tracer, c.Request())
 	defer span.Finish()
@@ -203,7 +201,6 @@ func (p postHandler) CreatePostCampaignInfluencer(c echo.Context) error {
 
 }
 
-
 func (p postHandler) CreatePostCampaignFromApi(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("PostHandlerCreatePostCampaignFromApi", p.tracer, c.Request())
 	defer span.Finish()
@@ -218,10 +215,10 @@ func (p postHandler) CreatePostCampaignFromApi(c echo.Context) error {
 	}
 
 	postRequest := &model.PostRequest{
-		Description:              "",
-		Location:                 "",
-		Media:                    []*multipart.FileHeader{headers},
-		Tags:                     []model.Tag{},
+		Description: "",
+		Location:    "",
+		Media:       []*multipart.FileHeader{headers},
+		Tags:        []model.Tag{},
 	}
 	ctx := c.Request().Context()
 	if ctx == nil {
@@ -238,7 +235,6 @@ func (p postHandler) CreatePostCampaignFromApi(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, postId)
 }
-
 
 func (p postHandler) CreatePostCampaign(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("PostHandlerCreatePostCampaign", p.tracer, c.Request())
@@ -720,6 +716,7 @@ func (p postHandler) SearchPostsByHashTagByGuest(c echo.Context) error {
 	hashTagsInfo, err := p.PostService.SearchForPostsByHashTagByGuest(ctx, hashTag)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 

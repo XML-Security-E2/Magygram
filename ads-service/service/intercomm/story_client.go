@@ -3,7 +3,9 @@ package intercomm
 import (
 	"ads-service/conf"
 	"ads-service/domain/model"
+	"ads-service/tracer"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,8 +17,8 @@ import (
 )
 
 type StoryClient interface {
-	GetStoryMedia(storyIds []string) ([]*model.IdMediaWebsiteResponse, error)
-	CreateStoryCampagin(bearer string, request *multipart.FileHeader) (string, error)
+	GetStoryMedia(ctx context.Context, storyIds []string) ([]*model.IdMediaWebsiteResponse, error)
+	CreateStoryCampagin(ctx context.Context, bearer string, request *multipart.FileHeader) (string, error)
 }
 
 type storyClient struct {}
@@ -31,15 +33,18 @@ var (
 )
 
 
-func (s storyClient) GetStoryMedia(storyIds []string) ([]*model.IdMediaWebsiteResponse, error) {
+func (s storyClient) GetStoryMedia(ctx context.Context, storyIds []string) ([]*model.IdMediaWebsiteResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryClientGetStoryMedia")
+	defer span.Finish()
+
 	requ := IdsRequests{Users: storyIds}
 	jsonRequest, _ := json.Marshal(requ)
 
-
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/media/first/preview", baseStorytUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/media/first/preview", baseStorytUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Set("Content-Type", "application/json")
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -67,7 +72,10 @@ func (s storyClient) GetStoryMedia(storyIds []string) ([]*model.IdMediaWebsiteRe
 
 
 
-func (s storyClient) CreateStoryCampagin(bearer string, media *multipart.FileHeader) (string, error) {
+func (s storyClient) CreateStoryCampagin(ctx context.Context, bearer string, media *multipart.FileHeader) (string, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryClientCreateStoryCampagin")
+	defer span.Finish()
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	var fw io.Writer
@@ -87,7 +95,7 @@ func (s storyClient) CreateStoryCampagin(bearer string, media *multipart.FileHea
 	}
 	writer.Close()
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/campaign/agent", baseStorytUrl), bytes.NewReader(body.Bytes()))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/campaign/agent", baseStorytUrl), bytes.NewReader(body.Bytes()))
 	if err != nil {
 		return "", err
 	}
@@ -95,6 +103,7 @@ func (s storyClient) CreateStoryCampagin(bearer string, media *multipart.FileHea
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
+	tracer.Inject(span, req)
 
 	resp, err := client.Do(req)
 	if err != nil || resp.StatusCode != 201 {

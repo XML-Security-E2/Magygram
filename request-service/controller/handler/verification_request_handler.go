@@ -3,14 +3,14 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/opentracing/opentracing-go"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"request-service/domain/model"
-	"request-service/domain/service-contracts"
 	"request-service/tracer"
+
+	"github.com/labstack/echo"
+	"github.com/opentracing/opentracing-go"
 )
 
 type VerificationRequestHandler interface {
@@ -29,8 +29,8 @@ type VerificationRequestHandler interface {
 
 type verificationRequestHandler struct {
 	VerificationRequestService service_contracts.VerificationRequestService
-	tracer      opentracing.Tracer
-	closer      io.Closer
+	tracer                     opentracing.Tracer
+	closer                     io.Closer
 }
 
 func NewVerificationRequestHandler(u service_contracts.VerificationRequestService) VerificationRequestHandler {
@@ -61,16 +61,17 @@ func (v verificationRequestHandler) CreateVerificationRequest(c echo.Context) er
 	var formValues = mpf.Value
 
 	var verificationRequestDTO = model.VerificationRequestDTO{
-		Name: formValues["name"][0],
-		Surname: formValues["surname"][0],
+		Name:     formValues["name"][0],
+		Surname:  formValues["surname"][0],
 		Category: formValues["category"][0],
 	}
 
 	bearer := c.Request().Header.Get("Authorization")
 
-	request, err := v.VerificationRequestService.CreateVerificationRequest(ctx, verificationRequestDTO, bearer ,headers)
+	request, err := v.VerificationRequestService.CreateVerificationRequest(ctx, verificationRequestDTO, bearer, headers)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -86,6 +87,7 @@ func (v verificationRequestHandler) CreateCampaignRequest(c echo.Context) error 
 
 	campaignRequest := &model.CampaignRequestDTO{}
 	if err := c.Bind(campaignRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -99,6 +101,7 @@ func (v verificationRequestHandler) CreateCampaignRequest(c echo.Context) error 
 	request, err := v.VerificationRequestService.CreateCampaignRequest(ctx, bearer, campaignRequest)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -114,6 +117,7 @@ func (v verificationRequestHandler) CreateReportRequest(c echo.Context) error {
 
 	reportRequest := &model.ReportRequestDTO{}
 	if err := c.Bind(reportRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -127,6 +131,7 @@ func (v verificationRequestHandler) CreateReportRequest(c echo.Context) error {
 	request, err := v.VerificationRequestService.CreateReportRequest(ctx, bearer, reportRequest)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -148,6 +153,7 @@ func (v verificationRequestHandler) GetVerificationRequests(c echo.Context) erro
 
 	retVal, err := v.VerificationRequestService.GetVerificationRequests(ctx)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -171,6 +177,7 @@ func (v verificationRequestHandler) GetCampaignRequests(c echo.Context) error {
 
 	retVal, err := v.VerificationRequestService.GetCampaignRequests(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -192,6 +199,7 @@ func (v verificationRequestHandler) GetReportRequests(c echo.Context) error {
 
 	retVal, err := v.VerificationRequestService.GetReportRequests(ctx)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -215,6 +223,7 @@ func (v verificationRequestHandler) DeleteCampaignRequest(c echo.Context) error 
 
 	err := v.VerificationRequestService.DeleteCampaignRequest(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -238,6 +247,7 @@ func (v verificationRequestHandler) DeleteReportRequest(c echo.Context) error {
 
 	err := v.VerificationRequestService.DeleteReportRequest(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -261,6 +271,7 @@ func (v verificationRequestHandler) ApproveVerificationRequest(c echo.Context) e
 
 	err := v.VerificationRequestService.ApproveVerificationRequest(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -284,6 +295,7 @@ func (v verificationRequestHandler) RejectVerificationRequest(c echo.Context) er
 
 	err := v.VerificationRequestService.RejectVerificationRequest(ctx, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -305,8 +317,9 @@ func (v verificationRequestHandler) HasUserPendingRequest(c echo.Context) error 
 
 	bearer := c.Request().Header.Get("Authorization")
 
-	result,err := v.VerificationRequestService.HasUserPendingRequest(ctx, bearer)
+	result, err := v.VerificationRequestService.HasUserPendingRequest(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

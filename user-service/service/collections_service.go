@@ -10,6 +10,7 @@ import (
 	"user-service/domain/service-contracts"
 	"user-service/logger"
 	"user-service/service/intercomm"
+	"user-service/tracer"
 )
 
 type collectionsService struct {
@@ -23,6 +24,9 @@ func NewCollectionsService(r repository.UserRepository, ic 	intercomm.AuthClient
 }
 
 func (c collectionsService) CreateCollection(ctx context.Context, bearer string, collectionName string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCreateCollection")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
@@ -51,6 +55,9 @@ func (c collectionsService) CreateCollection(ctx context.Context, bearer string,
 }
 
 func (c collectionsService) AddPostToCollection(ctx context.Context, bearer string, favouritePostRequest *model.FavouritePostRequest) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceAddPostToCollection")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	userId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
@@ -80,7 +87,7 @@ func (c collectionsService) AddPostToCollection(ctx context.Context, bearer stri
 		}
 	}
 
-	postImage, err := c.PostClient.GetPostsFirstImage(favouritePostRequest.PostId)
+	postImage, err := c.PostClient.GetPostsFirstImage(ctx, favouritePostRequest.PostId)
 	if err != nil {
 		return err
 	}
@@ -131,6 +138,10 @@ func isPostInDefaultCollection(media []model.IdWithMedia, id string) bool {
 }
 
 func (c collectionsService) GetUsersCollections(ctx context.Context, bearer string, except string) (map[string][]model.IdWithMedia, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetUsersCollections")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -160,6 +171,10 @@ func (c collectionsService) GetUsersCollections(ctx context.Context, bearer stri
 }
 
 func (c collectionsService) CheckIfPostsInFavourites(ctx context.Context, bearer string, postIds *[]string) ([]*model.PostIdFavouritesFlag, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceCheckIfPostsInFavourites")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err
@@ -187,6 +202,10 @@ func (c collectionsService) CheckIfPostsInFavourites(ctx context.Context, bearer
 }
 
 func (c collectionsService) DeletePostFromCollections(ctx context.Context, bearer string, postId string) error {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceDeletePostFromCollections")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return err
@@ -233,6 +252,10 @@ func deletePostFromCollection(collection []model.IdWithMedia, postId string) []m
 
 
 func (c collectionsService) GetCollectionPosts(ctx context.Context, bearer string, collectionName string) ([]*model.PostProfileResponse, error) {
+	span := tracer.StartSpanFromContext(ctx, "UserServiceGetCollectionPosts")
+	defer span.Finish()
+	ctx = tracer.ContextWithSpan(ctx, span)
+
 	userId, err := c.AuthClient.GetLoggedUserId(ctx, bearer)
 	if err != nil {
 		return nil, err

@@ -198,7 +198,6 @@ func (h *userHandler) ChangeUsersNotificationsSettings(c echo.Context) error {
 func (h *userHandler) GetUsersForPostNotification(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("UserHandlerGetUsersForPostNotification", h.tracer, c.Request())
 	defer span.Finish()
-
 	span.LogFields(
 		tracer.LogString("handler", fmt.Sprintf("handling get users post notification at %s\n", c.Path())),
 	)
@@ -223,7 +222,6 @@ func (h *userHandler) GetUsersForPostNotification(c echo.Context) error {
 func (h *userHandler) GetUsersForStoryNotification(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("UserHandlerGetUsersForStoryNotification", h.tracer, c.Request())
 	defer span.Finish()
-
 	span.LogFields(
 		tracer.LogString("handler", fmt.Sprintf("handling get users for story notification at %s\n", c.Path())),
 	)
@@ -248,7 +246,6 @@ func (h *userHandler) GetUsersForStoryNotification(c echo.Context) error {
 func (h *userHandler) CheckIfPostInteractionNotificationEnabled(c echo.Context) error {
 	span := tracer.StartSpanFromRequest("UserHandlerCheckIfPostInteractionNotificationEnabled", h.tracer, c.Request())
 	defer span.Finish()
-
 	span.LogFields(
 		tracer.LogString("handler", fmt.Sprintf("handling check if post interaction notification enabled at %s\n", c.Path())),
 	)
@@ -281,9 +278,16 @@ func (h *userHandler) UserLoggingMiddleware(next echo.HandlerFunc) echo.HandlerF
 }
 
 func (h *userHandler) EditUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerEditUser", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling edit user at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 	userRequest := &model.EditUserRequest{}
 	if err := c.Bind(userRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -291,10 +295,12 @@ func (h *userHandler) EditUser(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
+
 	updatedId, err := h.UserService.EditUser(ctx, bearer, userId, userRequest)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -306,8 +312,15 @@ func (h *userHandler) EditUser(c echo.Context) error {
 }
 
 func (h *userHandler) EditUsersNotifications(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerEditUsersNotifications", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling edit users notifications at %s\n", c.Path())),
+	)
+
 	notificationReq := &model.NotificationSettingsUpdateReq{}
 	if err := c.Bind(notificationReq); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -315,10 +328,12 @@ func (h *userHandler) EditUsersNotifications(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
+
 	err := h.UserService.EditUsersNotifications(ctx, bearer, notificationReq)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -326,8 +341,15 @@ func (h *userHandler) EditUsersNotifications(c echo.Context) error {
 }
 
 func (h *userHandler) EditUsersPrivacySettings(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerEditUsersPrivacySettings", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling edit users privacy settings at %s\n", c.Path())),
+	)
+
 	privacySettingsReq := &model.PrivacySettings{}
 	if err := c.Bind(privacySettingsReq); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -335,10 +357,12 @@ func (h *userHandler) EditUsersPrivacySettings(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
+
 	err := h.UserService.EditUsersPrivacySettings(ctx, bearer, privacySettingsReq)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -346,6 +370,12 @@ func (h *userHandler) EditUsersPrivacySettings(c echo.Context) error {
 }
 
 func (h *userHandler) EditUserImage(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerEditUserImage", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling edit user image at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	mpf, _ := c.MultipartForm()
@@ -358,10 +388,12 @@ func (h *userHandler) EditUserImage(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
+
 	url, err := h.UserService.EditUserImage(ctx, bearer, userId, headers)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -420,6 +452,7 @@ func (h *userHandler) ActivateUser(c echo.Context) error {
 
 	activated, err := h.UserService.ActivateUser(ctx, activationId)
 	if err != nil || activated == false {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "User can not be activated.")
 	}
 
@@ -432,16 +465,24 @@ func (h *userHandler) ActivateUser(c echo.Context) error {
 }
 
 func (h *userHandler) ResendActivationLink(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerResendActivationLink", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling resend activation link at %s\n", c.Path())),
+	)
 
 	activateLinkRequest := &model.ActivateLinkRequest{}
 	if err := c.Bind(activateLinkRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
 	ctx := c.Request().Context()
+	ctx = tracer.ContextWithSpan(ctx, span)
 	_, err := h.UserService.ResendActivationLink(ctx, activateLinkRequest)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return ErrWrongCredentials
 	}
 
@@ -449,16 +490,25 @@ func (h *userHandler) ResendActivationLink(c echo.Context) error {
 }
 
 func (h *userHandler) ResetPasswordRequest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerResetPasswordRequest", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling reset password request at %s\n", c.Path())),
+	)
+
 	resetPasswordRequest := &model.ResetPasswordRequest{}
 	if err := c.Bind(resetPasswordRequest); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
 	ctx := c.Request().Context()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	_, err := h.UserService.ResetPassword(ctx, resetPasswordRequest.Email)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -466,6 +516,11 @@ func (h *userHandler) ResetPasswordRequest(c echo.Context) error {
 }
 
 func (h *userHandler) ResetPasswordActivation(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerResetPasswordActivation", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling reset password activation at %s\n", c.Path())),
+	)
 
 	resetPasswordId := c.Param("resetPasswordId")
 
@@ -473,9 +528,11 @@ func (h *userHandler) ResetPasswordActivation(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	activated, err := h.UserService.ResetPasswordActivation(ctx, resetPasswordId)
 	if err != nil || activated == false {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "User can not reset password.")
 	}
 
@@ -483,16 +540,24 @@ func (h *userHandler) ResetPasswordActivation(c echo.Context) error {
 }
 
 func (h *userHandler) ChangeNewPassword(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerChangeNewPassword", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling change new password at %s\n", c.Path())),
+	)
+
 	changeNewPasswordRequest := &model.ChangeNewPasswordRequest{}
 	if err := c.Bind(changeNewPasswordRequest); err != nil {
 		return err
 	}
 
 	ctx := c.Request().Context()
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	successful, err := h.UserService.ChangeNewPassword(ctx, changeNewPasswordRequest)
 
 	if err != nil || !successful {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -500,16 +565,24 @@ func (h *userHandler) ChangeNewPassword(c echo.Context) error {
 }
 
 func (h *userHandler) GetUserEmailIfUserExist(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerGetUserEmailIfUserExist", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get user email if user exists at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	user, err := h.UserService.GetUserEmailIfUserExist(ctx, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -519,16 +592,24 @@ func (h *userHandler) GetUserEmailIfUserExist(c echo.Context) error {
 }
 
 func (h *userHandler) GetUserById(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerGetUserById", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get user by id at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	user, err := h.UserService.GetUserById(ctx, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -592,16 +673,24 @@ func (h *userHandler) SearchForInfluencerByUsername(c echo.Context) error {
 }
 
 func (h *userHandler) SearchForUsersByUsernameByGuest(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerSearchForUsersByUsernameByGuest", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling search for influencers by username by guest at %s\n", c.Path())),
+	)
+
 	username := c.Param("username")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	users, err := h.UserService.SearchForUsersByUsernameByGuest(ctx, username)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't find any users")
 	}
 
@@ -624,6 +713,7 @@ func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
 	ctx = tracer.ContextWithSpan(ctx, span)
 	userInfo, err := h.UserService.GetLoggedUserInfo(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
 	}
 
@@ -631,14 +721,23 @@ func (h *userHandler) GetLoggedUserInfo(c echo.Context) error {
 }
 
 func (h *userHandler) GetLoggedUserTargetGroup(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerGetLoggedUserTargetGroup", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get logged user target group at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 	userInfo, err := h.UserService.GetLoggedUserTargetGroup(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
 	}
 
@@ -646,7 +745,14 @@ func (h *userHandler) GetLoggedUserTargetGroup(c echo.Context) error {
 }
 
 func (h *userHandler) GetLoggedAgentInfo(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerGetLoggedAgentInfo", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get logged agent info at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	if ctx == nil {
@@ -654,6 +760,7 @@ func (h *userHandler) GetLoggedAgentInfo(c echo.Context) error {
 	}
 	userInfo, err := h.UserService.GetLoggedAgentInfo(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized")
 	}
 
@@ -704,6 +811,7 @@ func (h *userHandler) IsUserPrivate(c echo.Context) error {
 	user, err := h.UserService.GetUserById(ctx, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -731,6 +839,7 @@ func (h *userHandler) GetFollowedUsers(c echo.Context) error {
 	}
 	users, err := h.UserService.GetFollowedUsers(ctx, bearer, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -763,6 +872,7 @@ func (h *userHandler) GetFollowingUsers(c echo.Context) error {
 	}
 	users, err := h.UserService.GetFollowingUsers(ctx, bearer, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -796,6 +906,7 @@ func (h *userHandler) FollowUser(c echo.Context) error {
 	followRequest, err := h.UserService.FollowUser(ctx, bearer, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -827,6 +938,7 @@ func (h *userHandler) MuteUser(c echo.Context) error {
 	err := h.UserService.MuteUser(ctx, bearer, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -855,6 +967,7 @@ func (h *userHandler) UnmuteUser(c echo.Context) error {
 	err := h.UserService.UnmuteUser(ctx, bearer, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -941,6 +1054,7 @@ func (h *userHandler) UnollowUser(c echo.Context) error {
 	err := h.UserService.UnfollowUser(ctx, bearer, userId)
 
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, "User not found.")
 	}
 
@@ -967,6 +1081,7 @@ func (h *userHandler) GetFollowRequests(c echo.Context) error {
 
 	reqs, err := h.UserService.GetFollowRequests(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		switch t := err.(type) {
 		default:
 			return echo.NewHTTPError(http.StatusInternalServerError, t.Error())
@@ -992,14 +1107,15 @@ func (h *userHandler) AcceptFollowRequest(c echo.Context) error {
 		ctx = context.Background()
 	}
 	ctx = tracer.ContextWithSpan(ctx, span)
-
 	bearer := c.Request().Header.Get("Authorization")
+
 	if bearer == "" {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
 
 	err := h.UserService.AcceptFollowRequest(ctx, bearer, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1007,13 +1123,19 @@ func (h *userHandler) AcceptFollowRequest(c echo.Context) error {
 }
 
 func (h *userHandler) UpdateLikedPost(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerUpdateLikedPost", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling update liked post at %s\n", c.Path())),
+	)
+
 	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	if bearer == "" {
@@ -1022,6 +1144,7 @@ func (h *userHandler) UpdateLikedPost(c echo.Context) error {
 
 	err := h.UserService.UpdateLikedPost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1029,13 +1152,19 @@ func (h *userHandler) UpdateLikedPost(c echo.Context) error {
 }
 
 func (h *userHandler) UpdateDislikedPost(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerUpdateDisikedPost", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling update disliked post at %s\n", c.Path())),
+	)
+
 	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	if bearer == "" {
@@ -1044,6 +1173,7 @@ func (h *userHandler) UpdateDislikedPost(c echo.Context) error {
 
 	err := h.UserService.UpdateDislikedPost(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1070,6 +1200,7 @@ func (h *userHandler) GetUserLikedPost(c echo.Context) error {
 
 	retVal, err := h.UserService.GetUserLikedPost(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1096,6 +1227,7 @@ func (h *userHandler) GetUserDislikedPost(c echo.Context) error {
 
 	retVal, err := h.UserService.GetUserDislikedPost(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1103,6 +1235,12 @@ func (h *userHandler) GetUserDislikedPost(c echo.Context) error {
 }
 
 func (h *userHandler) VerifyUser(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerVerifyUser", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling verify user at %s\n", c.Path())),
+	)
+
 	verifyAccountDTO := &model.VerifyAccountDTO{}
 	if err := c.Bind(verifyAccountDTO); err != nil {
 		return err
@@ -1112,9 +1250,11 @@ func (h *userHandler) VerifyUser(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	err := h.UserService.VerifyUser(ctx, verifyAccountDTO)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1122,15 +1262,22 @@ func (h *userHandler) VerifyUser(c echo.Context) error {
 }
 
 func (h *userHandler) CheckIfUserVerified(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerCheckIfUserVerified", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling check if user verified at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	result, err := h.UserService.CheckIfUserVerified(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1138,15 +1285,22 @@ func (h *userHandler) CheckIfUserVerified(c echo.Context) error {
 }
 
 func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerGetFollowRecommendation", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling get follow recommendation at %s\n", c.Path())),
+	)
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	result, err := h.UserService.GetFollowRecommendation(ctx, bearer)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1154,8 +1308,15 @@ func (h *userHandler) GetFollowRecommendation(c echo.Context) error {
 }
 
 func (h *userHandler) RegisterAgent(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerRegisterAgent", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling register agent at %s\n", c.Path())),
+	)
+
 	agentRegistrationDTO := &model.AgentRegistrationDTO{}
 	if err := c.Bind(agentRegistrationDTO); err != nil {
+		tracer.LogError(span, err)
 		return err
 	}
 
@@ -1163,9 +1324,11 @@ func (h *userHandler) RegisterAgent(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	result, err := h.UserService.RegisterAgent(ctx, agentRegistrationDTO)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1173,13 +1336,18 @@ func (h *userHandler) RegisterAgent(c echo.Context) error {
 }
 
 func (h *userHandler) AddComment(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerAddComment", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling add comment at %s\n", c.Path())),
+	)
 	postId := c.Param("postId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-
+	ctx = tracer.ContextWithSpan(ctx, span)
 	bearer := c.Request().Header.Get("Authorization")
 
 	if bearer == "" {
@@ -1188,6 +1356,7 @@ func (h *userHandler) AddComment(c echo.Context) error {
 
 	err := h.UserService.AddComment(ctx, bearer, postId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1195,15 +1364,23 @@ func (h *userHandler) AddComment(c echo.Context) error {
 }
 
 func (h *userHandler) CheckIfUserVerifiedById(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerCheckIfUserVerifiedById", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling check if user verified by id at %s\n", c.Path())),
+	)
+
 	userId := c.Param("userId")
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	result, err := h.UserService.CheckIfUserVerifiedById(ctx, userId)
 	if err != nil {
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
@@ -1211,6 +1388,12 @@ func (h *userHandler) CheckIfUserVerifiedById(c echo.Context) error {
 }
 
 func (h *userHandler) RegisterAgentByAdmin(c echo.Context) error {
+	span := tracer.StartSpanFromRequest("UserHandlerRegisterAgentByAdmin", h.tracer, c.Request())
+	defer span.Finish()
+	span.LogFields(
+		tracer.LogString("handler", fmt.Sprintf("handling register agent by admin at %s\n", c.Path())),
+	)
+
 	agentRequest := &model.AgentRequest{}
 	if err := c.Bind(agentRequest); err != nil {
 		return err
@@ -1220,12 +1403,13 @@ func (h *userHandler) RegisterAgentByAdmin(c echo.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	ctx = tracer.ContextWithSpan(ctx, span)
 
 	resp, err := h.UserService.RegisterAgentByAdmin(ctx, agentRequest)
 
 	if err != nil {
 		fmt.Println(err)
-
+		tracer.LogError(span, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

@@ -2,6 +2,7 @@ package intercomm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,11 +13,12 @@ import (
 	"user-service/conf"
 	"user-service/domain/model"
 	"user-service/logger"
+	"user-service/tracer"
 )
 
 type StoryClient interface {
-	GetStoryHighlightIfValid(bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error)
-	EditStoryOwnerInfo(bearer string, userInfo model.UserInfo) error
+	GetStoryHighlightIfValid(ctx context.Context, bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error)
+	EditStoryOwnerInfo(ctx context.Context, bearer string, userInfo model.UserInfo) error
 }
 
 type storyClient struct {}
@@ -31,13 +33,16 @@ var (
 )
 
 
-func (s storyClient) EditStoryOwnerInfo(bearer string, userInfo model.UserInfo) error {
+func (s storyClient) EditStoryOwnerInfo(ctx context.Context, bearer string, userInfo model.UserInfo) error {
+	span := tracer.StartSpanFromContext(ctx, "StoryClientEditStoryOwnerInfo")
+	defer span.Finish()
+
 	jsonRequest, _ := json.Marshal(userInfo)
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/user-info", baseStorytUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"PUT", fmt.Sprintf("%s/user-info", baseStorytUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
-
+	tracer.Inject(span, req)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 
@@ -52,12 +57,16 @@ func (s storyClient) EditStoryOwnerInfo(bearer string, userInfo model.UserInfo) 
 }
 
 
-func (s storyClient) GetStoryHighlightIfValid(bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error) {
+func (s storyClient) GetStoryHighlightIfValid(ctx context.Context, bearer string, request *model.HighlightRequest) (*model.HighlightImageWithMedia, error) {
+	span := tracer.StartSpanFromContext(ctx, "StoryClientGetStoryHighlightIfValid")
+	defer span.Finish()
+
 	jsonRequest, _ := json.Marshal(request)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/highlights", baseStorytUrl), bytes.NewBuffer(jsonRequest))
+	req, err := http.NewRequestWithContext(ctx,"POST", fmt.Sprintf("%s/highlights", baseStorytUrl), bytes.NewBuffer(jsonRequest))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json")
+	tracer.Inject(span, req)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(conf.Current.Server.Secret), bcrypt.MinCost)
 	req.Header.Add(conf.Current.Server.Handshake, string(hash))
 
