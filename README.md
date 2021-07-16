@@ -1,4 +1,3 @@
-
 # MagyGram - Replica of Instagram
 
 ## About
@@ -19,16 +18,6 @@ About text
 # More about technologies in our project
 
 <details>
-  <summary>GoLang echo</summary><details>
-  Tekst
-</details>
-
-<details>
-  <summary>React JS Redux</summary><details>
-  Tekst
-</details>
-
-<details>
-  <summary>PostgreSQL</summary><details>
+  <summary>GoLang echo</summary>
   Tekst
 </details>
