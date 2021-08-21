@@ -3,9 +3,11 @@
 
 ## About
 
-About text
+Application similar to Instagram, social network service for sharing photo and video. User can upload
+photo and video, like, dislike and comment other posts. Follow other users, and messanging to them.
+The application also supports agents for creating and monitoring campaigns.
 
-# Technologies
+##Technologies
 
 * GoLang (echo framework) - backend
 * React JS Redux (Hooks) - frontend
@@ -15,6 +17,12 @@ About text
 * Neo4j graph 
 * Nginx
 * Microservice architecture
+
+## Running in Docker
+
+This commands starts 11 back-end microservices, databases  and 2 React JS applications (Nistagram App and Agent's App)
+
+#### `docker-compose -f docker-compose-prod.yml up --build`
 
 # Images
 
@@ -33,19 +41,3 @@ About text
   <img src="https://user-images.githubusercontent.com/57506510/126015068-a9d706ff-a903-4fcc-bbff-0eeb3e0c7d4f.jpg" name="image-name">
 </details>
 
-# More about technologies in our project
-
-<details>
-  <summary>Microservices architecture</summary>
-  Tekst
-</details>
-
-<details>
-  <summary>Databases</summary>
-  Tekst
-</details>
-
-<details>
-  <summary>Security</summary>
-  Tekst
-</details>
