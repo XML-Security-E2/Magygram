@@ -7,7 +7,7 @@ Application similar to Instagram, social network service for sharing photo and v
 photo and video, like, dislike and comment other posts. Follow other users, and messanging to them.
 The application also supports agents for creating and monitoring campaigns.
 
-##Technologies
+## Technologies
 
 * GoLang (echo framework) - backend
 * React JS Redux (Hooks) - frontend
